@@ -95,7 +95,7 @@
     </style>
     
     <!-- Custom styles for this template -->
-    <link href="assets/dist/css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
   </head>
   <body class="bg-body-tertiary">
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
@@ -157,14 +157,14 @@
       <h2>Form Registrasi Pasien Lee Tit Tar</h2>
     </div>
 
-    <div class="row g-5">
+    <div class="row g-5" id="dataPasienForm">
       <div class="col-md-7 col-lg-8">
         <h4 class="mb-3">Data Pasien</h4>
         <form class="needs-validation" novalidate>
           <div class="row g-3">
             <div class="col-sm-6">
-              <label for="fullname" class="form-label">Nama Lengkap</label>
-              <input type="text" class="form-control" id="fullname" placeholder="John Doe" value="" required>
+              <label for="fullName" class="form-label">Nama Lengkap</label>
+              <input type="text" class="form-control" id="fullName" placeholder="John Doe" value="" required>
             </div>
 
             <div class="col-sm-6">
@@ -175,7 +175,7 @@
             <div class="col-12">
               <label for="age" class="form-label">Umur</label>
               <div class="input-group has-validation">
-                <input type="text" class="form-control" id="age" placeholder="32" required>
+                <input type="number" class="form-control" id="age" placeholder="32" required>
               </div>
             </div>
 
@@ -192,7 +192,7 @@
             <div class="col-md-5">
               <label class="form-label">Riwayat Penyakit</label>
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="healthHistory1" value="heartDisease" required>
+                <input class="form-check-input" type="checkbox" id="healthHistory1" value="heartDisease">
                 <label class="form-check-label" for="healthHistory1">
                   Sakit Jantung
                 </label>
@@ -228,9 +228,9 @@
             </div>
           </div>
 
-          <hr class="my-4">
+          <!-- <hr class="my-4"> -->
 
-          <h4 class="mb-3">Payment</h4>
+          <!-- <h4 class="mb-3">Payment</h4>
 
           <div class="my-3">
             <div class="form-check">
@@ -245,9 +245,9 @@
               <input id="paypal" name="paymentMethod" type="radio" class="form-check-input" required>
               <label class="form-check-label" for="paypal">PayPal</label>
             </div>
-          </div>
+          </div> -->
 
-          <div class="row gy-3">
+          <!-- <div class="row gy-3">
             <div class="col-md-6">
               <label for="cc-name" class="form-label">Name on card</label>
               <input type="text" class="form-control" id="cc-name" placeholder="" required>
@@ -255,9 +255,9 @@
               <div class="invalid-feedback">
                 Name on card is required
               </div>
-            </div>
+            </div> -->
 
-            <div class="col-md-6">
+            <!-- <div class="col-md-6">
               <label for="cc-number" class="form-label">Credit card number</label>
               <input type="text" class="form-control" id="cc-number" placeholder="" required>
               <div class="invalid-feedback">
@@ -279,12 +279,12 @@
               <div class="invalid-feedback">
                 Security code required
               </div>
-            </div>
-          </div>
+            </div> -->
+          <!-- </div> -->
 
-          <hr class="my-4">
+          <!-- <hr class="my-4"> -->
 
-          <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+          <button class="w-100 btn btn-primary btn-lg" type="submit" id="submitRegistration">Submit</button>
         </form>
       </div>
     </div>
@@ -299,7 +299,8 @@
     </ul>
   </footer>
 </div>
+<script src="bundle.js"></script>
 <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="assets/dist/css/main.css"></script></body>
+<script src="bundle.js"></script>
+<link rel="stylesheet" href="css/main.css"></body>
 </html>
