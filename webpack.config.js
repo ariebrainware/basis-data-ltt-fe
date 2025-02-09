@@ -34,10 +34,10 @@ module.exports = {
           from: "assets/js/color-modes.js",
           to: "assets/js/color-modes.js"
         },
-        {
-          from: "assets/js/main.js",
-          to: "assets/js/main.js"
-        },
+        // {
+        //   from: "assets/js/main.js",
+        //   to: "assets/js/main.js"
+        // },
         {
           from: "assets/dist/js/bootstrap.bundle.min.js",
           to: "assets/dist/js/bootstrap.bundle.min.js"
