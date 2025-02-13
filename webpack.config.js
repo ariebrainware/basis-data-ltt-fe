@@ -31,6 +31,10 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
+          from: 'patients.html',
+          to: 'patients.html'
+        },
+        {
           from: "assets/js/color-modes.js",
           to: "assets/js/color-modes.js"
         },

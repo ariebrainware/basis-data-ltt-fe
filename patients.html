@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Patient Data</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="mb-4 text-center">Patient Data</h1>
+        <div class="table-responsive">
+            <table id="patientTable" class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Phone Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Patient data will be populated here -->
+                    <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        fetchPatients()
+                            .then(patients => {
+                                // Define a Backbone model and collection for patients
+                                const Patient = Backbone.Model.extend({});
+                                const PatientCollection = Backbone.Collection.extend({
+                                    model: Patient
+                                });
+                                const patientsCollection = new PatientCollection(patients.data);
+
+                                // Define columns for Backgrid
+                                const columns = [
+                                    { name: "ID", label: "ID", cell: "string", editable: false },
+                                    { name: "full_name", label: "Name", cell: "string", editable: false },
+                                    { name: "age", label: "Age", cell: "integer", editable: false },
+                                    { name: "gender", label: "Gender", cell: "string", editable: false },
+                                    { name: "phone_number", label: "Phone Number", cell: "string", editable: false }
+                                ];
+
+                                // Initialize Backgrid grid
+                                const grid = new Backgrid.Grid({
+                                    columns: columns,
+                                    collection: patientsCollection
+                                });
+
+                                // Render the grid and add Bootstrap styling for a nicer table
+                                const tableResponsive = document.querySelector(".table-responsive");
+                                tableResponsive.innerHTML = "";
+                                const renderedGrid = grid.render().el;
+                                renderedGrid.classList.add("table", "table-striped", "table-hover", "table-bordered");
+                                tableResponsive.appendChild(renderedGrid);
+                            })
+                            .catch(error => console.error("Error fetching patients:", error));
+                    });
+                    </script>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Main JavaScript file where fetchPatient is defined -->
+    <script src="bundle.js"></script>
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

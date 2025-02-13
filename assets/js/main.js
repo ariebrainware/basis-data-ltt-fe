@@ -1,4 +1,15 @@
+import $ from 'jquery';
+window.$ = $;
+window.jQuery = $;
+
 import swal from 'sweetalert2';
+import Backbone from 'backbone';
+import Backgrid from 'backgrid';
+// Ensure Backbone uses the imported underscore (if needed)
+import _ from 'underscore';
+window._ = _;
+window.Backbone = Backbone;
+window.Backgrid = Backgrid;
 
 // Example starter JavaScript for disabling form submissions if there are invalid fields
 (() => {
@@ -65,3 +76,27 @@ async function registerPatient(patientData) {
   }
 }
 })()
+
+// ...existing code...
+export async function fetchPatients() {
+  try {
+    const response = await fetch('http://localhost:19091/patient', {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+  
+    if (!response.ok) {
+      throw new Error('Failed to fetch patients');
+    }
+  
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching patients:', error);
+  }
+}
+
+// Attach the function to the window object for global access:
+window.fetchPatients = fetchPatients;
