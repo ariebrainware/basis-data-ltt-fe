@@ -6,7 +6,7 @@ const getPosts = async () => {
     return response.json()
 }
 
-export default async function Post({ post }: { post: any }) {
+export default async function Post() {
     const posts = await getPosts()
 
     return (
