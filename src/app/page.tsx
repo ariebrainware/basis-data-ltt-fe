@@ -5,20 +5,21 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
+        {/* <Image
           className={styles.logo}
           src="/next.svg"
           alt="Next.js logo"
           width={180}
           height={38}
           priority
-        />
+        /> */}
+        <h1> Lee Tit Tar One Solution Web</h1>
         <ol>
           <li>
-            Get started by editing <code>src/app/page.tsx</code>.
+            <code>LOGIN</code> as Registered User(Patient) or Admin, you'll be redirected to related dashboard
           </li>
-          <li>Save and see your changes instantly.</li>
-          <li> Testing </li>
+          <li><code>REGISTER</code> as new User(Patient) </li>
+          <li> Take your pick right now! </li>
         </ol>
 
         <div className={styles.ctas}>
@@ -28,14 +29,14 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image
+            {/* <Image
               className={styles.logo}
               src="/vercel.svg"
               alt="Vercel logomark"
               width={20}
               height={20}
-            />
-            Deploy now
+            /> */}
+            LOGIN
           </a>
           <a
             href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
@@ -43,7 +44,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className={styles.secondary}
           >
-            Read our docs
+            REGISTER
           </a>
         </div>
       </main>
@@ -60,7 +61,7 @@ export default function Home() {
             width={16}
             height={16}
           />
-          Learn
+          Copyright 2025-3025 All Right Reserved
         </a>
         <a
           href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
@@ -74,7 +75,7 @@ export default function Home() {
             width={16}
             height={16}
           />
-          Examples
+          Made with Love by Arie Brainware
         </a>
         <a
           href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
@@ -88,7 +89,7 @@ export default function Home() {
             width={16}
             height={16}
           />
-          Go to nextjs.org →
+          Consult via WhatsApp
         </a>
       </footer>
     </div>
