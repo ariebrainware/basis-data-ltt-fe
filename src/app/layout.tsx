@@ -1,7 +1,11 @@
+"use client";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider, Button } from "@material-tailwind/react";
 import "./globals.css";
 
+export { ThemeProvider, Button };
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,7 +29,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <ThemeProvider>
         {children}
+        </ThemeProvider>
       </body>
     </html>
   );
