@@ -8,13 +8,12 @@ export default function Home() {
           <h1> Lee Tit Tar One Solution Web</h1>
           <ol>
             <li>
-              <code>LOGIN</code> as Registered User(Patient) or Admin, you'll be
-              redirected to related dashboard
+              <code>LOGIN</code> sebagai user(pasien) yang telah terdaftar atau admin, anda akan diarahkan ke dashboard utama
             </li>
             <li>
-              <code>REGISTER</code> as new User(Patient){" "}
+              <code>REGISTER</code> sebagai user(pasien) baru
             </li>
-            <li> Take your pick right now! </li>
+            <li> Pilih salah satu cuy! </li>
           </ol>
 
           <div className={styles.ctas}>
@@ -27,7 +26,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className={styles.secondary}
             >
-              REGISTER
+              DAFTAR
             </a>
           </div>
         </main>
@@ -72,7 +71,7 @@ export default function Home() {
               width={16}
               height={16}
             />
-            Consult via WhatsApp
+            Konsultasi via WhatsApp
           </a>
         </footer>
       </div>

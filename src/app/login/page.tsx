@@ -4,7 +4,7 @@ export default function Login() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-      <h1 className="text-3x1 font-bold underline">Try your memory</h1>
+      <h1 className="text-3x1 font-bold underline">Login Lee Tit Tar</h1>
         <div>
           <label htmlFor="username">Username </label>
           <input type="text" id="username" name="username" required />
