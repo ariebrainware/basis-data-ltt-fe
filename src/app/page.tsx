@@ -5,7 +5,7 @@ export default function Home() {
   return (
       <div className={styles.page}>
         <main className={styles.main}>
-          <h1> Lee Tit Tar One Solution Web</h1>
+          <text className="text-3xl font-bold antialiased"> Lee Tit Tar One Solution Web</text>
           <ol>
             <li>
               1. <code>LOGIN</code> sebagai user(pasien) yang telah terdaftar atau admin, anda akan diarahkan ke dashboard utama

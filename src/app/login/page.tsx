@@ -4,14 +4,14 @@ export default function Login() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-      <h1 className="text-3x1 font-bold underline">Login Lee Tit Tar</h1>
+      <text className="text-3xl font-bold antialiased">Login Lee Tit Tar</text>
         <div>
           <label htmlFor="username">Username </label>
-          <input type="text" id="username" name="username" required />
+          <input type="text" id="username" name="username" className="outline-solid rounded-sm m-8" required />
         </div>
         <div>
           <label htmlFor="password">Password </label>
-          <input type="password" id="password" name="password" required />
+          <input type="password" id="password" name="password" className="outline-solid rounded-sm" required />
         </div>
         <div className={styles.ctas}>
             <a
