@@ -8,12 +8,14 @@ export default function Home() {
           <h1> Lee Tit Tar One Solution Web</h1>
           <ol>
             <li>
-              <code>LOGIN</code> sebagai user(pasien) yang telah terdaftar atau admin, anda akan diarahkan ke dashboard utama
+              1. <code>LOGIN</code> sebagai user(pasien) yang telah terdaftar atau admin, anda akan diarahkan ke dashboard utama
             </li>
             <li>
-              <code>REGISTER</code> sebagai user(pasien) baru
+              2. <code>REGISTER</code> sebagai user(pasien) baru
             </li>
-            <li> Pilih salah satu cuy! </li>
+            <li> 
+              3. Pilih salah satu cuy! 
+            </li>
           </ol>
 
           <div className={styles.ctas}>
