@@ -1,7 +1,6 @@
-@import "tailwindcss";
-@import "tailwindcss/preflight";
-/* stylelint-disable at-rule-no-unknown */
-@tailwind utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
 
 :root {
   --background: #ffffff;
