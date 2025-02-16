@@ -27,11 +27,32 @@ export default function Register() {
         </div>
         <div>
           <label htmlFor="gender">Riwayat Penyakit </label>
-          <input type="text" id="gender" name="gender" required />
+          <div className="">
+            <label>
+              <input type="checkbox" name="healthHistory" value="diabetes" />
+              Sakit Jantung
+            </label>
+            <label>
+              <input type="checkbox" name="healthHistory" value="hipertensi" />
+              Kanker
+            </label>
+            <label>
+              <input type="checkbox" name="healthHistory" value="jantung" />
+              Diabetes
+            </label>
+            <label>
+              <input type="checkbox" name="healthHistory" value="asma" />
+              Pengapuran
+            </label>
+            <label>
+              <input type="checkbox" name="healthHistory" value="lainnya" />
+              Darah Rendah/Tinggi
+            </label>
+          </div>
         </div>
         <div>
-          <label htmlFor="gender">Umur </label>
-          <input type="text" id="gender" name="gender" required />
+          <label htmlFor="phone_number">Nomor HP </label>
+          <input type="text" id="phone_number" name="phone_number" required />
         </div>
         <div>
           <label htmlFor="gender">Umur </label>
