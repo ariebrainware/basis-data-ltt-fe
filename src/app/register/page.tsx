@@ -9,7 +9,10 @@ export default function Register() {
         </h1>
         <div className="relative w-full">
           <input
+            required
             type="text"
+            id="name"
+            name="name"
             className="peer w-full rounded-lg border border-slate-200 bg-transparent p-3 text-base text-slate-800 shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
             data-error="false"
             data-success="false"
@@ -18,58 +21,304 @@ export default function Register() {
           />
         </div>
         <div>
-          <label htmlFor="gender">Jenis Kelamin </label>
-          <input type="text" id="gender" name="gender" required />
+          <input
+            required
+            type="text"
+            id="gender"
+            name="gender"
+            className="peer w-full rounded-lg border border-slate-200 bg-transparent p-3 text-base text-slate-800 shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
+            data-error="false"
+            data-success="false"
+            data-icon-placement=""
+            placeholder="Jenis Kelamin (Pria/Wanita)"
+          />
         </div>
         <div>
-          <label htmlFor="age">Umur </label>
-          <input type="text" id="age" name="age" required />
+          <input
+            required
+            type="number"
+            id="age"
+            name="age"
+            className="peer w-full rounded-lg border border-slate-200 bg-transparent p-3 text-base text-slate-800 shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
+            data-error="false"
+            data-success="false"
+            data-icon-placement=""
+            placeholder="Umur"
+          />
         </div>
         <div>
-          <label htmlFor="job">Pekerjaan </label>
-          <input type="text" id="job" name="job" required />
+          <input
+            required
+            type="text"
+            id="job"
+            name="job"
+            className="peer w-full rounded-lg border border-slate-200 bg-transparent p-3 text-base text-slate-800 shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
+            data-error="false"
+            data-success="false"
+            data-icon-placement=""
+            placeholder="Pekerjaan"
+          />
         </div>
         <div>
-          <label htmlFor="address">Alamat </label>
-          <input type="text" id="address" name="address" required />
+          <textarea
+            rows={8}
+            id="address"
+            name="address"
+            placeholder="Alamat"
+            className="peer block w-full resize-none rounded-lg border border-slate-200 bg-transparent p-3.5 text-base leading-none text-slate-800 outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 dark:text-white"
+          ></textarea>
         </div>
-        <div>
-          <label htmlFor="gender">Riwayat Penyakit </label>
-          <div className="">
-            <label>
-              <input type="checkbox" name="healthHistory" value="diabetes" />
+        <div className="space-y-4 flex flex-col">
+          <p className="font-normal text-base antialiased">Riwayat Penyakit</p>
+          <div className="inline-flex items-center">
+            <label
+              className="flex items-center cursor-pointer relative"
+              htmlFor="default-checkbox"
+            >
+              <input
+                type="checkbox"
+                className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow-sm  border border-slate-200 checked:bg-slate-800 checked:border-slate-800"
+                id="default-checkbox"
+              />
+              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <svg
+                  fill="none"
+                  width="18px"
+                  height="18px"
+                  strokeWidth="2"
+                  color="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 13L9 17L19 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
+                </svg>
+              </span>
+            </label>
+            <label
+              className="cursor-pointer ml-2 text-slate-600 font-normal antialiased"
+              htmlFor="default-checkbox"
+            >
               Sakit Jantung
             </label>
-            <label>
-              <input type="checkbox" name="healthHistory" value="hipertensi" />
+          </div>
+          <div className="inline-flex items-center">
+            <label
+              className="flex items-center cursor-pointer relative"
+              htmlFor="checked-checkbox"
+            >
+              <input
+                type="checkbox"
+                className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow-sm  border border-slate-200 checked:bg-slate-800 checked:border-slate-800"
+                id="kanker"
+              />
+              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <svg
+                  fill="none"
+                  width="18px"
+                  height="18px"
+                  strokeWidth="2"
+                  color="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 13L9 17L19 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
+                </svg>
+              </span>
+            </label>
+            <label
+              className="cursor-pointer ml-2 text-slate-600 font-normal antialiased"
+              htmlFor="checkbox"
+            >
               Kanker
             </label>
-            <label>
-              <input type="checkbox" name="healthHistory" value="jantung" />
+          </div>
+          <div className="inline-flex items-center">
+            <label
+              className="flex items-center cursor-pointer relative"
+              htmlFor="checked-checkbox"
+            >
+              <input
+                type="checkbox"
+                className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow-sm  border border-slate-200 checked:bg-slate-800 checked:border-slate-800"
+                id="kanker"
+              />
+              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <svg
+                  fill="none"
+                  width="18px"
+                  height="18px"
+                  strokeWidth="2"
+                  color="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 13L9 17L19 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
+                </svg>
+              </span>
+            </label>
+            <label
+              className="cursor-pointer ml-2 text-slate-600 font-normal antialiased"
+              htmlFor="checkbox"
+            >
               Diabetes
             </label>
-            <label>
-              <input type="checkbox" name="healthHistory" value="asma" />
+          </div>
+          <div className="inline-flex items-center">
+            <label
+              className="flex items-center cursor-pointer relative"
+              htmlFor="checked-checkbox"
+            >
+              <input
+                type="checkbox"
+                className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow-sm  border border-slate-200 checked:bg-slate-800 checked:border-slate-800"
+                id="kanker"
+              />
+              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <svg
+                  fill="none"
+                  width="18px"
+                  height="18px"
+                  strokeWidth="2"
+                  color="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 13L9 17L19 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
+                </svg>
+              </span>
+            </label>
+            <label
+              className="cursor-pointer ml-2 text-slate-600 font-normal antialiased"
+              htmlFor="checkbox"
+            >
               Pengapuran
             </label>
-            <label>
-              <input type="checkbox" name="healthHistory" value="lainnya" />
+          </div>
+          <div className="inline-flex items-center">
+            <label
+              className="flex items-center cursor-pointer relative"
+              htmlFor="checked-checkbox"
+            >
+              <input
+                type="checkbox"
+                className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow-sm  border border-slate-200 checked:bg-slate-800 checked:border-slate-800"
+                id="kanker"
+              />
+              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <svg
+                  fill="none"
+                  width="18px"
+                  height="18px"
+                  strokeWidth="2"
+                  color="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 13L9 17L19 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
+                </svg>
+              </span>
+            </label>
+            <label
+              className="cursor-pointer ml-2 text-slate-600 font-normal antialiased"
+              htmlFor="checkbox"
+            >
               Darah Rendah/Tinggi
             </label>
           </div>
         </div>
         <div>
-          <label htmlFor="phone_number">Nomor HP </label>
-          <input type="text" id="phone_number" name="phone_number" required />
-        </div>
-        <div>
-          <label htmlFor="gender">Umur </label>
-          <input type="text" id="gender" name="gender" required />
+          <input
+            required
+            type="text"
+            id="phoneNumber"
+            name="phoneNumber"
+            className="peer w-full rounded-lg border border-slate-200 bg-transparent p-3 text-base text-slate-800 shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
+            data-error="false"
+            data-success="false"
+            data-icon-placement=""
+            placeholder="Nomor Telepon"
+          />
         </div>
         <div className={styles.ctas}>
           <a className={styles.primary} href="/login">
             DAFTAR
           </a>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label
+            className="flex items-center cursor-pointer relative"
+            htmlFor="checkbox-with-link"
+          >
+            <input
+              type="checkbox"
+              className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow-sm  border border-slate-200 checked:bg-slate-800 checked:border-slate-800"
+              id="checkbox-with-link"
+            />
+            <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <svg
+                fill="none"
+                width="18px"
+                height="18px"
+                strokeWidth="2"
+                color="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5 13L9 17L19 7"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></path>
+              </svg>
+            </span>
+          </label>
+          <label
+            className="cursor-pointer text-slate-600 antialiased"
+            htmlFor="checkbox-with-link"
+          >
+            Saya setuju dengan{' '}
+            <a
+              href="/termcondition"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-800"
+            >
+              syarat dan ketentuan
+            </a>
+          </label>
         </div>
       </main>
     </div>
