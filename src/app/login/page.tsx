@@ -21,6 +21,11 @@ async function sendLoginRequest() {
 
   const responseData = await data.json()
   const token = responseData.data
+  if (token) {
+    alert('Login successful!')
+  } else {
+    alert('Login failed!')
+  }
   return data
 }
 export default function Login() {
