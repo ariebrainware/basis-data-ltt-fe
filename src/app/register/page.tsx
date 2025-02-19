@@ -3,12 +3,13 @@ import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
 
 var fullnameInput: HTMLInputElement | null = null
-var genderInput: HTMLInputElement | null = null
+var genderInput: string
 var ageInput: HTMLInputElement | null = null
 var jobInput: HTMLInputElement | null = null
 var addressInput: HTMLInputElement | null = null
 var healthHistoryInput: HTMLInputElement | null = null
 var phoneNumberInput: HTMLInputElement | null = null
+var healthHistory: string[] = []
 
 const options = [
   { id: 'heartDecease', label: 'Sakit Jantung' },
@@ -20,7 +21,9 @@ const options = [
 
 function MultipleCheckboxes() {
   const [checkedItems, setCheckedItems] = useState<string[]>([])
-
+  useEffect(() => {
+    healthHistory = checkedItems
+  }, [checkedItems])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, checked } = e.target
     setCheckedItems((prev) =>
@@ -28,6 +31,14 @@ function MultipleCheckboxes() {
     )
   }
 
+  useEffect(() => {
+    const healthHistoryInputElement = document.getElementById(
+      'healthHistory'
+    ) as HTMLInputElement | null
+    if (healthHistoryInputElement) {
+      healthHistoryInputElement.value = checkedItems.join(', ')
+    }
+  }, [checkedItems])
   return (
     <div className="space-y-4 flex flex-col">
       <p className="font-normal text-base antialiased">Riwayat Penyakit</p>
@@ -79,35 +90,31 @@ function MultipleCheckboxes() {
 
 async function sendRegisterRequest() {
   const full_name = fullnameInput ? fullnameInput.value : ''
-  const gender = genderInput ? genderInput.value : ''
   const age = ageInput ? ageInput.value : ''
   const job = jobInput ? jobInput.value : ''
   const address = addressInput ? addressInput.value : ''
-  const health_history = healthHistoryInput ? healthHistoryInput.value : ''
   const phone_number = phoneNumberInput ? phoneNumberInput.value : ''
   const payload = {
     full_name,
-    gender,
+    genderInput,
     age,
     job,
     address,
-    health_history,
+    healthHistory,
     phone_number,
   }
-  console.log(payload)
-  debugger
+  console.log(`payload: ${payload}`)
   const data = await fetch('http://localhost:19091/patient', {
     method: 'POST',
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
     },
     body: JSON.stringify({
       payload,
     }),
   })
-
+  debugger
   const responseData = await data.json()
   console.log(`responseData`, responseData)
   return responseData
@@ -148,7 +155,7 @@ function renderInput(id: string, type: string, placeHolder: string) {
 export default function Register() {
   useEffect(() => {
     fullnameInput = document.getElementById('fullName') as HTMLInputElement
-    genderInput = document.getElementById('gender') as HTMLInputElement
+    // genderInput = document.getElementById('gender') as HTMLInputElement
     ageInput = document.getElementById('age') as HTMLInputElement
     jobInput = document.getElementById('job') as HTMLInputElement
     addressInput = document.getElementById('address') as HTMLInputElement
@@ -187,6 +194,7 @@ export default function Register() {
                   const femaleLabel = document.querySelector(
                     '[data-value="female"]'
                   )
+                  genderInput = 'male'
                   if (femaleLabel) {
                     femaleLabel.setAttribute('data-checked', 'false')
                   }
@@ -195,7 +203,7 @@ export default function Register() {
               htmlFor="html"
             >
               <input
-                id="male"
+                id="gender"
                 name="gender"
                 type="radio"
                 style={{ display: 'none' }}
@@ -240,6 +248,7 @@ export default function Register() {
                   const maleLabel = document.querySelector(
                     '[data-value="male"]'
                   )
+                  genderInput = 'female'
                   if (maleLabel) {
                     maleLabel.setAttribute('data-checked', 'false')
                   }
@@ -248,7 +257,7 @@ export default function Register() {
               htmlFor="react"
             >
               <input
-                id="female"
+                id="gender"
                 name="gender"
                 type="radio"
                 style={{ display: 'none' }}

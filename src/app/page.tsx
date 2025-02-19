@@ -15,7 +15,7 @@ export default function Home() {
             admin, anda akan diarahkan ke dashboard utama
           </li>
           <li>
-            2. <code>REGISTER</code> sebagai user(pasien) baru
+            2. <code>DAFTAR</code> sebagai user(pasien) baru
           </li>
           <li>3. Pilih salah satu cuy!</li>
         </ol>
