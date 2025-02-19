@@ -1,14 +1,58 @@
+'use client'
 import Image from 'next/image'
 import styles from '../page.module.css'
+import { useEffect } from 'react'
 
+var usernameInput: HTMLInputElement | null = null
+var passwordInput: HTMLInputElement | null = null
+
+async function sendLoginRequest() {
+  const email = usernameInput ? usernameInput.value : ''
+  const password = passwordInput ? passwordInput.value : ''
+  const data = await fetch('http://localhost:19091/login', {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  })
+
+  const responseData = await data.json()
+  const token = responseData.data
+  if (token) {
+    alert('Login successful!')
+  } else {
+    alert('Login failed!')
+  }
+  return data
+}
 export default function Login() {
+  useEffect(() => {
+    usernameInput = document.getElementById('email') as HTMLInputElement
+    passwordInput = document.getElementById('password') as HTMLInputElement
+  }, [])
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <h1 className="text-3xl font-bold antialiased">Login Lee Tit Tar</h1>
         <div className="w-72 space-y-4">
-          {renderInput('Username')}
-          {renderInput('Password')}
+          {renderInput('Email', 'email', 'text')}
+          {renderInput('Password', 'password', 'password')}
+        </div>
+        <div id="loginBtn" className={styles.ctas}>
+          <a
+            className={styles.primary}
+            href="#"
+            onClick={(e) => {
+              e.preventDefault()
+              sendLoginRequest()
+            }}
+          >
+            LOGIN
+          </a>
         </div>
       </main>
       <footer className={styles.footer}>
@@ -44,12 +88,13 @@ export default function Login() {
   )
 }
 
-function renderInput(placeholder: string) {
+function renderInput(placeholder: string, id: string, type: string) {
   return (
     <div className="relative w-full">
       <input
+        id={id}
+        type={type}
         placeholder={placeholder}
-        type="text"
         className="w-full aria-disabled:cursor-not-allowed outline-none focus:outline-none text-slate-800 dark:text-white placeholder:text-slate-600/60 bg-transparent ring-transparent border border-slate-200 transition-all duration-300 ease-in disabled:opacity-50 disabled:pointer-events-none data-[error=true]:border-red-500 data-[success=true]:border-green-500 text-sm rounded-md py-2 px-2.5 ring shadow-sm data-[icon-placement=start]:ps-9 data-[icon-placement=end]:pe-9 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer"
         data-error="false"
         data-success="false"
@@ -61,7 +106,7 @@ function renderInput(placeholder: string) {
         data-success="false"
         data-placement="start"
       >
-        {placeholder === 'Username' ? (
+        {placeholder === 'Email' ? (
           <svg
             width="1.5em"
             height="1.5em"
