@@ -121,14 +121,6 @@ function renderInput(id: string, type: string, placeHolder: string) {
           const phoneInput = document.getElementById(
             'phoneNumber'
           ) as HTMLInputElement | null
-          // phoneInput?.addEventListener('blur', () => {
-          //   let value = phoneInput.value.replace(/\D/g, '')
-          //   if (value.startsWith('0')) {
-          //     phoneInput.value = '+62' + value.slice(1)
-          //   } else if (value && !value.startsWith('+62')) {
-          //     phoneInput.value = '+62' + value
-          //   }
-          // })
           phoneInput?.addEventListener('input', () => {
             phoneInput.value = phoneInput.value.replace(/[^+\d-]/g, '')
           })
