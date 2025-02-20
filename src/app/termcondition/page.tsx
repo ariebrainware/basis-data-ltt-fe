@@ -9,17 +9,17 @@ export default function TermAndCondition() {
           Dengan saya mengisi form data diri klien dan menandatangani form data
           diri klien, maka bersama ini saya menyatakan: <br />
         </p>
-        <ul className="flex flex-col gap-0.5 min-w-60">
-          <li className="flex items-center cursor-pointer py-1.5 px-2.5 rounded-md align-middle select-none font-sans transition-all duration-300 ease-in aria-disabled:pointer-events-none bg-transparent text-slate-600 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 focus:bg-slate-200 focus:text-slate-800 dark:focus:text-white data-[selected=true]:bg-slate-200 data-[selected=true]:text-black dark:data-[selected=true]:text-white dark:bg-opacity-70">
+        <ul className="flex min-w-60 flex-col gap-0.5">
+          <li className="dark:bg/70 flex cursor-pointer select-none items-center rounded-md bg-transparent px-2.5 py-1.5 align-middle font-sans text-slate-600 transition-all duration-300 ease-in hover:bg-slate-200 hover:text-slate-800 focus:bg-slate-200 focus:text-slate-800 aria-disabled:pointer-events-none data-[selected=true]:bg-slate-200 data-[selected=true]:text-black dark:hover:text-white dark:focus:text-white dark:data-[selected=true]:text-white">
             1. Bahwa saya secara sadar dan atas kemauan sendiri untuk terapi
             fisik di LEE TIT TAR sebagai klien LEE TIT TAR{' '}
           </li>
-          <li className="flex items-center cursor-pointer py-1.5 px-2.5 rounded-md align-middle select-none font-sans transition-all duration-300 ease-in aria-disabled:pointer-events-none bg-transparent text-slate-600 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 focus:bg-slate-200 focus:text-slate-800 dark:focus:text-white data-[selected=true]:bg-slate-200 data-[selected=true]:text-black dark:data-[selected=true]:text-white dark:bg-opacity-70">
+          <li className="dark:bg/70 flex cursor-pointer select-none items-center rounded-md bg-transparent px-2.5 py-1.5 align-middle font-sans text-slate-600 transition-all duration-300 ease-in hover:bg-slate-200 hover:text-slate-800 focus:bg-slate-200 focus:text-slate-800 aria-disabled:pointer-events-none data-[selected=true]:bg-slate-200 data-[selected=true]:text-black dark:hover:text-white dark:focus:text-white dark:data-[selected=true]:text-white">
             2. Bahwa saya memahami dan bersedia untuk menerima segala tindakan
             terapi fisik yang dilakukan LEE TIT TAR atas diri saya selaku klien
             LEE TIT TAR
           </li>
-          <li className="flex items-center cursor-pointer py-1.5 px-2.5 rounded-md align-middle select-none font-sans transition-all duration-300 ease-in aria-disabled:pointer-events-none bg-transparent text-slate-600 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 focus:bg-slate-200 focus:text-slate-800 dark:focus:text-white data-[selected=true]:bg-slate-200 data-[selected=true]:text-black dark:data-[selected=true]:text-white dark:bg-opacity-70">
+          <li className="dark:bg/70 flex cursor-pointer select-none items-center rounded-md bg-transparent px-2.5 py-1.5 align-middle font-sans text-slate-600 transition-all duration-300 ease-in hover:bg-slate-200 hover:text-slate-800 focus:bg-slate-200 focus:text-slate-800 aria-disabled:pointer-events-none data-[selected=true]:bg-slate-200 data-[selected=true]:text-black dark:hover:text-white dark:focus:text-white dark:data-[selected=true]:text-white">
             3. Bahwa Saya secara sadar dan menerima segala bentuk kemungkinan
             resiko yang terjadi dalam proses atau setelah tindakan terapi fisik
             yang dilakukan sesuai prosedur LEE TIT TAR dan tidak akan menuntut
