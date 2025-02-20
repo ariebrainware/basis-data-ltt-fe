@@ -2,13 +2,13 @@
 import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
 
-var fullnameInput: HTMLInputElement | null = null
-var genderInput: HTMLInputElement | null = null
-var ageInput: HTMLInputElement | null = null
-var jobInput: HTMLInputElement | null = null
-var addressInput: HTMLInputElement | null = null
-var healthHistoryInput: HTMLInputElement | null = null
-var phoneNumberInput: HTMLInputElement | null = null
+let fullnameInput: HTMLInputElement | null = null
+let genderInput: string
+let ageInput: HTMLInputElement | null = null
+let jobInput: HTMLInputElement | null = null
+let addressInput: HTMLInputElement | null = null
+let phoneNumberInput: HTMLInputElement | null = null
+let healthHistory: string[] = []
 
 const options = [
   { id: 'heartDecease', label: 'Sakit Jantung' },
@@ -20,7 +20,9 @@ const options = [
 
 function MultipleCheckboxes() {
   const [checkedItems, setCheckedItems] = useState<string[]>([])
-
+  useEffect(() => {
+    healthHistory = checkedItems
+  }, [checkedItems])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, checked } = e.target
     setCheckedItems((prev) =>
@@ -28,13 +30,21 @@ function MultipleCheckboxes() {
     )
   }
 
+  useEffect(() => {
+    const healthHistoryInputElement = document.getElementById(
+      'healthHistory'
+    ) as HTMLInputElement | null
+    if (healthHistoryInputElement) {
+      healthHistoryInputElement.value = checkedItems.join(', ')
+    }
+  }, [checkedItems])
   return (
-    <div className="space-y-4 flex flex-col">
-      <p className="font-normal text-base antialiased">Riwayat Penyakit</p>
+    <div className="flex flex-col space-y-4">
+      <p className="text-base font-normal antialiased">Riwayat Penyakit</p>
       {options.map((option) => (
         <div key={option.id} className="inline-flex items-center gap-2">
           <label
-            className="flex items-center cursor-pointer relative"
+            className="relative flex cursor-pointer items-center"
             htmlFor={option.id}
           >
             <input
@@ -43,9 +53,9 @@ function MultipleCheckboxes() {
               name={option.id}
               checked={checkedItems.includes(option.id)}
               onChange={handleChange}
-              className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow-sm  border border-slate-200 checked:bg-slate-800 checked:border-slate-800"
+              className="peer size-5 cursor-pointer appearance-none rounded border border-slate-200 shadow-sm  transition-all checked:border-slate-800 checked:bg-slate-800"
             />
-            <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
               <svg
                 fill="none"
                 width="18px"
@@ -67,7 +77,7 @@ function MultipleCheckboxes() {
           </label>
           <label
             htmlFor={option.id}
-            className="cursor-pointer ml-2 text-slate-600 font-normal antialiased"
+            className="ml-2 cursor-pointer font-normal text-slate-600 antialiased"
           >
             {option.label}
           </label>
@@ -79,23 +89,9 @@ function MultipleCheckboxes() {
 
 async function sendRegisterRequest() {
   const full_name = fullnameInput ? fullnameInput.value : ''
-  const gender = genderInput ? genderInput.value : ''
   const age = ageInput ? ageInput.value : ''
   const job = jobInput ? jobInput.value : ''
   const address = addressInput ? addressInput.value : ''
-  const health_history = healthHistoryInput ? healthHistoryInput.value : ''
-  const phone_number = phoneNumberInput ? phoneNumberInput.value : ''
-  const payload = {
-    full_name,
-    gender,
-    age,
-    job,
-    address,
-    health_history,
-    phone_number,
-  }
-  console.log(payload)
-  debugger
   const data = await fetch('http://localhost:19091/patient', {
     method: 'POST',
     mode: 'cors',
@@ -104,37 +100,36 @@ async function sendRegisterRequest() {
       Accept: 'application/json',
     },
     body: JSON.stringify({
-      payload,
+      full_name,
+      gender: genderInput,
+      age: parseInt(age, 10),
+      job,
+      address,
+      health_history: healthHistory,
+      phone_number: phoneNumberInput?.value,
     }),
   })
-
   const responseData = await data.json()
   console.log(`responseData`, responseData)
+  if (data.status === 200) {
+    window.location.href = '/register'
+    alert('Registrasi berhasil')
+  } else {
+    alert('Registrasi gagal')
+  }
   return responseData
 }
 
 function renderInput(id: string, type: string, placeHolder: string) {
-  {
-    id === 'phoneNumber' &&
-      (() => {
-        if (typeof window !== 'undefined') {
-          const phoneInput = document.getElementById(
-            'phoneNumber'
-          ) as HTMLInputElement | null
-          // phoneInput?.addEventListener('blur', () => {
-          //   let value = phoneInput.value.replace(/\D/g, '')
-          //   if (value.startsWith('0')) {
-          //     phoneInput.value = '+62' + value.slice(1)
-          //   } else if (value && !value.startsWith('+62')) {
-          //     phoneInput.value = '+62' + value
-          //   }
-          // })
-          phoneInput?.addEventListener('input', () => {
-            phoneInput.value = phoneInput.value.replace(/[^+\d-]/g, '')
-          })
-        }
-        return null
-      })()
+  if (id === 'phoneNumber') {
+    if (typeof window !== 'undefined') {
+      const phoneInput = document.getElementById(
+        'phoneNumber'
+      ) as HTMLInputElement | null
+      phoneInput?.addEventListener('input', () => {
+        phoneInput.value = phoneInput.value.replace(/[^+\d-]/g, '')
+      })
+    }
   }
   return (
     <div className="relative w-full">
@@ -156,13 +151,9 @@ function renderInput(id: string, type: string, placeHolder: string) {
 export default function Register() {
   useEffect(() => {
     fullnameInput = document.getElementById('fullName') as HTMLInputElement
-    genderInput = document.getElementById('gender') as HTMLInputElement
     ageInput = document.getElementById('age') as HTMLInputElement
     jobInput = document.getElementById('job') as HTMLInputElement
     addressInput = document.getElementById('address') as HTMLInputElement
-    healthHistoryInput = document.getElementById(
-      'healthHistory'
-    ) as HTMLInputElement
     phoneNumberInput = document.getElementById(
       'phoneNumber'
     ) as HTMLInputElement
@@ -176,13 +167,13 @@ export default function Register() {
         </h1>
         {renderInput('fullName', 'text', 'Nama Lengkap')}
         <div
-          className="flex gap-2 data-[orientation=horizontal]:items-center data-[orientation=horizontal]:flex-row data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start"
+          className="flex gap-2 data-[orientation=horizontal]:flex-row data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start data-[orientation=horizontal]:items-center"
           data-value=""
           data-orientation="vertical"
         >
           <div className="flex items-center gap-2">
             <label
-              className="group block cursor-pointer shadow-sm shadow-slate-950/5 relative h-5 w-5 shrink-0 rounded-full bg-transparent border border-slate-200 transition-all duration-200 ease-in aria-disabled:opacity-50 aria-disabled:pointer-events-none hover:shadow-md data-[checked=true]:bg-slate-800 data-[checked=true]:border-slate-800 text-slate-50"
+              className="group relative block size-5 shrink-0 cursor-pointer rounded-full border border-slate-200 bg-transparent text-slate-50 shadow-sm shadow-slate-950/5 transition-all duration-200 ease-in hover:shadow-md aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[checked=true]:border-slate-800 data-[checked=true]:bg-slate-800"
               data-value="male"
               onClick={(e) => {
                 const target = e.currentTarget
@@ -195,6 +186,7 @@ export default function Register() {
                   const femaleLabel = document.querySelector(
                     '[data-value="female"]'
                   )
+                  genderInput = 'male'
                   if (femaleLabel) {
                     femaleLabel.setAttribute('data-checked', 'false')
                   }
@@ -203,13 +195,13 @@ export default function Register() {
               htmlFor="html"
             >
               <input
-                id="male"
+                id="gender"
                 name="gender"
                 type="radio"
                 style={{ display: 'none' }}
                 value="male"
               />
-              <span className="pointer-events-none absolute left-2/4 top-2/4 text-current -translate-x-2/4 -translate-y-2/4 scale-75 opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
+              <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
                 <svg
                   width="10px"
                   height="10px"
@@ -228,14 +220,14 @@ export default function Register() {
             </label>
             <label
               htmlFor="html"
-              className="font-sans antialiased text-base text-slate-600"
+              className="font-sans text-base text-slate-600 antialiased"
             >
               Pria
             </label>
           </div>
           <div className="flex items-center gap-2">
             <label
-              className="group block cursor-pointer shadow-sm shadow-slate-950/5 relative h-5 w-5 shrink-0 rounded-full bg-transparent border border-slate-200 transition-all duration-200 ease-in aria-disabled:opacity-50 aria-disabled:pointer-events-none hover:shadow-md data-[checked=true]:bg-slate-800 data-[checked=true]:border-slate-800 text-slate-50"
+              className="group relative block size-5 shrink-0 cursor-pointer rounded-full border border-slate-200 bg-transparent text-slate-50 shadow-sm shadow-slate-950/5 transition-all duration-200 ease-in hover:shadow-md aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[checked=true]:border-slate-800 data-[checked=true]:bg-slate-800"
               data-value="female"
               onClick={(e) => {
                 const target = e.currentTarget
@@ -248,6 +240,7 @@ export default function Register() {
                   const maleLabel = document.querySelector(
                     '[data-value="male"]'
                   )
+                  genderInput = 'female'
                   if (maleLabel) {
                     maleLabel.setAttribute('data-checked', 'false')
                   }
@@ -256,13 +249,13 @@ export default function Register() {
               htmlFor="react"
             >
               <input
-                id="female"
+                id="gender"
                 name="gender"
                 type="radio"
                 style={{ display: 'none' }}
                 value="female"
               />
-              <span className="pointer-events-none absolute left-2/4 top-2/4 text-current -translate-x-2/4 -translate-y-2/4 scale-75 opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
+              <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
                 <svg
                   width="10px"
                   height="10px"
@@ -281,7 +274,7 @@ export default function Register() {
             </label>
             <label
               htmlFor="react"
-              className="font-sans antialiased text-base text-slate-600"
+              className="font-sans text-base text-slate-600 antialiased"
             >
               Wanita
             </label>
@@ -303,7 +296,7 @@ export default function Register() {
 
         <div className={styles.ctas}>
           <a
-            className="bg-slate-200 cursor-not-allowed"
+            className="cursor-not-allowed bg-slate-200"
             id="registerBtn"
             href="/login"
             onClick={(e) => {
@@ -321,13 +314,13 @@ export default function Register() {
 
         <div className="flex items-center gap-2">
           <label
-            className="flex items-center cursor-pointer relative"
+            className="relative flex cursor-pointer items-center"
             htmlFor="termConditionCheckbox"
           >
             <input
               id="termConditionCheckbox"
               type="checkbox"
-              className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow-sm  border border-slate-200 checked:bg-slate-800 checked:border-slate-800"
+              className="peer size-5 cursor-pointer appearance-none rounded border border-slate-200 shadow-sm  transition-all checked:border-slate-800 checked:bg-slate-800"
               onClick={() => {
                 if (
                   (
@@ -344,7 +337,7 @@ export default function Register() {
                 }
               }}
             />
-            <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
               <svg
                 fill="none"
                 width="18px"
