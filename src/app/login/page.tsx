@@ -9,7 +9,8 @@ let passwordInput: HTMLInputElement | null = null
 async function sendLoginRequest() {
   const email = usernameInput ? usernameInput.value : ''
   const password = passwordInput ? passwordInput.value : ''
-  const data = await fetch('http://localhost:19091/login', {
+  const host = process.env.API_HOST || 'http://localhost:19091'
+  const data = await fetch(`${host}/login`, {
     method: 'POST',
     mode: 'cors',
     headers: {
