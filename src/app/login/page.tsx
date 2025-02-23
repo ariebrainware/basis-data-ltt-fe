@@ -9,25 +9,36 @@ let passwordInput: HTMLInputElement | null = null
 async function sendLoginRequest() {
   const email = usernameInput ? usernameInput.value : ''
   const password = passwordInput ? passwordInput.value : ''
-  const host = process.env.API_HOST || 'http://localhost:19091'
-  const data = await fetch(`${host}/login`, {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  })
+  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+  try {
+    const response = await fetch(`${host}/login`, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+      },
+      body: JSON.stringify({ email, password }),
+    })
 
-  const responseData = await data.json()
-  const token = responseData.data
-  if (token) {
-    alert('Login successful!')
-  } else {
-    alert('Login failed!')
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
+    }
+
+    const responseData = await response.json()
+    const token = responseData.data
+    if (token) {
+      alert('Login successful!')
+    } else {
+      alert('Login failed!')
+    }
+    return response
+  } catch (error) {
+    console.error('Failed to fetch:', error)
+    alert('Login failed due to network error!')
+    return null
   }
-  return data
 }
 export default function Login() {
   useEffect(() => {
