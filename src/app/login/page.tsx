@@ -30,6 +30,8 @@ async function sendLoginRequest() {
     const token = responseData.data
     if (token) {
       alert('Login successful!')
+      localStorage.setItem('session_token', token)
+      window.location.href = '/dashboard'
     } else {
       alert('Login failed!')
     }
