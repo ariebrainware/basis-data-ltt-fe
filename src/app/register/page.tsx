@@ -9,6 +9,7 @@ let jobInput: HTMLInputElement | null = null
 let addressInput: HTMLInputElement | null = null
 let phoneNumberInput: HTMLInputElement | null = null
 let healthHistory: string[] = []
+let patientCodeInput: HTMLInputElement | null = null
 
 const options = [
   { id: 'heartDecease', label: 'Sakit Jantung' },
@@ -92,12 +93,14 @@ async function sendRegisterRequest() {
   const age = ageInput ? ageInput.value : ''
   const job = jobInput ? jobInput.value : ''
   const address = addressInput ? addressInput.value : ''
+  const patient_code = patientCodeInput ? patientCodeInput.value : ''
   const data = await fetch('http://localhost:19091/patient', {
     method: 'POST',
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
     },
     body: JSON.stringify({
       full_name,
@@ -107,6 +110,7 @@ async function sendRegisterRequest() {
       address,
       health_history: healthHistory,
       phone_number: phoneNumberInput?.value,
+      patient_code,
     }),
   })
   const responseData = await data.json()
@@ -156,6 +160,9 @@ export default function Register() {
     addressInput = document.getElementById('address') as HTMLInputElement
     phoneNumberInput = document.getElementById(
       'phoneNumber'
+    ) as HTMLInputElement
+    patientCodeInput = document.getElementById(
+      'patientCode'
     ) as HTMLInputElement
   }, [])
 
@@ -293,6 +300,7 @@ export default function Register() {
         </div>
         {MultipleCheckboxes()}
         {renderInput('phoneNumber', 'phoneNumber', 'Nomor Telepon')}
+        {renderInput('patientCode', 'text', 'Kode Pasien')}
 
         <div className={styles.ctas}>
           <a
