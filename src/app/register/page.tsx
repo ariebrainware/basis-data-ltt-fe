@@ -14,7 +14,7 @@ let patientCodeInput: HTMLInputElement | null = null
 
 const options = [
   { id: 'heartDecease', label: 'Sakit Jantung' },
-  { id: 'cancer', label: 'Kanker' },
+  { id: 'cancer', label: 'Kanker/Tumor' },
   { id: 'diabetes', label: 'Diabetes' },
   { id: 'osteoporosis', label: 'Pengapuran' },
   { id: 'highBloodPressure', label: 'Darah Rendah/Tinggi' },
@@ -150,6 +150,56 @@ function renderInput(id: string, type: string, placeHolder: string) {
         data-icon-placement=""
         placeholder={placeHolder}
       />
+      {id === 'phoneNumber' && (
+        <div id="phoneNumberContainer">
+          <div id="optional-inputs"></div>
+          <button
+            type="button"
+            onClick={(e) => {
+              // Update click count stored in the button's dataset
+              const btn = e.currentTarget as HTMLButtonElement
+              let count = parseInt(
+                btn.getAttribute('data-click-count') || '0',
+                10
+              )
+              count++
+              btn.setAttribute('data-click-count', count.toString())
+              if (count === 2) {
+                btn.style.display = 'none'
+              }
+              // Get the container that holds the optional inputs and the button
+              const container =
+                document.getElementById('optional-inputs')?.parentElement
+              if (container) {
+                // Create a new input element with the same attributes as the phone number input
+                const newInput = document.createElement('input')
+                newInput.required = true
+                newInput.type = 'text'
+                const existingOptionalInputs = container.querySelectorAll(
+                  'input[id^="phoneNumberOptional"]'
+                ).length
+                newInput.id = `phoneNumberOptional-${existingOptionalInputs + 1}`
+                newInput.name = `phoneNumberOptional-${existingOptionalInputs + 1}`
+                newInput.placeholder = 'Nomor Telepon (Opsional)'
+                newInput.className =
+                  'peer w-full rounded-lg border border-slate-200 bg-transparent p-3 my-2 text-base text-slate-800 shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement:end]:pe-11 data-[icon-placement:start]:ps-11 dark:text-white'
+                // Always insert the new input right after the optional-inputs div so it stays below it
+                const optionalInputsDiv =
+                  document.getElementById('optional-inputs')
+                if (optionalInputsDiv) {
+                  container.insertBefore(
+                    newInput,
+                    optionalInputsDiv.nextSibling
+                  )
+                }
+              }
+            }}
+            className="mt-2 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          >
+            Tambah Nomor Telepon
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -302,6 +352,7 @@ export default function Register() {
         </div>
         {MultipleCheckboxes()}
         {renderInput('phoneNumber', 'phoneNumber', 'Nomor Telepon')}
+
         {renderInput('patientCode', 'text', 'Kode Pasien')}
 
         <div className={styles.ctas}>

@@ -56,7 +56,7 @@ export default function Dashboard() {
         <div className="mb-8 flex items-center justify-between gap-8">
           <div>
             <h6 className="font-sans text-base font-bold text-current antialiased md:text-lg lg:text-xl">
-              Pasien Daftar
+              Daftar Pasien
             </h6>
             <p className="mt-1 font-sans text-base text-current antialiased">
               Lihat semua informasi mengenai pasien
@@ -71,6 +71,9 @@ export default function Dashboard() {
               View all
             </button>
             <button
+              onClick={() =>
+                window.open('/register', '_blank', 'noopener,noreferrer')
+              }
               className="flex select-none items-center justify-center gap-3 rounded-md border border-slate-800 bg-slate-800 px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-50 shadow-sm transition-all duration-300 ease-in hover:border-slate-700 hover:bg-slate-700 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
               data-shape="default"
               data-width="default"
@@ -104,7 +107,7 @@ export default function Dashboard() {
                   strokeLinejoin="round"
                 ></path>
               </svg>{' '}
-              Add member
+              Add Patient
             </button>
           </div>
         </div>
