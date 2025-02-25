@@ -27,7 +27,7 @@ function ListPatients() {
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            session_token: localStorage.getItem('session_token') ?? '',
+            'session-token': localStorage.getItem('session-token') ?? '',
           },
         })
         if (!response.ok) {
