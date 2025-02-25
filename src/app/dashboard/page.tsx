@@ -11,6 +11,7 @@ interface PatientType {
   age: number
   gender: string
   last_visit: string
+  patient_code: string
 }
 
 function ListPatients() {
@@ -19,7 +20,7 @@ function ListPatients() {
   useEffect(() => {
     ;(async () => {
       try {
-        const res = await fetch(`${host}/patient`, {
+        const response = await fetch(`${host}/patient`, {
           method: 'GET',
           mode: 'cors',
           headers: {
@@ -29,10 +30,10 @@ function ListPatients() {
             session_token: localStorage.getItem('session_token') ?? '',
           },
         })
-        if (!res.ok) {
-          throw new Error('Failed to fetch patients')
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
-        const data = await res.json()
+        const data = await response.json()
         const patientsArray = Array.isArray(data.data)
           ? data.data
           : Array.isArray(data.data.patients)
@@ -48,6 +49,7 @@ function ListPatients() {
 }
 export default function Dashboard() {
   const patients = ListPatients()
+  console.log(patients)
   return (
     <div className={styles.main}>
       <DashboardContent>
@@ -331,7 +333,7 @@ export default function Dashboard() {
                     job={patient.job}
                     age={patient.age}
                     gender={patient.gender}
-                    patientCode={patient.last_visit}
+                    patientCode={patient.patient_code}
                   />
                 )
               })}
