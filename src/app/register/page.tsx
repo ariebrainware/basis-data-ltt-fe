@@ -1,6 +1,7 @@
 'use client'
 import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
+import Footer from '../_components/footer'
 
 let fullnameInput: HTMLInputElement | null = null
 let genderInput: string
@@ -381,6 +382,7 @@ export default function Register() {
           </label>
         </div>
       </main>
+      <Footer />
     </div>
   )
 }
