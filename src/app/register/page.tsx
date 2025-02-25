@@ -95,7 +95,8 @@ async function sendRegisterRequest() {
   const job = jobInput ? jobInput.value : ''
   const address = addressInput ? addressInput.value : ''
   const patient_code = patientCodeInput ? patientCodeInput.value : ''
-  const data = await fetch('http://localhost:19091/patient', {
+  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+  const data = await fetch(`${host}/patient`, {
     method: 'POST',
     mode: 'cors',
     headers: {
