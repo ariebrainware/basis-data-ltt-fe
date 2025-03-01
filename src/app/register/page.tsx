@@ -8,17 +8,49 @@ let genderInput: string
 let ageInput: HTMLInputElement | null = null
 let jobInput: HTMLInputElement | null = null
 let addressInput: HTMLInputElement | null = null
-let phoneNumberInput: HTMLInputElement | null = null
+let phoneNumber: string[] = []
 let healthHistory: string[] = []
 let patientCodeInput: HTMLInputElement | null = null
 
 const options = [
-  { id: 'heartDecease', label: 'Sakit Jantung' },
-  { id: 'cancer', label: 'Kanker/Tumor' },
+  { id: 'heartDecease', label: 'Sakit Jantung (Heart Disease)' },
+  { id: 'cancer', label: 'Kanker (Cancer) / Tumor' },
   { id: 'diabetes', label: 'Diabetes' },
-  { id: 'osteoporosis', label: 'Pengapuran' },
-  { id: 'highBloodPressure', label: 'Darah Rendah/Tinggi' },
+  {
+    id: 'osteoporosis',
+    label: 'Pengapuran (Osteoarthritis) / Kropos Tulang (Osteoporosis)',
+  },
+  {
+    id: 'highBloodPressure',
+    label:
+      'Darah Rendah (Low Blood Pressure) / Darah Tinggi (High Blood Pressure)',
+  },
 ]
+
+if (typeof window !== 'undefined') {
+  const updatePhoneNumbers = () => {
+    phoneNumber = []
+    const mainPhone = document.getElementById(
+      'phoneNumber'
+    ) as HTMLInputElement | null
+    if (mainPhone && mainPhone.value.trim()) {
+      phoneNumber.push(mainPhone.value.trim())
+    }
+    const optional1 = document.getElementById(
+      'phoneNumberOptional-1'
+    ) as HTMLInputElement | null
+    if (optional1 && optional1.value.trim()) {
+      phoneNumber.push(optional1.value.trim())
+    }
+    const optional2 = document.getElementById(
+      'phoneNumberOptional-2'
+    ) as HTMLInputElement | null
+    if (optional2 && optional2.value.trim()) {
+      phoneNumber.push(optional2.value.trim())
+    }
+  }
+  window.addEventListener('input', updatePhoneNumbers)
+}
 
 function MultipleCheckboxes() {
   const [checkedItems, setCheckedItems] = useState<string[]>([])
@@ -111,7 +143,7 @@ async function sendRegisterRequest() {
       job,
       address,
       health_history: healthHistory,
-      phone_number: phoneNumberInput?.value,
+      phone_number: phoneNumber,
       patient_code,
     }),
   })
@@ -210,9 +242,9 @@ export default function Register() {
     ageInput = document.getElementById('age') as HTMLInputElement
     jobInput = document.getElementById('job') as HTMLInputElement
     addressInput = document.getElementById('address') as HTMLInputElement
-    phoneNumberInput = document.getElementById(
-      'phoneNumber'
-    ) as HTMLInputElement
+    // phoneNumberInput = document.getElementById(
+    //   'phoneNumber'
+    // ) as HTMLInputElement
     patientCodeInput = document.getElementById(
       'patientCode'
     ) as HTMLInputElement
