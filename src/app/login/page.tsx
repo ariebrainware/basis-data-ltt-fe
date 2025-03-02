@@ -44,6 +44,10 @@ async function sendLoginRequest() {
 }
 export default function Login() {
   useEffect(() => {
+    if (localStorage.getItem('session-token')) {
+      window.location.href = '/dashboard'
+      return
+    }
     usernameInput = document.getElementById('email') as HTMLInputElement
     passwordInput = document.getElementById('password') as HTMLInputElement
   }, [])
