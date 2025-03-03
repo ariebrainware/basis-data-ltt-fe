@@ -41,6 +41,9 @@ function ListPatients() {
             : []
         setPatients(patientsArray)
       } catch (error) {
+        if (error instanceof Error && error.message.includes('401')) {
+          window.location.href = '/login'
+        }
         console.error('Error fetching patients:', error)
       }
     })()
