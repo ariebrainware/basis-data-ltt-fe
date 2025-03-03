@@ -1,48 +1,58 @@
 'use client'
 import styles from '../page.module.css'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
+import Alert from '../_components/alert'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
 
-async function sendLoginRequest() {
-  const email = usernameInput ? usernameInput.value : ''
-  const password = passwordInput ? passwordInput.value : ''
-  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-  try {
-    const response = await fetch(`${host}/login`, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-      },
-      body: JSON.stringify({ email, password }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`)
-    }
-
-    const responseData = await response.json()
-    const token = responseData.data
-    if (token) {
-      alert('Login successful!')
-      localStorage.setItem('session-token', token)
-      window.location.href = '/dashboard'
-    } else {
-      alert('Login failed!')
-    }
-    return response
-  } catch (error) {
-    console.error('Failed to fetch:', error)
-    alert('Login failed due to network error!')
-    return null
-  }
-}
 export default function Login() {
+  const [showError, setShowError] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  async function sendLoginRequest() {
+    const email = usernameInput ? usernameInput.value : ''
+    const password = passwordInput ? passwordInput.value : ''
+    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+    try {
+      const response = await fetch(`${host}/login`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+        },
+        body: JSON.stringify({ email, password }),
+      })
+      const responseData = await response.json()
+
+      if (!response.ok) {
+        if (responseData.error === 'user not found') {
+          setShowError(true)
+          setErrorMessage('User not found!')
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+
+      const token = responseData.data
+      if (token) {
+        alert('Login successful!')
+        localStorage.setItem('session-token', token)
+        window.location.href = '/dashboard'
+      } else {
+        alert('Login failed!')
+      }
+      return response
+    } catch (error) {
+      console.error('Failed to fetch:', error)
+      // alert('Login failed due to network error!')
+      setErrorMessage('Login failed due to network error!')
+      return null
+    }
+  }
+
   useEffect(() => {
     if (localStorage.getItem('session-token')) {
       window.location.href = '/dashboard'
@@ -54,6 +64,9 @@ export default function Login() {
 
   return (
     <div className={styles.page}>
+      {errorMessage && showError && (
+        <Alert onClose={() => setShowError(false)}>{errorMessage}</Alert>
+      )}
       <main className={styles.main}>
         <h1 className="text-3xl font-bold antialiased">Login Lee Tit Tar</h1>
         <div className="w-72 space-y-4">
