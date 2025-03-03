@@ -118,6 +118,8 @@ export default function Dashboard() {
                       Accept: 'application/json',
                       Authorization:
                         'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+                      'session-token':
+                        localStorage.getItem('session-token') ?? '',
                     },
                   })
                   if (!response.ok) {
@@ -125,6 +127,7 @@ export default function Dashboard() {
                   }
                   localStorage.removeItem('session-token')
                   console.log('Logged out successfully')
+                  window.location.href = '/login'
                 } catch (error) {
                   console.error('Logout error:', error)
                 }
