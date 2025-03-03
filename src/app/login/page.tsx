@@ -2,14 +2,14 @@
 import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
-import Alert from '../_components/alert'
+import { VariantAlert } from '../_components/alert'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
 
 export default function Login() {
-  const [showError, setShowError] = useState<boolean>(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [showError, setShowVariantAlert] = useState<boolean>(false)
+  const [textMessage, setMessage] = useState<string | null>(null)
 
   async function sendLoginRequest() {
     const email = usernameInput ? usernameInput.value : ''
@@ -30,25 +30,27 @@ export default function Login() {
 
       if (!response.ok) {
         if (responseData.error === 'user not found') {
-          setShowError(true)
-          setErrorMessage('User not found!')
+          setShowVariantAlert(true)
+          setMessage('User not found!')
+          return
         }
         throw new Error(`HTTP error! Status: ${response.status}`)
       }
 
       const token = responseData.data
       if (token) {
-        alert('Login successful!')
-        localStorage.setItem('session-token', token)
-        window.location.href = '/dashboard'
-      } else {
-        alert('Login failed!')
+        setShowVariantAlert(false)
+        setMessage('Login Successful!')
+        setTimeout(() => {
+          localStorage.setItem('session-token', token)
+          window.location.href = '/dashboard'
+        }, 1500)
+        return
       }
       return response
     } catch (error) {
       console.error('Failed to fetch:', error)
-      // alert('Login failed due to network error!')
-      setErrorMessage('Login failed due to network error!')
+      setMessage('Login failed due to network error!')
       return null
     }
   }
@@ -64,8 +66,13 @@ export default function Login() {
 
   return (
     <div className={styles.page}>
-      {errorMessage && showError && (
-        <Alert onClose={() => setShowError(false)}>{errorMessage}</Alert>
+      {showError && (
+        <VariantAlert
+          variant="error"
+          onClose={() => setShowVariantAlert(false)}
+        >
+          {textMessage}
+        </VariantAlert>
       )}
       <main className={styles.main}>
         <h1 className="text-3xl font-bold antialiased">Login Lee Tit Tar</h1>
