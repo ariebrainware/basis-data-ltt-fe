@@ -67,13 +67,6 @@ export default function Dashboard() {
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
             <button
-              className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-slate-200 px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-100 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-              data-shape="default"
-              data-width="default"
-            >
-              View all
-            </button>
-            <button
               onClick={() =>
                 window.open('/register', '_blank', 'noopener,noreferrer')
               }
@@ -111,6 +104,39 @@ export default function Dashboard() {
                 ></path>
               </svg>{' '}
               Add Patient
+            </button>
+            <button
+              onClick={async () => {
+                const host =
+                  process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+                try {
+                  const response = await fetch(`${host}/logout`, {
+                    method: 'DELETE',
+                    mode: 'cors',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Accept: 'application/json',
+                      Authorization:
+                        'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+                      'session-token':
+                        localStorage.getItem('session-token') ?? '',
+                    },
+                  })
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`)
+                  }
+                  localStorage.removeItem('session-token')
+                  console.log('Logged out successfully')
+                  window.location.href = '/login'
+                } catch (error) {
+                  console.error('Logout error:', error)
+                }
+              }}
+              className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-slate-200 px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-100 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
+              data-shape="default"
+              data-width="default"
+            >
+              Logout
             </button>
           </div>
         </div>
