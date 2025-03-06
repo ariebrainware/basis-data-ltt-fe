@@ -3,6 +3,7 @@ import styles from '../page.module.css'
 import DashboardContent from '../_components/dashboardComponent'
 import Patient from '../_components/patientRow'
 import { useEffect, useState } from 'react'
+import Footer from '../_components/footer'
 
 interface PatientType {
   full_name: string
@@ -394,6 +395,9 @@ export default function Dashboard() {
           </div>
         </div>
       </DashboardContent>
+      <div className={styles.page}>
+        <Footer />
+      </div>
     </div>
   )
 }
