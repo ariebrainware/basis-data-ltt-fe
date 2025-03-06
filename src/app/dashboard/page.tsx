@@ -104,7 +104,7 @@ export default function Dashboard() {
                   strokeLinejoin="round"
                 ></path>
               </svg>{' '}
-              Add Patient
+              Tambah Pasien
             </button>
             <button
               onClick={async () => {
