@@ -31,7 +31,7 @@ function usePatients(currentPage: number): ListPatientsResponse {
     ;(async () => {
       try {
         const res = await fetch(
-          `${host}/patient?limit=10&page=${currentPage}`,
+          `${host}/patient?limit=10&offset=${currentPage * 10}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -66,8 +66,6 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
   const { data, total } = usePatients(currentPage)
 
-  console.log('data:', data)
-  console.log('total:', total)
   return (
     <div className={styles.main}>
       <DashboardContent>
