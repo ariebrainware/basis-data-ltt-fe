@@ -15,32 +15,41 @@ interface PatientType {
   patient_code: string
 }
 
-function ListPatients() {
+interface ListPatientsResponse {
+  data: {
+    patients: PatientType[]
+  }
+  total: number
+}
+
+function usePatients(currentPage: number): ListPatientsResponse {
   const [patients, setPatients] = useState<PatientType[]>([])
+  const [total, setTotal] = useState(0)
   const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+
   useEffect(() => {
     ;(async () => {
       try {
-        const response = await fetch(`${host}/patient`, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
-          },
-        })
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
-        }
-        const data = await response.json()
-        const patientsArray = Array.isArray(data.data)
-          ? data.data
-          : Array.isArray(data.data.patients)
-            ? data.patients
-            : []
+        const res = await fetch(
+          `${host}/patient?limit=10&page=${currentPage}`,
+          {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+              'session-token': localStorage.getItem('session-token') ?? '',
+            },
+          }
+        )
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+        const data = await res.json()
+        const patientsArray = Array.isArray(data.data.patients)
+          ? data.data.patients
+          : []
         setPatients(patientsArray)
+        setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           window.location.href = '/login'
@@ -48,12 +57,17 @@ function ListPatients() {
         console.error('Error fetching patients:', error)
       }
     })()
-  }, [])
-  return patients
+  }, [currentPage, host])
+
+  return { data: { patients }, total }
 }
+
 export default function Dashboard() {
-  const patients = ListPatients()
-  console.log(patients)
+  const [currentPage, setCurrentPage] = useState(1)
+  const { data, total } = usePatients(currentPage)
+
+  console.log('data:', data)
+  console.log('total:', total)
   return (
     <div className={styles.main}>
       <DashboardContent>
@@ -357,10 +371,10 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody className="group text-sm text-slate-800 dark:text-white">
-              {patients.map((patient, index) => {
+              {data.patients.map((patient: PatientType, index: number) => {
                 return (
                   <Patient
-                    key={`${patient.phone_number}-${index}`}
+                    key={`${patient.patient_code || index}`}
                     name={patient.full_name}
                     phoneNumber={patient.phone_number}
                     job={patient.job}
@@ -373,7 +387,7 @@ export default function Dashboard() {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between border-t border-slate-200 py-4">
+        {/* <div className="flex items-center justify-between border-t border-slate-200 py-4">
           <small className="font-sans text-sm text-current antialiased">
             Halaman 1 of 10
           </small>
@@ -386,6 +400,31 @@ export default function Dashboard() {
               Sebelumnya
             </button>
             <button
+              className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-200 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
+              data-shape="default"
+              data-width="default"
+            >
+              Berikutnya
+            </button>
+          </div>
+        </div> */}
+        <div className="flex items-center justify-between border-t border-slate-200 py-4">
+          <small className="font-sans text-sm text-current antialiased">
+            Halaman {currentPage} dari {Math.ceil(total / 10)}
+          </small>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-200 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
+              data-shape="default"
+              data-width="default"
+            >
+              Sebelumnya
+            </button>
+            <button
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              disabled={currentPage === Math.ceil(total / 10)}
               className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-200 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
               data-shape="default"
               data-width="default"
