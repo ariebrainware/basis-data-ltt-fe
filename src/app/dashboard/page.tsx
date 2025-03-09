@@ -22,7 +22,10 @@ interface ListPatientsResponse {
   total: number
 }
 
-function usePatients(currentPage: number): ListPatientsResponse {
+function usePatients(
+  currentPage: number,
+  keyword: string
+): ListPatientsResponse {
   const [patients, setPatients] = useState<PatientType[]>([])
   const [total, setTotal] = useState(0)
   const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
@@ -31,7 +34,7 @@ function usePatients(currentPage: number): ListPatientsResponse {
     ;(async () => {
       try {
         const res = await fetch(
-          `${host}/patient?limit=10&offset=${currentPage * 10}`,
+          `${host}/patient?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -57,14 +60,51 @@ function usePatients(currentPage: number): ListPatientsResponse {
         console.error('Error fetching patients:', error)
       }
     })()
-  }, [currentPage, host])
+  }, [currentPage, host, keyword])
 
   return { data: { patients }, total }
 }
 
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
-  const { data, total } = usePatients(currentPage)
+  const [patients, setPatients] = useState<PatientType[]>([])
+  const [total, setTotal] = useState(0)
+  const [keyword, setKeyword] = useState('')
+  const { data } = usePatients(currentPage, keyword)
+
+  const handleInputKeyDown = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === 'Enter') {
+      const newKeyword = (e.target as HTMLInputElement).value
+      setKeyword(newKeyword)
+      const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+      try {
+        const res = await fetch(`${host}/patient?keyword=${newKeyword}`, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+            'session-token': localStorage.getItem('session-token') ?? '',
+          },
+        })
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+        const data = await res.json()
+        const patientsArray = Array.isArray(patients) ? data.data.patients : []
+        setPatients(patientsArray)
+        setTotal(data.data.total)
+        console.log(`data: ${JSON.stringify(patientsArray)}`)
+        console.log(`total: ${data.data.total}`)
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('401')) {
+          window.location.href = '/login'
+        }
+        console.error('Error fetching patients:', error)
+      }
+    }
+  }
 
   return (
     <div className={styles.main}>
@@ -205,12 +245,13 @@ export default function Dashboard() {
             <div className="relative w-full">
               <input
                 data-icon-placement="start"
-                placeholder="Cari"
+                placeholder="Cari berdasarkan Nama atau Kode Pasien"
                 type="text"
                 className="data-[error=true]:border-error data-[success=true]:border-success peer w-full select-none rounded-md border border-slate-200 bg-transparent px-2.5 py-2 text-sm text-slate-800 shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
                 data-error="false"
                 data-success="false"
                 data-shape="default"
+                onKeyDown={(e) => handleInputKeyDown(e)}
               />
               <span
                 className="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 overflow-hidden text-slate-600/70 transition-all duration-300 ease-in peer-focus:text-slate-800 data-[placement=end]:right-2.5 data-[placement=start]:left-2.5 dark:peer-hover:text-white dark:peer-focus:text-white"
@@ -372,7 +413,7 @@ export default function Dashboard() {
               {data.patients.map((patient: PatientType, index: number) => {
                 return (
                   <Patient
-                    key={`${patient.patient_code || index}`}
+                    key={`${patient.patient_code + index}`}
                     name={patient.full_name}
                     phoneNumber={patient.phone_number}
                     job={patient.job}
