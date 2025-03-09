@@ -2,8 +2,9 @@
 import styles from '../page.module.css'
 import DashboardContent from '../_components/dashboardComponent'
 import Patient from '../_components/patientRow'
-import { useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import Footer from '../_components/footer'
+import Pagination from '../_components/pagination'
 
 interface PatientType {
   full_name: string
@@ -53,6 +54,7 @@ function usePatients(
           : []
         setPatients(patientsArray)
         setTotal(data.data.total)
+        console.log(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           window.location.href = '/login'
@@ -68,9 +70,9 @@ function usePatients(
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
   const [patients, setPatients] = useState<PatientType[]>([])
-  const [total, setTotal] = useState(0)
+  const [, setTotal] = useState(0)
   const [keyword, setKeyword] = useState('')
-  const { data } = usePatients(currentPage, keyword)
+  const { data, total } = usePatients(currentPage, keyword)
 
   const handleInputKeyDown = async (
     e: React.KeyboardEvent<HTMLInputElement>
@@ -95,8 +97,6 @@ export default function Dashboard() {
         const patientsArray = Array.isArray(patients) ? data.data.patients : []
         setPatients(patientsArray)
         setTotal(data.data.total)
-        console.log(`data: ${JSON.stringify(patientsArray)}`)
-        console.log(`total: ${data.data.total}`)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           window.location.href = '/login'
@@ -426,52 +426,13 @@ export default function Dashboard() {
             </tbody>
           </table>
         </div>
-        {/* <div className="flex items-center justify-between border-t border-slate-200 py-4">
-          <small className="font-sans text-sm text-current antialiased">
-            Halaman 1 of 10
-          </small>
-          <div className="flex gap-2">
-            <button
-              className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-200 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-              data-shape="default"
-              data-width="default"
-            >
-              Sebelumnya
-            </button>
-            <button
-              className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-200 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-              data-shape="default"
-              data-width="default"
-            >
-              Berikutnya
-            </button>
-          </div>
-        </div> */}
-        <div className="flex items-center justify-between border-t border-slate-200 py-4">
-          <small className="font-sans text-sm text-current antialiased">
-            Halaman {currentPage} dari {Math.ceil(total / 10)}
-          </small>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-200 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-              data-shape="default"
-              data-width="default"
-            >
-              Sebelumnya
-            </button>
-            <button
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              disabled={currentPage === Math.ceil(total / 10)}
-              className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-200 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-              data-shape="default"
-              data-width="default"
-            >
-              Berikutnya
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          setCurrentPage={
+            setCurrentPage as React.Dispatch<SetStateAction<number>>
+          }
+          total={total}
+        />
       </DashboardContent>
       <div className={styles.page}>
         <Footer />
