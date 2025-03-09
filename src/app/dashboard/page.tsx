@@ -54,6 +54,7 @@ function usePatients(
           : []
         setPatients(patientsArray)
         setTotal(data.data.total)
+        console.log(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           window.location.href = '/login'
@@ -69,9 +70,9 @@ function usePatients(
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
   const [patients, setPatients] = useState<PatientType[]>([])
-  const [total, setTotal] = useState(0)
+  const [, setTotal] = useState(0)
   const [keyword, setKeyword] = useState('')
-  const { data } = usePatients(currentPage, keyword)
+  const { data, total } = usePatients(currentPage, keyword)
 
   const handleInputKeyDown = async (
     e: React.KeyboardEvent<HTMLInputElement>
