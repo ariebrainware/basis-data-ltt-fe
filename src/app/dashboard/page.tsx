@@ -96,8 +96,6 @@ export default function Dashboard() {
         const patientsArray = Array.isArray(patients) ? data.data.patients : []
         setPatients(patientsArray)
         setTotal(data.data.total)
-        console.log(`data: ${JSON.stringify(patientsArray)}`)
-        console.log(`total: ${data.data.total}`)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           window.location.href = '/login'
