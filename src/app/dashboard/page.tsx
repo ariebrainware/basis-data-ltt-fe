@@ -16,7 +16,7 @@ interface ListPatientsResponse {
   total: number
 }
 
-function usePatients(
+export function usePatients(
   currentPage: number,
   keyword: string
 ): ListPatientsResponse {
@@ -99,11 +99,42 @@ export default function Dashboard() {
     }
   }
 
+  const handleGroupingByDateFilter = async (dateKeyword: string) => {
+    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+    try {
+      const res = await fetch(`${host}/patient?group_by_date=${dateKeyword}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+          'session-token': localStorage.getItem('session-token') ?? '',
+        },
+      })
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+      const data = await res.json()
+      const patientsArray = Array.isArray(patients) ? data.data.patients : []
+      setPatients(patientsArray)
+      setTotal(data.data.total)
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('401')) {
+        window.location.href = '/login'
+      }
+      console.error('Error fetching patients:', error)
+    }
+  }
+
   return (
     <div className={styles.main}>
       <DashboardContent>
         <Header />
-        <SubHeader handleInputKeyDown={handleInputKeyDown} />
+        <SubHeader
+          handleInputKeyDown={handleInputKeyDown}
+          handleGroupingByDateFilter={(dateKeyword: string) =>
+            handleGroupingByDateFilter(dateKeyword)
+          }
+        />
         <TablePatient
           Data={{
             patients: data.patients,

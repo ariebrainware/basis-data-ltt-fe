@@ -1,8 +1,9 @@
 interface SubHeaderProps {
   handleInputKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  handleGroupingByDateFilter: (date: string) => Promise<void>
 }
 export default function SubHeader(handleSearchBox: SubHeaderProps) {
-  const { handleInputKeyDown } = handleSearchBox
+  const { handleInputKeyDown, handleGroupingByDateFilter } = handleSearchBox
   return (
     <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
       <div
@@ -20,6 +21,7 @@ export default function SubHeader(handleSearchBox: SubHeaderProps) {
             className="relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
             data-active="true"
             aria-selected="true"
+            onClick={() => handleGroupingByDateFilter('')}
           >
             Semua
           </button>
@@ -28,6 +30,7 @@ export default function SubHeader(handleSearchBox: SubHeaderProps) {
             className="relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
             data-active="false"
             aria-selected="false"
+            onClick={() => handleGroupingByDateFilter('last_3_months')}
           >
             3 bln
           </button>
@@ -36,6 +39,7 @@ export default function SubHeader(handleSearchBox: SubHeaderProps) {
             className="relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
             data-active="false"
             aria-selected="false"
+            onClick={() => handleGroupingByDateFilter('last_6_months')}
           >
             6 bln
           </button>
