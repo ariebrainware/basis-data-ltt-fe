@@ -1,22 +1,21 @@
-interface PatientProps {
-  // patientKey: string
-  name: string
-  phoneNumber: string
+export interface PatientType {
+  full_name: string
+  phone_number: string
   job: string
   age: number
   gender: string
-  patientCode: string
+  last_visit: string
+  patient_code: string
 }
 
 export default function Patient({
-  // patientKey,
-  name,
-  phoneNumber,
+  full_name: name,
+  phone_number: phoneNumber,
   job,
   age,
   gender,
-  patientCode,
-}: PatientProps) {
+  patient_code: patientCode,
+}: PatientType) {
   return (
     <tr className="border-b border-slate-200 last:border-0">
       <td className="p-3">
