@@ -16,7 +16,7 @@ interface ListPatientsResponse {
   total: number
 }
 
-export function usePatients(
+function usePatients(
   currentPage: number,
   keyword: string
 ): ListPatientsResponse {
