@@ -87,7 +87,7 @@ function MultipleCheckboxes() {
               name={option.id}
               checked={checkedItems.includes(option.id)}
               onChange={handleChange}
-              className="peer size-5 cursor-pointer appearance-none rounded border border-slate-200 shadow-sm  transition-all checked:border-slate-800 checked:bg-slate-800"
+              className="border-slate-200 checked:border-slate-800 checked:bg-slate-800 peer size-5 cursor-pointer appearance-none rounded  border shadow-sm transition-all"
             />
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
               <svg
@@ -111,7 +111,7 @@ function MultipleCheckboxes() {
           </label>
           <label
             htmlFor={option.id}
-            className="ml-2 cursor-pointer font-normal text-slate-600 antialiased"
+            className="text-slate-600 ml-2 cursor-pointer font-normal antialiased"
           >
             {option.label}
           </label>
@@ -176,7 +176,7 @@ function renderInput(id: string, type: string, placeHolder: string) {
         type={type}
         id={id}
         name={id}
-        className="peer w-full rounded-lg border border-slate-200 bg-transparent p-3 text-base text-slate-800 shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
+        className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-lg border bg-transparent p-3 text-base shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
         data-error="false"
         data-success="false"
         data-icon-placement=""
@@ -264,7 +264,7 @@ export default function Register() {
         >
           <div className="flex items-center gap-2">
             <label
-              className="group relative block size-5 shrink-0 cursor-pointer rounded-full border border-slate-200 bg-transparent text-slate-50 shadow-sm shadow-slate-950/5 transition-all duration-200 ease-in hover:shadow-md aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[checked=true]:border-slate-800 data-[checked=true]:bg-slate-800"
+              className="border-slate-200 text-slate-50 shadow-slate-950/5 data-[checked=true]:border-slate-800 data-[checked=true]:bg-slate-800 group relative block size-5 shrink-0 cursor-pointer rounded-full border bg-transparent shadow-sm transition-all duration-200 ease-in hover:shadow-md aria-disabled:pointer-events-none aria-disabled:opacity-50"
               data-value="male"
               onClick={(e) => {
                 const target = e.currentTarget
@@ -311,14 +311,14 @@ export default function Register() {
             </label>
             <label
               htmlFor="html"
-              className="font-sans text-base text-slate-600 antialiased"
+              className="text-slate-600 font-sans text-base antialiased"
             >
               Pria
             </label>
           </div>
           <div className="flex items-center gap-2">
             <label
-              className="group relative block size-5 shrink-0 cursor-pointer rounded-full border border-slate-200 bg-transparent text-slate-50 shadow-sm shadow-slate-950/5 transition-all duration-200 ease-in hover:shadow-md aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[checked=true]:border-slate-800 data-[checked=true]:bg-slate-800"
+              className="border-slate-200 text-slate-50 shadow-slate-950/5 data-[checked=true]:border-slate-800 data-[checked=true]:bg-slate-800 group relative block size-5 shrink-0 cursor-pointer rounded-full border bg-transparent shadow-sm transition-all duration-200 ease-in hover:shadow-md aria-disabled:pointer-events-none aria-disabled:opacity-50"
               data-value="female"
               onClick={(e) => {
                 const target = e.currentTarget
@@ -365,7 +365,7 @@ export default function Register() {
             </label>
             <label
               htmlFor="react"
-              className="font-sans text-base text-slate-600 antialiased"
+              className="text-slate-600 font-sans text-base antialiased"
             >
               Wanita
             </label>
@@ -379,7 +379,7 @@ export default function Register() {
             id="address"
             name="address"
             placeholder="Alamat"
-            className="peer block w-full resize-none rounded-lg border border-slate-200 bg-transparent p-3.5 text-base leading-none text-slate-800 outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 dark:text-white"
+            className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white"
           ></textarea>
         </div>
         {MultipleCheckboxes()}
@@ -389,7 +389,7 @@ export default function Register() {
 
         <div className={styles.ctas}>
           <a
-            className="cursor-not-allowed bg-slate-200"
+            className="bg-slate-200 cursor-not-allowed"
             id="registerBtn"
             href="/login"
             onClick={(e) => {
@@ -413,7 +413,7 @@ export default function Register() {
             <input
               id="termConditionCheckbox"
               type="checkbox"
-              className="peer size-5 cursor-pointer appearance-none rounded border border-slate-200 shadow-sm  transition-all checked:border-slate-800 checked:bg-slate-800"
+              className="border-slate-200 checked:border-slate-800 checked:bg-slate-800 peer size-5 cursor-pointer appearance-none rounded  border shadow-sm transition-all"
               onClick={() => {
                 if (
                   (
@@ -451,7 +451,7 @@ export default function Register() {
             </span>
           </label>
           <label
-            className="cursor-pointer text-slate-600 antialiased"
+            className="text-slate-600 cursor-pointer antialiased"
             htmlFor="termcondition"
           >
             Saya setuju dengan{' '}

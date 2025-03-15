@@ -1,8 +1,62 @@
+'use client'
+import React from 'react'
+import { Button } from '@material-tailwind/react'
+
 import styles from '../page.module.css'
 import Footer from '../_components/footer'
 import DatePicker from '../_components/datePicker'
 import PhoneInput from '../_components/phoneInput'
 import IDCardInput from '../_components/idCardInput'
+import WeightHeightInput from '../_components/weightHeightInput'
+
+const fullNameInput: HTMLInputElement | null = null
+const emailInput: HTMLInputElement | null = null
+const passwordInput: HTMLInputElement | null = null
+const addressInput: HTMLInputElement | null = null
+const dateOfBirthInput: HTMLInputElement | null = null
+const phoneInput: HTMLInputElement | null = null
+const nikInput: HTMLInputElement | null = null
+const weightInput: HTMLInputElement | null = null
+const heightInput: HTMLInputElement | null = null
+
+async function sendRegisterTherapistRequest() {
+  const fullName = fullNameInput ? fullNameInput.value : ''
+  const email = emailInput ? emailInput.value : ''
+  const password = passwordInput ? passwordInput.value : ''
+  const address = addressInput ? addressInput.value : ''
+  const dateOfBirth = dateOfBirthInput ? dateOfBirthInput.value : ''
+  const phone = phoneInput ? phoneInput.value : ''
+  const nik = nikInput ? nikInput.value : ''
+  const weight = weightInput ? weightInput.value : ''
+  const height = heightInput ? heightInput.value : ''
+  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+  const response = await fetch(`${host}/therapist`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+      'session-token': localStorage.getItem('session-token') ?? '',
+    },
+    body: JSON.stringify({
+      fullName: fullName,
+      email: email,
+      password: password,
+      address: address,
+      dateOfBirth: dateOfBirth,
+      phone: phone,
+      nik: nik,
+      weight: parseInt(weight, 10),
+      height: parseInt(height, 10),
+    }),
+  })
+  if (response.ok) {
+    console.log('Therapist registered successfully')
+  } else {
+    console.error('Failed to register therapist')
+  }
+}
+
 export default function Therapist() {
   return (
     <div className={styles.page}>
@@ -13,17 +67,17 @@ export default function Therapist() {
         <form>
           <div className="w-72 space-y-1">
             <label
-              htmlFor="email"
-              className="font-sans text-sm font-semibold text-slate-800 antialiased dark:text-white"
+              htmlFor="fullName"
+              className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               Nama Lengkap
             </label>
             <div className="relative w-full">
               <input
-                id="email"
+                id="fullName"
                 placeholder="Agus Salim"
                 type="text"
-                className="peer w-full rounded-md border border-slate-200 bg-transparent px-2.5 py-2 text-sm text-slate-800 shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
+                className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
                 data-error="false"
                 data-success="false"
                 data-icon-placement=""
@@ -34,7 +88,7 @@ export default function Therapist() {
           <div className="w-72 space-y-1">
             <label
               htmlFor="email"
-              className="font-sans text-sm font-semibold text-slate-800 antialiased dark:text-white"
+              className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               Email
             </label>
@@ -43,7 +97,7 @@ export default function Therapist() {
                 id="email"
                 placeholder="agussalim@gmail.com"
                 type="email"
-                className="peer w-full rounded-md border border-slate-200 bg-transparent px-2.5 py-2 text-sm text-slate-800 shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
+                className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
                 data-error="false"
                 data-success="false"
                 data-icon-placement=""
@@ -54,7 +108,7 @@ export default function Therapist() {
           <div className="w-72 space-y-1">
             <label
               htmlFor="email"
-              className="font-sans text-sm font-semibold text-slate-800 antialiased dark:text-white"
+              className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               Kata Sandi
             </label>
@@ -63,12 +117,12 @@ export default function Therapist() {
                 id="password"
                 placeholder=""
                 type="password"
-                className="peer w-full rounded-md border border-slate-200 bg-transparent px-2.5 py-2 text-sm text-slate-800 shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
+                className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
                 data-error="false"
                 data-success="false"
                 data-icon-placement=""
               />
-              <div className="flex gap-1.5 text-slate-600">
+              <div className="text-slate-600 flex gap-1.5">
                 <svg
                   width="1.5em"
                   height="1.5em"
@@ -108,7 +162,7 @@ export default function Therapist() {
             <div className="w-72 space-y-1">
               <label
                 htmlFor="email"
-                className="font-sans text-sm font-semibold text-slate-800 antialiased dark:text-white"
+                className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
               >
                 Alamat
               </label>
@@ -117,7 +171,7 @@ export default function Therapist() {
                   id="address"
                   placeholder="Jl. Sudirman No. 1"
                   type="text"
-                  className="peer w-full rounded-md border border-slate-200 bg-transparent px-2.5 py-2 text-sm text-slate-800 shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
+                  className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
                   data-error="false"
                   data-success="false"
                   data-icon-placement=""
@@ -129,7 +183,7 @@ export default function Therapist() {
           <div className="w-72 space-y-1">
             <label
               htmlFor="date_of_birth"
-              className="font-sans text-sm font-semibold text-slate-800 antialiased dark:text-white"
+              className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               Tanggal Lahir
             </label>
@@ -143,7 +197,7 @@ export default function Therapist() {
           <div className="w-72 space-y-1">
             <label
               htmlFor="NIK"
-              className="font-sans text-sm font-semibold text-slate-800 antialiased dark:text-white"
+              className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               NIK
             </label>
@@ -151,16 +205,30 @@ export default function Therapist() {
           </div>
 
           <div className="w-72 space-y-1">
-            <label htmlFor="weight">Weight:</label>
-            <input type="number" id="weight" name="weight" required />
+            <WeightHeightInput />
           </div>
-
-          <div className="w-72 space-y-1">
-            <label htmlFor="height">Height:</label>
-            <input type="number" id="height" name="height" required />
+          <div className={styles.ctas}>
+            <Button
+              className="mt-4 rounded-full"
+              onClick={(e) => {
+                e.preventDefault()
+                sendRegisterTherapistRequest()
+              }}
+            >
+              DAFTAR
+            </Button>
+            {/* <a
+              className="bg-slate-200 cursor-not-allowed"
+              id="registerBtn"
+              href="/therapist"
+              onClick={(e) => {
+                e.preventDefault()
+                sendRegisterTherapistRequest()
+              }}
+            >
+              DAFTAR
+            </a> */}
           </div>
-
-          <button type="submit">Register</button>
         </form>
 
         <Footer />

@@ -21,8 +21,8 @@ export default function PhoneInput() {
       <Typography
         variant="small"
         color="blue-gray"
-        className="font-sans text-sm font-semibold text-slate-800 antialiased dark:text-white"
-        placeholder="sss"
+        className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
+        placeholder="s"
         onPointerEnterCapture={() => {}}
         onPointerLeaveCapture={() => {}}
       >
@@ -35,7 +35,7 @@ export default function PhoneInput() {
               ripple={false}
               variant="text"
               color="blue-gray"
-              className="border-blue-gray-200 h-10 w-14 shrink-0 rounded-r-none border border-r-0 bg-transparent px-3"
+              className="h-10 w-14 shrink-0 rounded-r-none border border-r-0 border-blue-gray-200 bg-transparent px-3"
               placeholder=""
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
@@ -71,7 +71,7 @@ export default function PhoneInput() {
           inputMode="numeric"
           maxLength={12}
           placeholder="324-456-2323"
-          className="!border-t-blue-gray-200 placeholder:text-blue-gray-300 appearance-none rounded-l-none placeholder:opacity-100 focus:!border-t-gray-900 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="appearance-none rounded-l-none !border-t-blue-gray-200 placeholder:text-blue-gray-300 placeholder:opacity-100 focus:!border-t-gray-900 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           labelProps={{
             className: 'before:content-none after:content-none',
           }}
