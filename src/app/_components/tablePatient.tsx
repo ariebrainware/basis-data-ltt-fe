@@ -7,7 +7,7 @@ interface TablePatientProps {
   }
 }
 const TableHeader = () => (
-  <thead className="border-b border-slate-200 bg-slate-100 text-sm font-medium text-slate-600 dark:bg-slate-900">
+  <thead className="border-slate-200 bg-slate-100 text-slate-600 dark:bg-slate-900 border-b text-sm font-medium">
     <tr>
       {renderHeaderCell('Pasien')}
       {renderHeaderCell('Pekerjaan/Umur')}
@@ -54,7 +54,7 @@ const renderHeaderCell = (label: string) => (
 )
 
 const TableBody = ({ patients }: { patients: PatientType[] }) => (
-  <tbody className="group text-sm text-slate-800 dark:text-white">
+  <tbody className="text-slate-800 group text-sm dark:text-white">
     {patients.map((patient: PatientType, index: number) => (
       <Patient
         key={`${patient.patient_code + index}`}
@@ -73,7 +73,7 @@ const TableBody = ({ patients }: { patients: PatientType[] }) => (
 export default function TablePatient({ Data }: TablePatientProps) {
   const { patients } = Data
   return (
-    <div className="mt-4 w-full overflow-hidden rounded-lg border border-slate-200">
+    <div className="border-slate-200 mt-4 w-full overflow-hidden rounded-lg border">
       <table className="w-full">
         <TableHeader />
         <TableBody patients={patients} />

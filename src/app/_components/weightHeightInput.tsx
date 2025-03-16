@@ -26,12 +26,12 @@ export default function WeightHeightInput({
 }: WeightHeightInputProps) {
   const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const numericValue = e.target.value.replace(/[^0-9]/g, '')
-    onWeightChange(numericValue)
+    if (onWeightChange) onWeightChange(numericValue)
   }
 
   const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const numericValue = e.target.value.replace(/[^0-9]/g, '')
-    onHeightChange(numericValue)
+    if (onHeightChange) onHeightChange(numericValue)
   }
 
   return (
@@ -43,6 +43,8 @@ export default function WeightHeightInput({
             color="blue-gray"
             className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             placeholder={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
           >
             Berat Badan
           </Typography>
@@ -61,6 +63,8 @@ export default function WeightHeightInput({
               value={weight}
               onChange={handleWeightChange}
               crossOrigin={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             />
             <Menu placement="bottom-start">
               <MenuHandler>
@@ -70,6 +74,8 @@ export default function WeightHeightInput({
                   color="blue-gray"
                   className="h-10 w-14 shrink-0 rounded-l-none border border-l-0 border-blue-gray-200 bg-transparent px-3"
                   placeholder={undefined}
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
                 >
                   KG
                 </Button>
@@ -84,6 +90,8 @@ export default function WeightHeightInput({
             color="blue-gray"
             className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             placeholder={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
           >
             Tinggi Badan
           </Typography>
@@ -102,6 +110,8 @@ export default function WeightHeightInput({
               value={height}
               onChange={handleHeightChange}
               crossOrigin={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             />
             <Menu placement="bottom-start">
               <MenuHandler>
@@ -111,6 +121,8 @@ export default function WeightHeightInput({
                   color="blue-gray"
                   className="h-10 w-14 shrink-0 rounded-l-none border border-l-0 border-blue-gray-200 bg-transparent px-3"
                   placeholder={undefined}
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
                 >
                   CM
                 </Button>

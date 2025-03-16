@@ -19,7 +19,14 @@ export function ControlledSelect({
 
   return (
     <div className="w-72">
-      <Select id={id} label={label} onChange={handleChange}>
+      <Select
+        id={id}
+        label={label}
+        onChange={handleChange}
+        placeholder={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+      >
         <Option value="therapist-senior">Terapis Senior</Option>
         <Option value="therapist-master">Terapis Master</Option>
       </Select>

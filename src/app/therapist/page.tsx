@@ -321,6 +321,9 @@ export default function Therapist() {
                 // e.preventDefault()
                 sendRegisterTherapistRequest()
               }}
+              placeholder={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             >
               DAFTAR
             </Button>

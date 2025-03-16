@@ -36,6 +36,8 @@ export default function IDCardInput({
         value={value}
         onChange={handleChange}
         crossOrigin={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
       />
     </div>
   )

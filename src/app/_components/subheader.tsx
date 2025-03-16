@@ -12,13 +12,13 @@ export default function SubHeader(handleSearchBox: SubHeaderProps) {
       >
         <div
           role="tablist"
-          className="relative flex w-full shrink-0 rounded-md bg-slate-100 p-1 data-[orientation=horizontal]:flex-row data-[orientation=vertical]:flex-col md:w-max dark:bg-slate-200"
+          className="bg-slate-100 dark:bg-slate-200 relative flex w-full shrink-0 rounded-md p-1 data-[orientation=horizontal]:flex-row data-[orientation=vertical]:flex-col md:w-max"
           aria-orientation="horizontal"
           data-orientation="horizontal"
         >
           <button
             role="tab"
-            className="relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
+            className="text-slate-800 relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
             data-active="true"
             aria-selected="true"
             onClick={() => handleGroupingByDateFilter('')}
@@ -27,7 +27,7 @@ export default function SubHeader(handleSearchBox: SubHeaderProps) {
           </button>
           <button
             role="tab"
-            className="relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
+            className="text-slate-800 relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
             data-active="false"
             aria-selected="false"
             onClick={() => handleGroupingByDateFilter('last_3_months')}
@@ -36,7 +36,7 @@ export default function SubHeader(handleSearchBox: SubHeaderProps) {
           </button>
           <button
             role="tab"
-            className="relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
+            className="text-slate-800 relative z-[2] inline-flex w-full select-none items-center justify-center px-3 py-1.5 text-center align-middle font-sans text-sm font-medium aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-white"
             data-active="false"
             aria-selected="false"
             onClick={() => handleGroupingByDateFilter('last_6_months')}
@@ -52,7 +52,7 @@ export default function SubHeader(handleSearchBox: SubHeaderProps) {
               position: 'absolute',
               zIndex: 1,
             }}
-            className="rounded bg-white shadow-sm shadow-slate-800/10 transition-all duration-300 ease-in"
+            className="shadow-slate-800/10 rounded bg-white shadow-sm transition-all duration-300 ease-in"
           ></span>
         </div>
       </div>
@@ -62,14 +62,14 @@ export default function SubHeader(handleSearchBox: SubHeaderProps) {
             data-icon-placement="start"
             placeholder="Cari berdasarkan Nama atau Kode Pasien"
             type="text"
-            className="data-[error=true]:border-error data-[success=true]:border-success peer w-full select-none rounded-md border border-slate-200 bg-transparent px-2.5 py-2 text-sm text-slate-800 shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
+            className="data-[error=true]:border-error data-[success=true]:border-success border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full select-none rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
             data-error="false"
             data-success="false"
             data-shape="default"
             onKeyDown={(e) => handleInputKeyDown(e)}
           />
           <span
-            className="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 overflow-hidden text-slate-600/70 transition-all duration-300 ease-in peer-focus:text-slate-800 data-[placement=end]:right-2.5 data-[placement=start]:left-2.5 dark:peer-hover:text-white dark:peer-focus:text-white"
+            className="text-slate-600/70 peer-focus:text-slate-800 pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 overflow-hidden transition-all duration-300 ease-in data-[placement=end]:right-2.5 data-[placement=start]:left-2.5 dark:peer-hover:text-white dark:peer-focus:text-white"
             data-error="false"
             data-success="false"
             data-placement="start"

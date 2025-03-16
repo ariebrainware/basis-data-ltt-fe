@@ -14,7 +14,7 @@ export default function Header() {
           onClick={() =>
             window.open('/register', '_blank', 'noopener,noreferrer')
           }
-          className="flex select-none items-center justify-center gap-3 rounded-md border border-slate-800 bg-slate-800 px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-50 shadow-sm transition-all duration-300 ease-in hover:border-slate-700 hover:bg-slate-700 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
+          className="border-slate-800 bg-slate-800 text-slate-50 hover:border-slate-700 hover:bg-slate-700 flex select-none items-center justify-center gap-3 rounded-md border px-3 py-1.5 text-center align-middle font-sans text-sm font-medium shadow-sm transition-all duration-300 ease-in hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
           data-shape="default"
           data-width="default"
         >
@@ -74,7 +74,7 @@ export default function Header() {
               console.error('Logout error:', error)
             }
           }}
-          className="inline-flex select-none items-center justify-center rounded-md border border-slate-200 bg-slate-200 px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-slate-800 shadow-sm transition-all duration-300 ease-in hover:bg-slate-100 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
+          className="border-slate-200 bg-slate-200 text-slate-800 hover:bg-slate-100 inline-flex select-none items-center justify-center rounded-md border px-3 py-1.5 text-center align-middle font-sans text-sm font-medium shadow-sm transition-all duration-300 ease-in hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
           data-shape="default"
           data-width="default"
         >

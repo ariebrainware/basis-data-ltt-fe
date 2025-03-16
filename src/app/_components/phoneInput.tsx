@@ -27,6 +27,8 @@ export default function PhoneInput({ id }: PhoneInputProps) {
         color="blue-gray"
         className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
         placeholder="s"
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
       >
         Nomor Telepon
       </Typography>
@@ -38,13 +40,27 @@ export default function PhoneInput({ id }: PhoneInputProps) {
               variant="text"
               color="blue-gray"
               className="h-10 w-14 shrink-0 rounded-r-none border border-r-0 border-blue-gray-200 bg-transparent px-3"
+              placeholder={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             >
               {CODES[country]}
             </Button>
           </MenuHandler>
-          <MenuList className="max-h-80 max-w-72">
+          <MenuList
+            className="max-h-80 max-w-72"
+            placeholder={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
+          >
             {COUNTRIES.map((country, index) => (
-              <MenuItem key={country} onClick={() => setCountry(index)}>
+              <MenuItem
+                key={country}
+                onClick={() => setCountry(index)}
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+              >
                 {country}
               </MenuItem>
             ))}
@@ -68,6 +84,9 @@ export default function PhoneInput({ id }: PhoneInputProps) {
               e.preventDefault()
             }
           }}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
+          crossOrigin={undefined}
         />
       </div>
     </div>
