@@ -2,13 +2,27 @@
 import React from 'react'
 import { Input } from '@material-tailwind/react'
 
-export default function IDCardInput() {
-  const [idCardNumber, setIDCardNumber] = React.useState('')
+interface IDCardInputProps {
+  id?: string
+  onChange: (value: string) => void
+  value: string
+}
+export default function IDCardInput({
+  value,
+  onChange,
+  id = 'idCardNumber',
+}: IDCardInputProps) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove any spaces, then add a space after every 4 digits.
+    const rawValue = e.target.value.replace(/\s/g, '')
+    const formattedValue = rawValue.replace(/(\d{4})/g, '$1 ').trim()
+    onChange(formattedValue)
+  }
 
   return (
     <div className="w-full max-w-sm">
       <Input
-        id="idCardNumber"
+        id={id}
         type="text"
         placeholder="1234 5678 9012 3456"
         maxLength={19}
@@ -19,14 +33,8 @@ export default function IDCardInput() {
         containerProps={{
           className: 'min-w-0',
         }}
-        value={idCardNumber
-          .replace(/\s/g, '')
-          .replace(/(\d{4})/g, '$1 ')
-          .trim()}
-        onChange={(e) => {
-          const numericValue = e.target.value.replace(/\D/g, '')
-          setIDCardNumber(numericValue)
-        }}
+        value={value}
+        onChange={handleChange}
         crossOrigin={undefined}
       />
     </div>

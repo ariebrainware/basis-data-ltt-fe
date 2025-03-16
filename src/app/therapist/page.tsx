@@ -14,18 +14,21 @@ import { ControlledSelect } from '../_components/select'
 let fullNameInput: HTMLInputElement | null = null
 let emailInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
+let confirmPasswordInput: HTMLInputElement | null = null
 let addressInput: HTMLInputElement | null = null
 let dateOfBirthInput: HTMLInputElement | null = null
 let phoneInput: HTMLInputElement | null = null
-let nikInput: HTMLInputElement | null = null
 let weightInput: HTMLInputElement | null = null
 let heightInput: HTMLInputElement | null = null
-// let therapistRoleInput: HTMLSelectElement | null = null
-// const selectInput: HTMLSelectElement | null = null
+
 export default function Therapist() {
-  const [showError, setShowVariantAlert] = useState<boolean>(false)
+  const [showAlert, setShowVariantAlert] = useState<boolean>(false)
+  const [alertVariant, setAlertVariant] = useState<'error' | 'success'>('error')
   const [textMessage, setMessage] = useState<string | null>(null)
   const [role, setRole] = useState<string>('therapist')
+  const [nik, setNik] = useState<string>('')
+  const [weight, setWeight] = useState<string>('')
+  const [height, setHeight] = useState<string>('')
 
   async function sendRegisterTherapistRequest() {
     const fullName = fullNameInput ? fullNameInput.value : ''
@@ -33,10 +36,8 @@ export default function Therapist() {
     const address = addressInput ? addressInput.value : ''
     const dateOfBirth = dateOfBirthInput ? dateOfBirthInput.value : ''
     const phone = phoneInput ? phoneInput.value : ''
-    const nik = nikInput ? nikInput.value : ''
     const weight = weightInput ? weightInput.value : ''
     const height = heightInput ? heightInput.value : ''
-    // const therapistRole = therapistRoleInput ? therapistRoleInput.value : ''
     const password = passwordInput ? passwordInput.value : ''
     const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
     const response = await fetch(`${host}/therapist`, {
@@ -63,12 +64,28 @@ export default function Therapist() {
 
     if (!response.ok) {
       setShowVariantAlert(true)
-      setMessage('Failed to register Therapist')
-      console.error('Failed to register Therapist')
+      setAlertVariant('error')
+      setMessage('Gagal mendaftarkan terapis')
+      console.error('Gagal mendaftarkan terapis')
     } else {
-      setShowVariantAlert(false)
-      setMessage('Therapist registered successfully')
-      console.log('Therapist registered successfully')
+      setShowVariantAlert(true)
+      setAlertVariant('success')
+      setMessage('Terapis berhasil didaftarkan')
+      console.log('Terapis berhasil didaftarkan')
+
+      // Clear form fields after successful registration
+      if (fullNameInput) fullNameInput.value = ''
+      if (emailInput) emailInput.value = ''
+      if (passwordInput) passwordInput.value = ''
+      if (confirmPasswordInput) confirmPasswordInput.value = ''
+      if (addressInput) addressInput.value = ''
+      if (dateOfBirthInput) dateOfBirthInput.value = ''
+      if (phoneInput) phoneInput.value = ''
+      setNik('')
+      setWeight('')
+      setHeight('')
+      // Clear the ControlledSelect state (role)
+      setRole('')
     }
   }
 
@@ -76,25 +93,23 @@ export default function Therapist() {
     fullNameInput = document.getElementById('fullName') as HTMLInputElement
     emailInput = document.getElementById('email') as HTMLInputElement
     passwordInput = document.getElementById('password') as HTMLInputElement
+    confirmPasswordInput = document.getElementById(
+      'confirm_password'
+    ) as HTMLInputElement
     addressInput = document.getElementById('address') as HTMLInputElement
     dateOfBirthInput = document.getElementById(
       'date_of_birth'
     ) as HTMLInputElement
     phoneInput = document.getElementById('phone') as HTMLInputElement
-    nikInput = document.getElementById('idCardNumber') as HTMLInputElement
     weightInput = document.getElementById('weight') as HTMLInputElement
     heightInput = document.getElementById('height') as HTMLInputElement
-    // removed this line because we handle 'role' via state
-    // therapistRoleInput = document.getElementById(
-    //   'therapistRole'
-    // ) as HTMLSelectElement
   }, [])
 
   return (
     <div className={styles.page}>
-      {showError && (
+      {showAlert && textMessage && (
         <VariantAlert
-          variant="error"
+          variant={alertVariant}
           onClose={() => setShowVariantAlert(false)}
         >
           {textMessage}
@@ -155,7 +170,7 @@ export default function Therapist() {
             <div className="relative w-full">
               <input
                 id="password"
-                placeholder=""
+                placeholder="Kata sandi"
                 type="password"
                 className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
                 data-error="false"
@@ -208,7 +223,7 @@ export default function Therapist() {
             <div className="relative w-full">
               <input
                 id="confirm_password"
-                placeholder=""
+                placeholder="Konfirmasi Kata Sandi"
                 type="password"
                 onChange={() => {
                   const confirmPassword = (
@@ -269,16 +284,23 @@ export default function Therapist() {
 
           <div className="w-72 space-y-1">
             <label
-              htmlFor="NIK"
+              htmlFor="idCardNumber"
               className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               NIK
             </label>
-            <IDCardInput />
+            <IDCardInput id="idCardNumber" onChange={setNik} value={nik} />
           </div>
 
           <div className="w-72 space-y-1">
-            <WeightHeightInput idWeight="weight" idHeight="height" />
+            <WeightHeightInput
+              idWeight="weight"
+              idHeight="height"
+              weight={weight}
+              height={height}
+              onWeightChange={setWeight}
+              onHeightChange={setHeight}
+            />
           </div>
 
           <div className="mt-4 w-72 space-y-1">
@@ -295,8 +317,8 @@ export default function Therapist() {
           <div className={styles.ctas}>
             <Button
               className="mt-4 rounded-full"
-              onClick={(e) => {
-                e.preventDefault()
+              onClick={() => {
+                // e.preventDefault()
                 sendRegisterTherapistRequest()
               }}
             >

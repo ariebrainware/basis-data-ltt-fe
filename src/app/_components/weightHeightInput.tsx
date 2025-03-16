@@ -11,18 +11,33 @@ import {
 interface WeightHeightInputProps {
   idWeight?: string
   idHeight?: string
+  weight?: string
+  height?: string
+  onWeightChange?: (value: string) => void
+  onHeightChange?: (value: string) => void
 }
 export default function WeightHeightInput({
   idWeight,
   idHeight,
+  weight,
+  height,
+  onWeightChange,
+  onHeightChange,
 }: WeightHeightInputProps) {
-  const [fromAmount, setFromAmount] = React.useState('')
-  const [toAmount, setToAmount] = React.useState('')
+  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, '')
+    onWeightChange(numericValue)
+  }
+
+  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, '')
+    onHeightChange(numericValue)
+  }
 
   return (
     <div className="mx-auto mt-4 w-full max-w-xl">
       <div className="flex flex-col items-center justify-between">
-        <div className="mt-4 w-full max-w-sm">
+        <div className="w-full max-w-sm">
           <Typography
             variant="small"
             color="blue-gray"
@@ -43,8 +58,8 @@ export default function WeightHeightInput({
               containerProps={{
                 className: 'min-w-0',
               }}
-              value={fromAmount}
-              onChange={(e) => setFromAmount(e.target.value)}
+              value={weight}
+              onChange={handleWeightChange}
               crossOrigin={undefined}
             />
             <Menu placement="bottom-start">
@@ -84,8 +99,8 @@ export default function WeightHeightInput({
               containerProps={{
                 className: 'min-w-0',
               }}
-              value={toAmount}
-              onChange={(e) => setToAmount(e.target.value)}
+              value={height}
+              onChange={handleHeightChange}
               crossOrigin={undefined}
             />
             <Menu placement="bottom-start">
