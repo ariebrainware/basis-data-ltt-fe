@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 
 import styles from '../page.module.css'
@@ -8,58 +8,98 @@ import DatePicker from '../_components/datePicker'
 import PhoneInput from '../_components/phoneInput'
 import IDCardInput from '../_components/idCardInput'
 import WeightHeightInput from '../_components/weightHeightInput'
+import { VariantAlert } from '../_components/alert'
+import { ControlledSelect } from '../_components/select'
 
-const fullNameInput: HTMLInputElement | null = null
-const emailInput: HTMLInputElement | null = null
-const passwordInput: HTMLInputElement | null = null
-const addressInput: HTMLInputElement | null = null
-const dateOfBirthInput: HTMLInputElement | null = null
-const phoneInput: HTMLInputElement | null = null
-const nikInput: HTMLInputElement | null = null
-const weightInput: HTMLInputElement | null = null
-const heightInput: HTMLInputElement | null = null
-
-async function sendRegisterTherapistRequest() {
-  const fullName = fullNameInput ? fullNameInput.value : ''
-  const email = emailInput ? emailInput.value : ''
-  const password = passwordInput ? passwordInput.value : ''
-  const address = addressInput ? addressInput.value : ''
-  const dateOfBirth = dateOfBirthInput ? dateOfBirthInput.value : ''
-  const phone = phoneInput ? phoneInput.value : ''
-  const nik = nikInput ? nikInput.value : ''
-  const weight = weightInput ? weightInput.value : ''
-  const height = heightInput ? heightInput.value : ''
-  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-  const response = await fetch(`${host}/therapist`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-      'session-token': localStorage.getItem('session-token') ?? '',
-    },
-    body: JSON.stringify({
-      fullName: fullName,
-      email: email,
-      password: password,
-      address: address,
-      dateOfBirth: dateOfBirth,
-      phone: phone,
-      nik: nik,
-      weight: parseInt(weight, 10),
-      height: parseInt(height, 10),
-    }),
-  })
-  if (response.ok) {
-    console.log('Therapist registered successfully')
-  } else {
-    console.error('Failed to register therapist')
-  }
-}
-
+let fullNameInput: HTMLInputElement | null = null
+let emailInput: HTMLInputElement | null = null
+let passwordInput: HTMLInputElement | null = null
+let addressInput: HTMLInputElement | null = null
+let dateOfBirthInput: HTMLInputElement | null = null
+let phoneInput: HTMLInputElement | null = null
+let nikInput: HTMLInputElement | null = null
+let weightInput: HTMLInputElement | null = null
+let heightInput: HTMLInputElement | null = null
+// let therapistRoleInput: HTMLSelectElement | null = null
+// const selectInput: HTMLSelectElement | null = null
 export default function Therapist() {
+  const [showError, setShowVariantAlert] = useState<boolean>(false)
+  const [textMessage, setMessage] = useState<string | null>(null)
+  const [role, setRole] = useState<string>('therapist')
+
+  async function sendRegisterTherapistRequest() {
+    const fullName = fullNameInput ? fullNameInput.value : ''
+    const email = emailInput ? emailInput.value : ''
+    const address = addressInput ? addressInput.value : ''
+    const dateOfBirth = dateOfBirthInput ? dateOfBirthInput.value : ''
+    const phone = phoneInput ? phoneInput.value : ''
+    const nik = nikInput ? nikInput.value : ''
+    const weight = weightInput ? weightInput.value : ''
+    const height = heightInput ? heightInput.value : ''
+    // const therapistRole = therapistRoleInput ? therapistRoleInput.value : ''
+    const password = passwordInput ? passwordInput.value : ''
+    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+    const response = await fetch(`${host}/therapist`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+        'session-token': localStorage.getItem('session-token') ?? '',
+      },
+      body: JSON.stringify({
+        full_name: fullName,
+        email: email,
+        password: password,
+        address: address,
+        date_of_birth: dateOfBirth,
+        phone_number: phone,
+        nik: nik,
+        weight: parseInt(weight, 10),
+        height: parseInt(height, 10),
+        role: role,
+      }),
+    })
+
+    if (!response.ok) {
+      setShowVariantAlert(true)
+      setMessage('Failed to register Therapist')
+      console.error('Failed to register Therapist')
+    } else {
+      setShowVariantAlert(false)
+      setMessage('Therapist registered successfully')
+      console.log('Therapist registered successfully')
+    }
+  }
+
+  useEffect(() => {
+    fullNameInput = document.getElementById('fullName') as HTMLInputElement
+    emailInput = document.getElementById('email') as HTMLInputElement
+    passwordInput = document.getElementById('password') as HTMLInputElement
+    addressInput = document.getElementById('address') as HTMLInputElement
+    dateOfBirthInput = document.getElementById(
+      'date_of_birth'
+    ) as HTMLInputElement
+    phoneInput = document.getElementById('phone') as HTMLInputElement
+    nikInput = document.getElementById('idCardNumber') as HTMLInputElement
+    weightInput = document.getElementById('weight') as HTMLInputElement
+    heightInput = document.getElementById('height') as HTMLInputElement
+    // removed this line because we handle 'role' via state
+    // therapistRoleInput = document.getElementById(
+    //   'therapistRole'
+    // ) as HTMLSelectElement
+  }, [])
+
   return (
     <div className={styles.page}>
+      {showError && (
+        <VariantAlert
+          variant="error"
+          onClose={() => setShowVariantAlert(false)}
+        >
+          {textMessage}
+        </VariantAlert>
+      )}
       <main className={styles.main}>
         <h1 className="text-3xl font-bold antialiased">
           Form Registrasi Terapis
@@ -153,10 +193,43 @@ export default function Therapist() {
                   ></path>
                 </svg>
                 <small className="font-sans text-sm text-current antialiased">
-                  Use at least 8 characters, one uppercase, one lowercase and
-                  one number.
+                  Kata sandi minimal 8 karakter, kombinasi huruf besar, kecil,
+                  angka, dan karakter.
                 </small>
               </div>
+            </div>
+
+            <label
+              htmlFor="email"
+              className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
+            >
+              Konfirmasi Kata Sandi
+            </label>
+            <div className="relative w-full">
+              <input
+                id="confirm_password"
+                placeholder=""
+                type="password"
+                onChange={() => {
+                  const confirmPassword = (
+                    document.getElementById(
+                      'confirm_password'
+                    ) as HTMLInputElement
+                  ).value
+                  const password = (
+                    document.getElementById('password') as HTMLInputElement
+                  ).value
+                  if (confirmPassword !== password) {
+                    console.error('Passwords do not match')
+                  } else {
+                    console.log('Passwords match')
+                  }
+                }}
+                className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
+                data-error="false"
+                data-success="false"
+                data-icon-placement=""
+              />
             </div>
 
             <div className="w-72 space-y-1">
@@ -187,11 +260,11 @@ export default function Therapist() {
             >
               Tanggal Lahir
             </label>
-            <DatePicker />
+            <DatePicker id="date_of_birth" />
           </div>
 
           <div className="w-72 space-y-1">
-            <PhoneInput />
+            <PhoneInput id="phone" />
           </div>
 
           <div className="w-72 space-y-1">
@@ -205,8 +278,20 @@ export default function Therapist() {
           </div>
 
           <div className="w-72 space-y-1">
-            <WeightHeightInput />
+            <WeightHeightInput idWeight="weight" idHeight="height" />
           </div>
+
+          <div className="mt-4 w-72 space-y-1">
+            <ControlledSelect
+              id="therapistRole"
+              label="Tingkat Kelas Terapis"
+              onChange={(value: string) => {
+                console.log(`selected value ${value}`)
+                setRole(value)
+              }}
+            />
+          </div>
+
           <div className={styles.ctas}>
             <Button
               className="mt-4 rounded-full"
@@ -217,17 +302,6 @@ export default function Therapist() {
             >
               DAFTAR
             </Button>
-            {/* <a
-              className="bg-slate-200 cursor-not-allowed"
-              id="registerBtn"
-              href="/therapist"
-              onClick={(e) => {
-                e.preventDefault()
-                sendRegisterTherapistRequest()
-              }}
-            >
-              DAFTAR
-            </a> */}
           </div>
         </form>
 

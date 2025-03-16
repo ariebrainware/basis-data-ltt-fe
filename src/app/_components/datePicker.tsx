@@ -3,7 +3,11 @@
 import { useState } from 'react'
 import Datepicker from 'react-tailwindcss-datepicker'
 
-const DatePicker = () => {
+interface DatePickerProps {
+  id?: string
+}
+
+const DatePicker = ({ id }: DatePickerProps) => {
   const [value, setValue] = useState<any>({
     startDate: null,
     endDate: null,
@@ -11,6 +15,7 @@ const DatePicker = () => {
 
   return (
     <Datepicker
+      inputId={id}
       placeholder="TTTT-BB-HH"
       useRange={false}
       asSingle={true}
