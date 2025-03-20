@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 
-import styles from '../page.module.css'
-import Footer from '../_components/footer'
-import DatePicker from '../_components/datePicker'
-import PhoneInput from '../_components/phoneInput'
-import IDCardInput from '../_components/idCardInput'
-import WeightHeightInput from '../_components/weightHeightInput'
-import { VariantAlert } from '../_components/alert'
-import { ControlledSelect } from '../_components/select'
+import styles from '../../page.module.css'
+import Footer from '../../_components/footer'
+import DatePicker from '../../_components/datePicker'
+import PhoneInput from '../../_components/phoneInput'
+import IDCardInput from '../../_components/idCardInput'
+import WeightHeightInput from '../../_components/weightHeightInput'
+import { VariantAlert } from '../../_components/alert'
+import { ControlledSelect } from '../../_components/select'
 
 let fullNameInput: HTMLInputElement | null = null
 let emailInput: HTMLInputElement | null = null
@@ -21,7 +21,7 @@ let phoneInput: HTMLInputElement | null = null
 let weightInput: HTMLInputElement | null = null
 let heightInput: HTMLInputElement | null = null
 
-export default function Therapist() {
+export default function RegisterTherapist() {
   const [showAlert, setShowVariantAlert] = useState<boolean>(false)
   const [alertVariant, setAlertVariant] = useState<'error' | 'success'>('error')
   const [textMessage, setMessage] = useState<string | null>(null)
