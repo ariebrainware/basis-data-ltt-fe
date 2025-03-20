@@ -226,6 +226,9 @@ export default function Therapist() {
                 placeholder="Konfirmasi Kata Sandi"
                 type="password"
                 onChange={() => {
+                  document
+                    .getElementById('registerTherapistButton')
+                    ?.removeAttribute('disabled')
                   const confirmPassword = (
                     document.getElementById(
                       'confirm_password'
@@ -235,7 +238,13 @@ export default function Therapist() {
                     document.getElementById('password') as HTMLInputElement
                   ).value
                   if (confirmPassword !== password) {
-                    console.error('Passwords do not match')
+                    alert('Kata sandi tidak sesuai')
+                    setShowVariantAlert(true)
+                    setAlertVariant('error')
+                    setMessage('Kata sandi tidak sesuai')
+                    document
+                      .getElementById('registerTherapistButton')
+                      ?.setAttribute('disabled', 'true')
                   } else {
                     console.log('Passwords match')
                   }
@@ -316,6 +325,7 @@ export default function Therapist() {
 
           <div className={styles.ctas}>
             <Button
+              id="registerTherapistButton"
               className="mt-4 rounded-full"
               onClick={() => {
                 // e.preventDefault()
