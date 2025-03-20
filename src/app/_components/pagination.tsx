@@ -1,3 +1,4 @@
+import { Button } from '@material-tailwind/react'
 interface PaginationProps {
   currentPage: number
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
@@ -14,24 +15,27 @@ export default function Pagination({
         Halaman {currentPage} dari {Math.ceil(total / 10)}
       </small>
       <div className="flex gap-2">
-        <button
+        <Button
+          variant="outlined"
+          size="sm"
+          placeholder={undefined}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="border-slate-200 text-slate-800 hover:bg-slate-200 inline-flex select-none items-center justify-center rounded-md border bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium shadow-sm transition-all duration-300 ease-in hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-          data-shape="default"
-          data-width="default"
         >
           Sebelumnya
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outlined"
+          size="sm"
+          placeholder={undefined}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
           onClick={() => setCurrentPage((prev) => prev + 1)}
           disabled={currentPage === Math.ceil(total / 10)}
-          className="border-slate-200 text-slate-800 hover:bg-slate-200 inline-flex select-none items-center justify-center rounded-md border bg-transparent px-3 py-1.5 text-center align-middle font-sans text-sm font-medium shadow-sm transition-all duration-300 ease-in hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-          data-shape="default"
-          data-width="default"
         >
           Berikutnya
-        </button>
+        </Button>
       </div>
     </div>
   )
