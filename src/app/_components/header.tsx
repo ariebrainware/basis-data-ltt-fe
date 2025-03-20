@@ -49,7 +49,7 @@ export default function Header() {
           </svg>{' '}
           Tambah Pasien
         </button>
-        <button
+        {/* <button
           onClick={() =>
             window.open('/therapist', '_blank', 'noopener,noreferrer')
           }
@@ -87,7 +87,7 @@ export default function Header() {
             ></path>
           </svg>{' '}
           Tambah Terapis
-        </button>
+        </button> */}
 
         <button
           onClick={async () => {
