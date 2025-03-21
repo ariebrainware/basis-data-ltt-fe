@@ -8,7 +8,14 @@ interface TableTherapistProps {
     therapist: TherapistType[]
   }
 }
-const TABLE_HEAD = ['Terapis', 'Role', 'Status', 'Tanggal Bergabung', '']
+const TABLE_HEAD = [
+  'Terapis / No HP',
+  'Email / Alamat',
+  'Tanggal Lahir / NIK',
+  'Berat / Tinggi Badan',
+  'Role',
+  'Status',
+]
 
 const TableHeader = () => (
   <thead>
@@ -41,7 +48,8 @@ const TableBody = ({ therapist }: { therapist: TherapistType[] }) => (
   <tbody className="text-sm text-blue-gray-500">
     {therapist?.map((therapist: TherapistType, index: number) => (
       <Therapist
-        key={`${therapist.full_name + index}`}
+        key={`${therapist.ID}-${index}`}
+        ID={therapist.ID}
         full_name={therapist.full_name}
         email={therapist.email}
         phone_number={therapist.phone_number}
