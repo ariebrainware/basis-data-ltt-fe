@@ -92,7 +92,10 @@ export default function ListTherapist() {
   const [therapists, setTherapists] = useState<TherapistType[]>([])
   const [, setTotal] = useState(0)
   const [keyword, setKeyword] = useState('')
-  const { total } = useFetchTherapist(currentPage, keyword)
+  const { data, total } = useFetchTherapist(currentPage, keyword)
+  useEffect(() => {
+    setTherapists(data.therapist)
+  }, [data])
 
   const handleInputKeyDown = async (
     e: React.KeyboardEvent<HTMLInputElement>
@@ -128,7 +131,6 @@ export default function ListTherapist() {
     }
   }
 
-  console.log(`therapists: `, therapists)
   return (
     <>
       <Card
