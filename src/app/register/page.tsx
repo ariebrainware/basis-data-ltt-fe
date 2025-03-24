@@ -5,7 +5,6 @@ import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
 
 let fullnameInput: HTMLInputElement | null = null
-let genderInput: string
 let ageInput: HTMLInputElement | null = null
 let jobInput: HTMLInputElement | null = null
 let addressInput: HTMLInputElement | null = null
@@ -87,6 +86,9 @@ function MultipleCheckboxes() {
               name={option.id}
               checked={checkedItems.includes(option.id)}
               onChange={handleChange}
+              crossOrigin={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             />
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
               <svg
@@ -121,6 +123,9 @@ function MultipleCheckboxes() {
 }
 
 async function sendRegisterRequest() {
+  const genderInput =
+    (document.querySelector('input[name="gender"]:checked') as HTMLInputElement)
+      ?.value || ''
   const full_name = fullnameInput ? fullnameInput.value : ''
   const age = ageInput ? ageInput.value : ''
   const job = jobInput ? jobInput.value : ''
@@ -259,7 +264,14 @@ export default function Register() {
           data-orientation="vertical"
         >
           <div className="flex items-center gap-2">
-            <Radio id="gender_male" name="gender" value="male" />
+            <Radio
+              id="gender_male"
+              name="gender"
+              value="male"
+              crossOrigin={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+            />
             <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
               <svg
                 width="10px"
@@ -285,7 +297,14 @@ export default function Register() {
             </label>
           </div>
           <div className="flex items-center gap-2">
-            <Radio id="gender_female" name="gender" value="female" />
+            <Radio
+              id="gender_female"
+              name="gender"
+              value="female"
+              crossOrigin={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+            />
             <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
               <svg
                 width="10px"
@@ -366,6 +385,9 @@ export default function Register() {
                     'bg-slate-200 cursor-default'
                 }
               }}
+              crossOrigin={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             />
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
               <svg
