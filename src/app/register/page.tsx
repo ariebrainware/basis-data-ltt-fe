@@ -2,6 +2,7 @@
 import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
+import { Checkbox, Radio } from '@material-tailwind/react'
 
 let fullnameInput: HTMLInputElement | null = null
 let genderInput: string
@@ -81,13 +82,11 @@ function MultipleCheckboxes() {
             className="relative flex cursor-pointer items-center"
             htmlFor={option.id}
           >
-            <input
-              type="checkbox"
+            <Checkbox
               id={option.id}
               name={option.id}
               checked={checkedItems.includes(option.id)}
               onChange={handleChange}
-              className="border-slate-200 checked:border-slate-800 checked:bg-slate-800 peer size-5 cursor-pointer appearance-none rounded  border shadow-sm transition-all"
             />
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
               <svg
@@ -242,9 +241,6 @@ export default function Register() {
     ageInput = document.getElementById('age') as HTMLInputElement
     jobInput = document.getElementById('job') as HTMLInputElement
     addressInput = document.getElementById('address') as HTMLInputElement
-    // phoneNumberInput = document.getElementById(
-    //   'phoneNumber'
-    // ) as HTMLInputElement
     patientCodeInput = document.getElementById(
       'patientCode'
     ) as HTMLInputElement
@@ -263,52 +259,24 @@ export default function Register() {
           data-orientation="vertical"
         >
           <div className="flex items-center gap-2">
-            <label
-              className="border-slate-200 text-slate-50 shadow-slate-950/5 data-[checked=true]:border-slate-800 data-[checked=true]:bg-slate-800 group relative block size-5 shrink-0 cursor-pointer rounded-full border bg-transparent shadow-sm transition-all duration-200 ease-in hover:shadow-md aria-disabled:pointer-events-none aria-disabled:opacity-50"
-              data-value="male"
-              onClick={(e) => {
-                const target = e.currentTarget
-                const isChecked = target.getAttribute('data-checked') === 'true'
-                target.setAttribute(
-                  'data-checked',
-                  isChecked ? 'false' : 'true'
-                )
-                if (target.getAttribute('data-checked') === 'true') {
-                  const femaleLabel = document.querySelector(
-                    '[data-value="female"]'
-                  )
-                  genderInput = 'male'
-                  if (femaleLabel) {
-                    femaleLabel.setAttribute('data-checked', 'false')
-                  }
-                }
-              }}
-              htmlFor="gender_male"
-            >
-              <input
-                id="gender_male"
-                name="gender"
-                type="radio"
-                style={{ display: 'none' }}
-                value="male"
-              />
-              <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
-                <svg
-                  width="10px"
-                  height="10px"
-                  viewBox="0 0 22 22"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M11 0.25C5.06294 0.25 0.25 5.06294 0.25 11C0.25 16.9371 5.06294 21.75 11 21.75C16.9371 21.75 21.75 16.9371 21.75 11C21.75 5.06294 16.9371 0.25 11 0.25Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </span>
-            </label>
+            <Radio id="gender_male" name="gender" value="male" />
+            <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
+              <svg
+                width="10px"
+                height="10px"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M11 0.25C5.06294 0.25 0.25 5.06294 0.25 11C0.25 16.9371 5.06294 21.75 11 21.75C16.9371 21.75 21.75 16.9371 21.75 11C21.75 5.06294 16.9371 0.25 11 0.25Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </span>
+
             <label
               htmlFor="gender_male"
               className="text-slate-600 font-sans text-base antialiased"
@@ -317,53 +285,23 @@ export default function Register() {
             </label>
           </div>
           <div className="flex items-center gap-2">
-            <label
-              className="border-slate-200 text-slate-50 shadow-slate-950/5 data-[checked=true]:border-slate-800 data-[checked=true]:bg-slate-800 group relative block size-5 shrink-0 cursor-pointer rounded-full border bg-transparent shadow-sm transition-all duration-200 ease-in hover:shadow-md aria-disabled:pointer-events-none aria-disabled:opacity-50"
-              data-value="female"
-              onClick={(e) => {
-                const target = e.currentTarget
-                const isChecked = target.getAttribute('data-checked') === 'true'
-                target.setAttribute(
-                  'data-checked',
-                  isChecked ? 'false' : 'true'
-                )
-                if (target.getAttribute('data-checked') === 'true') {
-                  const maleLabel = document.querySelector(
-                    '[data-value="male"]'
-                  )
-                  genderInput = 'female'
-                  if (maleLabel) {
-                    maleLabel.setAttribute('data-checked', 'false')
-                  }
-                }
-              }}
-              htmlFor="gender_female"
-            >
-              <input
-                id="gender_female"
-                for="gender_female"
-                name="gender"
-                type="radio"
-                style={{ display: 'none' }}
-                value="female"
-              />
-              <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
-                <svg
-                  width="10px"
-                  height="10px"
-                  viewBox="0 0 22 22"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M11 0.25C5.06294 0.25 0.25 5.06294 0.25 11C0.25 16.9371 5.06294 21.75 11 21.75C16.9371 21.75 21.75 16.9371 21.75 11C21.75 5.06294 16.9371 0.25 11 0.25Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </span>
-            </label>
+            <Radio id="gender_female" name="gender" value="female" />
+            <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
+              <svg
+                width="10px"
+                height="10px"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M11 0.25C5.06294 0.25 0.25 5.06294 0.25 11C0.25 16.9371 5.06294 21.75 11 21.75C16.9371 21.75 21.75 16.9371 21.75 11C21.75 5.06294 16.9371 0.25 11 0.25Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </span>
             <label
               htmlFor="gender_female"
               className="text-slate-600 font-sans text-base antialiased"
@@ -411,10 +349,8 @@ export default function Register() {
             className="relative flex cursor-pointer items-center"
             htmlFor="termConditionCheckbox"
           >
-            <input
+            <Checkbox
               id="termConditionCheckbox"
-              type="checkbox"
-              className="border-slate-200 checked:border-slate-800 checked:bg-slate-800 peer size-5 cursor-pointer appearance-none rounded  border shadow-sm transition-all"
               onClick={() => {
                 if (
                   (
