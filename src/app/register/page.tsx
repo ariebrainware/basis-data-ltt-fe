@@ -283,10 +283,10 @@ export default function Register() {
                   }
                 }
               }}
-              htmlFor="html"
+              htmlFor="gender_male"
             >
               <input
-                id="gender"
+                id="gender_male"
                 name="gender"
                 type="radio"
                 style={{ display: 'none' }}
@@ -310,7 +310,7 @@ export default function Register() {
               </span>
             </label>
             <label
-              htmlFor="html"
+              htmlFor="gender_male"
               className="text-slate-600 font-sans text-base antialiased"
             >
               Pria
@@ -337,10 +337,11 @@ export default function Register() {
                   }
                 }
               }}
-              htmlFor="react"
+              htmlFor="gender_female"
             >
               <input
-                id="gender"
+                id="gender_female"
+                for="gender_female"
                 name="gender"
                 type="radio"
                 style={{ display: 'none' }}
@@ -364,7 +365,7 @@ export default function Register() {
               </span>
             </label>
             <label
-              htmlFor="react"
+              htmlFor="gender_female"
               className="text-slate-600 font-sans text-base antialiased"
             >
               Wanita
@@ -452,7 +453,7 @@ export default function Register() {
           </label>
           <label
             className="text-slate-600 cursor-pointer antialiased"
-            htmlFor="termcondition"
+            htmlFor="termConditionCheckbox"
           >
             Saya setuju dengan{' '}
             <a
