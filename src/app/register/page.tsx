@@ -13,7 +13,7 @@ let healthHistory: string[] = []
 let patientCodeInput: HTMLInputElement | null = null
 
 const healthConditionOptions = [
-  { id: 'heartDecease', label: 'Sakit Jantung (Heart Disease)' },
+  { id: 'heartDisease', label: 'Sakit Jantung (Heart Disease)' },
   { id: 'cancer', label: 'Kanker (Cancer) / Tumor' },
   { id: 'diabetes', label: 'Diabetes' },
   {
@@ -22,13 +22,11 @@ const healthConditionOptions = [
   },
   {
     id: 'highBloodPressure',
-    label:
-      'Darah Tinggi (High Blood Pressure)',
+    label: 'Darah Tinggi (High Blood Pressure)',
   },
   {
     id: 'lowBloodPressure',
-    label:
-      'Darah Rendah (Low Blood Pressure)',
+    label: 'Darah Rendah (Low Blood Pressure)',
   },
 ]
 
@@ -89,7 +87,7 @@ function MultipleCheckboxes() {
             <Checkbox
               id={option.id}
               name={option.id}
-              checked={checkedItems.includes(option.id)} 
+              checked={checkedItems.includes(option.id)}
               onChange={handleChange}
               crossOrigin={undefined}
               onPointerEnterCapture={undefined}
