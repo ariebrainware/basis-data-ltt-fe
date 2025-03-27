@@ -10,6 +10,7 @@ let jobInput: HTMLInputElement | null = null
 let addressInput: HTMLInputElement | null = null
 let phoneNumber: string[] = []
 let healthHistory: string[] = []
+let surgeryHistory: HTMLInputElement | null = null
 let patientCodeInput: HTMLInputElement | null = null
 
 const healthConditionOptions = [
@@ -133,6 +134,7 @@ async function sendRegisterRequest() {
   const age = ageInput ? ageInput.value : ''
   const job = jobInput ? jobInput.value : ''
   const address = addressInput ? addressInput.value : ''
+  const surgery_history = surgeryHistory ? surgeryHistory.value : ''
   const patient_code = patientCodeInput ? patientCodeInput.value : ''
   const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
   const data = await fetch(`${host}/patient`, {
@@ -150,6 +152,7 @@ async function sendRegisterRequest() {
       job,
       address,
       health_history: healthHistory,
+      surgery_history,
       phone_number: phoneNumber,
       patient_code,
     }),
@@ -249,6 +252,9 @@ export default function Register() {
     ageInput = document.getElementById('age') as HTMLInputElement
     jobInput = document.getElementById('job') as HTMLInputElement
     addressInput = document.getElementById('address') as HTMLInputElement
+    surgeryHistory = document.getElementById(
+      'surgeryHistory'
+    ) as HTMLInputElement
     patientCodeInput = document.getElementById(
       'patientCode'
     ) as HTMLInputElement
@@ -344,6 +350,15 @@ export default function Register() {
           ></textarea>
         </div>
         {MultipleCheckboxes()}
+        <div>
+          <textarea
+            rows={8}
+            id="surgeryHistory"
+            name="surgeryHistory"
+            placeholder="Riwayat Operasi"
+            className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 focus:outline-none peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in disabled:pointer-events-none disabled:opacity-50 dark:text-white"
+          ></textarea>
+        </div>
         {renderInput('phoneNumber', 'phoneNumber', 'Nomor Telepon')}
 
         {renderInput('patientCode', 'text', 'Kode Pasien')}
