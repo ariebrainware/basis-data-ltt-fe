@@ -12,8 +12,8 @@ let phoneNumber: string[] = []
 let healthHistory: string[] = []
 let patientCodeInput: HTMLInputElement | null = null
 
-const options = [
-  { id: 'heartDecease', label: 'Sakit Jantung (Heart Disease)' },
+const healthConditionOptions = [
+  { id: 'heartDisease', label: 'Sakit Jantung (Heart Disease)' },
   { id: 'cancer', label: 'Kanker (Cancer) / Tumor' },
   { id: 'diabetes', label: 'Diabetes' },
   {
@@ -22,8 +22,11 @@ const options = [
   },
   {
     id: 'highBloodPressure',
-    label:
-      'Darah Rendah (Low Blood Pressure) / Darah Tinggi (High Blood Pressure)',
+    label: 'Darah Tinggi (High Blood Pressure)',
+  },
+  {
+    id: 'lowBloodPressure',
+    label: 'Darah Rendah (Low Blood Pressure)',
   },
 ]
 
@@ -75,7 +78,7 @@ function MultipleCheckboxes() {
   return (
     <div className="flex flex-col space-y-4">
       <p className="text-base font-normal antialiased">Riwayat Penyakit</p>
-      {options.map((option) => (
+      {healthConditionOptions.map((option) => (
         <div key={option.id} className="inline-flex items-center gap-2">
           <label
             className="relative flex cursor-pointer items-center"
