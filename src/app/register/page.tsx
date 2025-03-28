@@ -18,8 +18,12 @@ const healthConditionOptions = [
   { id: 'cancer', label: 'Kanker (Cancer) / Tumor' },
   { id: 'diabetes', label: 'Diabetes' },
   {
+    id: 'osteoarthritis',
+    label: 'Pengapuran (Osteoarthritis)',
+  },
+  {
     id: 'osteoporosis',
-    label: 'Pengapuran (Osteoarthritis) / Kropos Tulang (Osteoporosis)',
+    label: 'Kropos Tulang (Osteoporosis)',
   },
   {
     id: 'highBloodPressure',
@@ -28,6 +32,18 @@ const healthConditionOptions = [
   {
     id: 'lowBloodPressure',
     label: 'Darah Rendah (Low Blood Pressure)',
+  },
+  {
+    id: 'gastrictAcid',
+    label: 'Asam Lambung (Gastric Acid)',
+  },
+  {
+    id: 'goutyArthritis',
+    label: 'Asam Urat (Gouty Arthritis)',
+  },
+  {
+    id: 'cholesterol',
+    label: 'Kolesterol (Cholesterol)',
   },
 ]
 
@@ -355,8 +371,8 @@ export default function Register() {
             rows={8}
             id="surgeryHistory"
             name="surgeryHistory"
-            placeholder="Riwayat Operasi"
-            className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 focus:outline-none peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in disabled:pointer-events-none disabled:opacity-50 dark:text-white"
+            placeholder="Riwayat Operasi (Jika ada)"
+            className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white"
           ></textarea>
         </div>
         {renderInput('phoneNumber', 'phoneNumber', 'Nomor Telepon')}
