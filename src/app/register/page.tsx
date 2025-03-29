@@ -15,7 +15,8 @@ let patientCodeInput: HTMLInputElement | null = null
 
 const healthConditionOptions = [
   { id: 'heartDisease', label: 'Sakit Jantung (Heart Disease)' },
-  { id: 'cancer', label: 'Kanker (Cancer) / Tumor' },
+  { id: 'cancer', label: 'Kanker (Cancer)' },
+  { id: 'tumor', label: 'Tumor' },
   { id: 'diabetes', label: 'Diabetes' },
   {
     id: 'osteoarthritis',
