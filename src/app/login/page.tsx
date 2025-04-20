@@ -37,7 +37,9 @@ export default function Login() {
         throw new Error(`HTTP error! Status: ${response.status}`)
       }
 
-      const token = responseData.data
+      const token = responseData.data.token
+      console.log('token', token)
+      debugger
       if (token) {
         setShowVariantAlert(false)
         setMessage('Login Successful!')
