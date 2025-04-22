@@ -38,14 +38,23 @@ export default function Login() {
       }
 
       const token = responseData.data.token
+      const role = responseData.data.role
       console.log('token', token)
-      debugger
-      if (token) {
+      console.log('role', role)
+      if (token && role === 'Admin') {
         setShowVariantAlert(false)
-        setMessage('Login Successful!')
+        setMessage('Login admin successful!')
         setTimeout(() => {
           localStorage.setItem('session-token', token)
           window.location.href = '/dashboard'
+        }, 1500)
+        return
+      } else if (token && role === 'User') {
+        setShowVariantAlert(false)
+        setMessage('Login user successful!')
+        setTimeout(() => {
+          localStorage.setItem('session-token', token)
+          window.location.href = '/dashboard/user'
         }, 1500)
         return
       }
