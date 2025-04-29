@@ -1,5 +1,5 @@
 import Patient from '../_components/patientRow'
-import { PatientType } from '../_components/patientRow'
+import { PatientType } from '../_types/patient'
 
 interface TablePatientProps {
   Data: {
@@ -65,6 +65,10 @@ const TableBody = ({ patients }: { patients: PatientType[] }) => (
         gender={patient.gender}
         patient_code={patient.patient_code}
         last_visit={''}
+        email={patient.email}
+        health_history={patient.health_history}
+        surgery_history={patient.surgery_history}
+        address={patient.address}
       />
     ))}
   </tbody>
