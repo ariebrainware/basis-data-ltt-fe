@@ -7,7 +7,7 @@ import Pagination from '../_components/pagination'
 import Header from '../_components/header'
 import SubHeader from '../_components/subheader'
 import TablePatient from '../_components/tablePatient'
-import { PatientType } from '../_components/patientRow'
+import { PatientType } from '../_types/patient'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 interface ListPatientsResponse {
