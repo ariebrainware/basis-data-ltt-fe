@@ -3,6 +3,7 @@ import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
+import { HealthConditionOptions } from '../_types/healthcondition'
 
 let fullnameInput: HTMLInputElement | null = null
 let ageInput: HTMLInputElement | null = null
@@ -12,41 +13,6 @@ let phoneNumber: string[] = []
 let healthHistory: string[] = []
 let surgeryHistory: HTMLInputElement | null = null
 let patientCodeInput: HTMLInputElement | null = null
-
-const healthConditionOptions = [
-  { id: 'heartDisease', label: 'Sakit Jantung (Heart Disease)' },
-  { id: 'cancer', label: 'Kanker (Cancer)' },
-  { id: 'tumor', label: 'Tumor' },
-  { id: 'diabetes', label: 'Diabetes' },
-  {
-    id: 'osteoarthritis',
-    label: 'Pengapuran (Osteoarthritis)',
-  },
-  {
-    id: 'osteoporosis',
-    label: 'Kropos Tulang (Osteoporosis)',
-  },
-  {
-    id: 'highBloodPressure',
-    label: 'Darah Tinggi (High Blood Pressure)',
-  },
-  {
-    id: 'lowBloodPressure',
-    label: 'Darah Rendah (Low Blood Pressure)',
-  },
-  {
-    id: 'gastrictAcid',
-    label: 'Asam Lambung (Gastric Acid)',
-  },
-  {
-    id: 'goutyArthritis',
-    label: 'Asam Urat (Gouty Arthritis)',
-  },
-  {
-    id: 'cholesterol',
-    label: 'Kolesterol (Cholesterol)',
-  },
-]
 
 if (typeof window !== 'undefined') {
   const updatePhoneNumbers = () => {
@@ -96,7 +62,7 @@ function MultipleCheckboxes() {
   return (
     <div className="flex flex-col space-y-4">
       <p className="text-base font-normal antialiased">Riwayat Penyakit</p>
-      {healthConditionOptions.map((option) => (
+      {HealthConditionOptions.map((option) => (
         <div key={option.id} className="inline-flex items-center gap-2">
           <label
             className="relative flex cursor-pointer items-center"

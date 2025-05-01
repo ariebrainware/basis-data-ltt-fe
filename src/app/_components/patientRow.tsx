@@ -1,6 +1,7 @@
 import React from 'react'
 import { PatientForm } from '../_components/form'
 import { PatientType } from '../_types/patient'
+import { HealthConditionOptions } from '../_types/healthcondition'
 import {
   Button,
   Dialog,
@@ -26,6 +27,31 @@ export default function Patient({
 
   const handleOpen = () => setOpen(!open)
 
+  const handleHealthConditionLabelDisplay = (ids: string): string => {
+    const idArray = ids.split(',').map((id) => id.trim())
+    const labels = idArray
+      .map((id) => {
+        const option = HealthConditionOptions.find((opt) => opt.id === id)
+        return option ? option.label : null
+      })
+      .filter((label) => label !== null)
+    return labels.join(', ')
+  }
+
+  const handleHealthConditionInput = (input: string): string => {
+    if (!input.trim() || input === '-') return '-'
+    const inputArray = input.split(',').map((item) => item.trim().toLowerCase())
+    const matchedIds = inputArray
+      .map((inputItem) => {
+        const option = HealthConditionOptions.find((opt) =>
+          opt.label.toLowerCase().includes(inputItem)
+        )
+        return option ? option.id : null
+      })
+      .filter((id) => id !== null)
+    return matchedIds.join(',')
+  }
+
   const handleUpdatePatientInfo = () => {
     const full_name_new_input =
       document.querySelector<HTMLInputElement>('#full_name')?.value || name
@@ -42,7 +68,7 @@ export default function Patient({
       document.querySelector<HTMLInputElement>('#address')?.value || address
     const health_history_new_input =
       document.querySelector<HTMLTextAreaElement>('#health_history')?.value ||
-      health_history
+      ''
     const surgery_history_new_input =
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
       surgery_history
@@ -64,7 +90,9 @@ export default function Patient({
         age: Number(age_new_input), // Convert age_new_input to number
         email: email_new_input,
         address: address_new_input,
-        health_history: health_history_new_input,
+        health_history: handleHealthConditionInput(
+          health_history_new_input || ''
+        ),
         surgery_history: surgery_history_new_input,
       }),
     })
@@ -112,7 +140,7 @@ export default function Patient({
             phone_number={phoneNumber}
             email={email}
             address={address}
-            health_history={health_history}
+            health_history={handleHealthConditionLabelDisplay(health_history)}
             surgery_history={surgery_history}
             gender={''}
             last_visit={''}
