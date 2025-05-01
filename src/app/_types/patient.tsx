@@ -1,4 +1,5 @@
 export interface PatientType {
+  ID: number
   full_name: string
   phone_number: string
   job: string

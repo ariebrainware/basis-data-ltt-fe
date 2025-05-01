@@ -57,6 +57,7 @@ const TableBody = ({ patients }: { patients: PatientType[] }) => (
   <tbody className="text-slate-800 group text-sm dark:text-white">
     {patients.map((patient: PatientType, index: number) => (
       <Patient
+        ID={patient.ID}
         key={`${patient.patient_code + index}`}
         full_name={patient.full_name}
         phone_number={patient.phone_number}

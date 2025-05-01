@@ -10,6 +10,7 @@ import {
 } from '@material-tailwind/react'
 
 export default function Patient({
+  ID,
   full_name: name,
   phone_number: phoneNumber,
   job,
@@ -25,6 +26,62 @@ export default function Patient({
 
   const handleOpen = () => setOpen(!open)
 
+  const handleUpdatePatientInfo = () => {
+    const full_name_new_input =
+      document.querySelector<HTMLInputElement>('#full_name')?.value || name
+    const phone_number_new_input =
+      document.querySelector<HTMLInputElement>('#phone_number')?.value ||
+      phoneNumber
+    const job_new_input =
+      document.querySelector<HTMLInputElement>('#job')?.value || job
+    const age_new_input =
+      document.querySelector<HTMLInputElement>('#age')?.value || age
+    const email_new_input =
+      document.querySelector<HTMLInputElement>('#email')?.value || email
+    const address_new_input =
+      document.querySelector<HTMLInputElement>('#address')?.value || address
+    const health_history_new_input =
+      document.querySelector<HTMLTextAreaElement>('#health_history')?.value ||
+      health_history
+    const surgery_history_new_input =
+      document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
+      surgery_history
+
+    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+    fetch(`${host}/patient/${ID}`, {
+      method: 'PATCH',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+        'session-token': localStorage.getItem('session-token') ?? '',
+      },
+      body: JSON.stringify({
+        full_name: full_name_new_input,
+        phone_number: phone_number_new_input,
+        job: job_new_input,
+        age: Number(age_new_input), // Convert age_new_input to number
+        email: email_new_input,
+        address: address_new_input,
+        health_history: health_history_new_input,
+        surgery_history: surgery_history_new_input,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to update patient information')
+        }
+        return response.json()
+      })
+      .then((data) => {
+        console.log('Patient information updated successfully:', data)
+      })
+      .catch((error) => {
+        console.error('Error updating patient information:', error)
+      })
+    setOpen(!open)
+  }
   return (
     <>
       <Dialog
@@ -48,6 +105,7 @@ export default function Patient({
           onPointerLeaveCapture={undefined}
         >
           <PatientForm
+            ID={ID}
             full_name={name}
             job={job}
             age={age}
@@ -80,7 +138,7 @@ export default function Patient({
           <Button
             variant="gradient"
             color="green"
-            onClick={() => handleOpen()}
+            onClick={() => handleUpdatePatientInfo()}
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}

@@ -23,41 +23,46 @@ export function PatientForm({
         <div className="mb-1 flex w-72 gap-6">
           <div className="flex flex-col items-center gap-4">
             <Input
+              id="full_name"
               type="text"
               label="Nama Lengkap"
-              value={full_name}
+              defaultValue={full_name}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
             />
             <Input
+              id="job"
               type="text"
               label="Pekerjaan"
-              value={job}
+              defaultValue={job}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
             />
             <Input
+              id="age"
               type="number"
               label="Umur"
-              value={age}
+              defaultValue={age}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
             />
             <Input
+              id="email"
               type="email"
               label="Email"
-              value={email}
+              defaultValue={email}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
             />
             <Input
+              id="phone_number"
               type="number"
               label="Nomor Telepon"
-              value={phone_number}
+              defaultValue={phone_number}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -65,20 +70,23 @@ export function PatientForm({
           </div>
           <div className="flex flex-col items-center gap-4">
             <Textarea
+              id="address"
               label="Alamat"
-              value={address}
+              defaultValue={address}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
             />
             <Textarea
+              id="health_history"
               label="Riwayat Penyakit"
-              value={health_history}
+              defaultValue={health_history}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
             />
             <Textarea
+              id="surgery_history"
               label="Riwayat Operasi"
-              value={surgery_history}
+              defaultValue={surgery_history}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
             />
