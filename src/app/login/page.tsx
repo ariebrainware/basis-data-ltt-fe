@@ -39,7 +39,6 @@ export default function Login() {
 
       const token = responseData.data.token
       console.log('token', token)
-      debugger
       if (token) {
         setShowVariantAlert(false)
         setMessage('Login Successful!')

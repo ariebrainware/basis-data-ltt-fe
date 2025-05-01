@@ -1,5 +1,5 @@
 import Patient from '../_components/patientRow'
-import { PatientType } from '../_components/patientRow'
+import { PatientType } from '../_types/patient'
 
 interface TablePatientProps {
   Data: {
@@ -57,6 +57,7 @@ const TableBody = ({ patients }: { patients: PatientType[] }) => (
   <tbody className="text-slate-800 group text-sm dark:text-white">
     {patients.map((patient: PatientType, index: number) => (
       <Patient
+        ID={patient.ID}
         key={`${patient.patient_code + index}`}
         full_name={patient.full_name}
         phone_number={patient.phone_number}
@@ -65,6 +66,10 @@ const TableBody = ({ patients }: { patients: PatientType[] }) => (
         gender={patient.gender}
         patient_code={patient.patient_code}
         last_visit={''}
+        email={patient.email}
+        health_history={patient.health_history}
+        surgery_history={patient.surgery_history}
+        address={patient.address}
       />
     ))}
   </tbody>
