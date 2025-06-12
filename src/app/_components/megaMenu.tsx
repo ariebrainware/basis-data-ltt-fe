@@ -15,9 +15,9 @@ import {
 import {
   ChevronDownIcon,
   Bars3Icon,
-  PhoneIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
+import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
 
 const navListMenuItems = [
@@ -49,10 +49,10 @@ const navListMenuItems = [
   //     icon: GlobeAmericasIcon,
   //   },
   {
-    title: 'Kontak',
-    description: 'Menu kontak',
-    icon: PhoneIcon,
-    url: 'https://linktr.ee/leetittarbatam',
+    title: 'Penanganan',
+    description: 'Halaman untuk penanganan pasien',
+    icon: HeartIcon,
+    url: '/patient/treatment',
   },
   //   {
   //     title: 'News',
