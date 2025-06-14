@@ -39,7 +39,7 @@ function useFetchTreatment(
       try {
         const res = await fetch(
           //   `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
-          `${host}/patient/treatment`,
+          `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -53,8 +53,10 @@ function useFetchTreatment(
         )
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
-        const treatmentArray: TreatmentType[] = Array.isArray(data.data)
-          ? data.data
+        const treatmentArray: TreatmentType[] = Array.isArray(
+          data.data.treatment
+        )
+          ? data.data.treatment
           : []
         setTreatment(treatmentArray)
         console.log(`treatmentArray: `, treatmentArray)
@@ -116,7 +118,9 @@ export default function ListTreatment() {
         })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
-        const treatmentArray = Array.isArray(data.data) ? data.data : []
+        const treatmentArray = Array.isArray(data.data.treatment)
+          ? data.data.treatment
+          : []
         setTreatment(treatmentArray)
         setTotal(data.data.total)
       } catch (error) {
