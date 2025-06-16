@@ -79,12 +79,12 @@ const TABS = [
     value: 'all',
   },
   {
-    label: 'Approved',
-    value: 'approved',
+    label: '10',
+    value: '10',
   },
   {
-    label: 'Unapproved',
-    value: 'unapproved',
+    label: '100',
+    value: '100',
   },
 ]
 
@@ -177,7 +177,9 @@ export default function ListTreatment() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
-                onClick={() => window.open('/treatment/register', '_blank')}
+                onClick={() =>
+                  window.open('/patient/treatment/register', '_blank')
+                }
               >
                 <UserPlusIcon strokeWidth={2} className="size-4" /> Tambah
                 Penanganan
