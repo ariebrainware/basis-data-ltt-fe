@@ -54,11 +54,12 @@ function useFetchTreatment(
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
         const treatmentArray: TreatmentType[] = Array.isArray(
-          data.data.treatment
+          data.data.treatments
         )
-          ? data.data.treatment
+          ? data.data.treatments
           : []
         setTreatment(treatmentArray)
+        console.log(`data: `, data.data.treatments)
         console.log(`treatmentArray: `, treatmentArray)
         setTotal(data.data.total)
       } catch (error) {
@@ -118,8 +119,8 @@ export default function ListTreatment() {
         })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
-        const treatmentArray = Array.isArray(data.data.treatment)
-          ? data.data.treatment
+        const treatmentArray = Array.isArray(data.data.treatments)
+          ? data.data.treatments
           : []
         setTreatment(treatmentArray)
         setTotal(data.data.total)
