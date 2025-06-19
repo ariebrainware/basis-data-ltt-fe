@@ -48,13 +48,15 @@ export default function RegisterTherapist() {
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
         'session-token': localStorage.getItem('session-token') ?? '',
       },
+      credentials: 'include',
+      redirect: 'follow',
       body: JSON.stringify({
         full_name: fullName,
         email: email,
         password: password,
         address: address,
         date_of_birth: dateOfBirth,
-        phone_number: phone,
+        phone_number: `62${phone}`, // Assuming phone is in the format '81234567890'
         nik: nik,
         weight: parseInt(weight, 10),
         height: parseInt(height, 10),
@@ -238,7 +240,7 @@ export default function RegisterTherapist() {
                     document.getElementById('password') as HTMLInputElement
                   ).value
                   if (confirmPassword !== password) {
-                    alert('Kata sandi tidak sesuai')
+                    // alert('Kata sandi tidak sesuai')
                     setShowVariantAlert(true)
                     setAlertVariant('error')
                     setMessage('Kata sandi tidak sesuai')
