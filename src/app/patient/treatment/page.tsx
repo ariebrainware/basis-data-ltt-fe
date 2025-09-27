@@ -9,9 +9,9 @@ import {
   Button,
   CardBody,
   CardFooter,
-  Tabs,
-  TabsHeader,
-  Tab,
+  // Tabs,
+  // TabsHeader,
+  // Tab,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
 import Pagination from '../../_components/pagination'
@@ -39,7 +39,7 @@ function useFetchTreatment(
       try {
         const res = await fetch(
           //   `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
-          `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
+          `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=100&offset=${(currentPage - 1) * 100}`}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -74,20 +74,20 @@ function useFetchTreatment(
   return { data: { treatment: treatment }, total }
 }
 
-const TABS = [
-  {
-    label: 'All',
-    value: 'all',
-  },
-  {
-    label: '10',
-    value: '10',
-  },
-  {
-    label: '100',
-    value: '100',
-  },
-]
+// const TABS = [
+//   {
+//     label: 'All',
+//     value: 'all',
+//   },
+//   {
+//     label: '10',
+//     value: '10',
+//   },
+//   {
+//     label: '100',
+//     value: '100',
+//   },
+// ]
 
 export default function ListTreatment() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -223,7 +223,7 @@ export default function ListTreatment() {
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <Tabs value="all" className="w-full md:w-max">
+            {/* <Tabs value="all" className="w-full md:w-max">
               <TabsHeader
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
@@ -241,7 +241,7 @@ export default function ListTreatment() {
                   </Tab>
                 ))}
               </TabsHeader>
-            </Tabs>
+            </Tabs> */}
             <div className="w-full md:w-72">
               <Input
                 label="Cari Penanganan"
