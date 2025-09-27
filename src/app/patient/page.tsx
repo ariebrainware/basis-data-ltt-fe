@@ -29,7 +29,7 @@ function usePatients(
     ;(async () => {
       try {
         const res = await fetch(
-          `${host}/patient?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
+          `${host}/patient?${keyword ? `keyword=${keyword}` : `limit=100&offset=${(currentPage - 1) * 100}`}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -146,7 +146,7 @@ export default function Patient() {
           setCurrentPage={
             setCurrentPage as React.Dispatch<SetStateAction<number>>
           }
-          total={total}
+          total={total / 10}
         />
       </DashboardContent>
       <div className={styles.page}>
