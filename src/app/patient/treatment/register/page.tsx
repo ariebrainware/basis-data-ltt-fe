@@ -12,7 +12,7 @@ import { TreatmentConditionOptions } from '@/app/_types/treatmentConditionOption
 
 let treatmentDateInput: HTMLInputElement | null = null
 let patientCodeInput: HTMLInputElement | null = null
-let treatmentHistoryInput: string[] = []
+let treatmentHistoryInput: string[] | string = []
 let issuesInput: HTMLInputElement | null = null
 let remarksInput: HTMLInputElement | null = null
 let nextVisitInput: HTMLInputElement | null = null
@@ -34,7 +34,7 @@ function MultipleCheckboxes() {
       'treatmentHistory'
     ) as HTMLInputElement | null
     if (treatmentHistoryInputElement) {
-      treatmentHistoryInputElement.value = checkedItems.join(', ')
+      treatmentHistoryInputElement.value = checkedItems.join(',')
     }
   }, [checkedItems])
   return (
@@ -74,7 +74,14 @@ export default function RegisterTreatment() {
     const issues = issuesInput ? issuesInput.value : ''
     const remarks = remarksInput ? remarksInput.value : ''
     const nextVisit = nextVisitInput ? nextVisitInput.value : ''
-    const treatmentHistory = treatmentHistoryInput.join(', ')
+    const treatmentHistory = Array.isArray(treatmentHistoryInput)
+      ? treatmentHistoryInput
+      : typeof treatmentHistoryInput === 'string'
+        ? treatmentHistoryInput
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : []
     const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
     const response = await fetch(`${host}/patient/treatment`, {
       method: 'POST',
@@ -89,8 +96,8 @@ export default function RegisterTreatment() {
       redirect: 'follow',
       body: JSON.stringify({
         treatment_date: treatmentDate,
-        patientCode: patientCode,
-        therapistID: therapistID,
+        patient_code: patientCode,
+        therapist_id: therapistID,
         issues: issues,
         treatment: treatmentHistory,
         remarks: remarks,
@@ -98,6 +105,7 @@ export default function RegisterTreatment() {
       }),
     })
 
+    console.log(treatmentDate)
     if (!response.ok) {
       setShowVariantAlert(true)
       setAlertVariant('error')
@@ -129,7 +137,7 @@ export default function RegisterTreatment() {
     ) as HTMLInputElement
     issuesInput = document.getElementById('issues') as HTMLInputElement
     remarksInput = document.getElementById('remarks') as HTMLInputElement
-    nextVisitInput = document.getElementById('next_visit') as HTMLInputElement
+    nextVisitInput = document.getElementById('nextVisit') as HTMLInputElement
   }, [])
 
   return (
@@ -147,12 +155,12 @@ export default function RegisterTreatment() {
         <form>
           <div className="w-72 space-y-1">
             <label
-              htmlFor="date_of_birth"
+              htmlFor="treatmentDate"
               className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               Waktu & Tanggal
             </label>
-            <DatePicker id="date_of_birth" />
+            <DatePicker id="treatmentDate" />
           </div>
           <div className="w-72 space-y-1">
             <label
@@ -201,17 +209,34 @@ export default function RegisterTreatment() {
               Penanganan
             </label>
             <div className="relative w-full">{MultipleCheckboxes()}</div>
-
             <div className="w-72 space-y-1">
               <label
                 htmlFor="issues"
+                className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
+              >
+                Remarks
+              </label>
+              <div className="relative w-full">
+                <textarea
+                  id="remarks"
+                  placeholder="Lutut 80% membaik. Saran: HS 3x2"
+                  className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
+                  data-error="false"
+                  data-success="false"
+                  data-icon-placement=""
+                />
+              </div>
+            </div>
+            <div className="w-72 space-y-1">
+              <label
+                htmlFor="nextVisit"
                 className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
               >
                 Kunjungan Selanjutnya
               </label>
               <div className="relative w-full">
                 <input
-                  id="address"
+                  id="nextVisit"
                   placeholder="7-14 hari"
                   type="text"
                   className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
@@ -236,7 +261,7 @@ export default function RegisterTreatment() {
 
           <div className={styles.ctas}>
             <Button
-              id="registerTherapistButton"
+              id="registerTreatmentButton"
               className="mt-4 rounded-full"
               onClick={() => {
                 // e.preventDefault()
