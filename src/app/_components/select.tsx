@@ -16,7 +16,34 @@ export function ControlledSelect({
   const handleChange = (value: string | undefined) => {
     onChange(value ?? '')
   }
+  const [therapists, setTherapists] = React.useState<
+    { ID: string; full_name: string; role: string }[]
+  >([])
 
+  React.useEffect(() => {
+    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+
+    fetch(`${host}/therapist`, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+        'session-token': localStorage.getItem('session-token') ?? '',
+      },
+      credentials: 'include',
+      redirect: 'follow',
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const therapistsArray = Array.isArray(data.data.therapists)
+          ? data.data.therapists
+          : []
+        setTherapists(therapistsArray)
+      })
+      .catch(() => setTherapists([]))
+  }, [])
   return (
     <div className="w-72">
       <Select
@@ -27,8 +54,11 @@ export function ControlledSelect({
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
       >
-        <Option value="therapist-senior">Terapis Senior</Option>
-        <Option value="therapist-master">Terapis Master</Option>
+        {therapists.map((therapist) => (
+          <Option key={therapist.ID} value={therapist.ID}>
+            {therapist.role} | {therapist.full_name}
+          </Option>
+        ))}
       </Select>
     </div>
   )
