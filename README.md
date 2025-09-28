@@ -1,6 +1,6 @@
 # Next.js Project Setup and Explanation
 
-This project was bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) and uses the powerful framework [Next.js](https://nextjs.org) for building server-side rendered React applications. In addition to getting started quickly, this setup provides an optimized development experience with automatic hot-reloading and file-based routing.
+This project was bootstrapp with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) and uses the powerful framework [Next.js](https://nextjs.org) for building server-side rendered React applications. In addition to getting started quickly, this setup provides an optimized development experience with automatic hot-reloading and file-based routing.
 
 ## Getting Started
 
