@@ -92,8 +92,6 @@ export default function RegisterTreatment() {
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
         'session-token': localStorage.getItem('session-token') ?? '',
       },
-      credentials: 'include',
-      redirect: 'follow',
       body: JSON.stringify({
         treatment_date: treatmentDate,
         patient_code: patientCode,
