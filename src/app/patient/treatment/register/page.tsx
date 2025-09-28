@@ -86,6 +86,7 @@ export default function RegisterTreatment() {
     const response = await fetch(`${host}/patient/treatment`, {
       method: 'POST',
       mode: 'cors',
+      credentials: 'omit',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
