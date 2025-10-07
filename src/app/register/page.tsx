@@ -12,7 +12,7 @@ let addressInput: HTMLInputElement | null = null
 let phoneNumber: string[] = []
 let healthHistory: string[] = []
 let surgeryHistory: HTMLInputElement | null = null
-// let patientCodeInput: HTMLInputElement | null = null
+let patientCodeInput: HTMLInputElement | null = null
 
 if (typeof window !== 'undefined') {
   const updatePhoneNumbers = () => {
@@ -118,7 +118,7 @@ async function sendRegisterRequest() {
   const job = jobInput ? jobInput.value : ''
   const address = addressInput ? addressInput.value : ''
   const surgery_history = surgeryHistory ? surgeryHistory.value : ''
-  // const patient_code = patientCodeInput ? patientCodeInput.value : ''
+  const patient_code = patientCodeInput ? patientCodeInput.value : ''
   const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
   const data = await fetch(`${host}/patient`, {
     method: 'POST',
@@ -137,7 +137,7 @@ async function sendRegisterRequest() {
       health_history: healthHistory,
       surgery_history,
       phone_number: phoneNumber,
-      // patient_code,
+      patient_code,
     }),
   })
   const responseData = await data.json()
@@ -238,9 +238,9 @@ export default function Register() {
     surgeryHistory = document.getElementById(
       'surgeryHistory'
     ) as HTMLInputElement
-    // patientCodeInput = document.getElementById(
-    //   'patientCode'
-    // ) as HTMLInputElement
+    patientCodeInput = document.getElementById(
+      'patientCode'
+    ) as HTMLInputElement
   }, [])
 
   return (
@@ -344,7 +344,7 @@ export default function Register() {
         </div>
         {renderInput('phoneNumber', 'phoneNumber', 'Nomor Telepon')}
 
-        {/* {renderInput('patientCode', 'text', 'Kode Pasien')} */}
+        {renderInput('patientCode', 'text', 'Kode Pasien')}
 
         <div className={styles.ctas}>
           <a
