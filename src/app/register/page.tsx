@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
 import { HealthConditionOptions } from '../_types/healthcondition'
+import { useRef } from 'react'
 
 let fullnameInput: HTMLInputElement | null = null
 let ageInput: HTMLInputElement | null = null
@@ -12,7 +13,6 @@ let addressInput: HTMLInputElement | null = null
 let phoneNumber: string[] = []
 let healthHistory: string[] = []
 let surgeryHistory: HTMLInputElement | null = null
-let patientCodeInput: HTMLInputElement | null = null
 
 if (typeof window !== 'undefined') {
   const updatePhoneNumbers = () => {
@@ -108,8 +108,9 @@ function MultipleCheckboxes() {
     </div>
   )
 }
-
-async function sendRegisterRequest() {
+async function sendRegisterRequest(
+  patientCodeRef?: React.RefObject<HTMLInputElement | null>
+) {
   const genderInput =
     (document.querySelector('input[name="gender"]:checked') as HTMLInputElement)
       ?.value || ''
@@ -118,9 +119,20 @@ async function sendRegisterRequest() {
   const job = jobInput ? jobInput.value : ''
   const address = addressInput ? addressInput.value : ''
   const surgery_history = surgeryHistory ? surgeryHistory.value : ''
-  const patient_code = patientCodeInput ? patientCodeInput.value : ''
+  // Always try to get the value from the patientCode input field if it exists in the DOM
+  let patient_code = ''
+  if (patientCodeRef && patientCodeRef.current) {
+    patient_code = patientCodeRef.current.value
+  } else {
+    const patientCodeInputEl = document.getElementById(
+      'patientCode'
+    ) as HTMLInputElement | null
+    if (patientCodeInputEl) {
+      patient_code = patientCodeInputEl.value
+    }
+  }
   const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-  console.log(`patient_code`, patient_code)
+  console.log(`patient_code_ref_value:: `, patient_code)
   console.log(`full_name`, full_name)
   const data = await fetch(`${host}/patient`, {
     method: 'POST',
@@ -230,10 +242,9 @@ function renderInput(id: string, type: string, placeHolder: string) {
     </div>
   )
 }
-
 export default function Register() {
   const [showPatientCode, setShowPatientCode] = useState(false)
-
+  const patientCodeRef = useRef<HTMLInputElement | null>(null)
   useEffect(() => {
     fullnameInput = document.getElementById('fullName') as HTMLInputElement
     ageInput = document.getElementById('age') as HTMLInputElement
@@ -242,9 +253,7 @@ export default function Register() {
     surgeryHistory = document.getElementById(
       'surgeryHistory'
     ) as HTMLInputElement
-    patientCodeInput = document.getElementById(
-      'patientCode'
-    ) as HTMLInputElement
+    // patientCodeInput is now handled by ref
   }, [])
 
   return (
@@ -357,9 +366,23 @@ export default function Register() {
             checked={showPatientCode}
             onChange={() => setShowPatientCode((prev) => !prev)}
           />
-          {showPatientCode && renderInput('patientCode', 'text', 'Kode Pasien')}
+          {showPatientCode && (
+            <div className="relative w-full">
+              <input
+                required
+                type="text"
+                id="patientCode"
+                name="patientCode"
+                className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-lg border bg-transparent p-3 text-base shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
+                data-error="false"
+                data-success="false"
+                data-icon-placement=""
+                placeholder="Kode Pasien"
+                ref={patientCodeRef}
+              />
+            </div>
+          )}
         </div>
-
         <div className={styles.ctas}>
           <a
             className="bg-slate-200 cursor-not-allowed"
@@ -371,7 +394,7 @@ export default function Register() {
                 'termConditionCheckbox'
               ) as HTMLInputElement | null
               if (!termCheckbox?.checked) return
-              sendRegisterRequest()
+              sendRegisterRequest(patientCodeRef)
             }}
           >
             DAFTAR
