@@ -120,6 +120,8 @@ async function sendRegisterRequest() {
   const surgery_history = surgeryHistory ? surgeryHistory.value : ''
   const patient_code = patientCodeInput ? patientCodeInput.value : ''
   const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+  console.log(`patient_code`, patient_code)
+  console.log(`full_name`, full_name)
   const data = await fetch(`${host}/patient`, {
     method: 'POST',
     mode: 'cors',
@@ -230,6 +232,8 @@ function renderInput(id: string, type: string, placeHolder: string) {
 }
 
 export default function Register() {
+  const [showPatientCode, setShowPatientCode] = useState(false)
+
   useEffect(() => {
     fullnameInput = document.getElementById('fullName') as HTMLInputElement
     ageInput = document.getElementById('age') as HTMLInputElement
@@ -343,8 +347,18 @@ export default function Register() {
           ></textarea>
         </div>
         {renderInput('phoneNumber', 'phoneNumber', 'Nomor Telepon')}
-
-        {renderInput('patientCode', 'text', 'Kode Pasien')}
+        <div>
+          <Checkbox
+            label="Data Pasien Lama (Opsional)"
+            id="legacyPatientCodeCheckbox"
+            crossOrigin={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
+            checked={showPatientCode}
+            onChange={() => setShowPatientCode((prev) => !prev)}
+          />
+          {showPatientCode && renderInput('patientCode', 'text', 'Kode Pasien')}
+        </div>
 
         <div className={styles.ctas}>
           <a
