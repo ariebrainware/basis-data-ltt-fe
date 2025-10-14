@@ -49,6 +49,8 @@ function MultipleCheckboxes() {
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             crossOrigin={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           />
           <label
             htmlFor={option.id}
@@ -269,6 +271,8 @@ export default function RegisterTreatment() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               DAFTAR
             </Button>
