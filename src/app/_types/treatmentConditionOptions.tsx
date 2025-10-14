@@ -10,4 +10,5 @@ export const TreatmentConditionOptions = [
   { id: 'BB', label: 'Bebatu (BB)' },
   { id: 'GH', label: 'Ghuasa (GH)' },
   { id: 'KT', label: 'Kursi Terapi (KT)' },
+  { id: 'BSM', label: 'Body Space Medicine (BSM)' },
 ]
