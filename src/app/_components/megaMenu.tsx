@@ -85,6 +85,8 @@ function NavListMenu() {
           onClick={() => {
             window.location.href = url
           }}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <div className="flex items-center justify-center rounded-lg !bg-blue-gray-50 p-2 ">
             {' '}
@@ -101,6 +103,8 @@ function NavListMenu() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               {title}
             </Typography>
@@ -110,6 +114,8 @@ function NavListMenu() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               {description}
             </Typography>
@@ -135,6 +141,8 @@ function NavListMenu() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ListItem
               className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
@@ -143,6 +151,8 @@ function NavListMenu() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               Menu
               <ChevronDownIcon
@@ -165,6 +175,8 @@ function NavListMenu() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ul className="grid grid-cols-3 gap-y-2 outline-none outline-0">
             {renderItems}
@@ -185,6 +197,8 @@ function NavList() {
       placeholder={undefined}
       onPointerEnterCapture={undefined}
       onPointerLeaveCapture={undefined}
+      onResize={undefined}
+      onResizeCapture={undefined}
     >
       <Typography
         as="a"
@@ -195,12 +209,16 @@ function NavList() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <ListItem
           className="flex items-center gap-2 py-2 pr-4"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Home
         </ListItem>
@@ -215,6 +233,8 @@ function NavList() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <ListItem
           className="flex items-center gap-2 py-2 pr-4"
@@ -245,6 +265,8 @@ function NavList() {
               console.error('Logout error:', error)
             }
           }}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Log Out
         </ListItem>
@@ -269,6 +291,8 @@ export default function MegaMenuDefault() {
       placeholder={undefined}
       onPointerEnterCapture={undefined}
       onPointerLeaveCapture={undefined}
+      onResize={undefined}
+      onResizeCapture={undefined}
     >
       <div className="flex items-center justify-between text-blue-gray-900">
         <Typography
@@ -277,6 +301,8 @@ export default function MegaMenuDefault() {
           variant="h6"
           className="mr-4 cursor-pointer py-1.5 lg:ml-2"
           placeholder={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
         >
@@ -293,6 +319,8 @@ export default function MegaMenuDefault() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           {openNav ? (
             <XMarkIcon className="size-6" strokeWidth={2} />
