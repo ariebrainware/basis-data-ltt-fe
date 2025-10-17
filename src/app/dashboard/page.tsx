@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { useState, useEffect } from 'react'
 import MegaMenuDefault from '../_components/megaMenu'
 import {
   MagnifyingGlassIcon,
@@ -11,50 +12,120 @@ import {
   Typography,
   Button,
   CardBody,
+  CardFooter,
   Input,
 } from '@material-tailwind/react'
+import { TreatmentType } from '../_types/treatment'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
+import Pagination from '../_components/pagination'
 
 const TABLE_HEAD = ['Patient Name', 'Age', 'Date/Time', 'Therapist', 'Issues']
 
-const TREATMENT_DATA = [
-  {
-    patientName: 'Angga (A123)',
-    age: 30,
-    datetime: '2025-10-14 15:00',
-    therapist: 'Senior Afrizal',
-    issues: 'Vertigaul',
-  },
-  {
-    patientName: 'Gunawan (G123)',
-    age: 26,
-    datetime: '2025-10-14 16:00',
-    therapist: 'Master Nofianto',
-    issues: 'Keram betis',
-  },
-  {
-    patientName: 'Ratu (R123)',
-    age: 19,
-    datetime: '2025-10-14 17:00',
-    therapist: 'Senior Eric',
-    issues: 'Lower Back Pain',
-  },
-  {
-    patientName: 'Zandaya (Z123)',
-    age: 98,
-    datetime: '2025-10-14 18:00',
-    therapist: 'Master Robert',
-    issues: 'HNP L9-S1',
-  },
-  {
-    patientName: 'Peter (P123)',
-    age: 43,
-    datetime: '2025-10-14 19:00',
-    therapist: 'Master Eddy',
-    issues: 'Frozen Shoulder',
-  },
-]
+// const TREATMENT_DATA = [
+//   {
+//     patientName: 'Angga (A123)',
+//     age: 30,
+//     datetime: '2025-10-14 15:00',
+//     therapist: 'Senior Afrizal',
+//     issues: 'Vertigaul',
+//   },
+//   {
+//     patientName: 'Gunawan (G123)',
+//     age: 26,
+//     datetime: '2025-10-14 16:00',
+//     therapist: 'Master Nofianto',
+//     issues: 'Keram betis',
+//   },
+//   {
+//     patientName: 'Ratu (R123)',
+//     age: 19,
+//     datetime: '2025-10-14 17:00',
+//     therapist: 'Senior Eric',
+//     issues: 'Lower Back Pain',
+//   },
+//   {
+//     patientName: 'Zandaya (Z123)',
+//     age: 98,
+//     datetime: '2025-10-14 18:00',
+//     therapist: 'Master Robert',
+//     issues: 'HNP L9-S1',
+//   },
+//   {
+//     patientName: 'Peter (P123)',
+//     age: 43,
+//     datetime: '2025-10-14 19:00',
+//     therapist: 'Master Eddy',
+//     issues: 'Frozen Shoulder',
+//   },
+// ]
 
+interface ListTreatmentResponse {
+  data: {
+    treatment: TreatmentType[]
+  }
+  total: number
+}
+
+function useFetchTreatment(
+  currentPage: number,
+  keyword: string
+): ListTreatmentResponse {
+  const [treatment, setTreatment] = useState<TreatmentType[]>([])
+  const [total, setTotal] = useState(0)
+  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const today = new Date()
+        const yyyy = today.getFullYear()
+        const mm = String(today.getMonth() + 1).padStart(2, '0')
+        const dd = String(today.getDate()).padStart(2, '0')
+        const groupByDate = `${yyyy}-${mm}-${dd}`
+        // const customDate = `2025-09-13`
+        const res = await fetch(
+          `${host}/patient/treatment?group_by_date=${groupByDate}`,
+          {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+              'session-token': localStorage.getItem('session-token') ?? '',
+            },
+          }
+        )
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+        const data = await res.json()
+        const treatmentArray: TreatmentType[] = Array.isArray(
+          data.data.treatments
+        )
+          ? data.data.treatments
+          : []
+        setTreatment(treatmentArray)
+        console.log(`data: `, data.data.treatments)
+        console.log(`treatmentArray: `, treatmentArray)
+        setTotal(data.data.total)
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('401')) {
+          UnauthorizedAccess()
+        }
+        console.error('Error fetching treatment:', error)
+      }
+    })()
+  }, [currentPage, host, keyword])
+
+  return { data: { treatment: treatment }, total }
+}
 export default function Dashboard() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [treatment, setTreatment] = useState<TreatmentType[]>([])
+  const [keyword] = useState('')
+  const { data, total } = useFetchTreatment(currentPage, keyword)
+  useEffect(() => {
+    setTreatment(data.treatment)
+  }, [data])
   return (
     <div>
       <MegaMenuDefault />
@@ -150,15 +221,18 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {TREATMENT_DATA.map(
-                ({ patientName, age, datetime, therapist, issues }, index) => {
-                  const isLast = index === TREATMENT_DATA.length - 1
+              {treatment.map(
+                (
+                  { patient_name, treatment_date, therapist_id, issues },
+                  index
+                ) => {
+                  const isLast = index === treatment.length - 1
                   const classes = isLast
                     ? 'p-4'
                     : 'p-4 border-b border-blue-gray-50'
 
                   return (
-                    <tr key={patientName}>
+                    <tr key={patient_name}>
                       <td className={classes}>
                         <div className="flex items-center gap-3">
                           <Typography
@@ -171,11 +245,11 @@ export default function Dashboard() {
                             onResize={undefined}
                             onResizeCapture={undefined}
                           >
-                            {patientName}
+                            {patient_name}
                           </Typography>
                         </div>
                       </td>
-                      <td className={classes}>
+                      {/* <td className={classes}>
                         <Typography
                           variant="small"
                           color="blue-gray"
@@ -188,7 +262,7 @@ export default function Dashboard() {
                         >
                           {age}
                         </Typography>
-                      </td>
+                      </td> */}
                       <td className={classes}>
                         <Typography
                           variant="small"
@@ -200,7 +274,7 @@ export default function Dashboard() {
                           onResize={undefined}
                           onResizeCapture={undefined}
                         >
-                          {datetime}
+                          {treatment_date}
                         </Typography>
                       </td>
                       <td className={classes}>
@@ -214,7 +288,7 @@ export default function Dashboard() {
                           onResize={undefined}
                           onResizeCapture={undefined}
                         >
-                          {therapist}
+                          {therapist_id}
                         </Typography>
                       </td>
                       <td className={classes}>
@@ -242,7 +316,7 @@ export default function Dashboard() {
             </tbody>
           </table>
         </CardBody>
-        {/* <CardFooter
+        <CardFooter
           className="flex items-center justify-between border-t border-blue-gray-50 p-4"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
@@ -250,108 +324,12 @@ export default function Dashboard() {
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <Button
-            variant="outlined"
-            size="sm"
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            Previous
-          </Button>
-          <div className="flex items-center gap-2">
-            <IconButton
-              variant="outlined"
-              size="sm"
-              placeholder={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            >
-              1
-            </IconButton>
-            <IconButton
-              variant="text"
-              size="sm"
-              placeholder={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            >
-              2
-            </IconButton>
-            <IconButton
-              variant="text"
-              size="sm"
-              placeholder={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            >
-              3
-            </IconButton>
-            <IconButton
-              variant="text"
-              size="sm"
-              placeholder={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            >
-              ...
-            </IconButton>
-            <IconButton
-              variant="text"
-              size="sm"
-              placeholder={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            >
-              8
-            </IconButton>
-            <IconButton
-              variant="text"
-              size="sm"
-              placeholder={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            >
-              9
-            </IconButton>
-            <IconButton
-              variant="text"
-              size="sm"
-              placeholder={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            >
-              10
-            </IconButton>
-          </div>
-          <Button
-            variant="outlined"
-            size="sm"
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            Next
-          </Button>
-        </CardFooter> */}
+          <Pagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            total={total}
+          />
+        </CardFooter>
       </Card>
     </div>
   )
