@@ -19,7 +19,12 @@ import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import Pagination from '../_components/pagination'
 
-const TABLE_HEAD = ['Patient Name', 'Age', 'Date/Time', 'Therapist', 'Issues']
+const TABLE_HEAD = [
+  'Patient Name (P. Code)',
+  'Date/Time',
+  'Therapist (ID)',
+  'Keluhan',
+]
 
 // const TREATMENT_DATA = [
 //   {
@@ -181,6 +186,9 @@ export default function Dashboard() {
                 onPointerLeaveCapture={undefined}
                 onResize={undefined}
                 onResizeCapture={undefined}
+                onClick={() =>
+                  window.open('/patient/treatment/register', '_blank')
+                }
               >
                 <PlusCircleIcon strokeWidth={2} className="size-4" /> Tambah
                 Penanganan
@@ -223,7 +231,15 @@ export default function Dashboard() {
             <tbody>
               {treatment.map(
                 (
-                  { patient_name, treatment_date, therapist_id, issues },
+                  {
+                    patient_name,
+                    patient_code,
+
+                    treatment_date,
+                    therapist_name,
+                    therapist_id,
+                    issues,
+                  },
                   index
                 ) => {
                   const isLast = index === treatment.length - 1
@@ -245,7 +261,7 @@ export default function Dashboard() {
                             onResize={undefined}
                             onResizeCapture={undefined}
                           >
-                            {patient_name}
+                            {patient_name} ({patient_code})
                           </Typography>
                         </div>
                       </td>
@@ -288,7 +304,7 @@ export default function Dashboard() {
                           onResize={undefined}
                           onResizeCapture={undefined}
                         >
-                          {therapist_id}
+                          {therapist_name} ({therapist_id})
                         </Typography>
                       </td>
                       <td className={classes}>
