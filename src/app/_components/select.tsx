@@ -53,6 +53,8 @@ export function ControlledSelect({
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         {therapists.map((therapist) => (
           <Option key={therapist.ID} value={therapist.ID}>
