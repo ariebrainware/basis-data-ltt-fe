@@ -22,6 +22,8 @@ export default function Pagination({
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Sebelumnya
         </Button>
@@ -33,6 +35,8 @@ export default function Pagination({
           onPointerLeaveCapture={undefined}
           onClick={() => setCurrentPage((prev) => prev + 1)}
           disabled={currentPage === Math.ceil(total / 10)}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Berikutnya
         </Button>

@@ -119,11 +119,15 @@ export default function Patient({
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
         open={open}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <DialogHeader
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Ubah Data Pasien
         </DialogHeader>
@@ -131,6 +135,8 @@ export default function Patient({
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <PatientForm
             ID={ID}
@@ -151,6 +157,8 @@ export default function Patient({
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <Button
             variant="text"
@@ -160,6 +168,8 @@ export default function Patient({
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <span>Cancel</span>
           </Button>
@@ -170,6 +180,8 @@ export default function Patient({
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <span>Confirm</span>
           </Button>
