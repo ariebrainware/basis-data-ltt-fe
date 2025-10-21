@@ -32,6 +32,8 @@ const TableHeader = () => (
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             {head}{' '}
             {index !== TABLE_HEAD.length - 1 && (

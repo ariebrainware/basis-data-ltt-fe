@@ -29,6 +29,8 @@ export default function PhoneInput({ id }: PhoneInputProps) {
         placeholder="s"
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         Nomor Telepon
       </Typography>
@@ -43,6 +45,8 @@ export default function PhoneInput({ id }: PhoneInputProps) {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               {CODES[country]}
             </Button>
@@ -52,6 +56,8 @@ export default function PhoneInput({ id }: PhoneInputProps) {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             {COUNTRIES.map((country, index) => (
               <MenuItem
@@ -60,6 +66,8 @@ export default function PhoneInput({ id }: PhoneInputProps) {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 {country}
               </MenuItem>
@@ -87,6 +95,8 @@ export default function PhoneInput({ id }: PhoneInputProps) {
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
           crossOrigin={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         />
       </div>
     </div>

@@ -26,44 +26,6 @@ const TABLE_HEAD = [
   'Keluhan',
 ]
 
-// const TREATMENT_DATA = [
-//   {
-//     patientName: 'Angga (A123)',
-//     age: 30,
-//     datetime: '2025-10-14 15:00',
-//     therapist: 'Senior Afrizal',
-//     issues: 'Vertigaul',
-//   },
-//   {
-//     patientName: 'Gunawan (G123)',
-//     age: 26,
-//     datetime: '2025-10-14 16:00',
-//     therapist: 'Master Nofianto',
-//     issues: 'Keram betis',
-//   },
-//   {
-//     patientName: 'Ratu (R123)',
-//     age: 19,
-//     datetime: '2025-10-14 17:00',
-//     therapist: 'Senior Eric',
-//     issues: 'Lower Back Pain',
-//   },
-//   {
-//     patientName: 'Zandaya (Z123)',
-//     age: 98,
-//     datetime: '2025-10-14 18:00',
-//     therapist: 'Master Robert',
-//     issues: 'HNP L9-S1',
-//   },
-//   {
-//     patientName: 'Peter (P123)',
-//     age: 43,
-//     datetime: '2025-10-14 19:00',
-//     therapist: 'Master Eddy',
-//     issues: 'Frozen Shoulder',
-//   },
-// ]
-
 interface ListTreatmentResponse {
   data: {
     treatment: TreatmentType[]

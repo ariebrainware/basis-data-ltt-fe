@@ -33,42 +33,12 @@ const navListMenuItems = [
     icon: UserGroupIcon,
     url: '/therapist',
   },
-  //   {
-  //     title: 'Blog',
-  //     description: 'Find the perfect solution for your needs.',
-  //     icon: Bars4Icon,
-  //   },
-  //   {
-  //     title: 'Services',
-  //     description: 'Learn how we can help you achieve your goals.',
-  //     icon: SunIcon,
-  //   },
-  //   {
-  //     title: 'Support',
-  //     description: 'Reach out to us for assistance or inquiries',
-  //     icon: GlobeAmericasIcon,
-  //   },
   {
     title: 'Penanganan',
     description: 'Halaman untuk penanganan pasien',
     icon: HeartIcon,
     url: '/patient/treatment',
   },
-  //   {
-  //     title: 'News',
-  //     description: 'Read insightful articles, tips, and expert opinions.',
-  //     icon: NewspaperIcon,
-  //   },
-  //   {
-  //     title: 'Products',
-  //     description: 'Find the perfect solution for your needs.',
-  //     icon: RectangleGroupIcon,
-  //   },
-  //   {
-  //     title: 'Special Offers',
-  //     description: 'Explore limited-time deals and bundles',
-  //     icon: TagIcon,
-  //   },
 ]
 
 function NavListMenu() {

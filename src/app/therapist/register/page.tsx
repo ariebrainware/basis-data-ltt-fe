@@ -336,6 +336,8 @@ export default function RegisterTherapist() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               DAFTAR
             </Button>

@@ -18,6 +18,8 @@ export function PatientForm({
       placeholder={undefined}
       onPointerEnterCapture={undefined}
       onPointerLeaveCapture={undefined}
+      onResize={undefined}
+      onResizeCapture={undefined}
     >
       <form className="mb-2 mt-8 w-80 max-w-screen-lg sm:w-96">
         <div className="mb-1 flex w-72 gap-6">
@@ -30,6 +32,8 @@ export function PatientForm({
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
             <Input
               id="job"
@@ -39,6 +43,8 @@ export function PatientForm({
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
             <Input
               id="age"
@@ -48,6 +54,8 @@ export function PatientForm({
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
             <Input
               id="email"
@@ -57,6 +65,8 @@ export function PatientForm({
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
             <Input
               id="phone_number"
@@ -66,6 +76,8 @@ export function PatientForm({
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
           </div>
           <div className="flex flex-col items-center gap-4">
@@ -75,6 +87,8 @@ export function PatientForm({
               defaultValue={address}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
             <Textarea
               id="health_history"
@@ -82,6 +96,8 @@ export function PatientForm({
               defaultValue={health_history}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
             <Textarea
               id="surgery_history"
@@ -89,6 +105,8 @@ export function PatientForm({
               defaultValue={surgery_history}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
           </div>
         </div>
