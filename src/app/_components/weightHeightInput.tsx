@@ -45,6 +45,8 @@ export default function WeightHeightInput({
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             Berat Badan
           </Typography>
@@ -65,6 +67,8 @@ export default function WeightHeightInput({
               crossOrigin={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
             <Menu placement="bottom-start">
               <MenuHandler>
@@ -76,6 +80,8 @@ export default function WeightHeightInput({
                   placeholder={undefined}
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
+                  onResize={undefined}
+                  onResizeCapture={undefined}
                 >
                   KG
                 </Button>
@@ -92,6 +98,8 @@ export default function WeightHeightInput({
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             Tinggi Badan
           </Typography>
@@ -112,6 +120,8 @@ export default function WeightHeightInput({
               crossOrigin={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
             <Menu placement="bottom-start">
               <MenuHandler>
@@ -123,6 +133,8 @@ export default function WeightHeightInput({
                   placeholder={undefined}
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
+                  onResize={undefined}
+                  onResizeCapture={undefined}
                 >
                   CM
                 </Button>

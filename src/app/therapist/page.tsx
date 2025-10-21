@@ -138,6 +138,8 @@ export default function ListTherapist() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <CardHeader
           floated={false}
@@ -146,6 +148,8 @@ export default function ListTherapist() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <div className="mb-8 flex items-center justify-between gap-8">
             <div>
@@ -155,6 +159,8 @@ export default function ListTherapist() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Daftar Terapis
               </Typography>
@@ -164,6 +170,8 @@ export default function ListTherapist() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Lihat semua informasi mengenai terapis
               </Typography>
@@ -176,6 +184,8 @@ export default function ListTherapist() {
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
                 onClick={() => window.open('/therapist/register', '_blank')}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 <UserPlusIcon strokeWidth={2} className="size-4" /> Tambah
                 Terapis
@@ -212,6 +222,8 @@ export default function ListTherapist() {
                   localStorage.removeItem('session-token')
                   window.location.href = '/login'
                 }}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Log Out
               </Button>
@@ -223,6 +235,8 @@ export default function ListTherapist() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 {TABS.map(({ label, value }) => (
                   <Tab
@@ -231,6 +245,8 @@ export default function ListTherapist() {
                     placeholder={undefined}
                     onPointerEnterCapture={undefined}
                     onPointerLeaveCapture={undefined}
+                    onResize={undefined}
+                    onResizeCapture={undefined}
                   >
                     &nbsp;&nbsp;{label}&nbsp;&nbsp;
                   </Tab>
@@ -245,6 +261,8 @@ export default function ListTherapist() {
                 onPointerLeaveCapture={undefined}
                 crossOrigin={undefined}
                 onKeyDown={handleInputKeyDown}
+                onResize={undefined}
+                onResizeCapture={undefined}
               />
             </div>
           </div>
@@ -254,6 +272,8 @@ export default function ListTherapist() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <TableTherapist Data={{ therapist: therapists }} />
         </CardBody>
@@ -262,6 +282,8 @@ export default function ListTherapist() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <Pagination
             currentPage={currentPage}

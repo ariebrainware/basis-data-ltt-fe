@@ -41,6 +41,8 @@ function SidebarLight() {
       placeholder={undefined}
       onPointerEnterCapture={undefined}
       onPointerLeaveCapture={undefined}
+      onResize={undefined}
+      onResizeCapture={undefined}
     >
       <>
         <Image
@@ -56,6 +58,8 @@ function SidebarLight() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Material Tailwind
         </Typography>
@@ -65,12 +69,16 @@ function SidebarLight() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <Accordion
           open={open === 1}
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItem
             selected={open === 1}
@@ -80,11 +88,15 @@ function SidebarLight() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ListItemPrefix
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               <Avatar
                 size="sm"
@@ -92,6 +104,8 @@ function SidebarLight() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               />
             </ListItemPrefix>
             <Typography
@@ -99,6 +113,8 @@ function SidebarLight() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               Brooklyn Alice
             </Typography>
@@ -113,12 +129,16 @@ function SidebarLight() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               <ListItem
                 className={`px-16 ${LIST_ITEM_STYLES}`}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 My Profile
               </ListItem>
@@ -127,6 +147,8 @@ function SidebarLight() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Settings
               </ListItem>
@@ -139,6 +161,8 @@ function SidebarLight() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItem
             selected={open === 2}
@@ -148,11 +172,15 @@ function SidebarLight() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ListItemPrefix
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               <RectangleGroupIcon className="size-5" />
             </ListItemPrefix>
@@ -161,6 +189,8 @@ function SidebarLight() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               Dashboard
             </Typography>
@@ -175,12 +205,16 @@ function SidebarLight() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               <ListItem
                 className={`px-12 ${LIST_ITEM_STYLES}`}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Analytics
               </ListItem>
@@ -189,6 +223,8 @@ function SidebarLight() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Sales
               </ListItem>
@@ -200,11 +236,15 @@ function SidebarLight() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <Square2StackIcon className="size-5" />
           </ListItemPrefix>
@@ -215,11 +255,15 @@ function SidebarLight() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <TicketIcon className="size-5" />
           </ListItemPrefix>
@@ -230,11 +274,15 @@ function SidebarLight() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <UserGroupIcon className="size-5" />
           </ListItemPrefix>
@@ -246,17 +294,23 @@ function SidebarLight() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <ListItem
           className={LIST_ITEM_STYLES}
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ChatBubbleLeftEllipsisIcon className="size-5" />
           </ListItemPrefix>
@@ -267,11 +321,15 @@ function SidebarLight() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ArrowLeftStartOnRectangleIcon
               strokeWidth={2.5}
@@ -289,6 +347,8 @@ function SidebarLight() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           New Version Available
         </Typography>
@@ -299,6 +359,8 @@ function SidebarLight() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Update your app and enjoy the new features and improvements.
         </Typography>
@@ -313,6 +375,8 @@ function SidebarLight() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             Dismiss
           </Typography>
@@ -325,6 +389,8 @@ function SidebarLight() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             Upgrade Now
           </Typography>
@@ -336,6 +402,8 @@ function SidebarLight() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         mt v2.1.2
       </Typography>
@@ -361,6 +429,8 @@ function SidebarDark() {
       placeholder={undefined}
       onPointerEnterCapture={undefined}
       onPointerLeaveCapture={undefined}
+      onResize={undefined}
+      onResizeCapture={undefined}
     >
       <div className="mb-2 flex items-center gap-4 p-4">
         <Image
@@ -375,6 +445,8 @@ function SidebarDark() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Material Tailwind
         </Typography>
@@ -384,12 +456,16 @@ function SidebarDark() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <Accordion
           open={open === 1}
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItem
             selected={open === 1}
@@ -399,11 +475,15 @@ function SidebarDark() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ListItemPrefix
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               <Avatar
                 size="sm"
@@ -411,6 +491,8 @@ function SidebarDark() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               />
             </ListItemPrefix>
             <Typography
@@ -418,6 +500,8 @@ function SidebarDark() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               Brooklyn Alice
             </Typography>
@@ -432,12 +516,16 @@ function SidebarDark() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               <ListItem
                 className={`px-16 ${LIST_ITEM_STYLES}`}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 My Profile
               </ListItem>
@@ -446,6 +534,8 @@ function SidebarDark() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Settings
               </ListItem>
@@ -458,6 +548,8 @@ function SidebarDark() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItem
             selected={open === 2}
@@ -467,11 +559,15 @@ function SidebarDark() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ListItemPrefix
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               <RectangleGroupIcon className="size-5" />
             </ListItemPrefix>
@@ -480,6 +576,8 @@ function SidebarDark() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               Dashboard
             </Typography>
@@ -494,12 +592,16 @@ function SidebarDark() {
               placeholder={undefined}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             >
               <ListItem
                 className={`px-12 ${LIST_ITEM_STYLES}`}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Analytics
               </ListItem>
@@ -508,6 +610,8 @@ function SidebarDark() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Sales
               </ListItem>
@@ -519,11 +623,15 @@ function SidebarDark() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <Square2StackIcon className="size-5" />
           </ListItemPrefix>
@@ -534,11 +642,15 @@ function SidebarDark() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <TicketIcon className="size-5" />
           </ListItemPrefix>
@@ -549,11 +661,15 @@ function SidebarDark() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <UserGroupIcon className="size-5" />
           </ListItemPrefix>
@@ -565,17 +681,23 @@ function SidebarDark() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <ListItem
           className={LIST_ITEM_STYLES}
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ChatBubbleLeftEllipsisIcon className="size-5" />
           </ListItemPrefix>
@@ -586,11 +708,15 @@ function SidebarDark() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <ListItemPrefix
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <ArrowLeftStartOnRectangleIcon
               strokeWidth={2.5}
@@ -608,6 +734,8 @@ function SidebarDark() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           New Version Available
         </Typography>
@@ -618,6 +746,8 @@ function SidebarDark() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           Update your app and enjoy the new features and improvements.
         </Typography>
@@ -632,6 +762,8 @@ function SidebarDark() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             Dismiss
           </Typography>
@@ -644,6 +776,8 @@ function SidebarDark() {
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             Upgrade Now
           </Typography>
@@ -655,6 +789,8 @@ function SidebarDark() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         mt v2.1.2
       </Typography>
