@@ -9,9 +9,6 @@ import {
   Button,
   CardBody,
   CardFooter,
-  // Tabs,
-  // TabsHeader,
-  // Tab,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
 import Pagination from '../../_components/pagination'
@@ -38,7 +35,6 @@ function useFetchTreatment(
     ;(async () => {
       try {
         const res = await fetch(
-          //   `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
           `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=100&offset=${(currentPage - 1) * 100}`}`,
           {
             method: 'GET',
@@ -73,21 +69,6 @@ function useFetchTreatment(
 
   return { data: { treatment: treatment }, total }
 }
-
-// const TABS = [
-//   {
-//     label: 'All',
-//     value: 'all',
-//   },
-//   {
-//     label: '10',
-//     value: '10',
-//   },
-//   {
-//     label: '100',
-//     value: '100',
-//   },
-// ]
 
 export default function ListTreatment() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -140,6 +121,8 @@ export default function ListTreatment() {
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <CardHeader
           floated={false}
@@ -148,6 +131,8 @@ export default function ListTreatment() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <div className="mb-8 flex items-center justify-between gap-8">
             <div>
@@ -157,6 +142,8 @@ export default function ListTreatment() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Daftar Penanganan
               </Typography>
@@ -166,6 +153,8 @@ export default function ListTreatment() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Lihat semua informasi mengenai penanganan yang telah dilakukan
                 terhadap pasien
@@ -181,6 +170,8 @@ export default function ListTreatment() {
                 onClick={() =>
                   window.open('/patient/treatment/register', '_blank')
                 }
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 <UserPlusIcon strokeWidth={2} className="size-4" /> Tambah
                 Penanganan
@@ -217,31 +208,14 @@ export default function ListTreatment() {
                   localStorage.removeItem('session-token')
                   window.location.href = '/login'
                 }}
+                onResize={undefined}
+                onResizeCapture={undefined}
               >
                 Log Out
               </Button>
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            {/* <Tabs value="all" className="w-full md:w-max">
-              <TabsHeader
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-              >
-                {TABS.map(({ label, value }) => (
-                  <Tab
-                    key={value}
-                    value={value}
-                    placeholder={undefined}
-                    onPointerEnterCapture={undefined}
-                    onPointerLeaveCapture={undefined}
-                  >
-                    &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                  </Tab>
-                ))}
-              </TabsHeader>
-            </Tabs> */}
             <div className="w-full md:w-72">
               <Input
                 label="Cari Penanganan"
@@ -250,6 +224,8 @@ export default function ListTreatment() {
                 onPointerLeaveCapture={undefined}
                 crossOrigin={undefined}
                 onKeyDown={handleInputKeyDown}
+                onResize={undefined}
+                onResizeCapture={undefined}
               />
             </div>
           </div>
@@ -259,6 +235,8 @@ export default function ListTreatment() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <TableTreatment Data={{ treatment: treatment }} />
         </CardBody>
@@ -267,6 +245,8 @@ export default function ListTreatment() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
         >
           <Pagination
             currentPage={currentPage}
