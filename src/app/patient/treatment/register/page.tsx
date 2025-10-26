@@ -9,8 +9,10 @@ import { VariantAlert } from '../../../_components/alert'
 import { ControlledSelect } from '../../../_components/select'
 
 import { TreatmentConditionOptions } from '@/app/_types/treatmentConditionOptions'
+import TimePicker from '@/app/_components/timepicker'
 
 let treatmentDateInput: HTMLInputElement | null = null
+let treatmentTimeInput: HTMLInputElement | null = null
 let patientCodeInput: HTMLInputElement | null = null
 let treatmentHistoryInput: string[] | string = []
 let issuesInput: HTMLInputElement | null = null
@@ -72,6 +74,7 @@ export default function RegisterTreatment() {
 
   async function sendRegisterTreatmentRequest() {
     const treatmentDate = treatmentDateInput ? treatmentDateInput.value : ''
+    const treatmentTime = treatmentTimeInput ? treatmentTimeInput.value : ''
     const patientCode = patientCodeInput ? patientCodeInput.value : ''
     const issues = issuesInput ? issuesInput.value : ''
     const remarks = remarksInput ? remarksInput.value : ''
@@ -96,7 +99,7 @@ export default function RegisterTreatment() {
         'session-token': localStorage.getItem('session-token') ?? '',
       },
       body: JSON.stringify({
-        treatment_date: treatmentDate,
+        treatment_date: `${treatmentDate} ${treatmentTime}`,
         patient_code: patientCode,
         therapist_id: therapistID,
         issues: issues,
@@ -136,6 +139,12 @@ export default function RegisterTreatment() {
     patientCodeInput = document.getElementById(
       'patientCode'
     ) as HTMLInputElement
+    treatmentTimeInput = document.getElementById(
+      'treatmentTime'
+    ) as HTMLInputElement | null
+    if (treatmentDateInput && treatmentTimeInput) {
+      treatmentDateInput.value = `${treatmentDateInput.value}T${treatmentTimeInput.value}:00`
+    }
     issuesInput = document.getElementById('issues') as HTMLInputElement
     remarksInput = document.getElementById('remarks') as HTMLInputElement
     nextVisitInput = document.getElementById('nextVisit') as HTMLInputElement
@@ -162,6 +171,7 @@ export default function RegisterTreatment() {
               Waktu & Tanggal
             </label>
             <DatePicker id="treatmentDate" />
+            <TimePicker id="treatmentTime" />
           </div>
           <div className="w-72 space-y-1">
             <label
