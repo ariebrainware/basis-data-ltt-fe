@@ -44,14 +44,14 @@ function useFetchTreatment(
   useEffect(() => {
     ;(async () => {
       try {
-        const today = new Date()
-        const yyyy = today.getFullYear()
-        const mm = String(today.getMonth() + 1).padStart(2, '0')
-        const dd = String(today.getDate()).padStart(2, '0')
-        const groupByDate = `${yyyy}-${mm}-${dd}`
-        // const customDate = `2025-09-13`
+        // const today = new Date()
+        // const yyyy = today.getFullYear()
+        // const mm = String(today.getMonth() + 1).padStart(2, '0')
+        // const dd = String(today.getDate()).padStart(2, '0')
+        // const groupByDate = `${yyyy}-${mm}-${dd}`
+        const customDate = `2025-10-24`
         const res = await fetch(
-          `${host}/patient/treatment?group_by_date=${groupByDate}`,
+          `${host}/patient/treatment?group_by_date=${customDate}`,
           {
             method: 'GET',
             mode: 'cors',
