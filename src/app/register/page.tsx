@@ -357,7 +357,7 @@ export default function Register() {
             rows={8}
             id="surgeryHistory"
             name="surgeryHistory"
-            placeholder="Riwayat Operasi (Jika ada)"
+            placeholder="Riwayat Operasi / Penyakit Tambahan (Jika ada)"
             className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white"
           ></textarea>
         </div>
