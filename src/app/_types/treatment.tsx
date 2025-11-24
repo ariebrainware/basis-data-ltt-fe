@@ -8,5 +8,6 @@ export interface TreatmentType {
   next_visit: string
   ID: string
   patient_code: number
+  age: number
   therapist_id: string
 }

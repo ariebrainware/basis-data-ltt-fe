@@ -20,9 +20,10 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import Pagination from '../_components/pagination'
 
 const TABLE_HEAD = [
-  'Patient Name (P. Code)',
-  'Date/Time',
-  'Therapist (ID)',
+  'Nama Pasien (K. Pasien)',
+  'Umur',
+  'Tanggal/Waktu',
+  'Terapis (ID)',
   'Keluhan',
 ]
 
@@ -196,7 +197,7 @@ export default function Dashboard() {
                   {
                     patient_name,
                     patient_code,
-
+                    age,
                     treatment_date,
                     therapist_name,
                     therapist_id,
@@ -227,7 +228,7 @@ export default function Dashboard() {
                           </Typography>
                         </div>
                       </td>
-                      {/* <td className={classes}>
+                      <td className={classes}>
                         <Typography
                           variant="small"
                           color="blue-gray"
@@ -238,9 +239,9 @@ export default function Dashboard() {
                           onResize={undefined}
                           onResizeCapture={undefined}
                         >
-                          {age}
+                          {age} Tahun
                         </Typography>
-                      </td> */}
+                      </td>
                       <td className={classes}>
                         <Typography
                           variant="small"
