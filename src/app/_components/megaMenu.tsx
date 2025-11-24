@@ -103,43 +103,46 @@ function NavListMenu() {
         offset={{ mainAxis: 20 }}
         placement="bottom"
       >
-        <MenuHandler>
-          <Typography
-            as="div"
-            variant="small"
-            className="font-medium"
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            <ListItem
-              className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
-              selected={isMenuOpen || isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen((cur) => !cur)}
-              placeholder={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            >
-              Menu
-              <ChevronDownIcon
-                strokeWidth={2.5}
-                className={`hidden size-3 transition-transform lg:block ${
-                  isMenuOpen ? 'rotate-180' : ''
-                }`}
-              />
-              <ChevronDownIcon
-                strokeWidth={2.5}
-                className={`block size-3 transition-transform lg:hidden ${
-                  isMobileMenuOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </ListItem>
-          </Typography>
-        </MenuHandler>
+        {typeof window !== 'undefined' &&
+          localStorage.getItem('user-role') === 'super_admin' && (
+            <MenuHandler>
+              <Typography
+                as="div"
+                variant="small"
+                className="font-medium"
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <ListItem
+                  className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
+                  selected={isMenuOpen || isMobileMenuOpen}
+                  onClick={() => setIsMobileMenuOpen((cur) => !cur)}
+                  placeholder={undefined}
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
+                  onResize={undefined}
+                  onResizeCapture={undefined}
+                >
+                  Menu
+                  <ChevronDownIcon
+                    strokeWidth={2.5}
+                    className={`hidden size-3 transition-transform lg:block ${
+                      isMenuOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                  <ChevronDownIcon
+                    strokeWidth={2.5}
+                    className={`block size-3 transition-transform lg:hidden ${
+                      isMobileMenuOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </ListItem>
+              </Typography>
+            </MenuHandler>
+          )}
         <MenuList
           className="hidden max-w-screen-xl rounded-xl lg:block"
           placeholder={undefined}

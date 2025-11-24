@@ -38,12 +38,14 @@ export default function Login() {
       }
 
       const token = responseData.data.token
+      const role = responseData.data.role
       console.log('token', token)
       if (token) {
         setShowVariantAlert(false)
         setMessage('Login Successful!')
         setTimeout(() => {
           localStorage.setItem('session-token', token)
+          localStorage.setItem('user-role', role)
           window.location.href = '/dashboard'
         }, 1500)
         return
