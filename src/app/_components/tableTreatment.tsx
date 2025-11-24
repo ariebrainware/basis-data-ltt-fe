@@ -56,6 +56,7 @@ const TableBody = ({ treatment }: { treatment: TreatmentType[] }) => (
         treatment_date={treatment.treatment_date}
         patient_code={treatment.patient_code}
         patient_name={treatment.patient_name}
+        age={treatment.age}
         issues={treatment.issues}
         treatment={treatment.treatment}
         remarks={treatment.remarks}
