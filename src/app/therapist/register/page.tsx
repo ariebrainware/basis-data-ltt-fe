@@ -9,7 +9,6 @@ import PhoneInput from '../../_components/phoneInput'
 import IDCardInput from '../../_components/idCardInput'
 import WeightHeightInput from '../../_components/weightHeightInput'
 import { VariantAlert } from '../../_components/alert'
-import { ControlledSelect } from '../../_components/select'
 
 let fullNameInput: HTMLInputElement | null = null
 let emailInput: HTMLInputElement | null = null
@@ -315,14 +314,34 @@ export default function RegisterTherapist() {
           </div>
 
           <div className="mt-4 w-72 space-y-1">
-            <ControlledSelect
-              id="therapistRole"
-              label="Tingkat Kelas Terapis"
-              onChange={(value: string) => {
-                console.log(`selected value ${value}`)
-                setRole(value)
-              }}
-            />
+            <label
+              htmlFor="therapistRole"
+              className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
+            >
+              Tingkat Kelas Terapis
+            </label>
+            {(() => {
+              const roleOptions = [
+                { value: 'therapist-senior', label: 'Terapis Senior' },
+                { value: 'therapist-master', label: 'Terapis Master' },
+              ]
+              return (
+                <div className="relative w-full">
+                  <select
+                    id="therapistRole"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white"
+                  >
+                    {roleOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )
+            })()}
           </div>
 
           <div className={styles.ctas}>
