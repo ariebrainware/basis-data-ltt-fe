@@ -20,7 +20,7 @@ export const HealthConditionOptions = [
     label: 'Darah Rendah (Low Blood Pressure)',
   },
   {
-    id: 'gastrictAcid',
+    id: 'gastricAcid',
     label: 'Asam Lambung (Gastric Acid)',
   },
   {
