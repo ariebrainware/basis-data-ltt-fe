@@ -70,7 +70,7 @@ export function PatientForm({
             />
             <Input
               id="phone_number"
-              type="number"
+              type="text"
               label="Nomor Telepon"
               defaultValue={phone_number}
               onPointerEnterCapture={undefined}
