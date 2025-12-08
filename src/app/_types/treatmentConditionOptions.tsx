@@ -12,4 +12,5 @@ export const TreatmentConditionOptions = [
   { id: 'KT', label: 'Kursi Terapi (KT)' },
   { id: 'BSM', label: 'Body Space Medicine (BSM)' },
   { id: 'TDP', label: 'Teding Diancibo Pu / Infrared (TDP)' },
+  { id: 'PL', label: 'Palu (PL)' },
 ]
