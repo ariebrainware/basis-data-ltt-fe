@@ -1,5 +1,5 @@
 import React from 'react'
-import { PatientForm } from '../_components/form'
+import { PatientForm } from './patientForm'
 import { PatientType } from '../_types/patient'
 import { HealthConditionOptions } from '../_types/healthcondition'
 import {
@@ -140,6 +140,7 @@ export default function Patient({
         >
           <PatientForm
             ID={ID}
+            patient_code={patientCode}
             full_name={name}
             job={job}
             age={age}
@@ -150,7 +151,6 @@ export default function Patient({
             surgery_history={surgery_history}
             gender={''}
             last_visit={''}
-            patient_code={patientCode}
           />
         </DialogBody>
         <DialogFooter

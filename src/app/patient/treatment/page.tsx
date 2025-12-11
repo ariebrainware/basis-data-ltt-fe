@@ -35,7 +35,7 @@ function useFetchTreatment(
     ;(async () => {
       try {
         const res = await fetch(
-          `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=100&offset=${(currentPage - 1) * 100}`}`,
+          `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
           {
             method: 'GET',
             mode: 'cors',

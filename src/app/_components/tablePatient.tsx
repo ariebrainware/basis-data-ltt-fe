@@ -9,7 +9,7 @@ interface TablePatientProps {
 const TableHeader = () => (
   <thead className="border-slate-200 bg-slate-100 text-slate-600 dark:bg-slate-900 border-b text-sm font-medium">
     <tr>
-      {renderHeaderCell('Pasien')}
+      {renderHeaderCell('Pasien/Nomor Telepon')}
       {renderHeaderCell('Pekerjaan/Umur')}
       {renderHeaderCell('Jenis Kelamin')}
       {renderHeaderCell('Kode Pasien')}
