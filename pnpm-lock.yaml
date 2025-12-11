@@ -47,6 +47,9 @@ importers:
       react-tailwindcss-datepicker:
         specifier: ^2.0.0
         version: 2.0.0(dayjs@1.11.18)(react@19.2.0)
+      sweetalert2:
+        specifier: ^11.26.4
+        version: 11.26.4
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.3.1
@@ -2030,6 +2033,9 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  sweetalert2@11.26.4:
+    resolution: {integrity: sha512-qIgIQOVoz85Xj2Rij+htVFNH+HiIgfSR8ZJsHQvX4p9uLtJveXVqU7vPxJ4Eo6SALnLeo0Sw6COY164Zg3oBiw==}
 
   synckit@0.11.11:
     resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
@@ -4275,6 +4281,8 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  sweetalert2@11.26.4: {}
 
   synckit@0.11.11:
     dependencies:

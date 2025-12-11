@@ -8,6 +8,7 @@ import {
   DialogFooter,
 } from '@material-tailwind/react'
 import { TreatmentForm } from './treatmentForm'
+import Swal from 'sweetalert2'
 
 export default function Treatment({
   ID,
@@ -86,6 +87,15 @@ export default function Treatment({
       .catch((error) => {
         console.error('Error updating patient information:', error)
       })
+    Swal.fire({
+      text: 'Data penanganan pasien berhasil diperbarui.',
+      icon: 'success',
+      confirmButtonText: 'OK',
+    }).then(() => {
+      // Reload the page after user clicks "OK"
+      if (typeof window !== 'undefined') window.location.reload()
+    })
+
     setOpen(!open)
   }
 
