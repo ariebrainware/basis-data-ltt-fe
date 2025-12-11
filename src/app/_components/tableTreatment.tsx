@@ -16,6 +16,7 @@ const TABLE_HEAD = [
   'Keterangan',
   'Kunjungan Selanjutnya',
   'Terapis',
+  '',
 ]
 
 const TableHeader = () => (

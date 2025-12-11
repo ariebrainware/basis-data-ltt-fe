@@ -2,14 +2,17 @@ import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
 
 export function PatientForm({
+  ID,
   full_name,
+  phone_number,
   job,
   age,
   email,
+  gender,
   address,
-  phone_number,
   health_history,
   surgery_history,
+  patient_code,
 }: PatientType) {
   return (
     <Card
@@ -25,6 +28,30 @@ export function PatientForm({
         <div className="mb-1 flex w-72 gap-6">
           <div className="flex flex-col items-center gap-4">
             <Input
+              id="ID"
+              type="text"
+              label="ID"
+              disabled
+              defaultValue={ID}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            />
+            <Input
+              id="patient_code"
+              type="text"
+              label="Kode Pasien"
+              disabled
+              defaultValue={patient_code}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            />
+            <Input
               id="full_name"
               type="text"
               label="Nama Lengkap"
@@ -32,6 +59,15 @@ export function PatientForm({
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            />
+            <Textarea
+              id="phone_number"
+              label="Nomor Telepon"
+              defaultValue={phone_number}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
               onResize={undefined}
               onResizeCapture={undefined}
             />
@@ -48,8 +84,8 @@ export function PatientForm({
             />
             <Input
               id="age"
-              type="number"
-              label="Umur"
+              type="email"
+              label="Age"
               defaultValue={age}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
@@ -59,7 +95,7 @@ export function PatientForm({
             />
             <Input
               id="email"
-              type="email"
+              type="text"
               label="Email"
               defaultValue={email}
               onPointerEnterCapture={undefined}
@@ -68,19 +104,17 @@ export function PatientForm({
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <Input
-              id="phone_number"
-              type="text"
-              label="Nomor Telepon"
-              defaultValue={phone_number}
+          </div>
+          <div className="flex flex-col items-center gap-4">
+            <Textarea
+              id="gender"
+              label="Jenis Kelamin"
+              defaultValue={gender}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
-              crossOrigin={undefined}
               onResize={undefined}
               onResizeCapture={undefined}
             />
-          </div>
-          <div className="flex flex-col items-center gap-4">
             <Textarea
               id="address"
               label="Alamat"
