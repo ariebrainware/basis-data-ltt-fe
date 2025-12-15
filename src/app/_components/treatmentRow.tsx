@@ -254,6 +254,73 @@ export default function Treatment({
               ></path>
             </svg>
           </button>
+          <button
+            className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
+            data-shape="default"
+            onClick={() => {
+              Swal.fire({
+                title: 'Delete Treatment Record?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  const host =
+                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+                  fetch(`${host}/patient/treatment/${ID}`, {
+                    method: 'DELETE',
+                    mode: 'cors',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Accept: 'application/json',
+                      Authorization:
+                        'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+                      'session-token':
+                        localStorage.getItem('session-token') ?? '',
+                    },
+                  })
+                    .then((response) => {
+                      if (!response.ok) throw new Error('Failed to delete')
+                      Swal.fire({
+                        text: 'Treatment record deleted successfully.',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                      }).then(() => {
+                        if (typeof window !== 'undefined')
+                          window.location.reload()
+                      })
+                    })
+                    .catch((error) => {
+                      console.error('Error deleting treatment record:', error)
+                      Swal.fire(
+                        'Error',
+                        'Failed to delete treatment record',
+                        'error'
+                      )
+                    })
+                }
+              })
+            }}
+          >
+            <svg
+              width="1.5em"
+              height="1.5em"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              color="currentColor"
+              className="text-slate-800 size-4 dark:text-white"
+            >
+              <path
+                d="M19.5 6H16.5M19.5 6H4.5M19.5 6V19.5C19.5 20.2956 18.8284 21 18 21H6C5.17157 21 4.5 20.2956 4.5 19.5V6M9 10.5V16.5M15 10.5V16.5M9 6V4.5C9 3.67157 9.67157 3 10.5 3H13.5C14.3284 3 15 3.67157 15 4.5V6"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></path>
+            </svg>
+          </button>
         </td>
       </tr>
     </>
