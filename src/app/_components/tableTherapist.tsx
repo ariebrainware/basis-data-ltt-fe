@@ -15,6 +15,7 @@ const TABLE_HEAD = [
   'Berat / Tinggi Badan',
   'Role',
   'Status',
+  '',
 ]
 
 const TableHeader = () => (
