@@ -52,9 +52,8 @@ function useFetchTherapist(
         )
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
-        // const therapistArray: TherapistType[] = Array.isArray(data) ? data : []
         setTherapist(data.data.therapists)
-        console.log(`therapistArray: `, data.data.therapists)
+        // console.log(`therapistArray: `, data.data.therapists)
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
