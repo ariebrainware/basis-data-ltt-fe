@@ -46,7 +46,7 @@ importers:
         version: 19.2.3(react@19.2.3)
       react-tailwindcss-datepicker:
         specifier: ^2.0.0
-        version: 2.0.0(dayjs@1.11.18)(react@19.2.3)
+        version: 2.0.0(dayjs@1.11.19)(react@19.2.3)
       sweetalert2:
         specifier: ^11.26.16
         version: 11.26.16
@@ -900,8 +900,8 @@ packages:
   date-fns@4.1.0:
     resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
-  dayjs@1.11.18:
-    resolution: {integrity: sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==}
+  dayjs@1.11.19:
+    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
 
   debug@3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
@@ -2851,7 +2851,7 @@ snapshots:
 
   date-fns@4.1.0: {}
 
-  dayjs@1.11.18: {}
+  dayjs@1.11.19: {}
 
   debug@3.2.7:
     dependencies:
@@ -3849,9 +3849,9 @@ snapshots:
 
   react-is@16.13.1: {}
 
-  react-tailwindcss-datepicker@2.0.0(dayjs@1.11.18)(react@19.2.3):
+  react-tailwindcss-datepicker@2.0.0(dayjs@1.11.19)(react@19.2.3):
     dependencies:
-      dayjs: 1.11.18
+      dayjs: 1.11.19
       react: 19.2.3
 
   react@19.2.3: {}
