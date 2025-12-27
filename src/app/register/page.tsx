@@ -158,8 +158,11 @@ async function sendRegisterRequest(
   })
   const responseData = await data.json()
   console.log(`responseData`, responseData)
+
+  // Import SweetAlert2 once for both success and error cases
+  const Swal = (await import('sweetalert2')).default
+
   if (data.ok) {
-    const Swal = (await import('sweetalert2')).default
     await Swal.fire({
       title: 'Sukses',
       text: 'Registrasi berhasil',
@@ -168,7 +171,6 @@ async function sendRegisterRequest(
     })
     window.location.href = '/login'
   } else {
-    const Swal = (await import('sweetalert2')).default
     await Swal.fire({
       title: 'Gagal',
       text: 'Registrasi gagal',
