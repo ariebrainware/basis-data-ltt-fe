@@ -123,11 +123,11 @@ export default function Patient({
 
   const handleDeletePatient = () => {
     Swal.fire({
-      title: 'Delete Patient Record?',
+      title: 'Hapus Data Pasien?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Delete',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: 'Hapus',
+      cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
         const host =
@@ -145,7 +145,7 @@ export default function Patient({
           .then((response) => {
             if (!response.ok) throw new Error('Failed to delete')
             Swal.fire({
-              text: 'Patient record deleted successfully.',
+              text: 'Data pasien berhasil dihapus.',
               icon: 'success',
               confirmButtonText: 'OK',
             }).then(() => {
@@ -154,7 +154,7 @@ export default function Patient({
           })
           .catch((error) => {
             console.error('Error deleting patient record:', error)
-            Swal.fire('Error', 'Failed to delete patient record', 'error')
+            Swal.fire('Error', 'Gagal menghapus data pasien', 'error')
           })
       }
     })
