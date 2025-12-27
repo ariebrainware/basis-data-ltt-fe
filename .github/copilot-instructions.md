@@ -54,7 +54,8 @@ pnpm lint     # Run ESLint
 - Place reusable components in `src/app/_components/`
 - Use functional components with TypeScript
 - Follow Next.js App Router conventions
-- Component files use PascalCase naming (e.g., `PatientForm.tsx`)
+- Component names use PascalCase (e.g., `PatientForm`)
+- Component files use camelCase with `.tsx` extension (e.g., `patientForm.tsx`)
 
 ### Tailwind CSS
 - Use Tailwind CSS utility classes for styling
@@ -81,8 +82,10 @@ src/app/
 - Example: `import { PatientType } from '@/app/_types/patient'`
 
 ## Naming Conventions
-- **Components**: PascalCase (e.g., `PatientForm`, `TableTherapist`)
-- **Files**: camelCase for components (e.g., `patientForm.tsx`, `tablePatient.tsx`)
+- **Component Names**: PascalCase (e.g., `PatientForm`, `TableTherapist`)
+- **Component Files**: camelCase with `.tsx` extension (e.g., `patientForm.tsx`, `tablePatient.tsx`)
+  - Note: The component name inside the file is PascalCase, but the file itself uses camelCase
+  - Example: `PatientForm` component is in `patientForm.tsx` file
 - **Types/Interfaces**: PascalCase with `Type` suffix (e.g., `PatientType`)
 - **Functions**: camelCase
 - **Constants**: UPPER_SNAKE_CASE for true constants
