@@ -157,7 +157,7 @@ export default function Patient({
           .then((response) => {
             if (response.status === 401) {
               UnauthorizedAccess()
-              return
+              return Promise.reject(new Error('Unauthorized'))
             }
             if (!response.ok) throw new Error('Failed to delete')
             Swal.fire({
@@ -170,7 +170,10 @@ export default function Patient({
           })
           .catch((error) => {
             console.error('Error deleting patient record:', error)
-            Swal.fire('Error', 'Gagal menghapus data pasien', 'error')
+            // Don't show error for unauthorized access since UnauthorizedAccess handles it
+            if (error.message !== 'Unauthorized') {
+              Swal.fire('Error', 'Gagal menghapus data pasien', 'error')
+            }
           })
       }
     })
