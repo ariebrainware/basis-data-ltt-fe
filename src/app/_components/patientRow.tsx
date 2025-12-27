@@ -26,6 +26,7 @@ export default function Patient({
   patient_code: patientCode,
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
+  const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
 
   const handleOpen = () => setOpen(!open)
 
@@ -75,8 +76,7 @@ export default function Patient({
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
       surgery_history
 
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-    fetch(`${host}/patient/${ID}`, {
+    fetch(`${API_HOST}/patient/${ID}`, {
       method: 'PATCH',
       mode: 'cors',
       headers: {
@@ -110,6 +110,8 @@ export default function Patient({
       })
       .then((data) => {
         console.log('Patient information updated successfully:', data)
+        // Close modal and show success message
+        setOpen(false)
         Swal.fire({
           text: 'Data pasien berhasil diperbarui.',
           icon: 'success',
@@ -118,7 +120,6 @@ export default function Patient({
           // Reload the page after user clicks "OK"
           if (typeof window !== 'undefined') window.location.reload()
         })
-        setOpen(!open)
       })
       .catch((error) => {
         console.error('Error updating patient information:', error)
@@ -142,9 +143,7 @@ export default function Patient({
       cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
-        const host =
-          process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-        fetch(`${host}/patient/${ID}`, {
+        fetch(`${API_HOST}/patient/${ID}`, {
           method: 'DELETE',
           mode: 'cors',
           headers: {

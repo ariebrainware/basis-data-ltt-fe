@@ -171,6 +171,7 @@ async function sendRegisterRequest(
     })
     window.location.href = '/login'
   } else {
+    // Enhanced error message handling to support various response formats
     const errorMessage =
       (responseData &&
         typeof responseData === 'object' &&
@@ -182,6 +183,15 @@ async function sendRegisterRequest(
            typeof (responseData as any).error === 'string' &&
            (responseData as any).error.trim() !== '')
         ? (responseData as any).error
+        : (responseData &&
+           typeof responseData === 'object' &&
+           Array.isArray((responseData as any).errors))
+        ? (responseData as any).errors.join(', ')
+        : (responseData &&
+           typeof responseData === 'object' &&
+           typeof (responseData as any).errors === 'string' &&
+           (responseData as any).errors.trim() !== '')
+        ? (responseData as any).errors
         : 'Registrasi gagal'
     await Swal.fire({
       title: 'Gagal',
