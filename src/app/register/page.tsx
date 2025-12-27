@@ -158,11 +158,23 @@ async function sendRegisterRequest(
   })
   const responseData = await data.json()
   console.log(`responseData`, responseData)
-  if (data.status === 200) {
-    window.location.href = '/register'
-    alert('Registrasi berhasil')
+  if (data.ok) {
+    const Swal = (await import('sweetalert2')).default
+    await Swal.fire({
+      title: 'Sukses',
+      text: 'Registrasi berhasil',
+      icon: 'success',
+      confirmButtonText: 'OK',
+    })
+    window.location.href = '/login'
   } else {
-    alert('Registrasi gagal')
+    const Swal = (await import('sweetalert2')).default
+    await Swal.fire({
+      title: 'Gagal',
+      text: 'Registrasi gagal',
+      icon: 'error',
+      confirmButtonText: 'OK',
+    })
   }
   return responseData
 }
