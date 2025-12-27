@@ -10,6 +10,7 @@ import {
   DialogFooter,
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 export default function Patient({
   ID,
@@ -98,6 +99,10 @@ export default function Patient({
       }),
     })
       .then((response) => {
+        if (response.status === 401) {
+          UnauthorizedAccess()
+          return Promise.reject(new Error('Unauthorized'))
+        }
         if (!response.ok) {
           throw new Error('Failed to update patient information')
         }
@@ -105,20 +110,27 @@ export default function Patient({
       })
       .then((data) => {
         console.log('Patient information updated successfully:', data)
+        Swal.fire({
+          text: 'Data pasien berhasil diperbarui.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          // Reload the page after user clicks "OK"
+          if (typeof window !== 'undefined') window.location.reload()
+        })
+        setOpen(!open)
       })
       .catch((error) => {
         console.error('Error updating patient information:', error)
+        // Don't show error for unauthorized access since UnauthorizedAccess handles it
+        if (error.message !== 'Unauthorized') {
+          Swal.fire({
+            text: 'Gagal memperbarui data pasien.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          })
+        }
       })
-    Swal.fire({
-      text: 'Data pasien berhasil diperbarui.',
-      icon: 'success',
-      confirmButtonText: 'OK',
-    }).then(() => {
-      // Reload the page after user clicks "OK"
-      if (typeof window !== 'undefined') window.location.reload()
-    })
-
-    setOpen(!open)
   }
 
   const handleDeletePatient = () => {
@@ -143,6 +155,10 @@ export default function Patient({
           },
         })
           .then((response) => {
+            if (response.status === 401) {
+              UnauthorizedAccess()
+              return Promise.reject(new Error('Unauthorized'))
+            }
             if (!response.ok) throw new Error('Failed to delete')
             Swal.fire({
               text: 'Data pasien berhasil dihapus.',
@@ -154,7 +170,10 @@ export default function Patient({
           })
           .catch((error) => {
             console.error('Error deleting patient record:', error)
-            Swal.fire('Error', 'Gagal menghapus data pasien', 'error')
+            // Don't show error for unauthorized access since UnauthorizedAccess handles it
+            if (error.message !== 'Unauthorized') {
+              Swal.fire('Error', 'Gagal menghapus data pasien', 'error')
+            }
           })
       }
     })
