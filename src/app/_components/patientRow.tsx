@@ -10,6 +10,7 @@ import {
   DialogFooter,
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 export default function Patient({
   ID,
@@ -143,6 +144,10 @@ export default function Patient({
           },
         })
           .then((response) => {
+            if (response.status === 401) {
+              UnauthorizedAccess()
+              return
+            }
             if (!response.ok) throw new Error('Failed to delete')
             Swal.fire({
               text: 'Data pasien berhasil dihapus.',
