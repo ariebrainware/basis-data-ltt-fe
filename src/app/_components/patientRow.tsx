@@ -99,6 +99,10 @@ export default function Patient({
       }),
     })
       .then((response) => {
+        if (response.status === 401) {
+          UnauthorizedAccess()
+          return
+        }
         if (!response.ok) {
           throw new Error('Failed to update patient information')
         }
