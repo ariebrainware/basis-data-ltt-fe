@@ -369,7 +369,7 @@ export default function Therapist({
                       })
                     })
                     .catch((error) => {
-                      console.error('Error deleting treatment record:', error)
+                      console.error('Error deleting therapist record:', error)
                       Swal.fire(
                         'Error',
                         'Gagal menghapus data terapis',
