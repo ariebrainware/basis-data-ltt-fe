@@ -336,11 +336,11 @@ export default function Therapist({
             data-shape="default"
             onClick={() => {
               Swal.fire({
-                title: 'Delete Therapist Record?',
+                title: 'Hapus Data Terapis?',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Delete',
-                cancelButtonText: 'Cancel',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
               }).then((result) => {
                 if (result.isConfirmed) {
                   const host =
@@ -360,7 +360,7 @@ export default function Therapist({
                     .then((response) => {
                       if (!response.ok) throw new Error('Failed to delete')
                       Swal.fire({
-                        text: 'Therapist record deleted successfully.',
+                        text: 'Data terapis berhasil dihapus.',
                         icon: 'success',
                         confirmButtonText: 'OK',
                       }).then(() => {
@@ -369,10 +369,10 @@ export default function Therapist({
                       })
                     })
                     .catch((error) => {
-                      console.error('Error deleting treatment record:', error)
+                      console.error('Error deleting therapist record:', error)
                       Swal.fire(
                         'Error',
-                        'Failed to delete treatment record',
+                        'Gagal menghapus data terapis',
                         'error'
                       )
                     })
