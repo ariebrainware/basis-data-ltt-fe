@@ -171,9 +171,21 @@ async function sendRegisterRequest(
     })
     window.location.href = '/login'
   } else {
+    const errorMessage =
+      (responseData &&
+        typeof responseData === 'object' &&
+        typeof (responseData as any).message === 'string' &&
+        (responseData as any).message.trim() !== '')
+        ? (responseData as any).message
+        : (responseData &&
+           typeof responseData === 'object' &&
+           typeof (responseData as any).error === 'string' &&
+           (responseData as any).error.trim() !== '')
+        ? (responseData as any).error
+        : 'Registrasi gagal'
     await Swal.fire({
       title: 'Gagal',
-      text: 'Registrasi gagal',
+      text: errorMessage,
       icon: 'error',
       confirmButtonText: 'OK',
     })
