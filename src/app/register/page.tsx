@@ -162,6 +162,8 @@ async function sendRegisterRequest(
   // Import SweetAlert2 once for both success and error cases
   const Swal = (await import('sweetalert2')).default
 
+  // Using data.ok checks for all 2xx success status codes (200-299)
+  // This is more robust than checking data.status === 200
   if (data.ok) {
     await Swal.fire({
       title: 'Sukses',
