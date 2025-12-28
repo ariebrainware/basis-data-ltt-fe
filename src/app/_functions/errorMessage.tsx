@@ -44,7 +44,12 @@ export function extractErrorMessage(
 
   // Check for errors as array
   if (Array.isArray(apiResponse.errors)) {
-    return (apiResponse.errors as string[]).join(', ')
+    const errorArray = (apiResponse.errors as string[])
+      .map((err) => (typeof err === 'string' ? err.trim() : ''))
+      .filter((err) => err !== '')
+    if (errorArray.length > 0) {
+      return errorArray.join(', ')
+    }
   }
 
   // Check for errors as string
