@@ -16,6 +16,7 @@ import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
 import { UnauthorizedAccess } from '../../_functions/unauthorized'
 import { getApiHost } from '../../_functions/apiHost'
+import { getSessionToken } from '../../_functions/sessionToken'
 
 interface ListTreatmentResponse {
   data: {
@@ -43,7 +44,7 @@ function useFetchTreatment(
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -94,7 +95,7 @@ export default function ListTreatment() {
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
+            'session-token': getSessionToken(),
           },
         })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
@@ -191,8 +192,7 @@ export default function ListTreatment() {
                         Accept: 'application/json',
                         Authorization:
                           'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                        'session-token':
-                          localStorage.getItem('session-token') ?? '',
+                        'session-token': getSessionToken(),
                       },
                     })
                     if (!response.ok) {

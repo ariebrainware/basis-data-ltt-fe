@@ -26,7 +26,8 @@ export default function Patient({
   health_history,
   surgery_history,
   patient_code: patientCode,
-}: PatientType) {
+  onDataChange,
+}: PatientRowProps) {
   const [open, setOpen] = React.useState(false)
 
   const handleOpen = () => setOpen(!open)
@@ -84,7 +85,7 @@ export default function Patient({
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': localStorage.getItem('session-token') ?? '',
+        'session-token': getSessionToken(),
       },
       body: JSON.stringify({
         full_name: full_name_new_input,
@@ -118,8 +119,8 @@ export default function Patient({
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
-          // Reload the page after user clicks "OK"
-          if (typeof window !== 'undefined') window.location.reload()
+          // Refresh data using callback instead of page reload
+          if (onDataChange) onDataChange()
         })
       })
       .catch((error) => {

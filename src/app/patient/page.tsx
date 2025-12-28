@@ -10,6 +10,7 @@ import TablePatient from '../_components/tablePatient'
 import { PatientType } from '../_types/patient'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 interface ListPatientsResponse {
   data: {
@@ -20,7 +21,8 @@ interface ListPatientsResponse {
 
 function usePatients(
   currentPage: number,
-  keyword: string
+  keyword: string,
+  refreshTrigger: number
 ): ListPatientsResponse {
   const [patients, setPatients] = useState<PatientType[]>([])
   const [total, setTotal] = useState(0)
@@ -37,7 +39,7 @@ function usePatients(
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -56,7 +58,7 @@ function usePatients(
         console.error('Error fetching patients:', error)
       }
     })()
-  }, [currentPage, keyword])
+  }, [currentPage, keyword, refreshTrigger])
 
   return { data: { patients }, total }
 }
@@ -66,7 +68,12 @@ export default function Patient() {
   const [patients, setPatients] = useState<PatientType[]>([])
   const [, setTotal] = useState(0)
   const [keyword, setKeyword] = useState('')
-  const { data, total } = usePatients(currentPage, keyword)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const { data, total } = usePatients(currentPage, keyword, refreshTrigger)
+
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1)
+  }
 
   const handleInputKeyDown = async (
     e: React.KeyboardEvent<HTMLInputElement>
@@ -84,7 +91,7 @@ export default function Patient() {
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -113,7 +120,7 @@ export default function Patient() {
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
+            'session-token': getSessionToken(),
           },
         }
       )
@@ -144,6 +151,7 @@ export default function Patient() {
           Data={{
             patients: data.patients,
           }}
+          onDataChange={handleRefresh}
         />
         <Pagination
           currentPage={currentPage}

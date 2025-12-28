@@ -6,12 +6,8 @@ import { Checkbox, Radio } from '@material-tailwind/react'
 import { HealthConditionOptions } from '../_types/healthcondition'
 import { useRef } from 'react'
 import { getApiHost } from '../_functions/apiHost'
-
-interface ApiErrorResponse {
-  message?: string
-  error?: string
-  errors?: string | string[]
-}
+import { extractErrorMessage } from '../_functions/errorMessage'
+import Swal from 'sweetalert2'
 
 let fullnameInput: HTMLInputElement | null = null
 let ageInput: HTMLInputElement | null = null
@@ -165,43 +161,18 @@ async function sendRegisterRequest(
   const responseData = await data.json()
   console.log(`responseData`, responseData)
 
-  // Import SweetAlert2 once for both success and error cases
-  const Swal = (await import('sweetalert2')).default
-
-  // Using data.ok checks for all 2xx success status codes (200-299)
-  // This is more robust than checking data.status === 200
+  // Using response.ok checks for all 2xx success status codes (200-299)
+  // This is more robust than checking response.status === 200
   if (data.ok) {
     await Swal.fire({
       title: 'Sukses',
-      text: 'Registrasi berhasil',
+      text: 'Registrasi berhasil. Silakan login dengan akun baru Anda.',
       icon: 'success',
       confirmButtonText: 'OK',
     })
     window.location.href = '/login'
   } else {
-    // Enhanced error message handling to support various response formats
-    const apiResponse = responseData as ApiErrorResponse
-    const errorMessage =
-      apiResponse &&
-      typeof apiResponse === 'object' &&
-      typeof apiResponse.message === 'string' &&
-      apiResponse.message.trim() !== ''
-        ? apiResponse.message
-        : apiResponse &&
-            typeof apiResponse === 'object' &&
-            typeof apiResponse.error === 'string' &&
-            apiResponse.error.trim() !== ''
-          ? apiResponse.error
-          : apiResponse &&
-              typeof apiResponse === 'object' &&
-              Array.isArray(apiResponse.errors)
-            ? (apiResponse.errors as string[]).join(', ')
-            : apiResponse &&
-                typeof apiResponse === 'object' &&
-                typeof apiResponse.errors === 'string' &&
-                apiResponse.errors.trim() !== ''
-              ? apiResponse.errors
-              : 'Registrasi gagal'
+    const errorMessage = extractErrorMessage(responseData, 'Registrasi gagal')
     await Swal.fire({
       title: 'Gagal',
       text: errorMessage,
