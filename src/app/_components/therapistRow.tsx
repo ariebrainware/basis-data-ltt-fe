@@ -1,4 +1,5 @@
 import React from 'react'
+import { getSessionToken } from '../_functions/sessionToken'
 import { TherapistType } from '../_types/therapist'
 import { TherapistForm } from '../_components/therapistForm'
 import Swal from 'sweetalert2'
@@ -10,7 +11,7 @@ import {
   DialogFooter,
 } from '@material-tailwind/react'
 import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
+import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Therapist({
   ID: ID,
@@ -35,6 +36,12 @@ export default function Therapist({
   const handleRoleChange = (newRole: string) => {
     setRole(newRole)
   }
+
+  const handleDeleteTherapist = useDeleteResource({
+    resourceType: 'therapist',
+    resourceId: ID,
+    resourceName: 'Data Terapis',
+  })
 
   const handleOpen = () => setOpen(!open)
 
@@ -332,48 +339,7 @@ export default function Therapist({
           <button
             className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
             data-shape="default"
-            onClick={() => {
-              Swal.fire({
-                title: 'Hapus Data Terapis?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  fetch(`${getApiHost()}/therapist/${ID}`, {
-                    method: 'DELETE',
-                    mode: 'cors',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization:
-                        'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token': getSessionToken(),
-                    },
-                  })
-                    .then((response) => {
-                      if (!response.ok) throw new Error('Failed to delete')
-                      Swal.fire({
-                        text: 'Data terapis berhasil dihapus.',
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                      }).then(() => {
-                        if (typeof window !== 'undefined')
-                          window.location.reload()
-                      })
-                    })
-                    .catch((error) => {
-                      console.error('Error deleting therapist record:', error)
-                      Swal.fire(
-                        'Error',
-                        'Gagal menghapus data terapis',
-                        'error'
-                      )
-                    })
-                }
-              })
-            }}
+            onClick={handleDeleteTherapist}
           >
             <svg
               width="1.5em"

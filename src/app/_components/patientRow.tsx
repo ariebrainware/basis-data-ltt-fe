@@ -1,4 +1,5 @@
 import React from 'react'
+import { getSessionToken } from '../_functions/sessionToken'
 import { PatientForm } from './patientForm'
 import { PatientType } from '../_types/patient'
 import { HealthConditionOptions } from '../_types/healthcondition'
@@ -12,11 +13,7 @@ import {
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
-
-interface PatientRowProps extends PatientType {
-  onDataChange?: () => void
-}
+import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Patient({
   ID,
@@ -31,7 +28,7 @@ export default function Patient({
   surgery_history,
   patient_code: patientCode,
   onDataChange,
-}: PatientRowProps) {
+}: PatientType) {
   const [open, setOpen] = React.useState(false)
 
   const handleOpen = () => setOpen(!open)
@@ -140,54 +137,11 @@ export default function Patient({
       })
   }
 
-  const handleDeletePatient = () => {
-    Swal.fire({
-      title: 'Hapus Data Pasien?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Hapus',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`${getApiHost()}/patient/${ID}`, {
-          method: 'DELETE',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': getSessionToken(),
-          },
-        })
-          .then((response) => {
-            if (response.status === 401) {
-              UnauthorizedAccess()
-              return Promise.reject(new Error('Unauthorized'))
-            }
-            if (!response.ok) throw new Error('Failed to delete')
-            Swal.fire({
-              text: 'Data pasien berhasil dihapus.',
-              icon: 'success',
-              confirmButtonText: 'OK',
-            }).then(() => {
-              // Refresh data using callback instead of page reload
-              if (onDataChange) onDataChange()
-            })
-          })
-          .catch((error) => {
-            console.error('Error deleting patient record:', error)
-            // Don't show error for unauthorized access since UnauthorizedAccess handles it
-            if (error.message !== 'Unauthorized') {
-              Swal.fire({
-                title: 'Error',
-                text: 'Gagal menghapus data pasien',
-                icon: 'error',
-              })
-            }
-          })
-      }
-    })
-  }
+  const handleDeletePatient = useDeleteResource({
+    resourceType: 'patient',
+    resourceId: ID,
+    resourceName: 'Data Pasien',
+  })
   return (
     <>
       <Dialog
