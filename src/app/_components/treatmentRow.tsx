@@ -31,7 +31,7 @@ export default function Treatment({
 
   const handleDeleteTreatment = useDeleteResource({
     resourceType: 'treatment',
-    resourceId: ID,
+    resourceId: Number(ID),
     resourceName: 'Data Penanganan',
   })
 
