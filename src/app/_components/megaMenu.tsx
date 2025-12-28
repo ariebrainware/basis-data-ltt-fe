@@ -20,6 +20,7 @@ import {
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
 import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 const navListMenuItems = [
   {
@@ -224,7 +225,7 @@ function NavList() {
                   'Content-Type': 'application/json',
                   Accept: 'application/json',
                   Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                  'session-token': localStorage.getItem('session-token') ?? '',
+                  'session-token': getSessionToken(),
                 },
               })
               if (!response.ok) {

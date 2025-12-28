@@ -10,6 +10,7 @@ import {
 import { TreatmentForm } from './treatmentForm'
 import Swal from 'sweetalert2'
 import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 export default function Treatment({
   ID,
@@ -61,7 +62,7 @@ export default function Treatment({
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': localStorage.getItem('session-token') ?? '',
+        'session-token': getSessionToken(),
       },
       body: JSON.stringify({
         treatment_date: treatment_date_new_input,
@@ -274,8 +275,7 @@ export default function Treatment({
                       Accept: 'application/json',
                       Authorization:
                         'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token':
-                        localStorage.getItem('session-token') ?? '',
+                      'session-token': getSessionToken(),
                     },
                   })
                     .then((response) => {

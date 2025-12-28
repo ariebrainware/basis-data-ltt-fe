@@ -10,6 +10,7 @@ import {
   DialogFooter,
 } from '@material-tailwind/react'
 import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 export default function Therapist({
   ID: ID,
@@ -65,7 +66,7 @@ export default function Therapist({
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': localStorage.getItem('session-token') ?? '',
+        'session-token': getSessionToken(),
       },
       body: JSON.stringify({
         full_name: full_name_input,
@@ -264,8 +265,7 @@ export default function Therapist({
                       Accept: 'application/json',
                       Authorization:
                         'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token':
-                        localStorage.getItem('session-token') ?? '',
+                      'session-token': getSessionToken(),
                     },
                     body: JSON.stringify({ is_approved: true }),
                   })
@@ -349,8 +349,7 @@ export default function Therapist({
                       Accept: 'application/json',
                       Authorization:
                         'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token':
-                        localStorage.getItem('session-token') ?? '',
+                      'session-token': getSessionToken(),
                     },
                   })
                     .then((response) => {

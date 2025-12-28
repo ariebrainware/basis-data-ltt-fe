@@ -19,6 +19,7 @@ import TableTherapist from '../_components/tableTherapist'
 import { TherapistType } from '../_types/therapist'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 interface ListTherapistResponse {
   data: {
@@ -46,7 +47,7 @@ function useFetchTherapist(
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -108,7 +109,7 @@ export default function ListTherapist() {
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -203,8 +204,7 @@ export default function ListTherapist() {
                         Accept: 'application/json',
                         Authorization:
                           'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                        'session-token':
-                          localStorage.getItem('session-token') ?? '',
+                        'session-token': getSessionToken(),
                       },
                     })
                     if (!response.ok) {

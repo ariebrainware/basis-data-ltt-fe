@@ -10,6 +10,7 @@ import TablePatient from '../_components/tablePatient'
 import { PatientType } from '../_types/patient'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 interface ListPatientsResponse {
   data: {
@@ -38,7 +39,7 @@ function usePatients(
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -90,7 +91,7 @@ export default function Patient() {
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -119,7 +120,7 @@ export default function Patient() {
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
+            'session-token': getSessionToken(),
           },
         }
       )
