@@ -1,6 +1,8 @@
 'use client'
 import React from 'react'
 import { Select, Option } from '@material-tailwind/react'
+import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 interface ControlledSelectProps {
   id?: string
@@ -21,16 +23,14 @@ export function ControlledSelect({
   >([])
 
   React.useEffect(() => {
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-
-    fetch(`${host}/therapist`, {
+    fetch(`${getApiHost()}/therapist`, {
       method: 'GET',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': localStorage.getItem('session-token') ?? '',
+        'session-token': getSessionToken(),
       },
       credentials: 'include',
       redirect: 'follow',

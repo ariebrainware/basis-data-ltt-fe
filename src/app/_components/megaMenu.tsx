@@ -19,6 +19,8 @@ import {
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
+import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 const navListMenuItems = [
   {
@@ -215,17 +217,15 @@ function NavList() {
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
           onClick={async () => {
-            const host =
-              process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
             try {
-              const response = await fetch(`${host}/logout`, {
+              const response = await fetch(`${getApiHost()}/logout`, {
                 method: 'DELETE',
                 mode: 'cors',
                 headers: {
                   'Content-Type': 'application/json',
                   Accept: 'application/json',
                   Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                  'session-token': localStorage.getItem('session-token') ?? '',
+                  'session-token': getSessionToken(),
                 },
               })
               if (!response.ok) {

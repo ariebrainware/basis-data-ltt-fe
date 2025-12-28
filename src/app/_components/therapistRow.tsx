@@ -1,4 +1,5 @@
 import React from 'react'
+import { getSessionToken } from '../_functions/sessionToken'
 import { TherapistType } from '../_types/therapist'
 import { TherapistForm } from '../_components/therapistForm'
 import Swal from 'sweetalert2'
@@ -9,6 +10,8 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
+import { getApiHost } from '../_functions/apiHost'
+import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Therapist({
   ID: ID,
@@ -34,6 +37,12 @@ export default function Therapist({
     setRole(newRole)
   }
 
+  const handleDeleteTherapist = useDeleteResource({
+    resourceType: 'therapist',
+    resourceId: ID,
+    resourceName: 'Data Terapis',
+  })
+
   const handleOpen = () => setOpen(!open)
 
   const handleUpdateTherapist = () => {
@@ -57,15 +66,14 @@ export default function Therapist({
       document.querySelector<HTMLTextAreaElement>('#height')?.value || height
     const role_input =
       document.querySelector<HTMLTextAreaElement>('#role')?.value || role
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-    fetch(`${host}/therapist/${ID}`, {
+    fetch(`${getApiHost()}/therapist/${ID}`, {
       method: 'PATCH',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': localStorage.getItem('session-token') ?? '',
+        'session-token': getSessionToken(),
       },
       body: JSON.stringify({
         full_name: full_name_input,
@@ -256,9 +264,7 @@ export default function Therapist({
                 if (!isApproved) {
                   // Logic to update the approval status can be added here
                   console.log('Set to Approved')
-                  const host =
-                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-                  fetch(`${host}/therapist/${ID}`, {
+                  fetch(`${getApiHost()}/therapist/${ID}`, {
                     method: 'PUT',
                     mode: 'cors',
                     headers: {
@@ -266,8 +272,7 @@ export default function Therapist({
                       Accept: 'application/json',
                       Authorization:
                         'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token':
-                        localStorage.getItem('session-token') ?? '',
+                      'session-token': getSessionToken(),
                     },
                     body: JSON.stringify({ is_approved: true }),
                   })
@@ -334,51 +339,7 @@ export default function Therapist({
           <button
             className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
             data-shape="default"
-            onClick={() => {
-              Swal.fire({
-                title: 'Delete Therapist Record?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Delete',
-                cancelButtonText: 'Cancel',
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  const host =
-                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-                  fetch(`${host}/therapist/${ID}`, {
-                    method: 'DELETE',
-                    mode: 'cors',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization:
-                        'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token':
-                        localStorage.getItem('session-token') ?? '',
-                    },
-                  })
-                    .then((response) => {
-                      if (!response.ok) throw new Error('Failed to delete')
-                      Swal.fire({
-                        text: 'Therapist record deleted successfully.',
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                      }).then(() => {
-                        if (typeof window !== 'undefined')
-                          window.location.reload()
-                      })
-                    })
-                    .catch((error) => {
-                      console.error('Error deleting treatment record:', error)
-                      Swal.fire(
-                        'Error',
-                        'Failed to delete treatment record',
-                        'error'
-                      )
-                    })
-                }
-              })
-            }}
+            onClick={handleDeleteTherapist}
           >
             <svg
               width="1.5em"

@@ -18,6 +18,8 @@ import Pagination from '../_components/pagination'
 import TableTherapist from '../_components/tableTherapist'
 import { TherapistType } from '../_types/therapist'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
+import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 interface ListTherapistResponse {
   data: {
@@ -32,13 +34,12 @@ function useFetchTherapist(
 ): ListTherapistResponse {
   const [therapist, setTherapist] = useState<TherapistType[]>([])
   const [total, setTotal] = useState(0)
-  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
 
   useEffect(() => {
     ;(async () => {
       try {
         const res = await fetch(
-          `${host}/therapist?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
+          `${getApiHost()}/therapist?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -46,7 +47,7 @@ function useFetchTherapist(
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -62,7 +63,7 @@ function useFetchTherapist(
         console.error('Error fetching therapist:', error)
       }
     })()
-  }, [currentPage, host, keyword])
+  }, [currentPage, keyword])
 
   return { data: { therapist: therapist }, total }
 }
@@ -98,18 +99,20 @@ export default function ListTherapist() {
     if (e.key === 'Enter') {
       const newKeyword = (e.target as HTMLInputElement).value
       setKeyword(newKeyword)
-      const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
       try {
-        const res = await fetch(`${host}/therapist?keyword=${newKeyword}`, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
-          },
-        })
+        const res = await fetch(
+          `${getApiHost()}/therapist?keyword=${newKeyword}`,
+          {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+              'session-token': getSessionToken(),
+            },
+          }
+        )
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
         const therapistArray = Array.isArray(therapists)
@@ -192,10 +195,8 @@ export default function ListTherapist() {
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
                 onClick={async () => {
-                  const host =
-                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
                   try {
-                    const response = await fetch(`${host}/logout`, {
+                    const response = await fetch(`${getApiHost()}/logout`, {
                       method: 'DELETE',
                       mode: 'cors',
                       headers: {
@@ -203,8 +204,7 @@ export default function ListTherapist() {
                         Accept: 'application/json',
                         Authorization:
                           'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                        'session-token':
-                          localStorage.getItem('session-token') ?? '',
+                        'session-token': getSessionToken(),
                       },
                     })
                     if (!response.ok) {

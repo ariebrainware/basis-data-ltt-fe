@@ -15,6 +15,8 @@ import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
 import { UnauthorizedAccess } from '../../_functions/unauthorized'
+import { getApiHost } from '../../_functions/apiHost'
+import { getSessionToken } from '../../_functions/sessionToken'
 
 interface ListTreatmentResponse {
   data: {
@@ -29,13 +31,12 @@ function useFetchTreatment(
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
-  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
 
   useEffect(() => {
     ;(async () => {
       try {
         const res = await fetch(
-          `${host}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
+          `${getApiHost()}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -43,7 +44,7 @@ function useFetchTreatment(
               'Content-Type': 'application/json',
               Accept: 'application/json',
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': localStorage.getItem('session-token') ?? '',
+              'session-token': getSessionToken(),
             },
           }
         )
@@ -65,7 +66,7 @@ function useFetchTreatment(
         console.error('Error fetching treatment:', error)
       }
     })()
-  }, [currentPage, host, keyword])
+  }, [currentPage, keyword])
 
   return { data: { treatment: treatment }, total }
 }
@@ -86,16 +87,15 @@ export default function ListTreatment() {
     if (e.key === 'Enter') {
       const newKeyword = (e.target as HTMLInputElement).value
       setKeyword(newKeyword)
-      const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
       try {
-        const res = await fetch(`${host}/patient/treatment`, {
+        const res = await fetch(`${getApiHost()}/patient/treatment`, {
           method: 'GET',
           mode: 'cors',
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
+            'session-token': getSessionToken(),
           },
         })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
@@ -183,10 +183,8 @@ export default function ListTreatment() {
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
                 onClick={async () => {
-                  const host =
-                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
                   try {
-                    const response = await fetch(`${host}/logout`, {
+                    const response = await fetch(`${getApiHost()}/logout`, {
                       method: 'DELETE',
                       mode: 'cors',
                       headers: {
@@ -194,8 +192,7 @@ export default function ListTreatment() {
                         Accept: 'application/json',
                         Authorization:
                           'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                        'session-token':
-                          localStorage.getItem('session-token') ?? '',
+                        'session-token': getSessionToken(),
                       },
                     })
                     if (!response.ok) {

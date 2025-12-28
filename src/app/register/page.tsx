@@ -5,6 +5,9 @@ import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
 import { HealthConditionOptions } from '../_types/healthcondition'
 import { useRef } from 'react'
+import { getApiHost } from '../_functions/apiHost'
+import { extractErrorMessage } from '../_functions/errorMessage'
+import Swal from 'sweetalert2'
 
 let fullnameInput: HTMLInputElement | null = null
 let ageInput: HTMLInputElement | null = null
@@ -133,10 +136,9 @@ async function sendRegisterRequest(
       patient_code = patientCodeInputEl.value
     }
   }
-  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
   console.log(`patient_code_ref_value:: `, patient_code)
   console.log(`full_name`, full_name)
-  const data = await fetch(`${host}/patient`, {
+  const data = await fetch(`${getApiHost()}/patient`, {
     method: 'POST',
     mode: 'cors',
     headers: {
@@ -158,11 +160,25 @@ async function sendRegisterRequest(
   })
   const responseData = await data.json()
   console.log(`responseData`, responseData)
-  if (data.status === 200) {
-    window.location.href = '/register'
-    alert('Registrasi berhasil')
+
+  // Using response.ok checks for all 2xx success status codes (200-299)
+  // This is more robust than checking response.status === 200
+  if (data.ok) {
+    await Swal.fire({
+      title: 'Sukses',
+      text: 'Registrasi berhasil. Silakan login dengan akun baru Anda.',
+      icon: 'success',
+      confirmButtonText: 'OK',
+    })
+    window.location.href = '/login'
   } else {
-    alert('Registrasi gagal')
+    const errorMessage = extractErrorMessage(responseData, 'Registrasi gagal')
+    await Swal.fire({
+      title: 'Gagal',
+      text: errorMessage,
+      icon: 'error',
+      confirmButtonText: 'OK',
+    })
   }
   return responseData
 }

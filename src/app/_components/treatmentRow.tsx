@@ -1,4 +1,5 @@
 import React from 'react'
+import { getSessionToken } from '../_functions/sessionToken'
 import { TreatmentType } from '../_types/treatment'
 import {
   Button,
@@ -9,6 +10,8 @@ import {
 } from '@material-tailwind/react'
 import { TreatmentForm } from './treatmentForm'
 import Swal from 'sweetalert2'
+import { getApiHost } from '../_functions/apiHost'
+import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Treatment({
   ID,
@@ -26,6 +29,12 @@ export default function Treatment({
   const [open, setOpen] = React.useState(false)
 
   const handleOpen = () => setOpen(!open)
+
+  const handleDeleteTreatment = useDeleteResource({
+    resourceType: 'treatment',
+    resourceId: Number(ID),
+    resourceName: 'Data Penanganan',
+  })
 
   const handleUpdateTreatment = () => {
     const treatment_date_new_input =
@@ -53,15 +62,14 @@ export default function Treatment({
     const next_visit_new_input =
       document.querySelector<HTMLTextAreaElement>('#next_visit')?.value ||
       nextVisit
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-    fetch(`${host}/patient/treatment/${ID}`, {
+    fetch(`${getApiHost()}/patient/treatment/${ID}`, {
       method: 'PATCH',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': localStorage.getItem('session-token') ?? '',
+        'session-token': getSessionToken(),
       },
       body: JSON.stringify({
         treatment_date: treatment_date_new_input,
@@ -257,51 +265,7 @@ export default function Treatment({
           <button
             className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
             data-shape="default"
-            onClick={() => {
-              Swal.fire({
-                title: 'Delete Treatment Record?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Delete',
-                cancelButtonText: 'Cancel',
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  const host =
-                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-                  fetch(`${host}/patient/treatment/${ID}`, {
-                    method: 'DELETE',
-                    mode: 'cors',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization:
-                        'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token':
-                        localStorage.getItem('session-token') ?? '',
-                    },
-                  })
-                    .then((response) => {
-                      if (!response.ok) throw new Error('Failed to delete')
-                      Swal.fire({
-                        text: 'Treatment record deleted successfully.',
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                      }).then(() => {
-                        if (typeof window !== 'undefined')
-                          window.location.reload()
-                      })
-                    })
-                    .catch((error) => {
-                      console.error('Error deleting treatment record:', error)
-                      Swal.fire(
-                        'Error',
-                        'Failed to delete treatment record',
-                        'error'
-                      )
-                    })
-                }
-              })
-            }}
+            onClick={handleDeleteTreatment}
           >
             <svg
               width="1.5em"
