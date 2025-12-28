@@ -12,6 +12,7 @@ import {
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { getApiHost } from '../_functions/apiHost'
+import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Patient({
   ID,
@@ -134,49 +135,11 @@ export default function Patient({
       })
   }
 
-  const handleDeletePatient = () => {
-    Swal.fire({
-      title: 'Hapus Data Pasien?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Hapus',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`${getApiHost()}/patient/${ID}`, {
-          method: 'DELETE',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
-          },
-        })
-          .then((response) => {
-            if (response.status === 401) {
-              UnauthorizedAccess()
-              return Promise.reject(new Error('Unauthorized'))
-            }
-            if (!response.ok) throw new Error('Failed to delete')
-            Swal.fire({
-              text: 'Data pasien berhasil dihapus.',
-              icon: 'success',
-              confirmButtonText: 'OK',
-            }).then(() => {
-              if (typeof window !== 'undefined') window.location.reload()
-            })
-          })
-          .catch((error) => {
-            console.error('Error deleting patient record:', error)
-            // Don't show error for unauthorized access since UnauthorizedAccess handles it
-            if (error.message !== 'Unauthorized') {
-              Swal.fire('Error', 'Gagal menghapus data pasien', 'error')
-            }
-          })
-      }
-    })
-  }
+  const handleDeletePatient = useDeleteResource({
+    resourceType: 'patient',
+    resourceId: ID,
+    resourceName: 'Data Pasien',
+  })
   return (
     <>
       <Dialog
