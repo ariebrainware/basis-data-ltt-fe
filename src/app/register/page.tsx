@@ -7,6 +7,7 @@ import { HealthConditionOptions } from '../_types/healthcondition'
 import { useRef } from 'react'
 import { getApiHost } from '../_functions/apiHost'
 import { extractErrorMessage } from '../_functions/errorMessage'
+import Swal from 'sweetalert2'
 
 let fullnameInput: HTMLInputElement | null = null
 let ageInput: HTMLInputElement | null = null
@@ -160,11 +161,8 @@ async function sendRegisterRequest(
   const responseData = await data.json()
   console.log(`responseData`, responseData)
 
-  // Import SweetAlert2 once for both success and error cases
-  const Swal = (await import('sweetalert2')).default
-
-  // Using data.ok checks for all 2xx success status codes (200-299)
-  // This is more robust than checking data.status === 200
+  // Using response.ok checks for all 2xx success status codes (200-299)
+  // This is more robust than checking response.status === 200
   if (data.ok) {
     await Swal.fire({
       title: 'Sukses',
