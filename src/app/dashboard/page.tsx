@@ -19,6 +19,7 @@ import {
 import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import Pagination from '../_components/pagination'
+import { getApiHost } from '../_functions/apiHost'
 
 const TABLE_HEAD = [
   'Nama Pasien (K. Pasien)',
@@ -41,7 +42,6 @@ function useFetchTreatment(
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
-  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
 
   useEffect(() => {
     ;(async () => {
@@ -53,7 +53,7 @@ function useFetchTreatment(
         const groupByDate = `${yyyy}-${mm}-${dd}`
         // const customDate = `2025-10-24`
         const res = await fetch(
-          `${host}/patient/treatment?group_by_date=${groupByDate}`,
+          `${getApiHost()}/patient/treatment?group_by_date=${groupByDate}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -83,7 +83,7 @@ function useFetchTreatment(
         console.error('Error fetching treatment:', error)
       }
     })()
-  }, [currentPage, host, keyword])
+  }, [currentPage, keyword])
 
   return { data: { treatment: treatment }, total }
 }

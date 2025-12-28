@@ -11,6 +11,7 @@ import {
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
+import { getApiHost } from '../_functions/apiHost'
 
 export default function Patient({
   ID,
@@ -26,7 +27,6 @@ export default function Patient({
   patient_code: patientCode,
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
-  const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
 
   const handleOpen = () => setOpen(!open)
 
@@ -76,7 +76,7 @@ export default function Patient({
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
       surgery_history
 
-    fetch(`${API_HOST}/patient/${ID}`, {
+    fetch(`${getApiHost()}/patient/${ID}`, {
       method: 'PATCH',
       mode: 'cors',
       headers: {
@@ -143,7 +143,7 @@ export default function Patient({
       cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`${API_HOST}/patient/${ID}`, {
+        fetch(`${getApiHost()}/patient/${ID}`, {
           method: 'DELETE',
           mode: 'cors',
           headers: {
