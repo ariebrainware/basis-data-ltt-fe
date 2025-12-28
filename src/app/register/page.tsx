@@ -5,6 +5,7 @@ import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
 import { HealthConditionOptions } from '../_types/healthcondition'
 import { useRef } from 'react'
+import { getApiHost } from '../_functions/apiHost'
 
 interface ApiErrorResponse {
   message?: string
@@ -139,10 +140,9 @@ async function sendRegisterRequest(
       patient_code = patientCodeInputEl.value
     }
   }
-  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
   console.log(`patient_code_ref_value:: `, patient_code)
   console.log(`full_name`, full_name)
-  const data = await fetch(`${host}/patient`, {
+  const data = await fetch(`${getApiHost()}/patient`, {
     method: 'POST',
     mode: 'cors',
     headers: {

@@ -9,6 +9,7 @@ import SubHeader from '../_components/subheader'
 import TablePatient from '../_components/tablePatient'
 import { PatientType } from '../_types/patient'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
+import { getApiHost } from '../_functions/apiHost'
 
 interface ListPatientsResponse {
   data: {
@@ -23,13 +24,12 @@ function usePatients(
 ): ListPatientsResponse {
   const [patients, setPatients] = useState<PatientType[]>([])
   const [total, setTotal] = useState(0)
-  const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
 
   useEffect(() => {
     ;(async () => {
       try {
         const res = await fetch(
-          `${host}/patient?${keyword ? `keyword=${keyword}` : `limit=100&offset=${(currentPage - 1) * 100}`}`,
+          `${getApiHost()}/patient?${keyword ? `keyword=${keyword}` : `limit=100&offset=${(currentPage - 1) * 100}`}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -74,9 +74,8 @@ export default function Patient() {
     if (e.key === 'Enter') {
       const newKeyword = (e.target as HTMLInputElement).value
       setKeyword(newKeyword)
-      const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
       try {
-        const res = await fetch(`${host}/patient?keyword=${newKeyword}`, {
+        const res = await fetch(`${getApiHost()}/patient?keyword=${newKeyword}`, {
           method: 'GET',
           mode: 'cors',
           headers: {
@@ -101,9 +100,8 @@ export default function Patient() {
   }
 
   const handleGroupingByDateFilter = async (dateKeyword: string) => {
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
     try {
-      const res = await fetch(`${host}/patient?group_by_date=${dateKeyword}`, {
+      const res = await fetch(`${getApiHost()}/patient?group_by_date=${dateKeyword}`, {
         method: 'GET',
         mode: 'cors',
         headers: {

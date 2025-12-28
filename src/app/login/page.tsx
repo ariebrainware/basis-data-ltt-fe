@@ -3,6 +3,7 @@ import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
 import { VariantAlert } from '../_components/alert'
+import { getApiHost } from '../_functions/apiHost'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
@@ -14,9 +15,8 @@ export default function Login() {
   async function sendLoginRequest() {
     const email = usernameInput ? usernameInput.value : ''
     const password = passwordInput ? passwordInput.value : ''
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
     try {
-      const response = await fetch(`${host}/login`, {
+      const response = await fetch(`${getApiHost()}/login`, {
         method: 'POST',
         mode: 'cors',
         headers: {

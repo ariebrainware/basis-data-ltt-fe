@@ -10,6 +10,7 @@ import { ControlledSelect } from '../../../_components/selectTherapist'
 
 import { TreatmentConditionOptions } from '@/app/_types/treatmentConditionOptions'
 import TimePicker from '@/app/_components/timepicker'
+import { getApiHost } from '@/app/_functions/apiHost'
 
 let treatmentDateInput: HTMLInputElement | null = null
 let treatmentTimeInput: HTMLInputElement | null = null
@@ -87,8 +88,7 @@ export default function RegisterTreatment() {
             .map((item) => item.trim())
             .filter(Boolean)
         : []
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-    const response = await fetch(`${host}/patient/treatment`, {
+    const response = await fetch(`${getApiHost()}/patient/treatment`, {
       method: 'POST',
       mode: 'cors',
       credentials: 'omit',
