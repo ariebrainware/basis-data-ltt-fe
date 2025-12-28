@@ -12,7 +12,7 @@ export interface DeleteResourceConfig {
  * Custom hook for deleting resources with confirmation dialog
  * @param config Configuration object containing resource type, ID, and display name
  * @returns Function to trigger the delete operation
- * 
+ *
  * @example
  * ```typescript
  * const handleDelete = useDeleteResource({
@@ -20,13 +20,13 @@ export interface DeleteResourceConfig {
  *   resourceId: 123,
  *   resourceName: 'Data Pasien'
  * })
- * 
+ *
  * // Then call it from a button:
  * <button onClick={handleDelete}>Delete</button>
  * ```
  */
 export function useDeleteResource(config: DeleteResourceConfig) {
-  const { resourceType, resourceId, resourceName } = config
+  const { resourceType, resourceId } = config
 
   const getEndpoint = (): string => {
     switch (resourceType) {
