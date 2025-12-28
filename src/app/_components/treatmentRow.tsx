@@ -259,11 +259,11 @@ export default function Treatment({
             data-shape="default"
             onClick={() => {
               Swal.fire({
-                title: 'Delete Treatment Record?',
+                title: 'Hapus Data Penanganan?',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Delete',
-                cancelButtonText: 'Cancel',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
               }).then((result) => {
                 if (result.isConfirmed) {
                   const host =
@@ -283,7 +283,7 @@ export default function Treatment({
                     .then((response) => {
                       if (!response.ok) throw new Error('Failed to delete')
                       Swal.fire({
-                        text: 'Treatment record deleted successfully.',
+                        text: 'Data penanganan berhasil dihapus.',
                         icon: 'success',
                         confirmButtonText: 'OK',
                       }).then(() => {
@@ -295,7 +295,7 @@ export default function Treatment({
                       console.error('Error deleting treatment record:', error)
                       Swal.fire(
                         'Error',
-                        'Failed to delete treatment record',
+                        'Gagal menghapus data penanganan',
                         'error'
                       )
                     })
