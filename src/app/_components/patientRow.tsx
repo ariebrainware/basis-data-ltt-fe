@@ -1,4 +1,5 @@
 import React from 'react'
+import { getSessionToken } from '../_functions/sessionToken'
 import { PatientForm } from './patientForm'
 import { PatientType } from '../_types/patient'
 import { HealthConditionOptions } from '../_types/healthcondition'

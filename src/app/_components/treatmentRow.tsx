@@ -1,4 +1,5 @@
 import React from 'react'
+import { getSessionToken } from '../_functions/sessionToken'
 import { TreatmentType } from '../_types/treatment'
 import {
   Button,

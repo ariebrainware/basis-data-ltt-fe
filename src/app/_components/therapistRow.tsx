@@ -1,4 +1,5 @@
 import React from 'react'
+import { getSessionToken } from '../_functions/sessionToken'
 import { TherapistType } from '../_types/therapist'
 import { TherapistForm } from '../_components/therapistForm'
 import Swal from 'sweetalert2'
