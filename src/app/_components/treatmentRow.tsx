@@ -9,6 +9,7 @@ import {
 } from '@material-tailwind/react'
 import { TreatmentForm } from './treatmentForm'
 import Swal from 'sweetalert2'
+import { getApiHost } from '../_functions/apiHost'
 
 export default function Treatment({
   ID,
@@ -53,8 +54,7 @@ export default function Treatment({
     const next_visit_new_input =
       document.querySelector<HTMLTextAreaElement>('#next_visit')?.value ||
       nextVisit
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-    fetch(`${host}/patient/treatment/${ID}`, {
+    fetch(`${getApiHost()}/patient/treatment/${ID}`, {
       method: 'PATCH',
       mode: 'cors',
       headers: {
@@ -266,9 +266,7 @@ export default function Treatment({
                 cancelButtonText: 'Batal',
               }).then((result) => {
                 if (result.isConfirmed) {
-                  const host =
-                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-                  fetch(`${host}/patient/treatment/${ID}`, {
+                  fetch(`${getApiHost()}/patient/treatment/${ID}`, {
                     method: 'DELETE',
                     mode: 'cors',
                     headers: {

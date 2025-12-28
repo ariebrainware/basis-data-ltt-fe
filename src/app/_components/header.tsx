@@ -1,3 +1,5 @@
+import { getApiHost } from '../_functions/apiHost'
+
 export default function Header() {
   return (
     <div className="mb-8 flex items-center justify-between gap-8">
@@ -51,10 +53,8 @@ export default function Header() {
         </button>
         <button
           onClick={async () => {
-            const host =
-              process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
             try {
-              const response = await fetch(`${host}/logout`, {
+              const response = await fetch(`${getApiHost()}/logout`, {
                 method: 'DELETE',
                 mode: 'cors',
                 headers: {

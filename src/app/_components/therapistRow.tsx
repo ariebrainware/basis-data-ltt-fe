@@ -9,6 +9,7 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
+import { getApiHost } from '../_functions/apiHost'
 
 export default function Therapist({
   ID: ID,
@@ -57,8 +58,7 @@ export default function Therapist({
       document.querySelector<HTMLTextAreaElement>('#height')?.value || height
     const role_input =
       document.querySelector<HTMLTextAreaElement>('#role')?.value || role
-    const host = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-    fetch(`${host}/therapist/${ID}`, {
+    fetch(`${getApiHost()}/therapist/${ID}`, {
       method: 'PATCH',
       mode: 'cors',
       headers: {
@@ -256,9 +256,7 @@ export default function Therapist({
                 if (!isApproved) {
                   // Logic to update the approval status can be added here
                   console.log('Set to Approved')
-                  const host =
-                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-                  fetch(`${host}/therapist/${ID}`, {
+                  fetch(`${getApiHost()}/therapist/${ID}`, {
                     method: 'PUT',
                     mode: 'cors',
                     headers: {
@@ -343,9 +341,7 @@ export default function Therapist({
                 cancelButtonText: 'Batal',
               }).then((result) => {
                 if (result.isConfirmed) {
-                  const host =
-                    process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
-                  fetch(`${host}/therapist/${ID}`, {
+                  fetch(`${getApiHost()}/therapist/${ID}`, {
                     method: 'DELETE',
                     mode: 'cors',
                     headers: {
