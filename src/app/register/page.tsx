@@ -6,12 +6,7 @@ import { Checkbox, Radio } from '@material-tailwind/react'
 import { HealthConditionOptions } from '../_types/healthcondition'
 import { useRef } from 'react'
 import { getApiHost } from '../_functions/apiHost'
-
-interface ApiErrorResponse {
-  message?: string
-  error?: string
-  errors?: string | string[]
-}
+import { extractErrorMessage } from '../_functions/errorMessage'
 
 let fullnameInput: HTMLInputElement | null = null
 let ageInput: HTMLInputElement | null = null
@@ -179,29 +174,7 @@ async function sendRegisterRequest(
     })
     window.location.href = '/login'
   } else {
-    // Enhanced error message handling to support various response formats
-    const apiResponse = responseData as ApiErrorResponse
-    const errorMessage =
-      apiResponse &&
-      typeof apiResponse === 'object' &&
-      typeof apiResponse.message === 'string' &&
-      apiResponse.message.trim() !== ''
-        ? apiResponse.message
-        : apiResponse &&
-            typeof apiResponse === 'object' &&
-            typeof apiResponse.error === 'string' &&
-            apiResponse.error.trim() !== ''
-          ? apiResponse.error
-          : apiResponse &&
-              typeof apiResponse === 'object' &&
-              Array.isArray(apiResponse.errors)
-            ? (apiResponse.errors as string[]).join(', ')
-            : apiResponse &&
-                typeof apiResponse === 'object' &&
-                typeof apiResponse.errors === 'string' &&
-                apiResponse.errors.trim() !== ''
-              ? apiResponse.errors
-              : 'Registrasi gagal'
+    const errorMessage = extractErrorMessage(responseData, 'Registrasi gagal')
     await Swal.fire({
       title: 'Gagal',
       text: errorMessage,
