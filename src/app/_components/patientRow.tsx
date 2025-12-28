@@ -13,6 +13,10 @@ import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { getApiHost } from '../_functions/apiHost'
 
+interface PatientRowProps extends PatientType {
+  onDataChange?: () => void
+}
+
 export default function Patient({
   ID,
   full_name: name,
@@ -25,7 +29,8 @@ export default function Patient({
   health_history,
   surgery_history,
   patient_code: patientCode,
-}: PatientType) {
+  onDataChange,
+}: PatientRowProps) {
   const [open, setOpen] = React.useState(false)
 
   const handleOpen = () => setOpen(!open)
@@ -117,8 +122,8 @@ export default function Patient({
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
-          // Reload the page after user clicks "OK"
-          if (typeof window !== 'undefined') window.location.reload()
+          // Refresh data using callback instead of page reload
+          if (onDataChange) onDataChange()
         })
       })
       .catch((error) => {
@@ -164,7 +169,8 @@ export default function Patient({
               icon: 'success',
               confirmButtonText: 'OK',
             }).then(() => {
-              if (typeof window !== 'undefined') window.location.reload()
+              // Refresh data using callback instead of page reload
+              if (onDataChange) onDataChange()
             })
           })
           .catch((error) => {

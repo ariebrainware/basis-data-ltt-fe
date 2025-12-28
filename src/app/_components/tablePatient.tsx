@@ -5,6 +5,7 @@ interface TablePatientProps {
   Data: {
     patients: PatientType[]
   }
+  onDataChange?: () => void
 }
 const TableHeader = () => (
   <thead className="border-slate-200 bg-slate-100 text-slate-600 dark:bg-slate-900 border-b text-sm font-medium">
@@ -53,7 +54,13 @@ const renderHeaderCell = (label: string) => (
   </th>
 )
 
-const TableBody = ({ patients }: { patients: PatientType[] }) => (
+const TableBody = ({
+  patients,
+  onDataChange,
+}: {
+  patients: PatientType[]
+  onDataChange?: () => void
+}) => (
   <tbody className="text-slate-800 group text-sm dark:text-white">
     {patients.map((patient: PatientType, index: number) => (
       <Patient
@@ -70,18 +77,22 @@ const TableBody = ({ patients }: { patients: PatientType[] }) => (
         health_history={patient.health_history}
         surgery_history={patient.surgery_history}
         address={patient.address}
+        onDataChange={onDataChange}
       />
     ))}
   </tbody>
 )
 
-export default function TablePatient({ Data }: TablePatientProps) {
+export default function TablePatient({
+  Data,
+  onDataChange,
+}: TablePatientProps) {
   const { patients } = Data
   return (
     <div className="border-slate-200 mt-4 w-full overflow-hidden rounded-lg border">
       <table className="w-full">
         <TableHeader />
-        <TableBody patients={patients} />
+        <TableBody patients={patients} onDataChange={onDataChange} />
       </table>
     </div>
   )
