@@ -145,7 +145,10 @@ pnpm run lint
 
 - `NEXT_PUBLIC_API_HOST`: Backend URL (e.g., `http://localhost:19091`)
 
-**⚠️ Security Note**: Any environment variables prefixed with `NEXT_PUBLIC_*` are exposed to the browser and embedded in the client-side JavaScript bundle. **Never store secrets, API keys, or authentication tokens in `NEXT_PUBLIC_*` variables.** The actual authentication in this application is handled via user-specific `session-token` obtained after login, which is stored in localStorage and sent with each authenticated request
+**⚠️ Security Note**: 
+- Any environment variables prefixed with `NEXT_PUBLIC_*` are exposed to the browser and embedded in the client-side JavaScript bundle
+- **Never store secrets, API keys, or authentication tokens in `NEXT_PUBLIC_*` variables**
+- The actual authentication in this application is handled via user-specific `session-token` obtained after login, which is stored in localStorage and sent with each authenticated request
 
 ---
 
