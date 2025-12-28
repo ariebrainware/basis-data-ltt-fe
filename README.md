@@ -1,14 +1,42 @@
-# Next.js Project Setup and Explanation
+# Basis Data LTT Frontend
 
-This project was bootstrapp with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) and uses the powerful framework [Next.js](https://nextjs.org) for building server-side rendered React applications. In addition to getting started quickly, this setup provides an optimized development experience with automatic hot-reloading and file-based routing.
+A Next.js 15-based healthcare management system for Lee Tit Tar One Solution—a therapy clinic. This application manages patients, therapists, and treatment records with session-based authentication and role-based access control.
+
+## Project Overview
+
+**Tech Stack:**
+
+- Next.js 15.4.10 with App Router
+- Tailwind CSS 3.4.19 + Material Tailwind components
+- TypeScript with strict mode
+- pnpm 10.4.1 package manager
+
+**Key Features:**
+
+- Patient and therapist management (CRUD operations)
+- Treatment record tracking with date-based filtering
+- Session-based authentication with role-based access control
+- RESTful API integration with configurable backend host
+- Responsive dashboard with pagination
+
+## Project Structure
+
+```
+src/app/
+├── _types/              # TypeScript interfaces (patient, therapist, treatment, etc.)
+├── _components/         # Reusable components (rows, tables, modals)
+├── _functions/          # Utility functions (auth, error handling)
+├── dashboard/           # Dashboard page with treatment overview
+├── login/               # Login page
+├── patient/             # Patient management (CRUD)
+├── therapist/           # Therapist management (CRUD)
+├── treatment/           # Treatment record management
+└── register/            # User registration page
+```
 
 ## Getting Started
 
-Follow these steps to set up and run the project locally.
-
 ### 1. Clone the Repository
-
-Clone the project to your local machine:
 
 ```bash
 git clone https://github.com/ariebrainware/basis-data-ltt-fe.git
@@ -17,60 +45,91 @@ cd basis-data-ltt-fe
 
 ### 2. Install Dependencies
 
-Install the project dependencies using your preferred package manager:
-
 ```bash
-npm install
-# or
-yarn install
-# or
 pnpm install
-# or
-bun install
 ```
 
-### 3. Start the Development Server
+### 3. Configure Environment Variables
 
-Run the development server to start the application:
+Copy `sample.env` to `.env.local` and set:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_API_HOST=http://localhost:19091
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the app.
+The `NEXT_PUBLIC_API_HOST` variable configures your backend API endpoint.
 
-### 4. Editing and Automatic Reload
+### 4. Start the Development Server
 
-The main page is located at `app/page.tsx`. Any changes you make will automatically reload the page, thanks to Next.js's hot-reload feature.
+```bash
+pnpm run dev
+```
 
-## Explanation of the Setup and Method
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Project Bootstrapping with create-next-app
+## Development Commands
 
-- **Scaffolding**: The project was initialized using `create-next-app`, which sets up a minimal, yet functional, Next.js project with sensible defaults.
-- **File-based Routing**: Next.js uses the file system to automatically build routes for your application, making it easy to manage and scale.
-- **Optimized Fonts**: This project utilizes [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically load and optimize fonts like [Geist](https://vercel.com/font), ensuring performance and design consistency.
+```bash
+pnpm run dev      # Development with Turbopack (fast)
+pnpm run build    # Production build
+pnpm run start    # Start production server
+pnpm run lint     # Run Prettier + Tailwind linting
+```
 
-### Advanced Features
+## Authentication & Authorization
 
-- **Server-Side Rendering (SSR)**: Next.js supports SSR, which can improve performance and SEO for your application.
-- **Static Generation**: With static generation, pages can be pre-rendered at build time, reducing load times.
-- **API Routes**: Next.js allows for the creation of backend API endpoints within the same project structure, facilitating a full-stack approach.
+- **Login Flow**: Users authenticate via the `/login` page; session tokens are stored in localStorage
+- **Token Management**: Each API request includes `session-token` header for authentication
+- **Authorization**: User roles are stored in localStorage as `user-role` for client-side access control
+- **Error Handling**: 401 responses trigger automatic re-authentication flow
+
+## Key Patterns
+
+### Component Architecture
+
+**Row Components** (e.g., `patientRow.tsx`)
+
+- Accept typed objects as props
+- Manage modal/form state locally
+- Handle data transformation and display
+
+**Table Components** (e.g., `tablePatient.tsx`)
+
+- Render data arrays as tables
+- Map items to Row components
+- Manage pagination and filtering
+
+### Data Fetching
+
+```typescript
+// Pattern: Custom hooks for data fetching
+const { data, total } = useFetchTreatment()
+```
+
+- Use `useEffect` for async operations
+- Always check response.ok and handle 401 errors
+- Store data in state and return typed objects
+
+### Forms & Validation
+
+- Use Material Tailwind `Input`, `Textarea`, `Select` components
+- Map business logic IDs to display labels via helper functions
+- Full prop forwarding for React 19 compatibility
+
+## Code Standards
+
+- **TypeScript**: Strict mode enabled
+- **Formatting**: Prettier enforced via ESLint
+- **Imports**: Use path alias `@/app/...` instead of relative paths
+- **Client Marking**: Add `'use client'` only where necessary (useState, localStorage, etc.)
+- **Naming**: Follow camelCase for variables/functions, PascalCase for components
 
 ## Learn More
 
-To dive deeper into Next.js and its capabilities, check out the following resources:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Material Tailwind](https://www.material-tailwind.com/)
 
-- [Next.js Documentation](https://nextjs.org/docs) – a comprehensive guide to all features and APIs.
-- [Learn Next.js](https://nextjs.org/learn) – an interactive tutorial to guide you through core concepts.
-- [Next.js GitHub Repository](https://github.com/vercel/next.js) – contribute to the source or report issues.
+## Deployment
 
-## Deploy on Vercel
-
-Deploying your Next.js app is straightforward using [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme). For detailed deployment instructions, refer to the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
+Deploy to Vercel or your preferred hosting platform. Ensure `NEXT_PUBLIC_API_HOST` is set correctly in production environment variables.
