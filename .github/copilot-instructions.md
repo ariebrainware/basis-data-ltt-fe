@@ -69,14 +69,20 @@ Two main component patterns:
 
 1. **Token Management**: User session tokens are stored in localStorage as `session-token` after successful login
 2. **Unauthorized Check**: On 401 response, call `UnauthorizedAccess()` from `_functions/unauthorized.tsx` to clear token and redirect to login
-3. **Header Setup**: All authenticated API calls require:
+3. **Header Setup**: The current implementation sends two tokens with authenticated API calls:
    ```typescript
    headers: {
      'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
      'session-token': localStorage.getItem('session-token') ?? '',
    }
    ```
-   **Note**: The `session-token` header carries the user-specific authentication token obtained at login. The Authorization header uses a static token for basic API access, but this is NOT secure for authentication purposes since `NEXT_PUBLIC_*` variables are publicly exposed in the browser.
+   
+   **⚠️ Security Warning**: This implementation has a security concern:
+   - The `session-token` header carries the user-specific authentication token (secure, obtained at login)
+   - The `Authorization` header uses `NEXT_PUBLIC_API_TOKEN` which is publicly exposed in the browser bundle
+   - `NEXT_PUBLIC_*` variables should NEVER be used for authentication/authorization as they are embedded in client-side JavaScript
+   - Backend should rely solely on `session-token` for authentication, not on the Authorization header with the public token
+   
 4. **Role Storage**: User role stored in localStorage as `user-role`
 
 ### API Integration
