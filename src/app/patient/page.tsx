@@ -56,7 +56,7 @@ function usePatients(
         console.error('Error fetching patients:', error)
       }
     })()
-  }, [currentPage, host, keyword])
+  }, [currentPage, keyword])
 
   return { data: { patients }, total }
 }
@@ -75,16 +75,19 @@ export default function Patient() {
       const newKeyword = (e.target as HTMLInputElement).value
       setKeyword(newKeyword)
       try {
-        const res = await fetch(`${getApiHost()}/patient?keyword=${newKeyword}`, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
-          },
-        })
+        const res = await fetch(
+          `${getApiHost()}/patient?keyword=${newKeyword}`,
+          {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+              'session-token': localStorage.getItem('session-token') ?? '',
+            },
+          }
+        )
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
         const patientsArray = Array.isArray(patients) ? data.data.patients : []
@@ -101,16 +104,19 @@ export default function Patient() {
 
   const handleGroupingByDateFilter = async (dateKeyword: string) => {
     try {
-      const res = await fetch(`${getApiHost()}/patient?group_by_date=${dateKeyword}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-          'session-token': localStorage.getItem('session-token') ?? '',
-        },
-      })
+      const res = await fetch(
+        `${getApiHost()}/patient?group_by_date=${dateKeyword}`,
+        {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+            'session-token': localStorage.getItem('session-token') ?? '',
+          },
+        }
+      )
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
       const data = await res.json()
       const patientsArray = Array.isArray(patients) ? data.data.patients : []

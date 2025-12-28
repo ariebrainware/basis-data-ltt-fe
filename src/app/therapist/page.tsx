@@ -62,7 +62,7 @@ function useFetchTherapist(
         console.error('Error fetching therapist:', error)
       }
     })()
-  }, [currentPage, host, keyword])
+  }, [currentPage, keyword])
 
   return { data: { therapist: therapist }, total }
 }
@@ -99,16 +99,19 @@ export default function ListTherapist() {
       const newKeyword = (e.target as HTMLInputElement).value
       setKeyword(newKeyword)
       try {
-        const res = await fetch(`${getApiHost()}/therapist?keyword=${newKeyword}`, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
-          },
-        })
+        const res = await fetch(
+          `${getApiHost()}/therapist?keyword=${newKeyword}`,
+          {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+              'session-token': localStorage.getItem('session-token') ?? '',
+            },
+          }
+        )
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
         const therapistArray = Array.isArray(therapists)
