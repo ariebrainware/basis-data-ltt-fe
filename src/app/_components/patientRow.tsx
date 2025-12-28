@@ -27,7 +27,7 @@ export default function Patient({
   surgery_history,
   patient_code: patientCode,
   onDataChange,
-}: PatientRowProps) {
+}: PatientType) {
   const [open, setOpen] = React.useState(false)
 
   const handleOpen = () => setOpen(!open)

@@ -11,4 +11,5 @@ export interface PatientType {
   surgery_history: string
   last_visit: string
   patient_code: string
+  onDataChange?: () => void
 }
