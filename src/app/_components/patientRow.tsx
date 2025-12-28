@@ -171,7 +171,11 @@ export default function Patient({
             console.error('Error deleting patient record:', error)
             // Don't show error for unauthorized access since UnauthorizedAccess handles it
             if (error.message !== 'Unauthorized') {
-              Swal.fire('Error', 'Gagal menghapus data pasien', 'error')
+              Swal.fire({
+                title: 'Error',
+                text: 'Gagal menghapus data pasien',
+                icon: 'error',
+              })
             }
           })
       }
