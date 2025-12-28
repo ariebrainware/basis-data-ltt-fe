@@ -67,17 +67,22 @@ Two main component patterns:
 
 ### Authentication & Authorization
 
-1. **Token Management**: Tokens stored in localStorage as `session-token`
+1. **Token Management**: User session tokens are stored in localStorage as `session-token` after successful login
 2. **Unauthorized Check**: On 401 response, call `UnauthorizedAccess()` from `_functions/unauthorized.tsx` to clear token and redirect to login
-3. **Header Setup**: All API calls require:
+3. **Header Setup**: The current implementation sends two tokens with authenticated API calls:
    ```typescript
-   const sessionToken = localStorage.getItem('session-token') ?? ''
-   
    headers: {
-     'Authorization': 'Bearer ' + sessionToken,
-     'session-token': sessionToken,
+     'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+     'session-token': localStorage.getItem('session-token') ?? '',
    }
    ```
+   
+   **⚠️ Security Warning**: This implementation has a security concern:
+   - The `session-token` header carries the user-specific authentication token (secure, obtained at login)
+   - The `Authorization` header uses `NEXT_PUBLIC_API_TOKEN` which is publicly exposed in the browser bundle
+   - `NEXT_PUBLIC_*` variables should NEVER be used for authentication/authorization as they are embedded in client-side JavaScript
+   - Backend should rely solely on `session-token` for authentication, not on the Authorization header with the public token
+   
 4. **Role Storage**: User role stored in localStorage as `user-role`
 
 ### API Integration
@@ -138,8 +143,12 @@ pnpm run lint
 
 **Environment Setup**: Copy `sample.env` to `.env.local` and set:
 
-- `NEXT_PUBLIC_API_HOST`: Backend URL
-- `NEXT_PUBLIC_API_TOKEN`: Static bearer token for API auth
+- `NEXT_PUBLIC_API_HOST`: Backend URL (e.g., `http://localhost:19091`)
+
+**⚠️ Security Note**: 
+- Any environment variables prefixed with `NEXT_PUBLIC_*` are exposed to the browser and embedded in the client-side JavaScript bundle
+- **Never store secrets, API keys, or authentication tokens in `NEXT_PUBLIC_*` variables**
+- The actual authentication in this application is handled via user-specific `session-token` obtained after login, which is stored in localStorage and sent with each authenticated request
 
 ---
 
