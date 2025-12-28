@@ -173,7 +173,7 @@ async function sendRegisterRequest(
   if (data.ok) {
     await Swal.fire({
       title: 'Sukses',
-      text: 'Registrasi berhasil',
+      text: 'Registrasi berhasil. Silakan login dengan akun baru Anda.',
       icon: 'success',
       confirmButtonText: 'OK',
     })
