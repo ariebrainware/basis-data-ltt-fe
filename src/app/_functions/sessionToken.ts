@@ -11,5 +11,9 @@
  * ```
  */
 export function getSessionToken(): string {
-  return localStorage.getItem('session-token') ?? ''
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return ''
+  }
+
+  return window.localStorage.getItem('session-token') ?? ''
 }
