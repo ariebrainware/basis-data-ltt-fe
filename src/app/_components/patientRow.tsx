@@ -12,6 +12,7 @@ import {
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 export default function Patient({
   ID,
@@ -83,7 +84,7 @@ export default function Patient({
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': localStorage.getItem('session-token') ?? '',
+        'session-token': getSessionToken(),
       },
       body: JSON.stringify({
         full_name: full_name_new_input,
@@ -150,7 +151,7 @@ export default function Patient({
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
+            'session-token': getSessionToken(),
           },
         })
           .then((response) => {

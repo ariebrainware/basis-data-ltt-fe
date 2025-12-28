@@ -1,4 +1,5 @@
 import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
 
 export default function Header() {
   return (
@@ -61,7 +62,7 @@ export default function Header() {
                   'Content-Type': 'application/json',
                   Accept: 'application/json',
                   Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                  'session-token': localStorage.getItem('session-token') ?? '',
+                  'session-token': getSessionToken(),
                 },
               })
               if (!response.ok) {
