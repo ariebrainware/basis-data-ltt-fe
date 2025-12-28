@@ -71,9 +71,11 @@ Two main component patterns:
 2. **Unauthorized Check**: On 401 response, call `UnauthorizedAccess()` from `_functions/unauthorized.tsx` to clear token and redirect to login
 3. **Header Setup**: All API calls require:
    ```typescript
+   const sessionToken = localStorage.getItem('session-token') ?? ''
+   
    headers: {
-     'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-     'session-token': localStorage.getItem('session-token') ?? '',
+     'Authorization': 'Bearer ' + sessionToken,
+     'session-token': sessionToken,
    }
    ```
 4. **Role Storage**: User role stored in localStorage as `user-role`
