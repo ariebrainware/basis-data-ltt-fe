@@ -31,7 +31,9 @@ export default function TimePicker({
 }: TimePickerProps) {
   const uid =
     id ??
-    `timepicker-${crypto.getRandomValues(new Uint8Array(4)).reduce((a, b) => a + b.toString(16), '')}`
+    `timepicker-${crypto
+      .getRandomValues(new Uint8Array(4))
+      .reduce((a, b) => a + b.toString(16).padStart(2, '0'), '')}`
   const [internal, setInternal] = useState<string | null>(value ?? null)
 
   useEffect(() => {
