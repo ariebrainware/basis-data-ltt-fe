@@ -170,7 +170,7 @@ async function sendRegisterRequest(
       icon: 'success',
       confirmButtonText: 'OK',
     })
-    window.location.href = '/login'
+    window.location.href = '/register'
   } else {
     const errorMessage = extractErrorMessage(responseData, 'Registrasi gagal')
     await Swal.fire({
