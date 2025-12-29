@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 
 type TimePickerProps = {
@@ -27,7 +29,9 @@ export default function TimePicker({
   min = null,
   max = null,
 }: TimePickerProps) {
-  const uid = id ?? `timepicker-${Math.random().toString(36).slice(2, 9)}`
+  const uid =
+    id ??
+    `timepicker-${crypto.getRandomValues(new Uint8Array(4)).reduce((a, b) => a + b.toString(16), '')}`
   const [internal, setInternal] = useState<string | null>(value ?? null)
 
   useEffect(() => {
