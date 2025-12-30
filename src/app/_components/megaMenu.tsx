@@ -46,8 +46,8 @@ const navListMenuItems = [
     roles: ['super_admin'],
   },
   {
-    title: 'Penanganan',
-    description: 'Halaman untuk penanganan pasien',
+    title: 'Penanganan Terapis',
+    description: 'Lihat dan lengkapi penanganan pasien',
     icon: HeartIcon,
     url: '/therapist/treatment',
     roles: ['therapist'],
