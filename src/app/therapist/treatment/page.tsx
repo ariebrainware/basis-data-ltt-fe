@@ -162,6 +162,7 @@ export default function TherapistTreatmentList() {
                     console.error('Logout error:', error)
                   }
                   localStorage.removeItem('session-token')
+                  localStorage.removeItem('user-role')
                   window.location.href = '/login'
                 }}
                 onResize={undefined}
