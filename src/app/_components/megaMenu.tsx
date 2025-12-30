@@ -21,6 +21,7 @@ import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
 import { getApiHost } from '../_functions/apiHost'
 import { getSessionToken } from '../_functions/sessionToken'
+import { getUserRole } from '../_functions/userRole'
 
 const navListMenuItems = [
   {
@@ -28,25 +29,41 @@ const navListMenuItems = [
     description: 'Halaman untuk manajemen pasien',
     icon: SquaresPlusIcon,
     url: '/patient',
+    roles: ['super_admin'],
   },
   {
     title: 'Terapis',
     description: 'Halaman manajemen terapis',
     icon: UserGroupIcon,
     url: '/therapist',
+    roles: ['super_admin'],
   },
   {
     title: 'Penanganan',
     description: 'Halaman untuk penanganan pasien',
     icon: HeartIcon,
     url: '/patient/treatment',
+    roles: ['super_admin'],
+  },
+  {
+    title: 'Penanganan',
+    description: 'Halaman untuk penanganan pasien',
+    icon: HeartIcon,
+    url: '/therapist/treatment',
+    roles: ['therapist'],
   },
 ]
 
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const renderItems = navListMenuItems.map(
+  const userRole = getUserRole()
+
+  const filteredMenuItems = navListMenuItems.filter((item) =>
+    item.roles.includes(userRole || '')
+  )
+
+  const renderItems = filteredMenuItems.map(
     ({ icon, title, description, url }, key) => (
       <a href="#" key={key}>
         <MenuItem
@@ -106,7 +123,8 @@ function NavListMenu() {
         placement="bottom"
       >
         {typeof window !== 'undefined' &&
-          localStorage.getItem('user-role') === 'super_admin' && (
+          (localStorage.getItem('user-role') === 'super_admin' ||
+            localStorage.getItem('user-role') === 'therapist') && (
             <MenuHandler>
               <Typography
                 as="div"

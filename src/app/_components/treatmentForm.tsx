@@ -1,5 +1,6 @@
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { TreatmentType } from '../_types/treatment'
+import { isTherapist } from '../_functions/userRole'
 
 export function TreatmentForm({
   ID,
@@ -13,6 +14,7 @@ export function TreatmentForm({
   remarks: remarks,
   next_visit: nextVisit,
 }: TreatmentType) {
+  const isTherapistRole = isTherapist()
   return (
     <Card
       color="transparent"
@@ -43,6 +45,7 @@ export function TreatmentForm({
               type="text"
               label="Treatment Date"
               defaultValue={treatmentDate}
+              disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -54,6 +57,7 @@ export function TreatmentForm({
               type="text"
               label="Patient Code"
               defaultValue={patientCode}
+              disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -65,6 +69,7 @@ export function TreatmentForm({
               type="text"
               label="Patient Name"
               defaultValue={patientName}
+              disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -76,6 +81,7 @@ export function TreatmentForm({
               type="text"
               label="Therapist Name"
               defaultValue={therapistName}
+              disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -87,6 +93,7 @@ export function TreatmentForm({
               type="text"
               label="Therapist ID"
               defaultValue={therapistID}
+              disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -99,6 +106,7 @@ export function TreatmentForm({
               id="issues"
               label="Issues"
               defaultValue={issues}
+              disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               onResize={undefined}
