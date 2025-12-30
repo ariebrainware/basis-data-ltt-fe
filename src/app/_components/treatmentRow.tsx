@@ -128,7 +128,9 @@ export default function Treatment({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          Ubah Data Penanganan Pasien
+          {isTherapistRole
+            ? 'Lengkapi Data Penanganan Pasien'
+            : 'Ubah Data Penanganan Pasien'}
         </DialogHeader>
         <DialogBody
           placeholder={undefined}
