@@ -16,6 +16,7 @@ import { TreatmentType } from '../../_types/treatment'
 import { UnauthorizedAccess } from '../../_functions/unauthorized'
 import { getApiHost } from '../../_functions/apiHost'
 import { getSessionToken } from '../../_functions/sessionToken'
+import { logout } from '../../_functions/logout'
 
 interface ListTreatmentResponse {
   data: {
@@ -141,30 +142,7 @@ export default function TherapistTreatmentList() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  try {
-                    const response = await fetch(`${getApiHost()}/logout`, {
-                      method: 'DELETE',
-                      mode: 'cors',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json',
-                        Authorization:
-                          'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                        'session-token': getSessionToken(),
-                      },
-                    })
-                    if (!response.ok) {
-                      throw new Error(`HTTP error! Status: ${response.status}`)
-                    }
-                    console.log('Logged out successfully')
-                  } catch (error) {
-                    console.error('Logout error:', error)
-                  }
-                  localStorage.removeItem('session-token')
-                  localStorage.removeItem('user-role')
-                  window.location.href = '/login'
-                }}
+                onClick={logout}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >
