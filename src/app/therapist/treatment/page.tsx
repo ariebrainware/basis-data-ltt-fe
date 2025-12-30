@@ -34,8 +34,11 @@ function useFetchTreatment(
   useEffect(() => {
     ;(async () => {
       try {
+        const baseParams = keyword
+          ? `keyword=${keyword}`
+          : `limit=20&offset=${(currentPage - 1) * 20}`
         const res = await fetch(
-          `${getApiHost()}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
+          `${getApiHost()}/patient/treatment?${baseParams}&filter_by_therapist=true`,
           {
             method: 'GET',
             mode: 'cors',
