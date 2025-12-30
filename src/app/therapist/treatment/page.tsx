@@ -1,6 +1,5 @@
 'use client'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
-import { UserPlusIcon } from '@heroicons/react/24/solid'
 import {
   Card,
   CardHeader,
@@ -36,8 +35,11 @@ function useFetchTreatment(
   useEffect(() => {
     ;(async () => {
       try {
+        const baseParams = keyword
+          ? `keyword=${keyword}&filter_by_therapist=true`
+          : `limit=20&offset=${(currentPage - 1) * 20}&filter_by_therapist=true`
         const res = await fetch(
-          `${getApiHost()}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
+          `${getApiHost()}/patient/treatment?${baseParams}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -57,8 +59,6 @@ function useFetchTreatment(
           ? data.data.treatments
           : []
         setTreatment(treatmentArray)
-        console.log(`data: `, data.data.treatments)
-        console.log(`treatmentArray: `, treatmentArray)
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
@@ -72,10 +72,9 @@ function useFetchTreatment(
   return { data: { treatment: treatment }, total }
 }
 
-export default function ListTreatment() {
+export default function TherapistTreatmentList() {
   const [currentPage, setCurrentPage] = useState(1)
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
-  const [, setTotal] = useState(0)
   const [keyword, setKeyword] = useState('')
   const { data, total } = useFetchTreatment(currentPage, keyword)
   useEffect(() => {
@@ -88,30 +87,6 @@ export default function ListTreatment() {
     if (e.key === 'Enter') {
       const newKeyword = (e.target as HTMLInputElement).value
       setKeyword(newKeyword)
-      try {
-        const res = await fetch(`${getApiHost()}/patient/treatment`, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': getSessionToken(),
-          },
-        })
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
-        const treatmentArray = Array.isArray(data.data.treatments)
-          ? data.data.treatments
-          : []
-        setTreatment(treatmentArray)
-        setTotal(data.data.total)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
-        }
-        console.error('Error fetching treatment:', error)
-      }
     }
   }
 
@@ -157,26 +132,10 @@ export default function ListTreatment() {
                 onResize={undefined}
                 onResizeCapture={undefined}
               >
-                Lihat semua informasi mengenai penanganan yang telah dilakukan
-                terhadap pasien
+                Lihat dan lengkapi informasi penanganan pasien
               </Typography>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                className="flex items-center gap-3"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={() =>
-                  window.open('/patient/treatment/register', '_blank')
-                }
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                <UserPlusIcon strokeWidth={2} className="size-4" /> Tambah
-                Penanganan
-              </Button>
               <Button
                 variant="outlined"
                 size="sm"

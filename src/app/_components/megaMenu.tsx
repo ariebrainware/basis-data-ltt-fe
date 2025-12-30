@@ -19,8 +19,8 @@ import {
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
-import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
+import { getUserRole } from '../_functions/userRole'
+import { logout } from '../_functions/logout'
 
 const navListMenuItems = [
   {
@@ -28,25 +28,41 @@ const navListMenuItems = [
     description: 'Halaman untuk manajemen pasien',
     icon: SquaresPlusIcon,
     url: '/patient',
+    roles: ['super_admin'],
   },
   {
     title: 'Terapis',
     description: 'Halaman manajemen terapis',
     icon: UserGroupIcon,
     url: '/therapist',
+    roles: ['super_admin'],
   },
   {
     title: 'Penanganan',
     description: 'Halaman untuk penanganan pasien',
     icon: HeartIcon,
     url: '/patient/treatment',
+    roles: ['super_admin'],
+  },
+  {
+    title: 'Penanganan Terapis',
+    description: 'Lihat dan lengkapi penanganan pasien',
+    icon: HeartIcon,
+    url: '/therapist/treatment',
+    roles: ['therapist'],
   },
 ]
 
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const renderItems = navListMenuItems.map(
+  const userRole = getUserRole()
+
+  const filteredMenuItems = navListMenuItems.filter((item) =>
+    item.roles.includes(userRole || '')
+  )
+
+  const renderItems = filteredMenuItems.map(
     ({ icon, title, description, url }, key) => (
       <a href="#" key={key}>
         <MenuItem
@@ -106,7 +122,7 @@ function NavListMenu() {
         placement="bottom"
       >
         {typeof window !== 'undefined' &&
-          localStorage.getItem('user-role') === 'super_admin' && (
+          (userRole === 'super_admin' || userRole === 'therapist') && (
             <MenuHandler>
               <Typography
                 as="div"
@@ -216,28 +232,7 @@ function NavList() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
-          onClick={async () => {
-            try {
-              const response = await fetch(`${getApiHost()}/logout`, {
-                method: 'DELETE',
-                mode: 'cors',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Accept: 'application/json',
-                  Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                  'session-token': getSessionToken(),
-                },
-              })
-              if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`)
-              }
-              localStorage.removeItem('session-token')
-              console.log('Logged out successfully')
-              window.location.href = '/login'
-            } catch (error) {
-              console.error('Logout error:', error)
-            }
-          }}
+          onClick={logout}
           onResize={undefined}
           onResizeCapture={undefined}
         >
