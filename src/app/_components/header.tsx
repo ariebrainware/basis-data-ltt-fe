@@ -1,5 +1,4 @@
-import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
+import { logout } from '../_functions/logout'
 
 export default function Header() {
   return (
@@ -53,28 +52,7 @@ export default function Header() {
           Tambah Pasien
         </button>
         <button
-          onClick={async () => {
-            try {
-              const response = await fetch(`${getApiHost()}/logout`, {
-                method: 'DELETE',
-                mode: 'cors',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Accept: 'application/json',
-                  Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                  'session-token': getSessionToken(),
-                },
-              })
-              if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`)
-              }
-              localStorage.removeItem('session-token')
-              console.log('Logged out successfully')
-              window.location.href = '/login'
-            } catch (error) {
-              console.error('Logout error:', error)
-            }
-          }}
+          onClick={logout}
           className="border-slate-200 bg-slate-200 text-slate-800 hover:bg-slate-100 inline-flex select-none items-center justify-center rounded-md border px-3 py-1.5 text-center align-middle font-sans text-sm font-medium shadow-sm transition-all duration-300 ease-in hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
           data-shape="default"
           data-width="default"
