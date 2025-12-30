@@ -35,10 +35,10 @@ function useFetchTreatment(
     ;(async () => {
       try {
         const baseParams = keyword
-          ? `keyword=${keyword}`
-          : `limit=20&offset=${(currentPage - 1) * 20}`
+          ? `keyword=${keyword}&filter_by_therapist=true`
+          : `limit=20&offset=${(currentPage - 1) * 20}&filter_by_therapist=true`
         const res = await fetch(
-          `${getApiHost()}/patient/treatment?${baseParams}&filter_by_therapist=true`,
+          `${getApiHost()}/patient/treatment?${baseParams}`,
           {
             method: 'GET',
             mode: 'cors',
