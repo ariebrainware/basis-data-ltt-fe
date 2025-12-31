@@ -49,6 +49,20 @@ export default function Treatment({
       normalizedCurrentUserId !== null &&
       normalizedTherapistId === normalizedCurrentUserId)
 
+  // Debug logging to help diagnose edit permission issues
+  if (process.env.NODE_ENV !== 'production' && isTherapistRole) {
+    console.log('[TreatmentRow] Edit permission check:', {
+      treatmentId: ID,
+      isTherapistRole,
+      therapistId,
+      normalizedTherapistId,
+      currentUserId,
+      normalizedCurrentUserId,
+      canEdit,
+      idsMatch: normalizedTherapistId === normalizedCurrentUserId,
+    })
+  }
+
   const handleOpen = () => setOpen(!open)
 
   const handleDeleteTreatment = useDeleteResource({

@@ -39,8 +39,16 @@ export default function Login() {
 
       const token = responseData.data.token
       const role = responseData.data.role
-      const userId = responseData.data.id || responseData.data.user_id
+      // Backend may return user ID in different field names depending on role
+      // Try multiple possible field names: id, user_id, therapist_id, ID
+      const userId =
+        responseData.data.id ||
+        responseData.data.user_id ||
+        responseData.data.therapist_id ||
+        responseData.data.ID
       console.log('token', token)
+      console.log('Login response data:', responseData.data)
+      console.log('Extracted userId:', userId, 'role:', role)
       if (token) {
         setShowVariantAlert(false)
         setMessage('Login Successful!')
@@ -49,9 +57,15 @@ export default function Login() {
           localStorage.setItem('user-role', role)
           if (userId) {
             localStorage.setItem('user-id', userId.toString())
-          } else if (process.env.NODE_ENV !== 'production') {
+            console.log(
+              '[Login] Successfully stored user-id:',
+              userId.toString()
+            )
+          } else {
             console.warn(
-              '[Login] No user ID received from backend. User may not be able to edit their treatments.'
+              '[Login] No user ID received from backend. User may not be able to edit their treatments.',
+              'Available fields in response:',
+              Object.keys(responseData.data)
             )
           }
           window.location.href = '/dashboard'
