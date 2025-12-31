@@ -62,10 +62,10 @@ const TableBody = ({
   onDataChange?: () => void
 }) => (
   <tbody className="text-slate-800 group text-sm dark:text-white">
-    {patients.map((patient: PatientType, index: number) => (
+    {patients.map((patient: PatientType) => (
       <Patient
         ID={patient.ID}
-        key={`${patient.patient_code + index}`}
+        key={patient.ID}
         full_name={patient.full_name}
         phone_number={patient.phone_number}
         job={patient.job}
