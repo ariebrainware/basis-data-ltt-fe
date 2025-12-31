@@ -50,7 +50,7 @@ export default function Treatment({
       normalizedTherapistId === normalizedCurrentUserId)
 
   // Helper function to determine why edit is denied
-  const getEditDenialReason = (): string => {
+  const getEditDenialReason = React.useCallback((): string => {
     if (normalizedCurrentUserId === null) {
       return 'User ID not found in localStorage'
     }
@@ -61,7 +61,7 @@ export default function Treatment({
       return 'Treatment is assigned to a different therapist'
     }
     return 'Unknown reason'
-  }
+  }, [normalizedCurrentUserId, normalizedTherapistId])
 
   // Debug logging to help diagnose edit permission issues
   // Only log when there's a potential issue (therapist can't edit their own treatment)
@@ -88,6 +88,7 @@ export default function Treatment({
     normalizedTherapistId,
     currentUserId,
     normalizedCurrentUserId,
+    getEditDenialReason,
   ])
 
   const handleOpen = () => setOpen(!open)

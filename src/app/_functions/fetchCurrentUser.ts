@@ -27,6 +27,15 @@ export async function fetchCurrentUserId(): Promise<string | null> {
     const CURRENT_USER_ENDPOINT =
       process.env.NEXT_PUBLIC_CURRENT_USER_ENDPOINT || '/user/me'
 
+    // Validate that session token is available before making the request
+    const sessionToken = getSessionToken()
+    if (!sessionToken) {
+      console.error(
+        '[fetchCurrentUserId] No session token available. Cannot fetch user ID.'
+      )
+      return null
+    }
+
     const response = await fetch(`${getApiHost()}${CURRENT_USER_ENDPOINT}`, {
       method: 'GET',
       mode: 'cors',
@@ -34,7 +43,7 @@ export async function fetchCurrentUserId(): Promise<string | null> {
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
+        'session-token': sessionToken,
       },
     })
 
@@ -47,10 +56,12 @@ export async function fetchCurrentUserId(): Promise<string | null> {
     }
 
     const data = await response.json()
-    console.log(
-      `[fetchCurrentUserId] Successfully fetched user data from ${CURRENT_USER_ENDPOINT}:`,
-      data
-    )
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(
+        `[fetchCurrentUserId] Successfully fetched user data from ${CURRENT_USER_ENDPOINT}:`,
+        data
+      )
+    }
 
     // Try to extract ID from various possible field names
     const userId =
@@ -68,7 +79,9 @@ export async function fetchCurrentUserId(): Promise<string | null> {
       data.therapist_id
 
     if (userId) {
-      console.log('[fetchCurrentUserId] Extracted user ID:', userId)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[fetchCurrentUserId] Extracted user ID:', userId)
+      }
       return String(userId)
     }
 

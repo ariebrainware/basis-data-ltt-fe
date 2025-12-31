@@ -54,9 +54,12 @@ export default function Login() {
         responseData.data.therapist?.id ||
         responseData.data.user?.ID ||
         responseData.data.user?.id
-      console.log('token', token)
-      console.log('Login response data:', responseData.data)
-      console.log('Extracted userId:', userId, 'role:', role)
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('token', token)
+        console.log('Login response data:', responseData.data)
+        console.log('Extracted userId:', userId, 'role:', role)
+      }
       if (token) {
         setShowVariantAlert(false)
         setMessage('Login Successful!')
@@ -68,7 +71,12 @@ export default function Login() {
         // Handle user ID storage
         if (userId) {
           localStorage.setItem('user-id', userId.toString())
-          console.log('[Login] Successfully stored user-id:', userId.toString())
+          if (process.env.NODE_ENV !== 'production') {
+            console.log(
+              '[Login] Successfully stored user-id:',
+              userId.toString()
+            )
+          }
           // Redirect after successful login with user ID
           setTimeout(() => {
             window.location.href = '/dashboard'
@@ -81,16 +89,17 @@ export default function Login() {
           )
 
           // Try to fetch user ID from profile endpoint as fallback
-          // Note: We don't need setTimeout here since localStorage operations are synchronous
-          // and we've already stored token and role above
+          // Wait for the fetch to complete before redirecting to avoid race condition
           fetchCurrentUserId()
             .then((fetchedUserId) => {
               if (fetchedUserId) {
                 localStorage.setItem('user-id', fetchedUserId)
-                console.log(
-                  '[Login] Successfully fetched and stored user-id from fallback:',
-                  fetchedUserId
-                )
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log(
+                    '[Login] Successfully fetched and stored user-id from fallback:',
+                    fetchedUserId
+                  )
+                }
               } else {
                 console.error(
                   '[Login] Failed to fetch user ID. User may not be able to edit their treatments.'
