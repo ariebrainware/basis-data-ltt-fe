@@ -83,7 +83,7 @@ export default function Treatment({
     const next_visit_new_input =
       document.querySelector<HTMLTextAreaElement>('#next_visit')?.value ||
       nextVisit
-    fetch(`${getApiHost()}/patient/treatment/${ID}`, {
+    fetch(`${getApiHost()}/treatment/${ID}`, {
       method: 'PATCH',
       mode: 'cors',
       headers: {
