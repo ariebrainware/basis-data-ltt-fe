@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Checkbox } from '@material-tailwind/react'
 
 import DatePicker from '../../_components/datePicker'
-import styles from '../../../page.module.css'
+import styles from '../../page.module.css'
 import Footer from '../../_components/footer'
 import { VariantAlert } from '../../_components/alert'
 import { ControlledSelect } from '../../_components/selectTherapist'
