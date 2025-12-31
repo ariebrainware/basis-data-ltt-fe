@@ -11,13 +11,13 @@ import {
   CardFooter,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
-import Pagination from '../../_components/pagination'
-import TableTreatment from '../../_components/tableTreatment'
-import { TreatmentType } from '../../_types/treatment'
-import { UnauthorizedAccess } from '../../_functions/unauthorized'
-import { getApiHost } from '../../_functions/apiHost'
-import { getSessionToken } from '../../_functions/sessionToken'
-import { logout } from '../../_functions/logout'
+import Pagination from '../_components/pagination'
+import TableTreatment from '../_components/tableTreatment'
+import { TreatmentType } from '../_types/treatment'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
+import { getApiHost } from '../_functions/apiHost'
+import { getSessionToken } from '../_functions/sessionToken'
+import { logout } from '../_functions/logout'
 
 interface ListTreatmentResponse {
   data: {

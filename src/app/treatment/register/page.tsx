@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Checkbox } from '@material-tailwind/react'
 
-import DatePicker from '../../../_components/datePicker'
+import DatePicker from '../../_components/datePicker'
 import styles from '../../../page.module.css'
-import Footer from '../../../_components/footer'
-import { VariantAlert } from '../../../_components/alert'
-import { ControlledSelect } from '../../../_components/selectTherapist'
+import Footer from '../../_components/footer'
+import { VariantAlert } from '../../_components/alert'
+import { ControlledSelect } from '../../_components/selectTherapist'
 
 import { TreatmentConditionOptions } from '@/app/_types/treatmentConditionOptions'
 import TimePicker from '@/app/_components/timepicker'
