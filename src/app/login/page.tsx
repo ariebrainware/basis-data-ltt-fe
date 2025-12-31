@@ -40,12 +40,19 @@ export default function Login() {
       const token = responseData.data.token
       const role = responseData.data.role
       // Backend may return user ID in different field names depending on role
-      // Try multiple possible field names: id, user_id, therapist_id, ID
+      // Try multiple possible field names and nested structures:
+      // - Direct fields: id, user_id, therapist_id, ID
+      // - Nested in therapist object: therapist.ID, therapist.id
+      // - Nested in user object: user.ID, user.id
       const userId =
         responseData.data.id ||
         responseData.data.user_id ||
         responseData.data.therapist_id ||
-        responseData.data.ID
+        responseData.data.ID ||
+        responseData.data.therapist?.ID ||
+        responseData.data.therapist?.id ||
+        responseData.data.user?.ID ||
+        responseData.data.user?.id
       console.log('token', token)
       console.log('Login response data:', responseData.data)
       console.log('Extracted userId:', userId, 'role:', role)
