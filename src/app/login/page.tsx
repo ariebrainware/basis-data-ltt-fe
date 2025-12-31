@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
 import { VariantAlert } from '../_components/alert'
 import { getApiHost } from '../_functions/apiHost'
+import { fetchCurrentUserId } from '../_functions/fetchCurrentUser'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
@@ -59,24 +60,43 @@ export default function Login() {
       if (token) {
         setShowVariantAlert(false)
         setMessage('Login Successful!')
-        setTimeout(() => {
-          localStorage.setItem('session-token', token)
-          localStorage.setItem('user-role', role)
-          if (userId) {
-            localStorage.setItem('user-id', userId.toString())
-            console.log(
-              '[Login] Successfully stored user-id:',
-              userId.toString()
-            )
-          } else {
-            console.warn(
-              '[Login] No user ID received from backend. User may not be able to edit their treatments.',
-              'Available fields in response:',
-              Object.keys(responseData.data)
-            )
-          }
-          window.location.href = '/dashboard'
-        }, 1500)
+
+        // Store token and role immediately
+        localStorage.setItem('session-token', token)
+        localStorage.setItem('user-role', role)
+
+        // Handle user ID storage
+        if (userId) {
+          localStorage.setItem('user-id', userId.toString())
+          console.log('[Login] Successfully stored user-id:', userId.toString())
+          // Redirect after successful login with user ID
+          setTimeout(() => {
+            window.location.href = '/dashboard'
+          }, 1500)
+        } else {
+          console.warn(
+            '[Login] No user ID received from backend. Attempting fallback fetch...',
+            'Available fields in response:',
+            Object.keys(responseData.data)
+          )
+
+          // Try to fetch user ID from profile endpoint as fallback
+          setTimeout(async () => {
+            const fetchedUserId = await fetchCurrentUserId()
+            if (fetchedUserId) {
+              localStorage.setItem('user-id', fetchedUserId)
+              console.log(
+                '[Login] Successfully fetched and stored user-id from fallback:',
+                fetchedUserId
+              )
+            } else {
+              console.error(
+                '[Login] Failed to fetch user ID. User may not be able to edit their treatments.'
+              )
+            }
+            window.location.href = '/dashboard'
+          }, 500)
+        }
         return
       }
       return response
