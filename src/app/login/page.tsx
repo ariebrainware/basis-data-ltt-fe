@@ -39,6 +39,7 @@ export default function Login() {
 
       const token = responseData.data.token
       const role = responseData.data.role
+      const userId = responseData.data.id || responseData.data.user_id
       console.log('token', token)
       if (token) {
         setShowVariantAlert(false)
@@ -46,6 +47,9 @@ export default function Login() {
         setTimeout(() => {
           localStorage.setItem('session-token', token)
           localStorage.setItem('user-role', role)
+          if (userId) {
+            localStorage.setItem('user-id', userId.toString())
+          }
           window.location.href = '/dashboard'
         }, 1500)
         return
