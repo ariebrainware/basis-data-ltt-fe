@@ -16,61 +16,64 @@ import { getSessionToken } from './sessionToken'
  */
 export async function fetchCurrentUserId(): Promise<string | null> {
   try {
-    // Try common API endpoints for getting current user info
-    // The actual endpoint may vary depending on the backend implementation
-    const endpoints = ['/user/me', '/therapist/me', '/me', '/profile']
+    /**
+     * Endpoint for fetching the current authenticated user's profile.
+     *
+     * Configure via NEXT_PUBLIC_CURRENT_USER_ENDPOINT to match the backend,
+     * e.g. "/user/me", "/therapist/me", or "/me".
+     *
+     * Default: "/user/me"
+     */
+    const CURRENT_USER_ENDPOINT =
+      process.env.NEXT_PUBLIC_CURRENT_USER_ENDPOINT || '/user/me'
 
-    for (const endpoint of endpoints) {
-      try {
-        const response = await fetch(`${getApiHost()}${endpoint}`, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': getSessionToken(),
-          },
-        })
+    const response = await fetch(`${getApiHost()}${CURRENT_USER_ENDPOINT}`, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+        'session-token': getSessionToken(),
+      },
+    })
 
-        if (response.ok) {
-          const data = await response.json()
-          console.log(
-            `[fetchCurrentUserId] Successfully fetched user data from ${endpoint}:`,
-            data
-          )
+    if (!response.ok) {
+      console.warn(
+        `[fetchCurrentUserId] Failed to fetch user data from ${CURRENT_USER_ENDPOINT}, status:`,
+        response.status
+      )
+      return null
+    }
 
-          // Try to extract ID from various possible field names
-          const userId =
-            data.data?.id ||
-            data.data?.ID ||
-            data.data?.user_id ||
-            data.data?.therapist_id ||
-            data.data?.therapist?.ID ||
-            data.data?.therapist?.id ||
-            data.data?.user?.ID ||
-            data.data?.user?.id ||
-            data.id ||
-            data.ID ||
-            data.user_id ||
-            data.therapist_id
+    const data = await response.json()
+    console.log(
+      `[fetchCurrentUserId] Successfully fetched user data from ${CURRENT_USER_ENDPOINT}:`,
+      data
+    )
 
-          if (userId) {
-            console.log('[fetchCurrentUserId] Extracted user ID:', userId)
-            return String(userId)
-          }
-        }
-      } catch (endpointError) {
-        // Try next endpoint - loop will continue naturally
-        console.log(
-          `[fetchCurrentUserId] Endpoint ${endpoint} not available:`,
-          endpointError
-        )
-      }
+    // Try to extract ID from various possible field names
+    const userId =
+      data.data?.id ||
+      data.data?.ID ||
+      data.data?.user_id ||
+      data.data?.therapist_id ||
+      data.data?.therapist?.ID ||
+      data.data?.therapist?.id ||
+      data.data?.user?.ID ||
+      data.data?.user?.id ||
+      data.id ||
+      data.ID ||
+      data.user_id ||
+      data.therapist_id
+
+    if (userId) {
+      console.log('[fetchCurrentUserId] Extracted user ID:', userId)
+      return String(userId)
     }
 
     console.warn(
-      '[fetchCurrentUserId] Could not fetch user ID from any known endpoint'
+      '[fetchCurrentUserId] Could not extract user ID from response payload'
     )
     return null
   } catch (error) {
