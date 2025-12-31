@@ -50,16 +50,22 @@ export default function Treatment({
       normalizedTherapistId === normalizedCurrentUserId)
 
   // Debug logging to help diagnose edit permission issues
-  if (process.env.NODE_ENV !== 'production' && isTherapistRole) {
-    console.log('[TreatmentRow] Edit permission check:', {
+  // Only log when there's a potential issue (therapist can't edit their own treatment)
+  if (process.env.NODE_ENV !== 'production' && isTherapistRole && !canEdit) {
+    console.warn('[TreatmentRow] Therapist cannot edit this treatment:', {
       treatmentId: ID,
-      isTherapistRole,
       therapistId,
       normalizedTherapistId,
       currentUserId,
       normalizedCurrentUserId,
-      canEdit,
-      idsMatch: normalizedTherapistId === normalizedCurrentUserId,
+      reason:
+        normalizedCurrentUserId === null
+          ? 'User ID not found in localStorage'
+          : normalizedTherapistId === null
+            ? 'Treatment has no therapist assigned'
+            : normalizedTherapistId !== normalizedCurrentUserId
+              ? 'Treatment is assigned to a different therapist'
+              : 'Unknown reason',
     })
   }
 
