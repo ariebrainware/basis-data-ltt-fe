@@ -37,7 +37,7 @@ function useFetchTreatment(
     ;(async () => {
       try {
         const res = await fetch(
-          `${getApiHost()}/patient/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
+          `${getApiHost()}/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -89,7 +89,7 @@ export default function ListTreatment() {
       const newKeyword = (e.target as HTMLInputElement).value
       setKeyword(newKeyword)
       try {
-        const res = await fetch(`${getApiHost()}/patient/treatment`, {
+        const res = await fetch(`${getApiHost()}/treatment`, {
           method: 'GET',
           mode: 'cors',
           headers: {
@@ -168,9 +168,7 @@ export default function ListTreatment() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
-                onClick={() =>
-                  window.open('/patient/treatment/register', '_blank')
-                }
+                onClick={() => window.open('/treatment/register', '_blank')}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >

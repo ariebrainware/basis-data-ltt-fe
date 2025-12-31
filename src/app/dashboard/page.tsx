@@ -54,7 +54,7 @@ function useFetchTreatment(
         const groupByDate = `${yyyy}-${mm}-${dd}`
         // const customDate = `2025-10-24`
         const res = await fetch(
-          `${getApiHost()}/patient/treatment?group_by_date=${groupByDate}`,
+          `${getApiHost()}/treatment?group_by_date=${groupByDate}`,
           {
             method: 'GET',
             mode: 'cors',
@@ -151,9 +151,7 @@ export default function Dashboard() {
                 onPointerLeaveCapture={undefined}
                 onResize={undefined}
                 onResizeCapture={undefined}
-                onClick={() =>
-                  window.open('/patient/treatment/register', '_blank')
-                }
+                onClick={() => window.open('/treatment/register', '_blank')}
               >
                 <PlusCircleIcon strokeWidth={2} className="size-4" /> Tambah
                 Penanganan

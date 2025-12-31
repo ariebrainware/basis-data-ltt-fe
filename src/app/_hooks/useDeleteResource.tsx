@@ -35,7 +35,7 @@ export function useDeleteResource(config: DeleteResourceConfig) {
       case 'therapist':
         return `${getApiHost()}/therapist/${resourceId}`
       case 'treatment':
-        return `${getApiHost()}/patient/treatment/${resourceId}`
+        return `${getApiHost()}/treatment/${resourceId}`
       default:
         throw new Error(`Unsupported resource type: ${resourceType}`)
     }

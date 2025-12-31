@@ -89,7 +89,7 @@ export default function RegisterTreatment() {
             .map((item) => item.trim())
             .filter(Boolean)
         : []
-    const response = await fetch(`${getApiHost()}/patient/treatment`, {
+    const response = await fetch(`${getApiHost()}/treatment`, {
       method: 'POST',
       mode: 'cors',
       credentials: 'omit',

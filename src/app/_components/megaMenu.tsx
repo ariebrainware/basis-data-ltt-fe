@@ -41,7 +41,7 @@ const navListMenuItems = [
     title: 'Penanganan',
     description: 'Halaman untuk penanganan pasien',
     icon: HeartIcon,
-    url: '/patient/treatment',
+    url: '/treatment',
     roles: ['super_admin'],
   },
   {
