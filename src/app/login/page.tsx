@@ -49,6 +49,10 @@ export default function Login() {
           localStorage.setItem('user-role', role)
           if (userId) {
             localStorage.setItem('user-id', userId.toString())
+          } else if (process.env.NODE_ENV !== 'production') {
+            console.warn(
+              '[Login] No user ID received from backend. User may not be able to edit their treatments.'
+            )
           }
           window.location.href = '/dashboard'
         }, 1500)

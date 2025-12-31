@@ -37,7 +37,7 @@ function useFetchTreatment(
       try {
         const baseParams = keyword
           ? `keyword=${keyword}`
-          : `limit=20&offset=${(currentPage - 1) * 20}`
+          : `limit=10&offset=${(currentPage - 1) * 10}`
         const res = await fetch(
           `${getApiHost()}/patient/treatment?${baseParams}`,
           {
