@@ -62,7 +62,7 @@ export async function fetchCurrentUserId(): Promise<string | null> {
         }
       } catch (endpointError) {
         // Try next endpoint
-        console.debug(
+        console.log(
           `[fetchCurrentUserId] Endpoint ${endpoint} not available:`,
           endpointError
         )

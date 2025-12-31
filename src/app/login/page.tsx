@@ -81,20 +81,27 @@ export default function Login() {
           )
 
           // Try to fetch user ID from profile endpoint as fallback
-          setTimeout(async () => {
-            const fetchedUserId = await fetchCurrentUserId()
-            if (fetchedUserId) {
-              localStorage.setItem('user-id', fetchedUserId)
-              console.log(
-                '[Login] Successfully fetched and stored user-id from fallback:',
-                fetchedUserId
-              )
-            } else {
-              console.error(
-                '[Login] Failed to fetch user ID. User may not be able to edit their treatments.'
-              )
-            }
-            window.location.href = '/dashboard'
+          setTimeout(() => {
+            fetchCurrentUserId()
+              .then((fetchedUserId) => {
+                if (fetchedUserId) {
+                  localStorage.setItem('user-id', fetchedUserId)
+                  console.log(
+                    '[Login] Successfully fetched and stored user-id from fallback:',
+                    fetchedUserId
+                  )
+                } else {
+                  console.error(
+                    '[Login] Failed to fetch user ID. User may not be able to edit their treatments.'
+                  )
+                }
+              })
+              .catch((error) => {
+                console.error('[Login] Error fetching user ID:', error)
+              })
+              .finally(() => {
+                window.location.href = '/dashboard'
+              })
           }, 500)
         }
         return

@@ -49,6 +49,20 @@ export default function Treatment({
       normalizedCurrentUserId !== null &&
       normalizedTherapistId === normalizedCurrentUserId)
 
+  // Helper function to determine why edit is denied
+  const getEditDenialReason = (): string => {
+    if (normalizedCurrentUserId === null) {
+      return 'User ID not found in localStorage'
+    }
+    if (normalizedTherapistId === null) {
+      return 'Treatment has no therapist assigned'
+    }
+    if (normalizedTherapistId !== normalizedCurrentUserId) {
+      return 'Treatment is assigned to a different therapist'
+    }
+    return 'Unknown reason'
+  }
+
   // Debug logging to help diagnose edit permission issues
   // Only log when there's a potential issue (therapist can't edit their own treatment)
   if (process.env.NODE_ENV !== 'production' && isTherapistRole && !canEdit) {
@@ -58,14 +72,7 @@ export default function Treatment({
       normalizedTherapistId,
       currentUserId,
       normalizedCurrentUserId,
-      reason:
-        normalizedCurrentUserId === null
-          ? 'User ID not found in localStorage'
-          : normalizedTherapistId === null
-            ? 'Treatment has no therapist assigned'
-            : normalizedTherapistId !== normalizedCurrentUserId
-              ? 'Treatment is assigned to a different therapist'
-              : 'Unknown reason',
+      reason: getEditDenialReason(),
     })
   }
 
