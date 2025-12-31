@@ -36,7 +36,8 @@ export default function Treatment({
   // Therapists can only edit treatments assigned to them
   // Non-therapists (admins) can edit all treatments
   const canEdit =
-    !isTherapistRole || (currentUserId && therapistId === currentUserId)
+    !isTherapistRole ||
+    (currentUserId !== null && therapistId === currentUserId)
 
   const handleOpen = () => setOpen(!open)
 
