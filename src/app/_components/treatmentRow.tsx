@@ -259,7 +259,7 @@ export default function Treatment({
             disabled={!canEdit}
             title={
               !canEdit
-                ? 'You can only edit your own treatments'
+                ? 'You can only edit treatments assigned to you'
                 : 'Edit treatment'
             }
           >
