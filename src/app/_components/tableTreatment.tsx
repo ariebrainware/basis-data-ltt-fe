@@ -50,9 +50,9 @@ const TableHeader = () => (
 
 const TableBody = ({ treatment }: { treatment: TreatmentType[] }) => (
   <tbody className="text-sm text-blue-gray-500">
-    {treatment?.map((treatment: TreatmentType, index: number) => (
+    {treatment?.map((treatment: TreatmentType) => (
       <Treatment
-        key={`${treatment.ID}-${index}`}
+        key={treatment.ID}
         ID={treatment.ID}
         treatment_date={treatment.treatment_date}
         patient_code={treatment.patient_code}

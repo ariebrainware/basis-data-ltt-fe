@@ -195,6 +195,7 @@ export default function Dashboard() {
               {treatment.map(
                 (
                   {
+                    ID,
                     patient_name,
                     patient_code,
                     age,
@@ -211,7 +212,7 @@ export default function Dashboard() {
                     : 'p-4 border-b border-blue-gray-50'
 
                   return (
-                    <tr key={patient_name}>
+                    <tr key={ID}>
                       <td className={classes}>
                         <div className="flex items-center gap-3">
                           <Typography
