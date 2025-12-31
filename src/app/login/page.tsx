@@ -39,6 +39,7 @@ export default function Login() {
 
       const token = responseData.data.token
       const role = responseData.data.role
+      const userId = responseData.data.id || responseData.data.user_id
       console.log('token', token)
       if (token) {
         setShowVariantAlert(false)
@@ -46,6 +47,13 @@ export default function Login() {
         setTimeout(() => {
           localStorage.setItem('session-token', token)
           localStorage.setItem('user-role', role)
+          if (userId) {
+            localStorage.setItem('user-id', userId.toString())
+          } else if (process.env.NODE_ENV !== 'production') {
+            console.warn(
+              '[Login] No user ID received from backend. User may not be able to edit their treatments.'
+            )
+          }
           window.location.href = '/dashboard'
         }, 1500)
         return

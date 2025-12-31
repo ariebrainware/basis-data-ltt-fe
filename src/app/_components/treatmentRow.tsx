@@ -13,6 +13,7 @@ import Swal from 'sweetalert2'
 import { getApiHost } from '../_functions/apiHost'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isTherapist } from '../_functions/userRole'
+import { getUserId } from '../_functions/userId'
 
 export default function Treatment({
   ID,
@@ -29,6 +30,24 @@ export default function Treatment({
 }: TreatmentType) {
   const [open, setOpen] = React.useState(false)
   const isTherapistRole = isTherapist()
+  const currentUserId = getUserId()
+  const normalizedTherapistId =
+    therapistId !== null && therapistId !== undefined
+      ? String(therapistId)
+      : null
+  const normalizedCurrentUserId =
+    currentUserId !== null && currentUserId !== undefined
+      ? String(currentUserId)
+      : null
+
+  // Check if current user can edit this treatment
+  // Therapists can only edit treatments assigned to them
+  // Non-therapists (admins) can edit all treatments
+  const canEdit =
+    !isTherapistRole ||
+    (normalizedTherapistId !== null &&
+      normalizedCurrentUserId !== null &&
+      normalizedTherapistId === normalizedCurrentUserId)
 
   const handleOpen = () => setOpen(!open)
 
@@ -247,6 +266,18 @@ export default function Treatment({
             className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
             data-shape="default"
             onClick={() => handleOpen()}
+            disabled={!canEdit}
+            aria-disabled={!canEdit}
+            aria-label={
+              !canEdit
+                ? 'Edit treatment (disabled - you can only edit treatments assigned to you)'
+                : 'Edit treatment'
+            }
+            title={
+              !canEdit
+                ? 'You can only edit treatments assigned to you'
+                : 'Edit treatment'
+            }
           >
             <svg
               width="1.5em"
@@ -266,6 +297,10 @@ export default function Treatment({
               ></path>
             </svg>
           </button>
+          {/* Delete button is only available to admins (not therapists)
+              This is intentionally different from edit permissions where therapists
+              can edit their own treatments. Deletion requires admin privileges to
+              prevent accidental data loss and maintain data integrity. */}
           {!isTherapistRole && (
             <button
               className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
