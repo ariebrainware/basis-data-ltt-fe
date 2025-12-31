@@ -65,15 +65,18 @@ export default function Treatment({
 
   // Debug logging to help diagnose edit permission issues
   // Only log when there's a potential issue (therapist can't edit their own treatment)
-  if (process.env.NODE_ENV !== 'production' && isTherapistRole && !canEdit) {
-    console.warn('[TreatmentRow] Therapist cannot edit this treatment:', {
-      treatmentId: ID,
-      therapistId,
-      normalizedTherapistId,
-      currentUserId,
-      normalizedCurrentUserId,
-      reason: getEditDenialReason(),
-    })
+  // Check NODE_ENV first to avoid unnecessary evaluations in production
+  if (process.env.NODE_ENV !== 'production') {
+    if (isTherapistRole && !canEdit) {
+      console.warn('[TreatmentRow] Therapist cannot edit this treatment:', {
+        treatmentId: ID,
+        therapistId,
+        normalizedTherapistId,
+        currentUserId,
+        normalizedCurrentUserId,
+        reason: getEditDenialReason(),
+      })
+    }
   }
 
   const handleOpen = () => setOpen(!open)

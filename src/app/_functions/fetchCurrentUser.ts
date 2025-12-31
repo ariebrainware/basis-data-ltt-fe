@@ -61,12 +61,11 @@ export async function fetchCurrentUserId(): Promise<string | null> {
           }
         }
       } catch (endpointError) {
-        // Try next endpoint
+        // Try next endpoint - loop will continue naturally
         console.log(
           `[fetchCurrentUserId] Endpoint ${endpoint} not available:`,
           endpointError
         )
-        continue
       }
     }
 
