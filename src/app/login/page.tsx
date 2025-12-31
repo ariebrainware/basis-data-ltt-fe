@@ -95,10 +95,20 @@ export default function Login() {
                 console.error(
                   '[Login] Failed to fetch user ID. User may not be able to edit their treatments.'
                 )
+                // Inform the user that their session may have limited functionality
+                setShowVariantAlert(true)
+                setMessage(
+                  'You are logged in, but we could not load your profile. Some actions, like editing treatments, may not be available.'
+                )
               }
             })
             .catch((error) => {
               console.error('[Login] Error fetching user ID:', error)
+              // Inform the user that their session may have limited functionality
+              setShowVariantAlert(true)
+              setMessage(
+                'You are logged in, but we could not load your profile due to a network or server error. Some actions, like editing treatments, may not be available.'
+              )
             })
             .finally(() => {
               // Redirect after attempting to fetch user ID
