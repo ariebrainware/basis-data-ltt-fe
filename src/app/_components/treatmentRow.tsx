@@ -31,13 +31,21 @@ export default function Treatment({
   const [open, setOpen] = React.useState(false)
   const isTherapistRole = isTherapist()
   const currentUserId = getUserId()
+  const normalizedTherapistId =
+    therapistId !== null && therapistId !== undefined ? String(therapistId) : null
+  const normalizedCurrentUserId =
+    currentUserId !== null && currentUserId !== undefined
+      ? String(currentUserId)
+      : null
 
   // Check if current user can edit this treatment
   // Therapists can only edit treatments assigned to them
   // Non-therapists (admins) can edit all treatments
   const canEdit =
     !isTherapistRole ||
-    (currentUserId !== null && therapistId === currentUserId)
+    (normalizedTherapistId !== null &&
+      normalizedCurrentUserId !== null &&
+      normalizedTherapistId === normalizedCurrentUserId)
 
   const handleOpen = () => setOpen(!open)
 
