@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
 import { VariantAlert } from '../_components/alert'
 import { getApiHost } from '../_functions/apiHost'
+import { fetchCurrentUserId } from '../_functions/fetchCurrentUser'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
@@ -39,23 +40,92 @@ export default function Login() {
 
       const token = responseData.data.token
       const role = responseData.data.role
-      const userId = responseData.data.id || responseData.data.user_id
-      console.log('token', token)
+      // Backend may return user ID in different field names depending on role
+      // Try multiple possible field names and nested structures:
+      // - Direct fields: id, user_id, therapist_id, ID
+      // - Nested in therapist object: therapist.ID, therapist.id
+      // - Nested in user object: user.ID, user.id
+      const userId =
+        responseData.data.id ||
+        responseData.data.user_id ||
+        responseData.data.therapist_id ||
+        responseData.data.ID ||
+        responseData.data.therapist?.ID ||
+        responseData.data.therapist?.id ||
+        responseData.data.user?.ID ||
+        responseData.data.user?.id
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('token', token)
+        console.log('Login response data:', responseData.data)
+        console.log('Extracted userId:', userId, 'role:', role)
+      }
       if (token) {
         setShowVariantAlert(false)
         setMessage('Login Successful!')
-        setTimeout(() => {
-          localStorage.setItem('session-token', token)
-          localStorage.setItem('user-role', role)
-          if (userId) {
-            localStorage.setItem('user-id', userId.toString())
-          } else if (process.env.NODE_ENV !== 'production') {
-            console.warn(
-              '[Login] No user ID received from backend. User may not be able to edit their treatments.'
+
+        // Store token and role immediately
+        localStorage.setItem('session-token', token)
+        localStorage.setItem('user-role', role)
+
+        // Handle user ID storage
+        if (userId) {
+          localStorage.setItem('user-id', userId.toString())
+          if (process.env.NODE_ENV !== 'production') {
+            console.log(
+              '[Login] Successfully stored user-id:',
+              userId.toString()
             )
           }
-          window.location.href = '/dashboard'
-        }, 1500)
+          // Redirect after successful login with user ID
+          setTimeout(() => {
+            window.location.href = '/dashboard'
+          }, 1500)
+        } else {
+          console.warn(
+            '[Login] No user ID received from backend. Attempting fallback fetch...',
+            'Available fields in response:',
+            Object.keys(responseData.data)
+          )
+
+          // Try to fetch user ID from profile endpoint as fallback
+          // Wait for the fetch to complete before redirecting to avoid race condition
+          fetchCurrentUserId()
+            .then((fetchedUserId) => {
+              if (fetchedUserId) {
+                localStorage.setItem('user-id', fetchedUserId)
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log(
+                    '[Login] Successfully fetched and stored user-id from fallback:',
+                    fetchedUserId
+                  )
+                }
+              } else {
+                console.error(
+                  '[Login] Failed to fetch user ID. User may not be able to edit their treatments.'
+                )
+                // Inform the user that their session may have limited functionality
+                setShowVariantAlert(true)
+                setMessage(
+                  'You are logged in, but we could not load your profile. Some actions, like editing treatments, may not be available.'
+                )
+              }
+            })
+            .catch((error) => {
+              console.error('[Login] Error fetching user ID:', error)
+              // Inform the user that their session may have limited functionality
+              setShowVariantAlert(true)
+              setMessage(
+                'You are logged in, but we could not load your profile due to a network or server error. Some actions, like editing treatments, may not be available.'
+              )
+            })
+            .finally(() => {
+              // Redirect after attempting to fetch user ID
+              setTimeout(() => {
+                window.location.href = '/dashboard'
+              }, 1500)
+            })
+        }
         return
       }
       return response

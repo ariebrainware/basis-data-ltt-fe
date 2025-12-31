@@ -49,6 +49,48 @@ export default function Treatment({
       normalizedCurrentUserId !== null &&
       normalizedTherapistId === normalizedCurrentUserId)
 
+  // Helper function to determine why edit is denied
+  const getEditDenialReason = React.useCallback((): string => {
+    if (normalizedCurrentUserId === null) {
+      return 'User ID not found in localStorage'
+    }
+    if (normalizedTherapistId === null) {
+      return 'Treatment has no therapist assigned'
+    }
+    if (normalizedTherapistId !== normalizedCurrentUserId) {
+      return 'Treatment is assigned to a different therapist'
+    }
+    return 'Unknown reason'
+  }, [normalizedCurrentUserId, normalizedTherapistId])
+
+  // Debug logging to help diagnose edit permission issues
+  // Only log when there's a potential issue (therapist can't edit their own treatment)
+  // Run this as an effect so it doesn't execute on every render
+  React.useEffect(() => {
+    // Check NODE_ENV first to avoid unnecessary evaluations in production
+    if (process.env.NODE_ENV !== 'production') {
+      if (isTherapistRole && !canEdit) {
+        console.warn('[TreatmentRow] Therapist cannot edit this treatment:', {
+          treatmentId: ID,
+          therapistId,
+          normalizedTherapistId,
+          currentUserId,
+          normalizedCurrentUserId,
+          reason: getEditDenialReason(),
+        })
+      }
+    }
+  }, [
+    isTherapistRole,
+    canEdit,
+    ID,
+    therapistId,
+    normalizedTherapistId,
+    currentUserId,
+    normalizedCurrentUserId,
+    getEditDenialReason,
+  ])
+
   const handleOpen = () => setOpen(!open)
 
   const handleDeleteTreatment = useDeleteResource({
