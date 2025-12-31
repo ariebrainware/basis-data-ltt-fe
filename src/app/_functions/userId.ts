@@ -10,8 +10,24 @@
  * ```
  */
 export function getUserId(): string | null {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('user-id')
+  // Guard against SSR / non-browser environments
+  if (typeof window === 'undefined') {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '[getUserId] Called in a non-browser environment. Returning null user-id.',
+      )
+    }
+    return null
   }
-  return null
+
+  const userId = localStorage.getItem('user-id')
+
+  // In development, help diagnose issues where user-id is unexpectedly missing
+  if ((userId === null || userId === '') && process.env.NODE_ENV !== 'production') {
+    console.warn(
+      '[getUserId] No user-id found in localStorage. Users may be unable to perform actions that require a user ID (e.g., editing treatments).',
+    )
+  }
+
+  return userId
 }
