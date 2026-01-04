@@ -5,13 +5,13 @@ import { Button, Checkbox } from '@material-tailwind/react'
 import DatePicker from '../../_components/datePicker'
 import styles from '../../page.module.css'
 import Footer from '../../_components/footer'
-import { VariantAlert } from '../../_components/alert'
 import { ControlledSelect } from '../../_components/selectTherapist'
 
 import { TreatmentConditionOptions } from '@/app/_types/treatmentConditionOptions'
 import TimePicker from '@/app/_components/timepicker'
 import { getApiHost } from '@/app/_functions/apiHost'
 import { getSessionToken } from '@/app/_functions/sessionToken'
+import Swal from 'sweetalert2'
 
 let treatmentDateInput: HTMLInputElement | null = null
 let treatmentTimeInput: HTMLInputElement | null = null
@@ -69,18 +69,17 @@ function MultipleCheckboxes() {
 }
 
 export default function RegisterTreatment() {
-  const [showAlert, setShowVariantAlert] = useState<boolean>(false)
-  const [alertVariant, setAlertVariant] = useState<'error' | 'success'>('error')
-  const [textMessage, setMessage] = useState<string | null>(null)
   const [therapistID, setTherapistID] = useState<string>('')
 
   async function sendRegisterTreatmentRequest() {
     // Validate that a therapist has been selected
     if (!therapistID) {
-      setShowVariantAlert(true)
-      setAlertVariant('error')
-      setMessage('Silakan pilih terapis terlebih dahulu')
-      console.error('Therapist not selected')
+      await Swal.fire({
+        title: 'Gagal',
+        text: 'Silakan pilih terapis terlebih dahulu',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      })
       return
     }
 
@@ -122,15 +121,19 @@ export default function RegisterTreatment() {
 
     console.log(treatmentDate)
     if (!response.ok) {
-      setShowVariantAlert(true)
-      setAlertVariant('error')
-      setMessage('Gagal mendaftarkan penanganan')
-      console.error('Gagal mendaftarkan penanganan')
+      await Swal.fire({
+        title: 'Gagal',
+        text: 'Gagal mendaftarkan penanganan',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      })
     } else {
-      setShowVariantAlert(true)
-      setAlertVariant('success')
-      setMessage('Penanganan berhasil didaftarkan')
-      console.log('Penanganan berhasil didaftarkan')
+      await Swal.fire({
+        title: 'Sukses',
+        text: 'Penanganan berhasil didaftarkan',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      })
 
       // Clear form fields after successful registration
       if (treatmentDateInput) treatmentDateInput.value = ''
@@ -163,14 +166,6 @@ export default function RegisterTreatment() {
 
   return (
     <div className={styles.page}>
-      {showAlert && textMessage && (
-        <VariantAlert
-          variant={alertVariant}
-          onClose={() => setShowVariantAlert(false)}
-        >
-          {textMessage}
-        </VariantAlert>
-      )}
       <main className={styles.main}>
         <h1 className="text-3xl font-bold antialiased">Form Penanganan</h1>
         <form>
@@ -275,7 +270,7 @@ export default function RegisterTreatment() {
               id="therapist_id"
               label="Pilih Terapis"
               onChange={(value: string) => {
-                console.log(`selected value ${value}`)
+                console.log('Therapist selected:', value)
                 setTherapistID(value)
               }}
             />
@@ -286,7 +281,7 @@ export default function RegisterTreatment() {
               id="registerTreatmentButton"
               className="mt-4 rounded-full"
               onClick={() => {
-                // e.preventDefault()
+                console.log('Current therapistID:', therapistID)
                 sendRegisterTreatmentRequest()
               }}
               placeholder={undefined}

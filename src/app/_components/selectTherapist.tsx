@@ -14,9 +14,10 @@ export function ControlledSelect({
   label,
   onChange,
 }: ControlledSelectProps) {
-  //   const [value, setValue] = React.useState<string | undefined>('therapist')
-  const handleChange = (value: string | undefined) => {
-    onChange(value ?? '')
+  const [value, setValue] = React.useState<string | undefined>(undefined)
+  const handleChange = (newValue: string | undefined) => {
+    setValue(newValue)
+    onChange(newValue ?? '')
   }
   const [therapists, setTherapists] = React.useState<
     { ID: string; full_name: string; role: string }[]
@@ -49,6 +50,7 @@ export function ControlledSelect({
       <Select
         id={id}
         label={label}
+        value={value}
         onChange={handleChange}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
