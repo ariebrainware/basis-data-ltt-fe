@@ -76,7 +76,7 @@ export default function RegisterTreatment() {
 
   async function sendRegisterTreatmentRequest() {
     // Validate that a therapist has been selected
-    if (!therapistID || therapistID === '') {
+    if (!therapistID) {
       setShowVariantAlert(true)
       setAlertVariant('error')
       setMessage('Silakan pilih terapis terlebih dahulu')
@@ -98,12 +98,6 @@ export default function RegisterTreatment() {
             .map((item) => item.trim())
             .filter(Boolean)
         : []
-
-    // Debug log to verify therapist_id value
-    console.log('Therapist ID before submission:', {
-      original: therapistID,
-      converted: Number(therapistID),
-    })
 
     const response = await fetch(`${getApiHost()}/treatment`, {
       method: 'POST',
