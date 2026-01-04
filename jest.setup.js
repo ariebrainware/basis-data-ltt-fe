@@ -10,9 +10,17 @@ const localStorageMock = {
 }
 global.localStorage = localStorageMock
 
-// Mock window.location
+// Mock window.location properly for jsdom
 delete window.location
-window.location = { href: '', reload: jest.fn() }
+window.location = {
+  href: '',
+  reload: jest.fn(),
+  assign: jest.fn(),
+  replace: jest.fn(),
+  pathname: '/',
+  search: '',
+  hash: '',
+}
 
 // Mock environment variables
 process.env.NEXT_PUBLIC_API_HOST = 'http://localhost:19091'
