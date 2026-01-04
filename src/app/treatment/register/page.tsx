@@ -72,9 +72,18 @@ export default function RegisterTreatment() {
   const [showAlert, setShowVariantAlert] = useState<boolean>(false)
   const [alertVariant, setAlertVariant] = useState<'error' | 'success'>('error')
   const [textMessage, setMessage] = useState<string | null>(null)
-  const [therapistID, setTherapistID] = useState<string>('therapistID')
+  const [therapistID, setTherapistID] = useState<string>('')
 
   async function sendRegisterTreatmentRequest() {
+    // Validate that a therapist has been selected
+    if (!therapistID || therapistID === '') {
+      setShowVariantAlert(true)
+      setAlertVariant('error')
+      setMessage('Silakan pilih terapis terlebih dahulu')
+      console.error('Therapist not selected')
+      return
+    }
+
     const treatmentDate = treatmentDateInput ? treatmentDateInput.value : ''
     const treatmentTime = treatmentTimeInput ? treatmentTimeInput.value : ''
     const patientCode = patientCodeInput ? patientCodeInput.value : ''
