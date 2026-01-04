@@ -98,6 +98,13 @@ export default function RegisterTreatment() {
             .map((item) => item.trim())
             .filter(Boolean)
         : []
+
+    // Debug log to verify therapist_id value
+    console.log('Therapist ID before submission:', {
+      original: therapistID,
+      converted: Number(therapistID),
+    })
+
     const response = await fetch(`${getApiHost()}/treatment`, {
       method: 'POST',
       mode: 'cors',
@@ -111,7 +118,7 @@ export default function RegisterTreatment() {
       body: JSON.stringify({
         treatment_date: `${treatmentDate} ${treatmentTime}`,
         patient_code: patientCode,
-        therapist_id: therapistID,
+        therapist_id: Number(therapistID),
         issues: issues,
         treatment: treatmentHistory,
         remarks: remarks,
