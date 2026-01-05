@@ -123,9 +123,27 @@ export default function RegisterTreatment() {
       console.log(treatmentDate)
     }
     if (!response.ok) {
+      let errorMessage = 'Gagal mendaftarkan penanganan'
+
+      try {
+        const data = await response.json()
+        if (data && typeof data === 'object') {
+          const apiMessage =
+            (data as any).message ||
+            (data as any).error ||
+            (data as any).detail
+
+          if (apiMessage && typeof apiMessage === 'string') {
+            errorMessage = `Gagal mendaftarkan penanganan: ${apiMessage}`
+          }
+        }
+      } catch (error) {
+        // Ignore JSON parsing errors and fall back to the default message
+      }
+
       await Swal.fire({
         title: 'Gagal',
-        text: 'Gagal mendaftarkan penanganan',
+        text: errorMessage,
         icon: 'error',
         confirmButtonText: 'OK',
       })
