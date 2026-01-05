@@ -41,9 +41,9 @@ export function TreatmentForm({
       onResize={undefined}
       onResizeCapture={undefined}
     >
-      <form className="mb-2 mt-8 w-80 max-w-screen-lg sm:w-96">
-        <div className="mb-1 flex w-72 gap-6">
-          <div className="flex flex-col items-center gap-4">
+      <form className="mb-2 mt-8 w-full max-w-screen-lg">
+        <div className="mb-1 flex w-full flex-col gap-6 md:flex-row">
+          <div className="flex w-full flex-col items-center gap-4 md:w-1/2">
             <Input
               id="ID"
               type="text"
@@ -59,7 +59,7 @@ export function TreatmentForm({
             <Input
               id="treatment_date"
               type="text"
-              label="Treatment Date"
+              label="Tanggal Penanganan"
               defaultValue={treatmentDate}
               disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
@@ -71,7 +71,7 @@ export function TreatmentForm({
             <Input
               id="patient_code"
               type="text"
-              label="Patient Code"
+              label="Kode Pasien"
               defaultValue={patientCode}
               disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
@@ -83,9 +83,9 @@ export function TreatmentForm({
             <Input
               id="patient_name"
               type="text"
-              label="Patient Name"
+              label="Nama Pasien"
               defaultValue={patientName}
-              disabled={isTherapistRole}
+              disabled
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -105,10 +105,10 @@ export function TreatmentForm({
               }}
             />
           </div>
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex w-full flex-col items-center gap-4 md:w-1/2">
             <Textarea
               id="issues"
-              label="Issues"
+              label="Keluhan"
               defaultValue={issues}
               disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
@@ -118,7 +118,7 @@ export function TreatmentForm({
             />
             <Textarea
               id="treatment"
-              label="Treatment"
+              label="Penanganan"
               defaultValue={treatment}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
@@ -127,7 +127,7 @@ export function TreatmentForm({
             />
             <Textarea
               id="remarks"
-              label="Remarks"
+              label="Keterangan"
               defaultValue={remarks}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
@@ -136,7 +136,7 @@ export function TreatmentForm({
             />
             <Textarea
               id="next_visit"
-              label="Next Visit"
+              label="Kunjungan Selanjutnya"
               defaultValue={nextVisit}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}

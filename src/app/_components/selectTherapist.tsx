@@ -63,13 +63,11 @@ export function ControlledSelect({
   }, [propValue])
 
   return (
-    <div className="w-72">
+    <div className="w-full">
       <Select
         id={id}
         label={label}
-        defaultValue={
-          propValue === '' ? selectedValue : (propValue ?? selectedValue)
-        }
+        value={propValue === '' ? selectedValue : (propValue ?? selectedValue)}
         onChange={handleChange}
         disabled={disabled}
         placeholder={undefined}

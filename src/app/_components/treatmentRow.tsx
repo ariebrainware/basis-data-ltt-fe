@@ -170,7 +170,7 @@ export default function Treatment({
   return (
     <>
       <Dialog
-        size={'sm'}
+        size={'xl'}
         handler={handleOpen}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
