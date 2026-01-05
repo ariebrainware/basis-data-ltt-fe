@@ -83,6 +83,18 @@ export default function RegisterTreatment() {
       return
     }
 
+    // Validate that therapist_id can be converted to a valid number
+    const therapistIdNumber = Number(therapistID)
+    if (isNaN(therapistIdNumber) || therapistIdNumber <= 0) {
+      await Swal.fire({
+        title: 'Gagal',
+        text: 'ID terapis tidak valid',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      })
+      return
+    }
+
     const treatmentDate = treatmentDateInput ? treatmentDateInput.value : ''
     const treatmentTime = treatmentTimeInput ? treatmentTimeInput.value : ''
     const patientCode = patientCodeInput ? patientCodeInput.value : ''
@@ -111,7 +123,7 @@ export default function RegisterTreatment() {
       body: JSON.stringify({
         treatment_date: `${treatmentDate} ${treatmentTime}`,
         patient_code: patientCode,
-        therapist_id: Number(therapistID),
+        therapist_id: therapistIdNumber,
         issues: issues,
         treatment: treatmentHistory,
         remarks: remarks,
@@ -129,15 +141,15 @@ export default function RegisterTreatment() {
         const data = await response.json()
         if (data && typeof data === 'object') {
           const apiMessage =
-            (data as any).message ||
-            (data as any).error ||
-            (data as any).detail
+            (data as { message?: string }).message ||
+            (data as { error?: string }).error ||
+            (data as { detail?: string }).detail
 
           if (apiMessage && typeof apiMessage === 'string') {
             errorMessage = `Gagal mendaftarkan penanganan: ${apiMessage}`
           }
         }
-      } catch (error) {
+      } catch {
         // Ignore JSON parsing errors and fall back to the default message
       }
 

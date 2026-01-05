@@ -55,6 +55,7 @@ export function ControlledSelect({
         id={id}
         label={label}
         value={value}
+        defaultValue={value}
         onChange={handleChange}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
