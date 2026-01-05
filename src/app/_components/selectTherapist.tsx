@@ -7,11 +7,13 @@ import { getSessionToken } from '../_functions/sessionToken'
 interface ControlledSelectProps {
   id?: string
   label: string
+  value?: string
   onChange: (value: string) => void
 }
 export function ControlledSelect({
   id,
   label,
+  value,
   onChange,
 }: ControlledSelectProps) {
   const handleChange = (newValue: string | undefined) => {
@@ -49,7 +51,7 @@ export function ControlledSelect({
       <Select
         id={id}
         label={label}
-        defaultValue={undefined}
+        value={value}
         onChange={handleChange}
         placeholder={undefined}
         onPointerEnterCapture={undefined}

@@ -269,6 +269,7 @@ export default function RegisterTreatment() {
             <ControlledSelect
               id="therapist_id"
               label="Pilih Terapis"
+              value={therapistID}
               onChange={(value: string) => {
                 console.log('Therapist selected:', value)
                 setTherapistID(value)
