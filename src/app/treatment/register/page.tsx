@@ -139,6 +139,7 @@ export default function RegisterTreatment() {
 
       // Clear form fields after successful registration
       if (treatmentDateInput) treatmentDateInput.value = ''
+      if (treatmentTimeInput) treatmentTimeInput.value = ''
       if (patientCodeInput) patientCodeInput.value = ''
       setTherapistID('')
       if (issuesInput) issuesInput.value = ''
