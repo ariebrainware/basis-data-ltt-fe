@@ -3,7 +3,6 @@ import React from 'react'
 import { Select, Option } from '@material-tailwind/react'
 import { getApiHost } from '../_functions/apiHost'
 import { getSessionToken } from '../_functions/sessionToken'
-import { id } from 'date-fns/locale'
 
 interface ControlledSelectProps {
   id?: string
