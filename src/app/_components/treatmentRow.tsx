@@ -94,7 +94,20 @@ export default function Treatment({
     getEditDenialReason,
   ])
 
-  const handleOpen = () => setOpen(!open)
+  const handleOpen = () => {
+    if (!open) {
+      // When opening the dialog, ensure therapistIDState is synced with current therapistId
+      setTherapistIDState(therapistId?.toString() ?? '')
+    }
+    setOpen(!open)
+  }
+
+  React.useEffect(() => {
+    // Ensure therapistIDState is always in sync with the therapistId prop
+    if (open) {
+      setTherapistIDState(therapistId?.toString() ?? '')
+    }
+  }, [open, therapistId])
 
   const handleDeleteTreatment = useDeleteResource({
     resourceType: 'treatment',

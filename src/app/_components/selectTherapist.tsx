@@ -51,7 +51,16 @@ export function ControlledSelect({
         const therapistsArray = Array.isArray(data.data.therapists)
           ? data.data.therapists
           : []
-        setTherapists(therapistsArray)
+        // dedupe by ID to avoid React key collisions
+        const uniqueById = Array.from(
+          new Map(
+            therapistsArray.map((t: unknown) => [
+              String((t as { ID: string }).ID),
+              t,
+            ])
+          ).values()
+        ) as { ID: string; full_name: string; role: string }[]
+        setTherapists(uniqueById)
       })
       .catch(() => setTherapists([]))
   }, [])
