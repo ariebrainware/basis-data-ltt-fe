@@ -41,9 +41,9 @@ export function TreatmentForm({
       onResize={undefined}
       onResizeCapture={undefined}
     >
-      <form className="mb-2 mt-8 w-full max-w-screen-lg">
-        <div className="mb-1 flex w-full flex-col gap-6 md:flex-row">
-          <div className="flex w-full flex-col items-center gap-4 md:w-1/2">
+      <form className="mb-2 mt-4 w-full px-2 md:mt-8 md:px-0">
+        <div className="mb-1 flex w-full flex-col gap-4 md:flex-row md:gap-6">
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <Input
               id="ID"
               type="text"
@@ -105,7 +105,7 @@ export function TreatmentForm({
               }}
             />
           </div>
-          <div className="flex w-full flex-col items-center gap-4 md:w-1/2">
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <Textarea
               id="issues"
               label="Keluhan"
