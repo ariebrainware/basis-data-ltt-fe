@@ -96,6 +96,7 @@ export function TreatmentForm({
               id="therapist_id"
               label="Pilih Terapis"
               value={therapistID}
+              disabled={isTherapistRole}
               onChange={(value: string) => {
                 if (process.env.NODE_ENV !== 'production') {
                   console.log('Therapist selected:', value)

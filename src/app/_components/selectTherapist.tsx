@@ -9,12 +9,14 @@ interface ControlledSelectProps {
   label: string
   value?: string
   onChange: (value: string) => void
+  disabled?: boolean
 }
 export function ControlledSelect({
   id,
   label,
   value: propValue,
   onChange,
+  disabled,
 }: ControlledSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState<string | undefined>(
     undefined
@@ -69,6 +71,7 @@ export function ControlledSelect({
           propValue === '' ? selectedValue : (propValue ?? selectedValue)
         }
         onChange={handleChange}
+        disabled={disabled}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
