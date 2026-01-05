@@ -13,14 +13,19 @@ interface ControlledSelectProps {
 export function ControlledSelect({
   id,
   label,
-  value,
+  value: propValue,
   onChange,
 }: ControlledSelectProps) {
+  const [selectedValue, setSelectedValue] = React.useState<string | undefined>(
+    undefined
+  )
   const handleChange = (newValue: string | undefined) => {
     if (process.env.NODE_ENV !== 'production') {
       console.log('ControlledSelect.handleChange', newValue)
     }
-    onChange(newValue ?? '')
+    const stringValue = newValue == null ? undefined : String(newValue)
+    setSelectedValue(stringValue)
+    onChange(stringValue ?? '')
   }
   const [therapists, setTherapists] = React.useState<
     { ID: string; full_name: string; role: string }[]
@@ -49,13 +54,20 @@ export function ControlledSelect({
       .catch(() => setTherapists([]))
   }, [])
 
+  React.useEffect(() => {
+    if (propValue !== undefined && propValue !== null && propValue !== '') {
+      setSelectedValue(String(propValue))
+    }
+  }, [propValue])
+
   return (
     <div className="w-72">
       <Select
         id={id}
         label={label}
-        value={value}
-        defaultValue={value}
+        defaultValue={
+          propValue === '' ? selectedValue : (propValue ?? selectedValue)
+        }
         onChange={handleChange}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
