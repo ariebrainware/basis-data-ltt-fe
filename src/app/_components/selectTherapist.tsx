@@ -20,7 +20,9 @@ export function ControlledSelect({
     undefined
   )
   const handleChange = (newValue: string | undefined) => {
-    console.log('ControlledSelect.handleChange', newValue)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('ControlledSelect.handleChange', newValue)
+    }
     const stringValue = newValue == null ? undefined : String(newValue)
     setSelectedValue(stringValue)
     onChange(stringValue ?? '')
