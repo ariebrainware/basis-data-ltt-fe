@@ -1,20 +1,38 @@
+'use client'
+import React from 'react'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { TreatmentType } from '../_types/treatment'
 import { isTherapist } from '../_functions/userRole'
+import { ControlledSelect } from './selectTherapist'
+
+interface TreatmentFormProps extends TreatmentType {
+  therapistIDState?: string
+  setTherapistIDState?: (value: string) => void
+}
 
 export function TreatmentForm({
   ID,
   treatment_date: treatmentDate,
   patient_code: patientCode,
   patient_name: patientName,
-  therapist_name: therapistName,
-  therapist_id: therapistID,
+  therapist_id: therapistIdProp,
   issues: issues,
   treatment: treatment,
   remarks: remarks,
   next_visit: nextVisit,
-}: TreatmentType) {
+  therapistIDState,
+  setTherapistIDState,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ...rest
+}: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
+  const [localTherapistID, setLocalTherapistID] = React.useState<string>(
+    therapistIdProp?.toString() ?? ''
+  )
+
+  // Use either the passed state or local state
+  const therapistID = therapistIDState ?? localTherapistID
+  const setTherapistID = setTherapistIDState ?? setLocalTherapistID
   return (
     <Card
       color="transparent"
@@ -76,29 +94,16 @@ export function TreatmentForm({
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <Input
-              id="therapist_name"
-              type="text"
-              label="Therapist Name"
-              defaultValue={therapistName}
-              disabled={isTherapistRole}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              crossOrigin={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            />
-            <Input
+            <ControlledSelect
               id="therapist_id"
-              type="text"
-              label="Therapist ID"
-              defaultValue={therapistID}
-              disabled={isTherapistRole}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              crossOrigin={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
+              label="Pilih Terapis"
+              value={therapistID}
+              onChange={(value: string) => {
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log('Therapist selected:', value)
+                }
+                setTherapistID(value)
+              }}
             />
           </div>
           <div className="flex flex-col items-center gap-4">

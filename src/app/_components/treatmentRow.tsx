@@ -29,6 +29,9 @@ export default function Treatment({
   next_visit: nextVisit,
 }: TreatmentType) {
   const [open, setOpen] = React.useState(false)
+  const [therapistIDState, setTherapistIDState] = React.useState<string>(
+    therapistId?.toString() ?? ''
+  )
   const isTherapistRole = isTherapist()
   const currentUserId = getUserId()
   const normalizedTherapistId =
@@ -109,12 +112,7 @@ export default function Treatment({
     const patient_name_new_input =
       document.querySelector<HTMLTextAreaElement>('#patient_name')?.value ||
       patientName
-    const therapist_name_new_input =
-      document.querySelector<HTMLTextAreaElement>('#therapist_name')?.value ||
-      therapistName
-    const therapist_id_new_input =
-      document.querySelector<HTMLTextAreaElement>('#therapist_id')?.value ||
-      therapistId
+    const therapist_id_new_input = therapistIDState || therapistId
     const issues_new_input =
       document.querySelector<HTMLTextAreaElement>('#issues')?.value || issues
     const treatment_new_input =
@@ -138,7 +136,6 @@ export default function Treatment({
         treatment_date: treatment_date_new_input,
         patient_code: patient_code_new_input,
         patient_name: patient_name_new_input,
-        therapist_name: therapist_name_new_input,
         therapist_id: Number(therapist_id_new_input), // Convert to uint
         issues: issues_new_input,
         treatment: treatment_new_input,
@@ -212,6 +209,8 @@ export default function Treatment({
             treatment={treatment}
             remarks={remarks}
             next_visit={nextVisit}
+            therapistIDState={therapistIDState}
+            setTherapistIDState={setTherapistIDState}
           />
         </DialogBody>
         <DialogFooter
