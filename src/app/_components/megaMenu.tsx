@@ -245,12 +245,13 @@ function NavList() {
 
 export default function MegaMenuDefault() {
   const [openNav, setOpenNav] = React.useState(false)
+  const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
-    window.addEventListener(
-      'resize',
-      () => window.innerWidth >= 960 && setOpenNav(false)
-    )
+    setMounted(true)
+    const onResize = () => window.innerWidth >= 960 && setOpenNav(false)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
   }, [])
 
   return (
@@ -276,9 +277,7 @@ export default function MegaMenuDefault() {
         >
           Lee Tit Tar Dashboard
         </Typography>
-        <div className="hidden lg:block">
-          <NavList />
-        </div>
+        <div className="hidden lg:block">{mounted && <NavList />}</div>
         <IconButton
           variant="text"
           color="blue-gray"

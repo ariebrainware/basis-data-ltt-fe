@@ -94,7 +94,13 @@ export default function Treatment({
     getEditDenialReason,
   ])
 
-  const handleOpen = () => setOpen(!open)
+  const handleOpen = () => {
+    if (!open) {
+      // When opening the dialog, ensure therapistIDState is synced with current therapistId
+      setTherapistIDState(therapistId?.toString() ?? '')
+    }
+    setOpen(!open)
+  }
 
   const handleDeleteTreatment = useDeleteResource({
     resourceType: 'treatment',
@@ -170,7 +176,8 @@ export default function Treatment({
   return (
     <>
       <Dialog
-        size={'sm'}
+        size={'xl'}
+        className="max-h-[90vh] overflow-y-auto"
         handler={handleOpen}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
@@ -191,6 +198,7 @@ export default function Treatment({
             : 'Ubah Data Penanganan Pasien'}
         </DialogHeader>
         <DialogBody
+          className="px-2 md:px-6"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}

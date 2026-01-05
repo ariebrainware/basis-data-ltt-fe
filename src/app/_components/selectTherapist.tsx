@@ -51,7 +51,32 @@ export function ControlledSelect({
         const therapistsArray = Array.isArray(data.data.therapists)
           ? data.data.therapists
           : []
-        setTherapists(therapistsArray)
+        // dedupe by ID to avoid React key collisions
+        const uniqueById = Array.from(
+          new Map(
+            therapistsArray.map((t: unknown) => [
+              String((t as { ID: string }).ID),
+              t,
+            ])
+          ).values()
+        ) as { ID: string; full_name: string; role: string }[]
+
+        // Warn in development if duplicates were found
+        if (process.env.NODE_ENV !== 'production') {
+          const duplicateCount = therapistsArray.length - uniqueById.length
+          if (duplicateCount > 0) {
+            console.warn(
+              `[ControlledSelect] Detected ${duplicateCount} duplicate therapist ID(s) in API response. This may indicate a backend data integrity issue.`,
+              {
+                total: therapistsArray.length,
+                unique: uniqueById.length,
+                duplicates: duplicateCount,
+              }
+            )
+          }
+        }
+
+        setTherapists(uniqueById)
       })
       .catch(() => setTherapists([]))
   }, [])
@@ -63,7 +88,7 @@ export function ControlledSelect({
   }, [propValue])
 
   return (
-    <div className="w-72">
+    <div className="w-full">
       <Select
         id={id}
         label={label}

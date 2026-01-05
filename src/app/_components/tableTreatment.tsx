@@ -71,7 +71,6 @@ const TableBody = ({ treatment }: { treatment: TreatmentType[] }) => (
 
 export default function TableTreatment({ Data }: TableTreatmentProps) {
   const { treatment } = Data
-  //   console.log(`treatment`, treatment)
   return (
     <table className="w-full whitespace-nowrap">
       <TableHeader />
