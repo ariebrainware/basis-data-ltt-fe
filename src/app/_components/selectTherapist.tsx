@@ -7,16 +7,25 @@ import { getSessionToken } from '../_functions/sessionToken'
 interface ControlledSelectProps {
   id?: string
   label: string
+  value?: string
   onChange: (value: string) => void
 }
 export function ControlledSelect({
   id,
   label,
+  value: propValue,
   onChange,
 }: ControlledSelectProps) {
-  //   const [value, setValue] = React.useState<string | undefined>('therapist')
-  const handleChange = (value: string | undefined) => {
-    onChange(value ?? '')
+  const [selectedValue, setSelectedValue] = React.useState<string | undefined>(
+    undefined
+  )
+  const handleChange = (newValue: string | undefined) => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('ControlledSelect.handleChange', newValue)
+    }
+    const stringValue = newValue == null ? undefined : String(newValue)
+    setSelectedValue(stringValue)
+    onChange(stringValue ?? '')
   }
   const [therapists, setTherapists] = React.useState<
     { ID: string; full_name: string; role: string }[]
@@ -44,11 +53,21 @@ export function ControlledSelect({
       })
       .catch(() => setTherapists([]))
   }, [])
+
+  React.useEffect(() => {
+    if (propValue !== undefined && propValue !== null && propValue !== '') {
+      setSelectedValue(String(propValue))
+    }
+  }, [propValue])
+
   return (
     <div className="w-72">
       <Select
         id={id}
         label={label}
+        defaultValue={
+          propValue === '' ? selectedValue : (propValue ?? selectedValue)
+        }
         onChange={handleChange}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
@@ -57,7 +76,7 @@ export function ControlledSelect({
         onResizeCapture={undefined}
       >
         {therapists.map((therapist) => (
-          <Option key={therapist.ID} value={therapist.ID}>
+          <Option key={therapist.ID} value={String(therapist.ID)}>
             {therapist.role} | {therapist.full_name}
           </Option>
         ))}
