@@ -60,6 +60,22 @@ export function ControlledSelect({
             ])
           ).values()
         ) as { ID: string; full_name: string; role: string }[]
+
+        // Warn in development if duplicates were found
+        if (process.env.NODE_ENV !== 'production') {
+          const duplicateCount = therapistsArray.length - uniqueById.length
+          if (duplicateCount > 0) {
+            console.warn(
+              `[ControlledSelect] Detected ${duplicateCount} duplicate therapist ID(s) in API response. This may indicate a backend data integrity issue.`,
+              {
+                total: therapistsArray.length,
+                unique: uniqueById.length,
+                duplicates: duplicateCount,
+              }
+            )
+          }
+        }
+
         setTherapists(uniqueById)
       })
       .catch(() => setTherapists([]))
