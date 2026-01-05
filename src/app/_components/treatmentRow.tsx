@@ -102,13 +102,6 @@ export default function Treatment({
     setOpen(!open)
   }
 
-  React.useEffect(() => {
-    // Ensure therapistIDState is always in sync with the therapistId prop
-    if (open) {
-      setTherapistIDState(therapistId?.toString() ?? '')
-    }
-  }, [open, therapistId])
-
   const handleDeleteTreatment = useDeleteResource({
     resourceType: 'treatment',
     resourceId: Number(ID),
