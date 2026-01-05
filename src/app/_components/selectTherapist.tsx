@@ -3,6 +3,7 @@ import React from 'react'
 import { Select, Option } from '@material-tailwind/react'
 import { getApiHost } from '../_functions/apiHost'
 import { getSessionToken } from '../_functions/sessionToken'
+import { id } from 'date-fns/locale'
 
 interface ControlledSelectProps {
   id?: string
@@ -13,12 +14,17 @@ interface ControlledSelectProps {
 export function ControlledSelect({
   id,
   label,
-  value,
+  value: propValue,
   onChange,
 }: ControlledSelectProps) {
+  const [selectedValue, setSelectedValue] = React.useState<string | undefined>(
+    undefined
+  )
   const handleChange = (newValue: string | undefined) => {
     console.log('ControlledSelect.handleChange', newValue)
-    onChange(newValue ?? '')
+    const stringValue = newValue == null ? undefined : String(newValue)
+    setSelectedValue(stringValue)
+    onChange(stringValue ?? '')
   }
   const [therapists, setTherapists] = React.useState<
     { ID: string; full_name: string; role: string }[]
@@ -46,12 +52,21 @@ export function ControlledSelect({
       })
       .catch(() => setTherapists([]))
   }, [])
+
+  React.useEffect(() => {
+    if (propValue !== undefined && propValue !== null && propValue !== '') {
+      setSelectedValue(String(propValue))
+    }
+  }, [propValue])
   return (
     <div className="w-72">
       <Select
         id={id}
         label={label}
-        value={value}
+        // value={propValue === '' ? selectedValue : (propValue ?? selectedValue)}
+        defaultValue={
+          propValue === '' ? selectedValue : (propValue ?? selectedValue)
+        }
         onChange={handleChange}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
@@ -60,7 +75,7 @@ export function ControlledSelect({
         onResizeCapture={undefined}
       >
         {therapists.map((therapist) => (
-          <Option key={therapist.ID} value={therapist.ID}>
+          <Option key={therapist.ID} value={String(therapist.ID)}>
             {therapist.role} | {therapist.full_name}
           </Option>
         ))}
