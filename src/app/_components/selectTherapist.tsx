@@ -13,27 +13,18 @@ interface ControlledSelectProps {
 export function ControlledSelect({
   id,
   label,
-  value: propValue,
+  value,
   onChange,
 }: ControlledSelectProps) {
-  const [selectedValue, setSelectedValue] = React.useState<string | undefined>(
-    undefined
-  )
   const handleChange = (newValue: string | undefined) => {
     if (process.env.NODE_ENV !== 'production') {
       console.log('ControlledSelect.handleChange', newValue)
     }
-    const stringValue = newValue == null ? undefined : String(newValue)
-    setSelectedValue(stringValue)
-    onChange(stringValue ?? '')
+    onChange(newValue ?? '')
   }
   const [therapists, setTherapists] = React.useState<
     { ID: string; full_name: string; role: string }[]
   >([])
-
-  const isValidPropValue = (value: string | undefined): boolean => {
-    return value !== undefined && value !== null && value !== ''
-  }
 
   React.useEffect(() => {
     fetch(`${getApiHost()}/therapist`, {
@@ -58,20 +49,12 @@ export function ControlledSelect({
       .catch(() => setTherapists([]))
   }, [])
 
-  React.useEffect(() => {
-    if (isValidPropValue(propValue)) {
-      setSelectedValue(String(propValue))
-    }
-  }, [propValue])
   return (
     <div className="w-72">
       <Select
         id={id}
         label={label}
-        // value={propValue === '' ? selectedValue : (propValue ?? selectedValue)}
-        defaultValue={
-          propValue === '' ? selectedValue : (propValue ?? selectedValue)
-        }
+        value={value}
         onChange={handleChange}
         placeholder={undefined}
         onPointerEnterCapture={undefined}

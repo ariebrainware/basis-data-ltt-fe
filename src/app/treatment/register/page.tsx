@@ -119,7 +119,9 @@ export default function RegisterTreatment() {
       }),
     })
 
-    console.log(treatmentDate)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(treatmentDate)
+    }
     if (!response.ok) {
       await Swal.fire({
         title: 'Gagal',
@@ -271,7 +273,9 @@ export default function RegisterTreatment() {
               label="Pilih Terapis"
               value={therapistID}
               onChange={(value: string) => {
-                console.log('Therapist selected:', value)
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log('Therapist selected:', value)
+                }
                 setTherapistID(value)
               }}
             />
@@ -282,7 +286,9 @@ export default function RegisterTreatment() {
               id="registerTreatmentButton"
               className="mt-4 rounded-full"
               onClick={() => {
-                console.log('Current therapistID:', therapistID)
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log('Current therapistID:', therapistID)
+                }
                 sendRegisterTreatmentRequest()
               }}
               placeholder={undefined}
