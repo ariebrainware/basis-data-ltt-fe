@@ -22,8 +22,6 @@ export function TreatmentForm({
   next_visit: nextVisit,
   therapistIDState,
   setTherapistIDState,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ...rest
 }: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
   const [localTherapistID, setLocalTherapistID] = React.useState<string>(
