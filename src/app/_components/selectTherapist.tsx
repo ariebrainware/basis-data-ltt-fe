@@ -62,16 +62,14 @@ export function ControlledSelect({
     }
   }, [propValue])
 
-  // Compute the effective value to use for the Select component
-  const computedValue =
-    propValue === '' ? selectedValue : (propValue ?? selectedValue)
-
   return (
     <div className="w-full">
       <Select
         id={id}
         label={label}
-        value={computedValue}
+        defaultValue={
+          propValue === '' ? selectedValue : (propValue ?? selectedValue)
+        }
         onChange={handleChange}
         disabled={disabled}
         placeholder={undefined}
