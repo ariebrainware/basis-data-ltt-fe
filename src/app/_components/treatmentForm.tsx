@@ -59,7 +59,7 @@ export function TreatmentForm({
             <Input
               id="treatment_date"
               type="text"
-              label="Tanggal Penanganan"
+              label="Waktu & Tanggal"
               defaultValue={treatmentDate}
               disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
