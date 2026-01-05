@@ -29,6 +29,10 @@ export function ControlledSelect({
     { ID: string; full_name: string; role: string }[]
   >([])
 
+  const isValidPropValue = (value: string | undefined): boolean => {
+    return value !== undefined && value !== null && value !== ''
+  }
+
   React.useEffect(() => {
     fetch(`${getApiHost()}/therapist`, {
       method: 'GET',
@@ -53,7 +57,7 @@ export function ControlledSelect({
   }, [])
 
   React.useEffect(() => {
-    if (propValue !== undefined && propValue !== null && propValue !== '') {
+    if (isValidPropValue(propValue)) {
       setSelectedValue(String(propValue))
     }
   }, [propValue])
