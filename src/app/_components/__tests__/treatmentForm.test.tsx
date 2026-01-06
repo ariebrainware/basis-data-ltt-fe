@@ -5,49 +5,57 @@ import { TreatmentType } from '@/app/_types/treatment'
 import { isTherapist } from '@/app/_functions/userRole'
 
 // Mock Material Tailwind components
-jest.mock('@material-tailwind/react', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="card">{children}</div>
-  ),
-  Input: ({
+jest.mock('@material-tailwind/react', () => {
+  // use imported React from module scope
+
+  const MockField = ({
     id,
     label,
     defaultValue,
     disabled,
+    as,
   }: {
     id?: string
     label?: string
-    defaultValue?: string | number
+    defaultValue?: string | number | readonly string[] | undefined
     disabled?: boolean
-  }) => (
-    <input
-      id={id}
-      data-testid={id}
-      aria-label={label}
-      defaultValue={defaultValue}
-      disabled={disabled}
-    />
-  ),
-  Textarea: ({
-    id,
-    label,
-    defaultValue,
-    disabled,
-  }: {
+    as?: 'input' | 'textarea'
+  }) =>
+    as === 'textarea' ? (
+      <textarea
+        id={id}
+        data-testid={id}
+        aria-label={label}
+        defaultValue={defaultValue}
+        disabled={disabled}
+      />
+    ) : (
+      <input
+        id={id}
+        data-testid={id}
+        aria-label={label}
+        defaultValue={defaultValue}
+        disabled={disabled}
+      />
+    )
+
+  type MockProps = {
     id?: string
     label?: string
-    defaultValue?: string
+    defaultValue?: string | number | readonly string[] | undefined
     disabled?: boolean
-  }) => (
-    <textarea
-      id={id}
-      data-testid={id}
-      aria-label={label}
-      defaultValue={defaultValue}
-      disabled={disabled}
-    />
-  ),
-}))
+  }
+
+  return {
+    Card: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="card">{children}</div>
+    ),
+    Input: ({ id, label, defaultValue, disabled }: MockProps) =>
+      MockField({ id, label, defaultValue, disabled, as: 'input' }),
+    Textarea: ({ id, label, defaultValue, disabled }: MockProps) =>
+      MockField({ id, label, defaultValue, disabled, as: 'textarea' }),
+  }
+})
 
 // Mock isTherapist function
 jest.mock('@/app/_functions/userRole', () => ({
