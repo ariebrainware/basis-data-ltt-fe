@@ -12,11 +12,15 @@ global.localStorage = localStorageMock
 
 // Mock window.location properly for jsdom
 delete window.location
-window.location = {
-  href: '',
-  reload: jest.fn(),
-  assign: jest.fn(),
-  replace: jest.fn(),
+Object.defineProperty(window, 'location', {
+  writable: true,
+  value: { assign: jest.fn(), reload: jest.fn(), replace: jest.fn() },
+})
+globalThis.navigation = {
+  // If direct access is used
+  navigate: jest.fn(),
+  back: jest.fn(),
+  forward: jest.fn(),
 }
 
 // Mock environment variables

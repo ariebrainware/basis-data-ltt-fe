@@ -4,6 +4,12 @@ import { TreatmentForm } from '../treatmentForm'
 import { TreatmentType } from '@/app/_types/treatment'
 import { isTherapist } from '@/app/_functions/userRole'
 
+jest.spyOn(console, 'error').mockImplementation((msg) => {
+  if (/Not implemented: navigation/.test(msg)) return
+  // otherwise show other errors
+  console.error(msg)
+})
+
 // Mock Material Tailwind components
 jest.mock('@material-tailwind/react', () => {
   // use imported React from module scope
