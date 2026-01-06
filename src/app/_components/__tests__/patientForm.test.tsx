@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { PatientForm } from '../patientForm'
@@ -5,22 +6,23 @@ import { PatientType } from '@/app/_types/patient'
 
 // Mock Material Tailwind components
 jest.mock('@material-tailwind/react', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,
-  Input: ({ id, label, defaultValue, disabled }: any) => (
+  Card: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="card">{children}</div>
+  ),
+  Input: (props: React.ComponentProps<'input'> & { label?: string }) => (
     <input
-      id={id}
-      data-testid={id}
-      aria-label={label}
-      defaultValue={defaultValue}
-      disabled={disabled}
+      {...props}
+      id={props.id}
+      data-testid={String(props.id)}
+      aria-label={props.label}
     />
   ),
-  Textarea: ({ id, label, defaultValue }: any) => (
+  Textarea: (props: React.ComponentProps<'textarea'> & { label?: string }) => (
     <textarea
-      id={id}
-      data-testid={id}
-      aria-label={label}
-      defaultValue={defaultValue}
+      {...props}
+      id={props.id}
+      data-testid={String(props.id)}
+      aria-label={props.label}
     />
   ),
 }))
@@ -38,14 +40,15 @@ describe('PatientForm Component', () => {
     health_history: '1,2',
     surgery_history: 'None',
     patient_code: 'PAT001',
+    last_visit: '',
   }
 
   test('renders patient form with all fields', () => {
     render(<PatientForm {...mockPatient} />)
-    
+
     // Check if form is rendered
     expect(screen.getByTestId('card')).toBeInTheDocument()
-    
+
     // Check if all input fields are present
     expect(screen.getByTestId('ID')).toBeInTheDocument()
     expect(screen.getByTestId('patient_code')).toBeInTheDocument()
@@ -62,7 +65,7 @@ describe('PatientForm Component', () => {
 
   test('displays correct patient data', () => {
     render(<PatientForm {...mockPatient} />)
-    
+
     // Check if data is displayed correctly
     expect(screen.getByTestId('ID')).toHaveValue('1')
     expect(screen.getByTestId('full_name')).toHaveValue('John Doe')
@@ -79,7 +82,7 @@ describe('PatientForm Component', () => {
 
   test('ID and patient_code fields are disabled', () => {
     render(<PatientForm {...mockPatient} />)
-    
+
     expect(screen.getByTestId('ID')).toBeDisabled()
     expect(screen.getByTestId('patient_code')).toBeDisabled()
   })
@@ -97,10 +100,11 @@ describe('PatientForm Component', () => {
       health_history: '',
       surgery_history: '',
       patient_code: '',
+      last_visit: '',
     }
-    
+
     render(<PatientForm {...emptyPatient} />)
-    
+
     expect(screen.getByTestId('full_name')).toHaveValue('')
     expect(screen.getByTestId('email')).toHaveValue('')
   })

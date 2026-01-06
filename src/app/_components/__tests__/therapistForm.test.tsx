@@ -5,8 +5,20 @@ import { TherapistType } from '@/app/_types/therapist'
 
 // Mock Material Tailwind components
 jest.mock('@material-tailwind/react', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,
-  Input: ({ id, label, defaultValue, disabled }: any) => (
+  Card: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="card">{children}</div>
+  ),
+  Input: ({
+    id,
+    label,
+    defaultValue,
+    disabled,
+  }: {
+    id?: string
+    label?: string
+    defaultValue?: string
+    disabled?: boolean
+  }) => (
     <input
       id={id}
       data-testid={id}
@@ -15,7 +27,15 @@ jest.mock('@material-tailwind/react', () => ({
       disabled={disabled}
     />
   ),
-  Textarea: ({ id, label, defaultValue }: any) => (
+  Textarea: ({
+    id,
+    label,
+    defaultValue,
+  }: {
+    id?: string
+    label?: string
+    defaultValue?: string
+  }) => (
     <textarea
       id={id}
       data-testid={id}
@@ -27,12 +47,20 @@ jest.mock('@material-tailwind/react', () => ({
 
 // Mock ControlledSelect component
 jest.mock('../selectTherapistRole', () => ({
-  ControlledSelect: ({ id, value, onChange }: any) => (
+  ControlledSelect: ({
+    id,
+    value,
+    onChange,
+  }: {
+    id?: string
+    value?: string
+    onChange?: (value: string) => void
+  }) => (
     <select
       id={id}
       data-testid={id}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange && onChange(e.target.value)}
     >
       <option value="">Select Role</option>
       <option value="admin">Admin</option>
@@ -43,7 +71,7 @@ jest.mock('../selectTherapistRole', () => ({
 
 describe('TherapistForm Component', () => {
   const mockOnRoleChange = jest.fn()
-  
+
   const mockTherapist: TherapistType = {
     ID: 1,
     is_approved: true,
@@ -53,8 +81,8 @@ describe('TherapistForm Component', () => {
     address: 'Jl. Therapy No. 456',
     date_of_birth: '1985-05-15',
     nik: '1234567890123456',
-    weight: '60',
-    height: '165',
+    weight: 60,
+    height: 165,
     role: 'therapist',
   }
 
@@ -64,10 +92,10 @@ describe('TherapistForm Component', () => {
 
   test('renders therapist form with all fields', () => {
     render(<TherapistForm {...mockTherapist} onRoleChange={mockOnRoleChange} />)
-    
+
     // Check if form is rendered
     expect(screen.getByTestId('card')).toBeInTheDocument()
-    
+
     // Check if all input fields are present
     expect(screen.getByTestId('ID')).toBeInTheDocument()
     expect(screen.getByTestId('is_approved')).toBeInTheDocument()
@@ -84,7 +112,7 @@ describe('TherapistForm Component', () => {
 
   test('displays correct therapist data', () => {
     render(<TherapistForm {...mockTherapist} onRoleChange={mockOnRoleChange} />)
-    
+
     // Check if data is displayed correctly
     expect(screen.getByTestId('ID')).toHaveValue('1')
     expect(screen.getByTestId('is_approved')).toHaveValue('Approved')
@@ -100,31 +128,38 @@ describe('TherapistForm Component', () => {
 
   test('displays "Not Approved" for unapproved therapist', () => {
     const unapprovedTherapist = { ...mockTherapist, is_approved: false }
-    render(<TherapistForm {...unapprovedTherapist} onRoleChange={mockOnRoleChange} />)
-    
+    render(
+      <TherapistForm {...unapprovedTherapist} onRoleChange={mockOnRoleChange} />
+    )
+
     expect(screen.getByTestId('is_approved')).toHaveValue('Not Approved')
   })
 
   test('ID and is_approved fields are disabled', () => {
     render(<TherapistForm {...mockTherapist} onRoleChange={mockOnRoleChange} />)
-    
+
     expect(screen.getByTestId('ID')).toBeDisabled()
     expect(screen.getByTestId('is_approved')).toBeDisabled()
   })
 
   test('role change triggers onRoleChange callback', () => {
     render(<TherapistForm {...mockTherapist} onRoleChange={mockOnRoleChange} />)
-    
+
     const roleSelect = screen.getByTestId('role')
     fireEvent.change(roleSelect, { target: { value: 'admin' } })
-    
+
     expect(mockOnRoleChange).toHaveBeenCalledWith('admin')
   })
 
   test('renders with empty role', () => {
     const therapistWithoutRole = { ...mockTherapist, role: '' }
-    render(<TherapistForm {...therapistWithoutRole} onRoleChange={mockOnRoleChange} />)
-    
+    render(
+      <TherapistForm
+        {...therapistWithoutRole}
+        onRoleChange={mockOnRoleChange}
+      />
+    )
+
     const roleSelect = screen.getByTestId('role')
     expect(roleSelect).toHaveValue('')
   })
