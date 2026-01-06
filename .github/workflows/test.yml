@@ -2,9 +2,9 @@ name: Automated Testing CI
 
 on:
   push:
-    branches: [ main, develop, 'copilot/**' ]
+    branches: [main, develop, 'copilot/**']
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 permissions:
   contents: read
@@ -13,10 +13,10 @@ jobs:
   unit-tests:
     name: Unit and Component Tests
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
           NEXT_PUBLIC_API_TOKEN: test-token
 
       - name: Upload test coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-report
@@ -65,10 +65,10 @@ jobs:
   e2e-tests:
     name: E2E Tests with Playwright
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -111,7 +111,7 @@ jobs:
           BASE_URL: http://localhost:3000
 
       - name: Upload Playwright Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
@@ -121,10 +121,10 @@ jobs:
   lint:
     name: Lint Check
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -148,10 +148,10 @@ jobs:
   build:
     name: Build Check
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
