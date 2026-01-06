@@ -10,9 +10,10 @@ const localStorageMock = {
 }
 global.localStorage = localStorageMock
 
-// Mock window.location properly for jsdom
+// Remove existing window.location if possible
+delete window.location
+// Now safely re-define
 Object.defineProperty(window, 'location', {
-  writable: true,
   configurable: true,
   value: {
     assign: jest.fn(),
