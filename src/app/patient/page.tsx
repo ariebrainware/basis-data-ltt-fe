@@ -31,14 +31,15 @@ function usePatients(
   useEffect(() => {
     ;(async () => {
       try {
-        // Build URL: date grouping takes precedence, then keyword, then pagination
-        const query = dateKeyword
-          ? `group_by_date=${dateKeyword}`
-          : keyword
-            ? `keyword=${keyword}`
-            : `limit=100&offset=${(currentPage - 1) * 100}`
+        // Build URL params: always include pagination (limit & offset), add keyword or group_by_date when present
+        const limit = 100
+        const offset = (currentPage - 1) * limit
+        let params = `limit=${limit}&offset=${offset}`
+        if (dateKeyword)
+          params += `&group_by_date=${encodeURIComponent(dateKeyword)}`
+        else if (keyword) params += `&keyword=${encodeURIComponent(keyword)}`
 
-        const res = await fetch(`${getApiHost()}/patient?${query}`, {
+        const res = await fetch(`${getApiHost()}/patient?${params}`, {
           method: 'GET',
           mode: 'cors',
           headers: {
@@ -124,6 +125,7 @@ export default function Patient() {
             setCurrentPage as React.Dispatch<SetStateAction<number>>
           }
           total={total}
+          pageSize={100}
           disabled={
             Boolean(keyword && keyword.trim() !== '') &&
             data.patients.length < 100

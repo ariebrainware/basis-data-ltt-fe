@@ -4,14 +4,16 @@ interface PaginationProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
   total: number
   disabled?: boolean
+  pageSize?: number
 }
 export default function Pagination({
   currentPage,
   setCurrentPage,
   total,
   disabled = false,
+  pageSize = 10,
 }: PaginationProps) {
-  const totalPages = Math.max(1, Math.ceil(total / 10))
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
   return (
     <div className="border-slate-200 flex items-center justify-between border-t py-4">
@@ -38,7 +40,9 @@ export default function Pagination({
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={disabled || currentPage === totalPages}
           onResize={undefined}
           onResizeCapture={undefined}
