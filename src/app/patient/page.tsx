@@ -35,7 +35,7 @@ function usePatients(
         const limit = 100
         const offset = (currentPage - 1) * limit
         let params = `limit=${limit}&offset=${offset}`
-        if (dateKeyword)
+        if (typeof dateKeyword === 'string' && dateKeyword.trim() !== '')
           params += `&group_by_date=${encodeURIComponent(dateKeyword)}`
         else if (keyword) params += `&keyword=${encodeURIComponent(keyword)}`
 
