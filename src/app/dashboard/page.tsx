@@ -23,7 +23,15 @@ import { getApiHost } from '../_functions/apiHost'
 import { getSessionToken } from '../_functions/sessionToken'
 
 // Simple in-module cache to deduplicate concurrent identical fetches
-const treatmentFetchCache = new Map<string, Promise<unknown>>()
+// API response interface (what the backend returns)
+interface TreatmentApiResponse {
+  data: {
+    treatments: TreatmentType[]
+  }
+  total: number
+}
+
+const treatmentFetchCache = new Map<string, Promise<TreatmentApiResponse>>()
 
 const TABLE_HEAD = [
   'Nama Pasien (K. Pasien)',
@@ -33,6 +41,7 @@ const TABLE_HEAD = [
   'Keluhan',
 ]
 
+// Hook return type interface (what useFetchTreatment returns)
 interface ListTreatmentResponse {
   data: {
     treatment: TreatmentType[]
@@ -93,7 +102,7 @@ function useFetchTreatment(
         setTreatment(treatmentArray)
         console.log(`data: `, data.data.treatments)
         console.log(`treatmentArray: `, treatmentArray)
-        setTotal(data.data.total)
+        setTotal(data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           UnauthorizedAccess()
