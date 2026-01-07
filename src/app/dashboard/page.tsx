@@ -23,7 +23,7 @@ import { getApiHost } from '../_functions/apiHost'
 import { getSessionToken } from '../_functions/sessionToken'
 
 // Simple in-module cache to deduplicate concurrent identical fetches
-const treatmentFetchCache = new Map<string, Promise<unknown>>()
+const treatmentFetchCache = new Map<string, Promise<ListTreatmentResponse>>()
 
 const TABLE_HEAD = [
   'Nama Pasien (K. Pasien)',
@@ -35,9 +35,9 @@ const TABLE_HEAD = [
 
 interface ListTreatmentResponse {
   data: {
-    treatment: TreatmentType[]
+    treatments: TreatmentType[]
+    total: number
   }
-  total: number
 }
 
 function useFetchTreatment(
