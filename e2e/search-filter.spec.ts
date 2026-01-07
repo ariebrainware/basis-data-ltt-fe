@@ -120,6 +120,10 @@ test.describe('Search and Filter Functionality', () => {
       const nextButton = page.getByRole('button', { name: /next/i })
       const prevButton = page.getByRole('button', { name: /prev/i })
       
+      // Trigger locator resolution without asserting visibility/existence
+      await nextButton.count()
+      await prevButton.count()
+      
       // Pagination might not always be visible if there's not enough data
       // So we just check if elements can be found
     })
