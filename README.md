@@ -70,11 +70,43 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Development Commands
 
 ```bash
-pnpm run dev      # Development with Turbopack (fast)
-pnpm run build    # Production build
-pnpm run start    # Start production server
-pnpm run lint     # Run Prettier + Tailwind linting
+pnpm run dev            # Development with Turbopack (fast)
+pnpm run build          # Production build
+pnpm run start          # Start production server
+pnpm run lint           # Run Prettier + Tailwind linting
+pnpm test               # Run unit tests
+pnpm test:watch         # Run tests in watch mode
+pnpm test:coverage      # Run tests with coverage
+pnpm test:e2e           # Run E2E tests with Playwright
+pnpm test:e2e:ui        # Run E2E tests in UI mode
 ```
+
+## Testing
+
+This project includes comprehensive automated testing to ensure code quality and prevent regressions:
+
+- **Unit Tests**: Component tests using Jest and React Testing Library
+- **E2E Tests**: End-to-end tests using Playwright
+- **CI/CD**: Automated testing on every push via GitHub Actions
+
+### Running Tests
+
+```bash
+# Run all unit tests
+pnpm test
+
+# Run E2E tests
+pnpm test:e2e
+
+# Run tests with coverage report
+pnpm test:coverage
+```
+
+See [TESTING.md](./TESTING.md) for detailed testing documentation, including:
+- Test structure and organization
+- Writing new tests
+- CI/CD integration
+- Troubleshooting guide
 
 ## Authentication & Authorization
 
