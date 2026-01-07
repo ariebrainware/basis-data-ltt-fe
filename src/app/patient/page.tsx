@@ -22,7 +22,8 @@ interface ListPatientsResponse {
 function usePatients(
   currentPage: number,
   keyword: string,
-  refreshTrigger: number
+  refreshTrigger: number,
+  dateKeyword?: string
 ): ListPatientsResponse {
   const [patients, setPatients] = useState<PatientType[]>([])
   const [total, setTotal] = useState(0)
@@ -30,90 +31,16 @@ function usePatients(
   useEffect(() => {
     ;(async () => {
       try {
-        const res = await fetch(
-          `${getApiHost()}/patient?${keyword ? `keyword=${keyword}` : `limit=100&offset=${(currentPage - 1) * 100}`}`,
-          {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': getSessionToken(),
-            },
-          }
-        )
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
-        const patientsArray = Array.isArray(data.data.patients)
-          ? data.data.patients
-          : []
-        setPatients(patientsArray)
-        setTotal(data.data.total)
-        console.log(data.data.total)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
-        }
-        console.error('Error fetching patients:', error)
-      }
-    })()
-  }, [currentPage, keyword, refreshTrigger])
+        // Build URL params: always include pagination (limit & offset), add keyword or group_by_date when present
+        const limit = 100
+        const offset = (currentPage - 1) * limit
+        let params = `limit=${limit}&offset=${offset}`
+        if (typeof dateKeyword === 'string' && dateKeyword.trim() !== '')
+          params += `&group_by_date=${encodeURIComponent(dateKeyword)}`
+        else if (keyword && keyword.trim() !== '')
+          params += `&keyword=${encodeURIComponent(keyword)}`
 
-  return { data: { patients }, total }
-}
-
-export default function Patient() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [patients, setPatients] = useState<PatientType[]>([])
-  const [, setTotal] = useState(0)
-  const [keyword, setKeyword] = useState('')
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
-  const { data, total } = usePatients(currentPage, keyword, refreshTrigger)
-
-  const handleRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1)
-  }
-
-  const handleInputKeyDown = async (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (e.key === 'Enter') {
-      const newKeyword = (e.target as HTMLInputElement).value
-      setKeyword(newKeyword)
-      try {
-        const res = await fetch(
-          `${getApiHost()}/patient?keyword=${newKeyword}`,
-          {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': getSessionToken(),
-            },
-          }
-        )
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
-        const patientsArray = Array.isArray(patients) ? data.data.patients : []
-        setPatients(patientsArray)
-        setTotal(data.data.total)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
-        }
-        console.error('Error fetching patients:', error)
-      }
-    }
-  }
-
-  const handleGroupingByDateFilter = async (dateKeyword: string) => {
-    try {
-      const res = await fetch(
-        `${getApiHost()}/patient?group_by_date=${dateKeyword}`,
-        {
+        const res = await fetch(`${getApiHost()}/patient?${params}`, {
           method: 'GET',
           mode: 'cors',
           headers: {
@@ -122,19 +49,59 @@ export default function Patient() {
             Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
             'session-token': getSessionToken(),
           },
+        })
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+        const data = await res.json()
+        const patientsArray = Array.isArray(data.data.patients)
+          ? data.data.patients
+          : []
+        setPatients(patientsArray)
+        setTotal(data.data.total)
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('401')) {
+          UnauthorizedAccess()
         }
-      )
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-      const data = await res.json()
-      const patientsArray = Array.isArray(patients) ? data.data.patients : []
-      setPatients(patientsArray)
-      setTotal(data.data.total)
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('401')) {
-        UnauthorizedAccess()
+        console.error('Error fetching patients:', error)
       }
-      console.error('Error fetching patients:', error)
+    })()
+  }, [currentPage, keyword, refreshTrigger, dateKeyword])
+
+  return { data: { patients }, total }
+}
+
+export default function Patient() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [groupingDate, setGroupingDate] = useState('')
+  const [keyword, setKeyword] = useState('')
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const { data, total } = usePatients(
+    currentPage,
+    keyword,
+    refreshTrigger,
+    groupingDate
+  )
+
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1)
+  }
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const newKeyword = (e.target as HTMLInputElement).value
+      // update keyword only; `usePatients` will fetch based on keyword
+      setKeyword(newKeyword)
+      // clear grouping when searching by keyword
+      setGroupingDate('')
+      // reset to first page
+      setCurrentPage(1)
     }
+  }
+
+  const handleGroupingByDateFilter = (dateKeyword: string) => {
+    // set grouping date filter and reset pagination/search
+    setGroupingDate(dateKeyword)
+    setKeyword('')
+    setCurrentPage(1)
   }
 
   return (
@@ -143,9 +110,7 @@ export default function Patient() {
         <Header />
         <SubHeader
           handleInputKeyDown={handleInputKeyDown}
-          handleGroupingByDateFilter={(dateKeyword: string) =>
-            handleGroupingByDateFilter(dateKeyword)
-          }
+          handleGroupingByDateFilter={handleGroupingByDateFilter}
         />
         <TablePatient
           Data={{
@@ -158,7 +123,9 @@ export default function Patient() {
           setCurrentPage={
             setCurrentPage as React.Dispatch<SetStateAction<number>>
           }
-          total={total / 10}
+          total={total}
+          pageSize={100}
+          disabled={currentPage * 100 >= total}
         />
       </DashboardContent>
       <div className={styles.page}>
