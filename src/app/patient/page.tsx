@@ -110,9 +110,7 @@ export default function Patient() {
         <Header />
         <SubHeader
           handleInputKeyDown={handleInputKeyDown}
-          handleGroupingByDateFilter={async (dateKeyword: string) =>
-            handleGroupingByDateFilter(dateKeyword)
-          }
+          handleGroupingByDateFilter={handleGroupingByDateFilter}
         />
         <TablePatient
           Data={{
