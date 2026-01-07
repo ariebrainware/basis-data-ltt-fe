@@ -142,6 +142,14 @@ export default function Patient({
     resourceId: ID,
     resourceName: 'Data Pasien',
   })
+  const genderLabel = (() => {
+    const g = (gender || '').toString().trim().toLowerCase()
+    if (g === 'female' || g === 'perempuan') return 'Perempuan'
+    if (g === 'male' || g === 'laki-laki' || g === 'laki laki')
+      return 'Laki-laki'
+    // Fallback: capitalize first letter
+    return gender ? String(g.charAt(0).toUpperCase() + g.slice(1)) : ''
+  })()
   return (
     <>
       <Dialog
@@ -245,15 +253,9 @@ export default function Patient({
         </td>
         <td className="p-3">
           <div className="w-max">
-            <div
-              data-open="true"
-              data-shape="pill"
-              className="relative inline-flex w-max items-center rounded-md border border-green-500 bg-green-500 p-0.5 font-sans text-xs font-medium text-green-50 shadow-sm data-[shape=pill]:rounded-full"
-            >
-              <span className="mx-1.5 my-0.5 font-sans leading-none text-current">
-                {gender}
-              </span>
-            </div>
+            <span className="font-sans text-sm text-current antialiased">
+              {genderLabel}
+            </span>
           </div>
         </td>
         <td className="p-3">
