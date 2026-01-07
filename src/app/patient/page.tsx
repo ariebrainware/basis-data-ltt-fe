@@ -31,6 +31,7 @@ function usePatients(
   useEffect(() => {
     ;(async () => {
       try {
+        // Build URL: date grouping takes precedence, then keyword, then pagination
         const query = dateKeyword
           ? `group_by_date=${dateKeyword}`
           : keyword
@@ -68,8 +69,8 @@ function usePatients(
 
 export default function Patient() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [keyword, setKeyword] = useState('')
   const [groupingDate, setGroupingDate] = useState('')
+  const [keyword, setKeyword] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const { data, total } = usePatients(
     currentPage,
@@ -85,19 +86,17 @@ export default function Patient() {
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       const newKeyword = (e.target as HTMLInputElement).value
-      // update keyword only; usePatients will fetch based on keyword
+      // update keyword only; `usePatients` will fetch based on keyword
       setKeyword(newKeyword)
-      // reset grouping when performing keyword search
+      // clear grouping when searching by keyword
       setGroupingDate('')
       // reset to first page
       setCurrentPage(1)
     }
   }
 
-  const handleGroupingByDateFilter = async (
-    dateKeyword: string
-  ): Promise<void> => {
-    // set grouping date filter and reset pagination
+  const handleGroupingByDateFilter = (dateKeyword: string) => {
+    // set grouping date filter and reset pagination/search
     setGroupingDate(dateKeyword)
     setKeyword('')
     setCurrentPage(1)
@@ -109,7 +108,7 @@ export default function Patient() {
         <Header />
         <SubHeader
           handleInputKeyDown={handleInputKeyDown}
-          handleGroupingByDateFilter={(dateKeyword: string) =>
+          handleGroupingByDateFilter={async (dateKeyword: string) =>
             handleGroupingByDateFilter(dateKeyword)
           }
         />
