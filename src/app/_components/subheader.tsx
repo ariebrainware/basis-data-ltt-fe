@@ -1,6 +1,6 @@
 interface SubHeaderProps {
   handleInputKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
-  handleGroupingByDateFilter: (date: string) => Promise<void>
+  handleGroupingByDateFilter: (date: string) => void
 }
 export default function SubHeader(handleSearchBox: SubHeaderProps) {
   const { handleInputKeyDown, handleGroupingByDateFilter } = handleSearchBox
