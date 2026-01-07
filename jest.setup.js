@@ -1,6 +1,19 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
 
+// Filter out specific React DOM warnings that occur due to forwarded props
+const _consoleError = console.error.bind(console)
+console.error = (...args) => {
+  const first = args[0]
+  if (
+    typeof first === 'string' &&
+    /Unknown event handler property `onPointer.*Capture`/.test(first)
+  ) {
+    return
+  }
+  return _consoleError(...args)
+}
+
 // Mock localStorage
 const localStorageMock = {
   getItem: jest.fn(),
