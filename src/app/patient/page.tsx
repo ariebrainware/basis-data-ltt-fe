@@ -127,10 +127,7 @@ export default function Patient() {
           }
           total={total}
           pageSize={100}
-          disabled={
-            Boolean(keyword && keyword.trim() !== '') &&
-            data.patients.length < 100
-          }
+          disabled={currentPage * 100 >= total}
         />
       </DashboardContent>
       <div className={styles.page}>
