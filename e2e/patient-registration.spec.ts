@@ -141,6 +141,7 @@ test.describe('Patient Registration', () => {
     
     // Verify register button is now active
     const registerBtn = page.locator('#registerBtn')
+    await expect(registerBtn).toBeEnabled()
     // Note: Actual submission test would require mocking the API
   })
 })
