@@ -15,6 +15,7 @@ export function TreatmentForm({
   treatment_date: treatmentDate,
   patient_code: patientCode,
   patient_name: patientName,
+  therapist_name: therapistName,
   therapist_id: therapistIdProp,
   issues: issues,
   treatment: treatment,
@@ -86,6 +87,18 @@ export function TreatmentForm({
               label="Nama Pasien"
               defaultValue={patientName}
               disabled
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            />
+            <Input
+              id="therapist_name"
+              type="text"
+              label="Nama Terapis"
+              defaultValue={therapistName}
+              disabled={isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
