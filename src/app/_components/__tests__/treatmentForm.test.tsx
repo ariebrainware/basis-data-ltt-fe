@@ -79,7 +79,7 @@ jest.mock('@material-tailwind/react', () => {
         id={id}
         data-testid={id}
         aria-label={label}
-        defaultValue={defaultValue ?? value}
+        defaultValue={value ?? defaultValue}
         disabled={disabled}
       />
     ),
