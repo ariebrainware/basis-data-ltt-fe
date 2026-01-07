@@ -37,7 +37,8 @@ function usePatients(
         let params = `limit=${limit}&offset=${offset}`
         if (typeof dateKeyword === 'string' && dateKeyword.trim() !== '')
           params += `&group_by_date=${encodeURIComponent(dateKeyword)}`
-        else if (keyword) params += `&keyword=${encodeURIComponent(keyword)}`
+        else if (keyword && keyword.trim() !== '')
+          params += `&keyword=${encodeURIComponent(keyword)}`
 
         const res = await fetch(`${getApiHost()}/patient?${params}`, {
           method: 'GET',
