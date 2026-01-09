@@ -1,13 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Button, Checkbox } from '@material-tailwind/react'
+import { Button } from '@material-tailwind/react'
 
 import DatePicker from '../../_components/datePicker'
 import styles from '../../page.module.css'
 import Footer from '../../_components/footer'
 import { ControlledSelect } from '../../_components/selectTherapist'
-
-import { TreatmentConditionOptions } from '@/app/_types/treatmentConditionOptions'
+import { TreatmentConditionMultiSelect } from '@/app/_components/selectTreatmentCondition'
 import TimePicker from '@/app/_components/timepicker'
 import { getApiHost } from '@/app/_functions/apiHost'
 import { getSessionToken } from '@/app/_functions/sessionToken'
@@ -21,55 +20,20 @@ let issuesInput: HTMLInputElement | null = null
 let remarksInput: HTMLInputElement | null = null
 let nextVisitInput: HTMLInputElement | null = null
 
-function MultipleCheckboxes() {
-  const [checkedItems, setCheckedItems] = useState<string[]>([])
-  useEffect(() => {
-    treatmentHistoryInput = checkedItems
-  }, [checkedItems])
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, checked } = e.target
-    setCheckedItems((prev) =>
-      checked ? [...prev, id] : prev.filter((item) => item !== id)
-    )
-  }
-
-  useEffect(() => {
-    const treatmentHistoryInputElement = document.getElementById(
-      'treatmentHistory'
-    ) as HTMLInputElement | null
-    if (treatmentHistoryInputElement) {
-      treatmentHistoryInputElement.value = checkedItems.join(',')
-    }
-  }, [checkedItems])
-  return (
-    <div className="flex flex-col">
-      {TreatmentConditionOptions.map((option) => (
-        <div key={option.id} className="mb-2 flex items-center">
-          <Checkbox
-            id={option.id}
-            name={option.id}
-            checked={checkedItems.includes(option.id)}
-            onChange={handleChange}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            crossOrigin={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          />
-          <label
-            htmlFor={option.id}
-            className="text-slate-800 ml-2 font-sans text-sm font-semibold antialiased dark:text-white"
-          >
-            {option.label}
-          </label>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 export default function RegisterTreatment() {
   const [therapistID, setTherapistID] = useState<string>('')
+  const [treatmentHistoryItems, setTreatmentHistoryItems] = useState<string[]>(
+    []
+  )
+
+  // Keep the module-scoped `treatmentHistoryInput` in sync for legacy code paths
+  React.useEffect(() => {
+    treatmentHistoryInput = treatmentHistoryItems
+    const el = document.getElementById(
+      'treatmentHistory'
+    ) as HTMLInputElement | null
+    if (el) el.value = treatmentHistoryItems.join(',')
+  }, [treatmentHistoryItems])
 
   async function sendRegisterTreatmentRequest() {
     // Validate that a therapist has been selected
@@ -259,7 +223,12 @@ export default function RegisterTreatment() {
               Penanganan
             </label>
             <div className="relative w-full">
-              <MultipleCheckboxes />
+              <TreatmentConditionMultiSelect
+                id="treatmentHistory"
+                label="Penanganan"
+                value={treatmentHistoryItems}
+                onChange={(items: string[]) => setTreatmentHistoryItems(items)}
+              />
             </div>
             <div className="w-72 space-y-1">
               <label

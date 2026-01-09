@@ -4,6 +4,7 @@ import { Card, Input, Textarea } from '@material-tailwind/react'
 import { TreatmentType } from '../_types/treatment'
 import { isTherapist } from '../_functions/userRole'
 import { ControlledSelect } from './selectTherapist'
+import { TreatmentConditionMultiSelect } from './selectTreatmentCondition'
 
 interface TreatmentFormProps extends TreatmentType {
   therapistIDState?: string
@@ -25,6 +26,29 @@ export function TreatmentForm({
   setTherapistIDState,
 }: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
+  const parseTreatmentToArray = (raw: string | undefined): string[] => {
+    if (!raw) return []
+    try {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) return parsed.map((v) => String(v))
+    } catch (_) {
+      // not json
+    }
+    return raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  }
+  const [selectedTreatmentConditions, setSelectedTreatmentConditions] =
+    React.useState<string[]>(() => parseTreatmentToArray(treatment))
+
+  React.useEffect(() => {
+    // keep textarea in sync when multi-select changes
+    const el = document.getElementById(
+      'treatment'
+    ) as HTMLTextAreaElement | null
+    if (el) el.value = selectedTreatmentConditions.join(',')
+  }, [selectedTreatmentConditions])
   const [localTherapistID, setLocalTherapistID] = React.useState<string>(
     therapistIdProp?.toString() ?? ''
   )
@@ -138,6 +162,17 @@ export function TreatmentForm({
               onResize={undefined}
               onResizeCapture={undefined}
             />
+            <div>
+              <TreatmentConditionMultiSelect
+                id="treatmentHistory"
+                label="Penanganan"
+                value={selectedTreatmentConditions}
+                onChange={(items: string[]) =>
+                  setSelectedTreatmentConditions(items)
+                }
+                disabled={false}
+              />
+            </div>
             <Textarea
               id="remarks"
               label="Keterangan"
