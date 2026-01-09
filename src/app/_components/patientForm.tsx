@@ -106,15 +106,30 @@ export function PatientForm({
             />
           </div>
           <div className="flex flex-col items-center gap-4">
-            <Textarea
+            <select
               id="gender"
-              label="Jenis Kelamin"
-              defaultValue={gender}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            />
+              name="gender"
+              defaultValue={
+                ['l', 'm', 'male', 'laki-laki', 'laki'].includes(
+                  String(gender ?? '').toLowerCase()
+                )
+                  ? 'male'
+                  : ['p', 'f', 'female', 'perempuan'].includes(
+                        String(gender ?? '').toLowerCase()
+                      )
+                    ? 'female'
+                    : gender
+                      ? 'other'
+                      : ''
+              }
+              className="w-full rounded-md border px-3 py-2 text-sm"
+            >
+              <option value="">Pilih Jenis Kelamin</option>
+              <option value="male">Laki-laki</option>
+              <option value="female">Perempuan</option>
+              <option value="other">Lainnya</option>
+            </select>
+
             <Textarea
               id="address"
               label="Alamat"

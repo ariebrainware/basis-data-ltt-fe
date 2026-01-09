@@ -78,6 +78,8 @@ export default function Patient({
     const surgery_history_new_input =
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
       surgery_history
+    const gender_new_input =
+      document.querySelector<HTMLInputElement>('#gender')?.value || gender
 
     fetch(`${getApiHost()}/patient/${ID}`, {
       method: 'PATCH',
@@ -91,6 +93,7 @@ export default function Patient({
       body: JSON.stringify({
         full_name: full_name_new_input,
         phone_number: phone_number_new_input,
+        gender: gender_new_input,
         job: job_new_input,
         age: Number(age_new_input), // Convert age_new_input to number
         email: email_new_input,
