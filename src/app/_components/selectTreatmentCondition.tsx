@@ -81,6 +81,7 @@ export function TreatmentConditionMultiSelect({
             type="checkbox"
             checked={selected.includes(option.id)}
             onChange={handleCheckboxChange}
+            disabled={disabled}
           />
           <label htmlFor={option.id} className="ml-2 text-sm font-semibold">
             {option.label}
