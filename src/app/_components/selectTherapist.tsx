@@ -141,8 +141,7 @@ export function ControlledSelect({
   }
 
   const selectOptions: React.ReactNode[] = [
-    ...(propValue &&
-    !therapists.find((t) => String(t.ID) === String(propValue))
+    ...(propValue && !therapists.find((t) => String(t.ID) === String(propValue))
       ? [
           <LibraryOption key="__prefill" value={String(propValue)}>
             {String(propValue)}
