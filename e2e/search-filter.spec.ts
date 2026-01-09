@@ -8,7 +8,7 @@ test.describe.serial('Search and Filter Functionality', () => {
       try {
         localStorage.setItem('session-token', 'mock-test-token')
         localStorage.setItem('user-role', 'admin')
-      } catch (e) {
+      } catch {
         // ignore if storage is not available in some contexts
       }
     })
@@ -25,7 +25,7 @@ test.describe.serial('Search and Filter Functionality', () => {
             localStorage.setItem('session-token', 'mock-test-token')
             localStorage.setItem('user-role', 'admin')
           })
-        } catch (e) {
+        } catch {
           // ignore if storage isn't available
         }
         await page.goto('/patient')
@@ -64,7 +64,7 @@ test.describe.serial('Search and Filter Functionality', () => {
             await expect(candidate).toHaveValue('John Doe')
             filled = true
             break
-          } catch (e) {
+          } catch {
             await page.waitForTimeout(200)
           }
         }
@@ -94,7 +94,7 @@ test.describe.serial('Search and Filter Functionality', () => {
             await candidate.press('Enter')
             acted = true
             break
-          } catch (e) {
+          } catch {
             await page.waitForTimeout(200)
           }
         }
@@ -123,7 +123,7 @@ test.describe.serial('Search and Filter Functionality', () => {
             localStorage.setItem('session-token', 'mock-test-token')
             localStorage.setItem('user-role', 'admin')
           })
-        } catch (e) {}
+        } catch {}
         await page.goto('/therapist')
         await page.waitForLoadState('networkidle')
       }
