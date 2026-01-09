@@ -1,5 +1,10 @@
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
+import { GenderSelect } from './selectGender'
+
+interface PatientFormProps extends PatientType {
+  onGenderChange?: (value: string) => void
+}
 
 export function PatientForm({
   ID,
@@ -13,7 +18,8 @@ export function PatientForm({
   health_history,
   surgery_history,
   patient_code,
-}: PatientType) {
+  onGenderChange,
+}: PatientFormProps) {
   return (
     <Card
       color="transparent"
@@ -106,30 +112,12 @@ export function PatientForm({
             />
           </div>
           <div className="flex w-full flex-col gap-4 md:w-1/2">
-            <select
+            <GenderSelect
               id="gender"
-              name="gender"
-              data-testid="gender"
-              defaultValue={
-                ['l', 'm', 'male', 'laki-laki', 'laki'].includes(
-                  String(gender ?? '').toLowerCase()
-                )
-                  ? 'male'
-                  : ['p', 'f', 'female', 'perempuan'].includes(
-                        String(gender ?? '').toLowerCase()
-                      )
-                    ? 'female'
-                    : gender
-                      ? 'other'
-                      : ''
-              }
-              className="w-full rounded-md border px-3 py-2 text-sm"
-            >
-              <option value="">Pilih Jenis Kelamin</option>
-              <option value="male">Laki-laki</option>
-              <option value="female">Perempuan</option>
-              <option value="other">Lainnya</option>
-            </select>
+              label="Jenis Kelamin"
+              value={gender}
+              onChange={onGenderChange}
+            />
 
             <Textarea
               id="address"
