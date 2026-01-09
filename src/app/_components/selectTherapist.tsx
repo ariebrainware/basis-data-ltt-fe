@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { Select, Option } from '@material-tailwind/react'
+import * as MT from '@material-tailwind/react'
 import { getApiHost } from '../_functions/apiHost'
 import { getSessionToken } from '../_functions/sessionToken'
 
@@ -34,6 +34,12 @@ export function ControlledSelect({
   >([])
 
   React.useEffect(() => {
+    // In test or SSR environments `fetch` may be undefined — guard against that.
+    if (typeof fetch === 'undefined') {
+      setTherapists([])
+      return
+    }
+
     fetch(`${getApiHost()}/therapist`, {
       method: 'GET',
       mode: 'cors',
@@ -87,10 +93,54 @@ export function ControlledSelect({
     }
   }, [propValue])
 
+  // If the library Select is unavailable (e.g., in lightweight tests),
+  // fall back to a native <select> so tests and non-browser envs work.
+  const LibrarySelect = (MT as any).Select
+  const LibraryOption = (MT as any).Option
+
+  const isLibraryAvailable =
+    LibrarySelect &&
+    LibraryOption &&
+    (typeof LibrarySelect === 'function' ||
+      typeof LibrarySelect === 'object') &&
+    (typeof LibraryOption === 'function' || typeof LibraryOption === 'object')
+
+  if (!isLibraryAvailable) {
+    return (
+      <div className="w-full">
+        <label htmlFor={id} className="sr-only">
+          {label}
+        </label>
+        <select
+          id={id}
+          data-testid={id}
+          defaultValue={
+            propValue === '' ? selectedValue : (propValue ?? selectedValue)
+          }
+          onChange={(e) => handleChange((e.target as HTMLSelectElement).value)}
+          disabled={disabled}
+          className="w-full rounded-md border px-3 py-2 text-sm"
+        >
+          <option value="">Pilih Terapis</option>
+          {propValue &&
+            !therapists.find((t) => String(t.ID) === String(propValue)) && (
+              <option value={String(propValue)}>{String(propValue)}</option>
+            )}
+          {therapists.map((therapist) => (
+            <option key={therapist.ID} value={String(therapist.ID)}>
+              {therapist.role} | {therapist.full_name}
+            </option>
+          ))}
+        </select>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full">
-      <Select
+      <LibrarySelect
         id={id}
+        data-testid={id}
         label={label}
         defaultValue={
           propValue === '' ? selectedValue : (propValue ?? selectedValue)
@@ -103,12 +153,18 @@ export function ControlledSelect({
         onResize={undefined}
         onResizeCapture={undefined}
       >
+        {propValue &&
+          !therapists.find((t) => String(t.ID) === String(propValue)) && (
+            <LibraryOption value={String(propValue)}>
+              {String(propValue)}
+            </LibraryOption>
+          )}
         {therapists.map((therapist) => (
-          <Option key={therapist.ID} value={String(therapist.ID)}>
+          <LibraryOption key={therapist.ID} value={String(therapist.ID)}>
             {therapist.role} | {therapist.full_name}
-          </Option>
+          </LibraryOption>
         ))}
-      </Select>
+      </LibrarySelect>
     </div>
   )
 }
