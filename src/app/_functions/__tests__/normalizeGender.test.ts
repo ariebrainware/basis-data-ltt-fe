@@ -118,10 +118,14 @@ describe('normalizeGenderValue', () => {
   })
 
   describe('Edge cases', () => {
-    test('handles strings with extra whitespace', () => {
-      // Note: Current implementation doesn't trim, so this would be 'other'
-      // If trimming is desired, the function should be updated
-      expect(normalizeGenderValue(' male ')).toBe('other')
+    test('handles strings with extra whitespace by trimming', () => {
+      expect(normalizeGenderValue(' male ')).toBe('male')
+      expect(normalizeGenderValue('  female  ')).toBe('female')
+      expect(normalizeGenderValue(' laki-laki ')).toBe('male')
+    })
+
+    test('handles whitespace-only string as empty', () => {
+      expect(normalizeGenderValue('   ')).toBe('')
     })
 
     test('handles mixed case correctly', () => {

@@ -10,6 +10,7 @@
  * normalizeGenderValue('perempuan') // returns 'female'
  * normalizeGenderValue('other') // returns 'other'
  * normalizeGenderValue('') // returns ''
+ * normalizeGenderValue(' male ') // returns 'male' (trimmed)
  * ```
  */
 export function normalizeGenderValue(
@@ -20,8 +21,13 @@ export function normalizeGenderValue(
     return ''
   }
 
-  // Convert to lowercase string for comparison
-  const genderStr = String(gender).toLowerCase()
+  // Convert to lowercase string and trim whitespace for comparison
+  const genderStr = String(gender).toLowerCase().trim()
+
+  // Handle empty string after trimming
+  if (!genderStr) {
+    return ''
+  }
 
   // Male gender variations
   const maleValues = ['l', 'm', 'male', 'laki-laki', 'laki']
