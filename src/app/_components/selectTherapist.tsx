@@ -127,9 +127,9 @@ export function ControlledSelect({
         >
           <option value="">Pilih Terapis</option>
           {propValue &&
-            !therapists.find((t) => String(t.ID) === String(propValue)) && (
-              <option value={String(propValue)}>{String(propValue)}</option>
-            )}
+          !therapists.find((t) => String(t.ID) === String(propValue)) ? (
+            <option value={String(propValue)}>{String(propValue)}</option>
+          ) : null}
           {therapists.map((therapist) => (
             <option key={therapist.ID} value={String(therapist.ID)}>
               {therapist.role} | {therapist.full_name}
@@ -139,6 +139,27 @@ export function ControlledSelect({
       </div>
     )
   }
+
+  const selectOptions: React.ReactNode[] = []
+
+  if (
+    propValue &&
+    !therapists.find((t) => String(t.ID) === String(propValue))
+  ) {
+    selectOptions.push(
+      <LibraryOption key="__prefill" value={String(propValue)}>
+        {String(propValue)}
+      </LibraryOption>
+    )
+  }
+
+  therapists.forEach((therapist) => {
+    selectOptions.push(
+      <LibraryOption key={therapist.ID} value={String(therapist.ID)}>
+        {therapist.role} | {therapist.full_name}
+      </LibraryOption>
+    )
+  })
 
   return (
     <div className="w-full">
@@ -157,17 +178,7 @@ export function ControlledSelect({
         onResize={undefined}
         onResizeCapture={undefined}
       >
-        {propValue &&
-          !therapists.find((t) => String(t.ID) === String(propValue)) && (
-            <LibraryOption value={String(propValue)}>
-              {String(propValue)}
-            </LibraryOption>
-          )}
-        {therapists.map((therapist) => (
-          <LibraryOption key={therapist.ID} value={String(therapist.ID)}>
-            {therapist.role} | {therapist.full_name}
-          </LibraryOption>
-        ))}
+        {selectOptions}
       </LibrarySelect>
     </div>
   )
