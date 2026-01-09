@@ -156,7 +156,8 @@ export default function Patient({
   return (
     <>
       <Dialog
-        size={'sm'}
+        size={'xl'}
+        className="max-h-[90vh] overflow-y-auto"
         handler={handleOpen}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
@@ -175,6 +176,7 @@ export default function Patient({
           Ubah Data Pasien
         </DialogHeader>
         <DialogBody
+          className="px-2 md:px-6"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}

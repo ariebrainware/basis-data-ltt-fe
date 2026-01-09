@@ -24,9 +24,9 @@ export function PatientForm({
       onResize={undefined}
       onResizeCapture={undefined}
     >
-      <form className="mb-2 mt-8 w-80 max-w-screen-lg sm:w-96">
-        <div className="mb-1 flex w-72 gap-6">
-          <div className="flex flex-col items-center gap-4">
+      <form className="mb-2 mt-4 w-full px-2 md:mt-8 md:px-0">
+        <div className="mb-1 flex w-full flex-col gap-4 md:flex-row md:gap-6">
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <Input
               id="ID"
               type="text"
@@ -105,10 +105,11 @@ export function PatientForm({
               onResizeCapture={undefined}
             />
           </div>
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <select
               id="gender"
               name="gender"
+              data-testid="gender"
               defaultValue={
                 ['l', 'm', 'male', 'laki-laki', 'laki'].includes(
                   String(gender ?? '').toLowerCase()
