@@ -31,7 +31,7 @@ export function TreatmentForm({
     try {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed)) return parsed.map((v) => String(v))
-    } catch (_) {
+    } catch {
       // not json
     }
     return raw
