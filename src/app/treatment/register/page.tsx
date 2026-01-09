@@ -258,7 +258,9 @@ export default function RegisterTreatment() {
             >
               Penanganan
             </label>
-            <div className="relative w-full">{MultipleCheckboxes()}</div>
+            <div className="relative w-full">
+              <MultipleCheckboxes />
+            </div>
             <div className="w-72 space-y-1">
               <label
                 htmlFor="issues"
