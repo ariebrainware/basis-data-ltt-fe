@@ -140,26 +140,21 @@ export function ControlledSelect({
     )
   }
 
-  const selectOptions: React.ReactNode[] = []
-
-  if (
-    propValue &&
+  const selectOptions: React.ReactNode[] = [
+    ...(propValue &&
     !therapists.find((t) => String(t.ID) === String(propValue))
-  ) {
-    selectOptions.push(
-      <LibraryOption key="__prefill" value={String(propValue)}>
-        {String(propValue)}
-      </LibraryOption>
-    )
-  }
-
-  therapists.forEach((therapist) => {
-    selectOptions.push(
+      ? [
+          <LibraryOption key="__prefill" value={String(propValue)}>
+            {String(propValue)}
+          </LibraryOption>,
+        ]
+      : []),
+    ...therapists.map((therapist) => (
       <LibraryOption key={therapist.ID} value={String(therapist.ID)}>
         {therapist.role} | {therapist.full_name}
       </LibraryOption>
-    )
-  })
+    )),
+  ]
 
   return (
     <div className="w-full">
