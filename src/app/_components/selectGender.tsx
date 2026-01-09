@@ -17,7 +17,7 @@ interface GenderSelectProps {
 export function normalizeGenderValue(gender: string | undefined): string {
   if (!gender) return ''
 
-  const normalizedGender = String(gender).toLowerCase().trim()
+  const normalizedGender = gender.toLowerCase().trim()
 
   // Check for male variants
   if (['l', 'm', 'male', 'laki-laki', 'laki'].includes(normalizedGender)) {
@@ -30,7 +30,7 @@ export function normalizeGenderValue(gender: string | undefined): string {
   }
 
   // If there's a value but it doesn't match male/female, return 'other'
-  return normalizedGender ? 'other' : ''
+  return 'other'
 }
 
 export function GenderSelect({
@@ -63,11 +63,6 @@ export function GenderSelect({
         label={label}
         value={selectedValue}
         onChange={handleChange}
-        placeholder={undefined}
-        onPointerEnterCapture={undefined}
-        onPointerLeaveCapture={undefined}
-        onResize={undefined}
-        onResizeCapture={undefined}
       >
         <Option value="">Pilih Jenis Kelamin</Option>
         <Option value="male">Laki-laki</Option>
