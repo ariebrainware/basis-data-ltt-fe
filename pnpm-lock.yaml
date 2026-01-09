@@ -32,9 +32,6 @@ importers:
       next:
         specifier: 15.4.10
         version: 15.4.10(@babel/core@7.28.5)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      outline:
-        specifier: link:@heroicons/react/24/outline
-        version: link:@heroicons/react/24/outline
       react:
         specifier: ^19.2.3
         version: 19.2.3

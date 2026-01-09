@@ -108,3 +108,31 @@ try {
 // Mock environment variables
 process.env.NEXT_PUBLIC_API_HOST = 'http://localhost:19091'
 process.env.NEXT_PUBLIC_API_TOKEN = 'test-token'
+
+// Provide a basic `fetch` mock for tests that call browser APIs
+global.fetch =
+  global.fetch ||
+  jest.fn((url) => {
+    // Return sensible defaults depending on endpoint
+    const stringUrl = String(url)
+    if (stringUrl.includes('/therapist')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ data: { therapists: [] }, total: 0 }),
+      })
+    }
+    if (stringUrl.includes('/patient')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ data: { patients: [] }, total: 0 }),
+      })
+    }
+    if (stringUrl.includes('/treatment')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ data: { treatments: [] }, total: 0 }),
+      })
+    }
+    // default
+    return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
+  })

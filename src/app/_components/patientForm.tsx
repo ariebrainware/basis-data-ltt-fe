@@ -1,5 +1,10 @@
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
+import { GenderSelect } from './selectGender'
+
+interface PatientFormProps extends PatientType {
+  onGenderChange?: (value: string) => void
+}
 
 export function PatientForm({
   ID,
@@ -13,7 +18,8 @@ export function PatientForm({
   health_history,
   surgery_history,
   patient_code,
-}: PatientType) {
+  onGenderChange,
+}: PatientFormProps) {
   return (
     <Card
       color="transparent"
@@ -24,9 +30,9 @@ export function PatientForm({
       onResize={undefined}
       onResizeCapture={undefined}
     >
-      <form className="mb-2 mt-8 w-80 max-w-screen-lg sm:w-96">
-        <div className="mb-1 flex w-72 gap-6">
-          <div className="flex flex-col items-center gap-4">
+      <form className="mb-2 mt-4 w-full px-2 md:mt-8 md:px-0">
+        <div className="mb-1 flex w-full flex-col gap-4 md:flex-row md:gap-6">
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <Input
               id="ID"
               type="text"
@@ -105,16 +111,14 @@ export function PatientForm({
               onResizeCapture={undefined}
             />
           </div>
-          <div className="flex flex-col items-center gap-4">
-            <Textarea
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
+            <GenderSelect
               id="gender"
               label="Jenis Kelamin"
-              defaultValue={gender}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
+              value={gender}
+              onChange={onGenderChange}
             />
+
             <Textarea
               id="address"
               label="Alamat"
