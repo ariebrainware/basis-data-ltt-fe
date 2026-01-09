@@ -20,7 +20,7 @@ export function normalizeGenderValue(gender: string | undefined): string {
   const normalizedGender = gender.toLowerCase().trim()
 
   // Check for male variants
-  if (['l', 'm', 'male', 'laki-laki', 'laki'].includes(normalizedGender)) {
+  if (['l', 'm', 'male', 'laki-laki', 'laki laki', 'laki'].includes(normalizedGender)) {
     return 'male'
   }
 
