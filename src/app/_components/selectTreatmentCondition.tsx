@@ -17,18 +17,14 @@ export function TreatmentConditionMultiSelect({
   onChange,
   disabled,
 }: MultiSelectProps) {
-  const [selected, setSelected] = React.useState<string[]>(propValue ?? [])
-
-  React.useEffect(() => {
-    setSelected(propValue ?? [])
-  }, [propValue])
+  // Fully controlled component - no internal state
+  const selected = propValue ?? []
 
   const handleNativeSelectChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const options = Array.from(e.target.options)
     const values = options.filter((o) => o.selected).map((o) => o.value)
-    setSelected(values)
     onChange(values)
   }
 
@@ -37,7 +33,6 @@ export function TreatmentConditionMultiSelect({
     const next = checked
       ? [...selected, optionId]
       : selected.filter((s) => s !== optionId)
-    setSelected(next)
     onChange(next)
   }
 
@@ -48,6 +43,8 @@ export function TreatmentConditionMultiSelect({
   if (isBrowser) {
     return (
       <div className="w-full">
+        {/* Label is sr-only for accessibility. Parent components must provide 
+            their own visible label element to inform sighted users what they're selecting. */}
         <label htmlFor={id} className="sr-only">
           {label}
         </label>

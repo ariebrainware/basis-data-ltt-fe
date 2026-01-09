@@ -26,6 +26,8 @@ export function TreatmentForm({
   setTherapistIDState,
 }: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
+  // The backend may return treatment data in either JSON array format or comma-separated string format.
+  // This function handles both formats to ensure compatibility with different API versions or data states.
   const parseTreatmentToArray = (raw: string | undefined): string[] => {
     if (!raw) return []
     try {
@@ -163,6 +165,8 @@ export function TreatmentForm({
               onResizeCapture={undefined}
             />
             <div>
+              {/* Treatment selection should remain editable for all roles,
+                  including therapists, per business requirements. */}
               <TreatmentConditionMultiSelect
                 id="treatmentHistory"
                 label="Penanganan"

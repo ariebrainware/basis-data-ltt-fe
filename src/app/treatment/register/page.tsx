@@ -22,18 +22,13 @@ let nextVisitInput: HTMLInputElement | null = null
 
 export default function RegisterTreatment() {
   const [therapistID, setTherapistID] = useState<string>('')
-  const [treatmentHistoryItems, setTreatmentHistoryItems] = useState<string[]>(
-    []
-  )
+  const [selectedTreatmentConditions, setSelectedTreatmentConditions] =
+    useState<string[]>([])
 
   // Keep the module-scoped `treatmentHistoryInput` in sync for legacy code paths
   React.useEffect(() => {
-    treatmentHistoryInput = treatmentHistoryItems
-    const el = document.getElementById(
-      'treatmentHistory'
-    ) as HTMLInputElement | null
-    if (el) el.value = treatmentHistoryItems.join(',')
-  }, [treatmentHistoryItems])
+    treatmentHistoryInput = selectedTreatmentConditions
+  }, [selectedTreatmentConditions])
 
   async function sendRegisterTreatmentRequest() {
     // Validate that a therapist has been selected
@@ -138,6 +133,7 @@ export default function RegisterTreatment() {
       setTherapistID('')
       if (issuesInput) issuesInput.value = ''
       if (treatmentHistoryInput) treatmentHistoryInput = []
+      setSelectedTreatmentConditions([])
       if (remarksInput) remarksInput.value = ''
       if (nextVisitInput) nextVisitInput.value = ''
     }
@@ -226,8 +222,10 @@ export default function RegisterTreatment() {
               <TreatmentConditionMultiSelect
                 id="treatment"
                 label="Penanganan"
-                value={treatmentHistoryItems}
-                onChange={(items: string[]) => setTreatmentHistoryItems(items)}
+                value={selectedTreatmentConditions}
+                onChange={(items: string[]) =>
+                  setSelectedTreatmentConditions(items)
+                }
               />
             </div>
             <div className="w-72 space-y-1">
