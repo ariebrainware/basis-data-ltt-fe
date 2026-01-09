@@ -31,10 +31,12 @@ jest.mock('@material-tailwind/react', () => ({
 jest.mock('../selectGender', () => ({
   GenderSelect: ({
     id,
+    label,
     value,
     onChange,
   }: {
     id?: string
+    label: string
     value?: string
     onChange?: (value: string) => void
   }) => (
@@ -43,6 +45,7 @@ jest.mock('../selectGender', () => ({
       data-testid={id}
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
+      aria-label={label}
     >
       <option value="">Pilih Jenis Kelamin</option>
       <option value="male">Laki-laki</option>
