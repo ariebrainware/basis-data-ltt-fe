@@ -4,10 +4,11 @@ import { TreatmentForm } from '../treatmentForm'
 import { TreatmentType } from '@/app/_types/treatment'
 import { isTherapist } from '@/app/_functions/userRole'
 
-jest.spyOn(console, 'error').mockImplementation((msg) => {
-  if (/Not implemented: navigation/.test(msg)) return
-  // otherwise show other errors
-  console.error(msg)
+const _origConsoleError = console.error.bind(console)
+jest.spyOn(console, 'error').mockImplementation((msg, ...args) => {
+  if (typeof msg === 'string' && /Not implemented: navigation/.test(msg)) return
+  // otherwise forward to original
+  _origConsoleError(msg, ...args)
 })
 
 // Mock Material Tailwind components
@@ -60,6 +61,35 @@ jest.mock('@material-tailwind/react', () => {
       MockField({ id, label, defaultValue, disabled, as: 'input' }),
     Textarea: ({ id, label, defaultValue, disabled }: MockProps) =>
       MockField({ id, label, defaultValue, disabled, as: 'textarea' }),
+    // Minimal Select/Option mocks used by ControlledSelect
+    Select: ({
+      id,
+      label,
+      defaultValue,
+      value,
+      disabled,
+    }: {
+      id?: string
+      label?: string
+      defaultValue?: string | number | readonly string[] | undefined
+      value?: string | number | readonly string[] | undefined
+      disabled?: boolean
+    }) => (
+      <input
+        id={id}
+        data-testid={id}
+        aria-label={label}
+        defaultValue={value ?? defaultValue}
+        disabled={disabled}
+      />
+    ),
+    Option: ({
+      value,
+      children,
+    }: {
+      value?: string | number
+      children?: React.ReactNode
+    }) => <div data-value={value}>{children}</div>,
   }
 })
 

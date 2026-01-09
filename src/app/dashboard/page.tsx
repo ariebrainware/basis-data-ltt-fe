@@ -22,6 +22,17 @@ import Pagination from '../_components/pagination'
 import { getApiHost } from '../_functions/apiHost'
 import { getSessionToken } from '../_functions/sessionToken'
 
+// Simple in-module cache to deduplicate concurrent identical fetches
+// API response interface (what the backend returns)
+interface TreatmentApiResponse {
+  data: {
+    treatments: TreatmentType[]
+  }
+  total: number
+}
+
+const treatmentFetchCache = new Map<string, Promise<TreatmentApiResponse>>()
+
 const TABLE_HEAD = [
   'Nama Pasien (K. Pasien)',
   'Umur',
@@ -30,6 +41,7 @@ const TABLE_HEAD = [
   'Keluhan',
 ]
 
+// Hook return type interface (what useFetchTreatment returns)
 interface ListTreatmentResponse {
   data: {
     treatment: TreatmentType[]
@@ -52,10 +64,14 @@ function useFetchTreatment(
         const mm = String(today.getMonth() + 1).padStart(2, '0')
         const dd = String(today.getDate()).padStart(2, '0')
         const groupByDate = `${yyyy}-${mm}-${dd}`
-        // const customDate = `2025-10-24`
-        const res = await fetch(
-          `${getApiHost()}/treatment?group_by_date=${groupByDate}`,
-          {
+        const url = `${getApiHost()}/treatment?group_by_date=${groupByDate}`
+
+        // Use cache to prevent duplicate concurrent fetches for same URL
+        let jsonData
+        if (treatmentFetchCache.has(url)) {
+          jsonData = await treatmentFetchCache.get(url)
+        } else {
+          const p = fetch(url, {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -64,10 +80,20 @@ function useFetchTreatment(
               Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
               'session-token': getSessionToken(),
             },
-          }
-        )
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
+          })
+            .then((r) => {
+              if (!r.ok) throw new Error(`HTTP error! Status: ${r.status}`)
+              return r.json()
+            })
+            .finally(() => {
+              // remove cache entry after completion so subsequent requests refetch
+              treatmentFetchCache.delete(url)
+            })
+
+          treatmentFetchCache.set(url, p)
+          jsonData = await p
+        }
+        const data = jsonData
         const treatmentArray: TreatmentType[] = Array.isArray(
           data.data.treatments
         )
@@ -76,7 +102,7 @@ function useFetchTreatment(
         setTreatment(treatmentArray)
         console.log(`data: `, data.data.treatments)
         console.log(`treatmentArray: `, treatmentArray)
-        setTotal(data.data.total)
+        setTotal(data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           UnauthorizedAccess()
