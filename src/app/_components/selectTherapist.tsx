@@ -88,15 +88,19 @@ export function ControlledSelect({
   }, [])
 
   React.useEffect(() => {
-    if (propValue !== undefined && propValue !== null && propValue !== '') {
+    if ((propValue ?? '') !== '') {
       setSelectedValue(String(propValue))
     }
   }, [propValue])
 
   // If the library Select is unavailable (e.g., in lightweight tests),
   // fall back to a native <select> so tests and non-browser envs work.
-  const LibrarySelect = (MT as any).Select
-  const LibraryOption = (MT as any).Option
+  const LibrarySelect = (MT as unknown as Record<string, unknown>).Select as
+    | React.ElementType
+    | undefined
+  const LibraryOption = (MT as unknown as Record<string, unknown>).Option as
+    | React.ElementType
+    | undefined
 
   const isLibraryAvailable =
     LibrarySelect &&
