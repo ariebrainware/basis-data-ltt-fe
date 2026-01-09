@@ -224,7 +224,7 @@ export default function RegisterTreatment() {
             </label>
             <div className="relative w-full">
               <TreatmentConditionMultiSelect
-                id="treatmentHistory"
+                id="treatment"
                 label="Penanganan"
                 value={treatmentHistoryItems}
                 onChange={(items: string[]) => setTreatmentHistoryItems(items)}
