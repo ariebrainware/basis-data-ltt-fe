@@ -84,7 +84,7 @@ test.describe('Search and Filter Functionality', () => {
       const allTab = page.getByText('All', { exact: false })
       const approvedTab = page.getByText('Approved', { exact: false })
       const unapprovedTab = page.getByText('Unapproved', { exact: false })
-      
+
       if (await allTab.isVisible()) {
         await expect(allTab).toBeVisible()
       }
@@ -100,11 +100,13 @@ test.describe('Search and Filter Functionality', () => {
   test.describe('Date Filter', () => {
     test('should have date filter functionality', async ({ page }) => {
       await page.goto('/patient')
-      
+
       // Look for date filter elements
-      const dateFilterElements = page.locator('[data-testid*="date"], [id*="date"]')
+      const dateFilterElements = page.locator(
+        '[data-testid*="date"], [id*="date"]'
+      )
       const count = await dateFilterElements.count()
-      
+
       // If date filters exist, test them
       if (count > 0) {
         expect(count).toBeGreaterThan(0)
@@ -115,15 +117,15 @@ test.describe('Search and Filter Functionality', () => {
   test.describe('Pagination', () => {
     test('should have pagination controls', async ({ page }) => {
       await page.goto('/patient')
-      
+
       // Look for pagination buttons or controls
       const nextButton = page.getByRole('button', { name: /next/i })
       const prevButton = page.getByRole('button', { name: /prev/i })
-      
+
       // Trigger locator resolution without asserting visibility/existence
       await nextButton.count()
       await prevButton.count()
-      
+
       // Pagination might not always be visible if there's not enough data
       // So we just check if elements can be found
     })
