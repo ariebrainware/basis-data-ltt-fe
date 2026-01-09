@@ -63,6 +63,11 @@ export function GenderSelect({
         label={label}
         value={selectedValue}
         onChange={handleChange}
+        placeholder={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         <Option value="">Pilih Jenis Kelamin</Option>
         <Option value="male">Laki-laki</Option>
