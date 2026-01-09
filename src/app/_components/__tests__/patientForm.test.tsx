@@ -27,6 +27,34 @@ jest.mock('@material-tailwind/react', () => ({
   ),
 }))
 
+// Mock GenderSelect component
+jest.mock('../selectGender', () => ({
+  GenderSelect: ({
+    id,
+    label,
+    value,
+    onChange,
+  }: {
+    id?: string
+    label: string
+    value?: string
+    onChange?: (value: string) => void
+  }) => (
+    <select
+      id={id}
+      data-testid={id}
+      value={value}
+      onChange={(e) => onChange?.(e.target.value)}
+      aria-label={label}
+    >
+      <option value="">Pilih Jenis Kelamin</option>
+      <option value="male">Laki-laki</option>
+      <option value="female">Perempuan</option>
+      <option value="other">Lainnya</option>
+    </select>
+  ),
+}))
+
 describe('PatientForm Component', () => {
   const mockPatient: PatientType = {
     ID: 1,

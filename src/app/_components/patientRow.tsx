@@ -30,8 +30,15 @@ export default function Patient({
   onDataChange,
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
+  const [genderValue, setGenderValue] = React.useState<string>(gender || '')
 
-  const handleOpen = () => setOpen(!open)
+  const handleOpen = () => {
+    if (!open) {
+      // Reset gender value when opening dialog
+      setGenderValue(gender || '')
+    }
+    setOpen(!open)
+  }
 
   const handleHealthConditionLabelDisplay = (ids: string): string => {
     const idArray = ids.split(',').map((id) => id.trim())
@@ -78,6 +85,7 @@ export default function Patient({
     const surgery_history_new_input =
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
       surgery_history
+    const gender_new_input = genderValue || gender
 
     fetch(`${getApiHost()}/patient/${ID}`, {
       method: 'PATCH',
@@ -91,6 +99,7 @@ export default function Patient({
       body: JSON.stringify({
         full_name: full_name_new_input,
         phone_number: phone_number_new_input,
+        gender: gender_new_input,
         job: job_new_input,
         age: Number(age_new_input), // Convert age_new_input to number
         email: email_new_input,
@@ -153,7 +162,8 @@ export default function Patient({
   return (
     <>
       <Dialog
-        size={'sm'}
+        size={'xl'}
+        className="max-h-[90vh] overflow-y-auto"
         handler={handleOpen}
         placeholder={undefined}
         onPointerEnterCapture={undefined}
@@ -172,6 +182,7 @@ export default function Patient({
           Ubah Data Pasien
         </DialogHeader>
         <DialogBody
+          className="px-2 md:px-6"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
@@ -189,8 +200,9 @@ export default function Patient({
             address={address}
             health_history={handleHealthConditionLabelDisplay(health_history)}
             surgery_history={surgery_history}
-            gender={''}
+            gender={genderValue}
             last_visit={''}
+            onGenderChange={setGenderValue}
           />
         </DialogBody>
         <DialogFooter

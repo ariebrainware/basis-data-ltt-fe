@@ -98,7 +98,7 @@ export function TreatmentForm({
               type="text"
               label="Nama Terapis"
               defaultValue={therapistName}
-              disabled={isTherapistRole}
+              disabled
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
