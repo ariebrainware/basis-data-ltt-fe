@@ -229,8 +229,8 @@ test.describe('Patient Edit Functionality', () => {
 
         if (maleOptionCount > 0) {
           await maleOption.click()
-          // Wait for dropdown to close
-          await page.waitForTimeout(300)
+          // Wait for the option to be selected (dropdown should close)
+          await page.waitForSelector('[data-testid="gender"]', { state: 'visible' })
         }
       }
 
