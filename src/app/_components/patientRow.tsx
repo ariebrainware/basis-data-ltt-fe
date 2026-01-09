@@ -30,8 +30,15 @@ export default function Patient({
   onDataChange,
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
+  const [genderValue, setGenderValue] = React.useState<string>(gender || '')
 
-  const handleOpen = () => setOpen(!open)
+  const handleOpen = () => {
+    if (!open) {
+      // Reset gender value when opening dialog
+      setGenderValue(gender || '')
+    }
+    setOpen(!open)
+  }
 
   const handleHealthConditionLabelDisplay = (ids: string): string => {
     const idArray = ids.split(',').map((id) => id.trim())
@@ -78,8 +85,7 @@ export default function Patient({
     const surgery_history_new_input =
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
       surgery_history
-    const gender_new_input =
-      document.querySelector<HTMLSelectElement>('#gender')?.value || gender
+    const gender_new_input = genderValue || gender
 
     fetch(`${getApiHost()}/patient/${ID}`, {
       method: 'PATCH',
@@ -194,8 +200,9 @@ export default function Patient({
             address={address}
             health_history={handleHealthConditionLabelDisplay(health_history)}
             surgery_history={surgery_history}
-            gender={''}
+            gender={genderValue}
             last_visit={''}
+            onGenderChange={setGenderValue}
           />
         </DialogBody>
         <DialogFooter
