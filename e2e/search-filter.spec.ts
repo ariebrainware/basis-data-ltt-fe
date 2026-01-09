@@ -1,43 +1,106 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Search and Filter Functionality', () => {
+test.describe.serial('Search and Filter Functionality', () => {
   test.beforeEach(async ({ page }) => {
-    // Mock authentication
-    await page.goto('/patient')
-    await page.evaluate(() => {
-      localStorage.setItem('session-token', 'mock-test-token')
-      localStorage.setItem('user-role', 'admin')
+    // Mock authentication before navigation to avoid redirects
+    // Use init script so storage is available before page navigations
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('session-token', 'mock-test-token')
+        localStorage.setItem('user-role', 'admin')
+      } catch (e) {
+        // ignore if storage is not available in some contexts
+      }
     })
   })
 
   test.describe('Patient Search', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/patient')
+      // Ensure we end up on the patient page; if redirected to login, restore storage and retry
+      await page.waitForLoadState('domcontentloaded')
+      if (page.url().includes('/login')) {
+        try {
+          await page.evaluate(() => {
+            localStorage.setItem('session-token', 'mock-test-token')
+            localStorage.setItem('user-role', 'admin')
+          })
+        } catch (e) {
+          // ignore if storage isn't available
+        }
+        await page.goto('/patient')
+        await page.waitForLoadState('networkidle')
+      }
     })
 
     test('should have search input field', async ({ page }) => {
-      // Look for search input in subheader
-      const searchInput = page.locator('input[type="text"]').first()
-      if (await searchInput.isVisible()) {
+      // Look for search input in subheader by placeholder
+      const searchInput = page.getByPlaceholder(
+        'Cari berdasarkan Nama atau Kode Pasien'
+      )
+      if ((await searchInput.count()) > 0 && (await searchInput.isVisible())) {
         await expect(searchInput).toBeVisible()
       }
     })
 
     test('should allow typing in search field', async ({ page }) => {
-      const searchInput = page.locator('input[type="text"]').first()
-      if (await searchInput.isVisible()) {
-        await searchInput.fill('John Doe')
-        await expect(searchInput).toHaveValue('John Doe')
+      const placeholder = 'Cari berdasarkan Nama atau Kode Pasien'
+
+      // Candidate locators (try fallback strategies)
+      const candidates = [
+        page.getByPlaceholder(placeholder),
+        page.locator('input[placeholder*="Cari berdasarkan"]'),
+        page.locator('input[data-icon-placement="start"]'),
+        page.locator('input[type="text"]').first(),
+      ]
+
+      let filled = false
+      for (const candidate of candidates) {
+        for (let i = 0; i < 4; i++) {
+          if (page.isClosed && page.isClosed()) break
+          try {
+            await candidate.waitFor({ state: 'visible', timeout: 1500 })
+            await candidate.fill('John Doe')
+            await expect(candidate).toHaveValue('John Doe')
+            filled = true
+            break
+          } catch (e) {
+            await page.waitForTimeout(200)
+          }
+        }
+        if (filled) break
       }
+      if (!filled) throw new Error('Search input not available to fill')
     })
 
     test('should trigger search on Enter key', async ({ page }) => {
-      const searchInput = page.locator('input[type="text"]').first()
-      if (await searchInput.isVisible()) {
-        await searchInput.fill('test patient')
-        await searchInput.press('Enter')
-        // Note: Actual search results would require API mocking
+      const placeholder = 'Cari berdasarkan Nama atau Kode Pasien'
+
+      // Try multiple locator strategies for pressing Enter
+      const candidates = [
+        page.getByPlaceholder(placeholder),
+        page.locator('input[placeholder*="Cari berdasarkan"]'),
+        page.locator('input[data-icon-placement="start"]'),
+        page.locator('input[type="text"]').first(),
+      ]
+
+      let acted = false
+      for (const candidate of candidates) {
+        for (let i = 0; i < 4; i++) {
+          if (page.isClosed && page.isClosed()) break
+          try {
+            await candidate.waitFor({ state: 'visible', timeout: 1500 })
+            await candidate.fill('test patient')
+            await candidate.press('Enter')
+            acted = true
+            break
+          } catch (e) {
+            await page.waitForTimeout(200)
+          }
+        }
+        if (acted) break
       }
+      if (!acted) throw new Error('Search input not available to trigger Enter')
     })
 
     test('should clear search field', async ({ page }) => {
@@ -53,6 +116,17 @@ test.describe('Search and Filter Functionality', () => {
   test.describe('Therapist Search', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/therapist')
+      await page.waitForLoadState('domcontentloaded')
+      if (page.url().includes('/login')) {
+        try {
+          await page.evaluate(() => {
+            localStorage.setItem('session-token', 'mock-test-token')
+            localStorage.setItem('user-role', 'admin')
+          })
+        } catch (e) {}
+        await page.goto('/therapist')
+        await page.waitForLoadState('networkidle')
+      }
     })
 
     test('should have search input field', async ({ page }) => {
@@ -80,19 +154,20 @@ test.describe('Search and Filter Functionality', () => {
     })
 
     test('should have filter tabs', async ({ page }) => {
-      // Check for All, Approved, Unapproved tabs
-      const allTab = page.getByText('All', { exact: false })
-      const approvedTab = page.getByText('Approved', { exact: false })
-      const unapprovedTab = page.getByText('Unapproved', { exact: false })
+      // Wait for any tab elements to appear and assert at least one exists
+      const tabLocator = page.locator('[role="tab"]')
+      await tabLocator.first().waitFor({ state: 'visible', timeout: 7000 })
+      const tabCount = await tabLocator.count()
+      await expect(tabCount).toBeGreaterThan(0)
 
-      if (await allTab.isVisible()) {
-        await expect(allTab).toBeVisible()
+      // If specific labels exist, also assert visibility (tolerant)
+      const maybeApproved = page.getByText(/\bApproved\b/)
+      if ((await maybeApproved.count()) > 0) {
+        await expect(maybeApproved.first()).toBeVisible()
       }
-      if (await approvedTab.isVisible()) {
-        await expect(approvedTab).toBeVisible()
-      }
-      if (await unapprovedTab.isVisible()) {
-        await expect(unapprovedTab).toBeVisible()
+      const maybeUnapproved = page.getByText(/\bUnapproved\b/)
+      if ((await maybeUnapproved.count()) > 0) {
+        await expect(maybeUnapproved.first()).toBeVisible()
       }
     })
   })
