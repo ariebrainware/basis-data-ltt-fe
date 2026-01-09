@@ -79,7 +79,7 @@ export default function Patient({
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
       surgery_history
     const gender_new_input =
-      document.querySelector<HTMLInputElement>('#gender')?.value || gender
+      document.querySelector<HTMLSelectElement>('#gender')?.value || gender
 
     fetch(`${getApiHost()}/patient/${ID}`, {
       method: 'PATCH',
