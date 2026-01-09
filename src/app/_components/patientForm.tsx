@@ -1,5 +1,6 @@
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
+import { normalizeGenderValue } from '../_functions/normalizeGender'
 
 export function PatientForm({
   ID,
@@ -110,19 +111,7 @@ export function PatientForm({
               id="gender"
               name="gender"
               data-testid="gender"
-              defaultValue={
-                ['l', 'm', 'male', 'laki-laki', 'laki'].includes(
-                  String(gender ?? '').toLowerCase()
-                )
-                  ? 'male'
-                  : ['p', 'f', 'female', 'perempuan'].includes(
-                        String(gender ?? '').toLowerCase()
-                      )
-                    ? 'female'
-                    : gender
-                      ? 'other'
-                      : ''
-              }
+              defaultValue={normalizeGenderValue(gender)}
               className="w-full rounded-md border px-3 py-2 text-sm"
             >
               <option value="">Pilih Jenis Kelamin</option>
