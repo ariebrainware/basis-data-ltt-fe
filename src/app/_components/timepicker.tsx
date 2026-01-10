@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useId, useState } from 'react'
+import React, { useId } from 'react'
 
 type TimePickerProps = {
   id?: string
@@ -31,15 +31,9 @@ export default function TimePicker({
 }: TimePickerProps) {
   const generatedId = useId()
   const uid = id ?? generatedId
-  const [internal, setInternal] = useState<string | null>(value ?? null)
-
-  useEffect(() => {
-    setInternal(value ?? null)
-  }, [value])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value // "" or "HH:MM" (browser provides HH:MM for type="time")
-    setInternal(v || null)
     onChange?.(v || null)
   }
 
@@ -56,7 +50,7 @@ export default function TimePicker({
       <input
         id={uid}
         type="time"
-        value={internal ?? ''}
+        value={value ?? ''}
         onChange={handleChange}
         disabled={disabled}
         min={min ?? undefined}
