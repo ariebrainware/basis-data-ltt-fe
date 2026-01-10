@@ -19,7 +19,7 @@ type TimePickerProps = {
 export default function TimePicker({
   id,
   label,
-  value = null,
+  value,
   onChange,
   step = 15,
   // keep props for compatibility but not used in this simple version
@@ -31,6 +31,7 @@ export default function TimePicker({
 }: TimePickerProps) {
   const generatedId = useId()
   const uid = id ?? generatedId
+  const isControlled = typeof value !== 'undefined'
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value // "" or "HH:MM" (browser provides HH:MM for type="time")
@@ -50,7 +51,7 @@ export default function TimePicker({
       <input
         id={uid}
         type="time"
-        value={value ?? ''}
+        {...(isControlled ? { value: value ?? '' } : {})}
         onChange={handleChange}
         disabled={disabled}
         min={min ?? undefined}
