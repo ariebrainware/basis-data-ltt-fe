@@ -7,6 +7,8 @@ test.describe.serial('Search and Filter Functionality', () => {
     await page.addInitScript(() => {
       try {
         localStorage.setItem('session-token', 'mock-test-token')
+        // Mark this session as an E2E test run so the app can avoid automatic redirects
+        localStorage.setItem('__E2E_TEST__', '1')
         localStorage.setItem('user-role', 'admin')
       } catch {
         // ignore if storage is not available in some contexts

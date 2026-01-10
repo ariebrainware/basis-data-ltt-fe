@@ -38,53 +38,30 @@ export function TreatmentConditionMultiSelect({
 
   // Prefer a native <select multiple> for a compact UI, fall back to checkboxes
   // so tests and non-browser environments continue to work.
-  const isBrowser = typeof window !== 'undefined'
-
-  if (isBrowser) {
-    return (
-      <div className="w-full">
-        {/* Label is sr-only for accessibility. Parent components must provide 
-            their own visible label element to inform sighted users what they're selecting. */}
-        <label htmlFor={id} className="sr-only">
-          {label}
-        </label>
-        <select
-          id={id}
-          data-testid={id}
-          multiple
-          value={selected}
-          onChange={handleNativeSelectChange}
-          disabled={disabled}
-          className="w-full rounded-md border px-3 py-2 text-sm"
-        >
-          {TreatmentConditionOptions.map((opt) => (
-            <option key={opt.id} value={opt.id}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
-    )
-  }
-
-  // Non-browser or extremely constrained environment: render checkboxes
+  // Render a deterministic DOM for server and client: a native <select multiple>
+  // This avoids SSR vs client markup mismatches caused by branching on `window`.
   return (
-    <div className="flex flex-col">
-      {TreatmentConditionOptions.map((option) => (
-        <div key={option.id} className="mb-2 flex items-center">
-          <input
-            id={option.id}
-            name={option.id}
-            type="checkbox"
-            checked={selected.includes(option.id)}
-            onChange={handleCheckboxChange}
-            disabled={disabled}
-          />
-          <label htmlFor={option.id} className="ml-2 text-sm font-semibold">
-            {option.label}
-          </label>
-        </div>
-      ))}
+    <div className="w-full">
+      {/* Label is sr-only for accessibility. Parent components must provide 
+          their own visible label element to inform sighted users what they're selecting. */}
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
+      <select
+        id={id}
+        data-testid={id}
+        multiple
+        value={selected}
+        onChange={handleNativeSelectChange}
+        disabled={disabled}
+        className="w-full rounded-md border px-3 py-2 text-sm"
+      >
+        {TreatmentConditionOptions.map((opt) => (
+          <option key={opt.id} value={opt.id}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }

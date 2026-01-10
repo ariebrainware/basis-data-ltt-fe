@@ -1,24 +1,17 @@
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
-import { FlatCompat } from '@eslint/eslintrc'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-})
+import nextConfig from 'eslint-config-next'
+import tailwindcss from 'eslint-plugin-tailwindcss'
+import prettier from 'eslint-plugin-prettier'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 const config = [
-  ...compat.extends(
-    'next/core-web-vitals',
-    'next/typescript',
-    'plugin:tailwindcss/recommended',
-    'plugin:prettier/recommended'
-  ),
+  ...nextConfig,
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    plugins: {
+      tailwindcss,
+      prettier,
+    },
     rules: {
+      ...eslintConfigPrettier.rules,
       // Warn for misordered Tailwind CSS classes
       'tailwindcss/classnames-order': 'warn',
       // Turn off if you allow custom classnames

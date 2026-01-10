@@ -4,7 +4,7 @@ test.describe('Patient Edit Functionality', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to patient page
     await page.goto('/patient')
-    
+
     // Wait for page to load
     await page.waitForLoadState('networkidle')
   })
@@ -13,7 +13,7 @@ test.describe('Patient Edit Functionality', () => {
     // Check if the patient table is present
     // Note: This test assumes there are patients in the system
     const table = page.locator('table')
-    
+
     // Check if table exists (it might not if there's no data)
     const tableExists = await table.count()
     if (tableExists > 0) {
@@ -21,7 +21,9 @@ test.describe('Patient Edit Functionality', () => {
     }
   })
 
-  test('should open edit dialog when clicking edit button', async ({ page }) => {
+  test('should open edit dialog when clicking edit button', async ({
+    page,
+  }) => {
     // Find and click the first edit button (if exists)
     const editButton = page.locator('button[data-open]').first()
     const editButtonCount = await editButton.count()
@@ -41,7 +43,9 @@ test.describe('Patient Edit Functionality', () => {
     }
   })
 
-  test('should display gender select dropdown in edit form', async ({ page }) => {
+  test('should display gender select dropdown in edit form', async ({
+    page,
+  }) => {
     // Find and click the first edit button
     const editButton = page.locator('button[data-open]').first()
     const editButtonCount = await editButton.count()
@@ -84,7 +88,9 @@ test.describe('Patient Edit Functionality', () => {
         await genderSelect.click()
 
         // Wait for dropdown menu to appear
-        await page.waitForSelector('text=Laki-laki', { timeout: 2000 }).catch(() => null)
+        await page
+          .waitForSelector('text=Laki-laki', { timeout: 2000 })
+          .catch(() => null)
 
         // Check if options are visible (Material Tailwind renders options in a menu)
         const maleOption = page.getByText('Laki-laki', { exact: true })
@@ -104,7 +110,9 @@ test.describe('Patient Edit Functionality', () => {
     }
   })
 
-  test('should display all required form fields in edit dialog', async ({ page }) => {
+  test('should display all required form fields in edit dialog', async ({
+    page,
+  }) => {
     // Find and click the first edit button
     const editButton = page.locator('button[data-open]').first()
     const editButtonCount = await editButton.count()
@@ -157,7 +165,9 @@ test.describe('Patient Edit Functionality', () => {
     }
   })
 
-  test('should have cancel and confirm buttons in edit dialog', async ({ page }) => {
+  test('should have cancel and confirm buttons in edit dialog', async ({
+    page,
+  }) => {
     // Find and click the first edit button
     const editButton = page.locator('button[data-open]').first()
     const editButtonCount = await editButton.count()
@@ -202,7 +212,9 @@ test.describe('Patient Edit Functionality', () => {
     }
   })
 
-  test('should preserve gender selection when reopening dialog', async ({ page }) => {
+  test('should preserve gender selection when reopening dialog', async ({
+    page,
+  }) => {
     // Find and click the first edit button
     const editButton = page.locator('button[data-open]').first()
     const editButtonCount = await editButton.count()
@@ -221,7 +233,9 @@ test.describe('Patient Edit Functionality', () => {
         await genderSelect.click()
 
         // Wait for dropdown to open
-        await page.waitForSelector('text=Laki-laki', { timeout: 2000 }).catch(() => null)
+        await page
+          .waitForSelector('text=Laki-laki', { timeout: 2000 })
+          .catch(() => null)
 
         // Select male option if available
         const maleOption = page.getByText('Laki-laki', { exact: true }).first()
@@ -230,7 +244,9 @@ test.describe('Patient Edit Functionality', () => {
         if (maleOptionCount > 0) {
           await maleOption.click()
           // Wait for the option to be selected (dropdown should close)
-          await page.waitForSelector('[data-testid="gender"]', { state: 'visible' })
+          await page.waitForSelector('[data-testid="gender"]', {
+            state: 'visible',
+          })
         }
       }
 

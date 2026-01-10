@@ -1,17 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useState } from 'react'
-import Datepicker from 'react-tailwindcss-datepicker'
+import Datepicker, { type DateValueType } from 'react-tailwindcss-datepicker'
 
 interface DatePickerProps {
   id?: string
 }
 
 const DatePicker = ({ id }: DatePickerProps) => {
-  const [value, setValue] = useState<any>({
-    startDate: null,
-    endDate: null,
-  })
+  const [value, setValue] = useState<DateValueType | null>(null)
 
   return (
     <Datepicker
@@ -20,7 +16,7 @@ const DatePicker = ({ id }: DatePickerProps) => {
       useRange={false}
       asSingle={true}
       value={value}
-      onChange={(newValue) => setValue(newValue)}
+      onChange={(newValue, e) => setValue(newValue)}
     />
   )
 }
