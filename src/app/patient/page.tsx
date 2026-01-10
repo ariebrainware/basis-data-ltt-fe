@@ -1,8 +1,11 @@
 'use client'
-import styles from '../page.module.css'
-import DashboardContent from '../_components/dashboardComponent'
 import { SetStateAction, useEffect, useState } from 'react'
-import Footer from '../_components/footer'
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+} from '@material-tailwind/react'
 import Pagination from '../_components/pagination'
 import Header from '../_components/header'
 import SubHeader from '../_components/subheader'
@@ -105,19 +108,53 @@ export default function Patient() {
   }
 
   return (
-    <div className={styles.main}>
-      <DashboardContent>
+    <Card
+      className="size-full"
+      placeholder={undefined}
+      onPointerEnterCapture={undefined}
+      onPointerLeaveCapture={undefined}
+      onResize={undefined}
+      onResizeCapture={undefined}
+    >
+      <CardHeader
+        floated={false}
+        shadow={false}
+        className="rounded-none"
+        placeholder={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
+      >
         <Header />
         <SubHeader
           handleInputKeyDown={handleInputKeyDown}
           handleGroupingByDateFilter={handleGroupingByDateFilter}
         />
+      </CardHeader>
+      <CardBody
+        className="overflow-scroll px-0"
+        placeholder={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
+      >
         <TablePatient
           Data={{
             patients: data.patients,
           }}
           onDataChange={handleRefresh}
         />
+      </CardBody>
+      <CardFooter
+        className="flex items-center justify-between border-t border-blue-gray-50 p-4"
+        placeholder={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
+      >
         <Pagination
           currentPage={currentPage}
           setCurrentPage={
@@ -127,10 +164,7 @@ export default function Patient() {
           pageSize={100}
           disabled={currentPage * 100 >= total}
         />
-      </DashboardContent>
-      <div className={styles.page}>
-        <Footer />
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   )
 }
