@@ -97,6 +97,12 @@ images: {
 - **Impact**: Auto-handled, no code changes needed  
 - **Benefit**: Improved scroll behavior during navigation
 
+### 5. Node.js Version Requirement (BREAKING)
+- **Change**: Next.js 16.1.1 requires Node.js >=20.9.0 (previously ^18.18.0 || ^19.8.0 || >= 20.0.0 in Next.js 15)
+- **Impact**: Developers need to ensure they have Node.js 20.9.0 or higher installed
+- **Verification**: Run `node --version` to check your current version
+- **Action**: Upgrade Node.js if needed using nvm or your preferred Node version manager
+
 ## Testing Performed
 
 ### ✅ Unit Tests
@@ -175,10 +181,18 @@ The upgrade from 15.5.9 to 16.1.1 includes significant improvements:
 2. ✅ **`images.domains` Deprecated** - Addressed  
 3. ✅ **`images.minimumCacheTTL` Default Change** - Auto-handled
 4. ✅ **Router Scroll Optimization Default** - Auto-handled
-5. N/A **`publicRuntimeConfig`/`serverRuntimeConfig` Removed** - Not used in project
-6. N/A **`.turbo` Config Object Removed** - Not used in project
+5. ✅ **Node.js Version Requirement (>=20.9.0)** - Documented
+6. N/A **`publicRuntimeConfig`/`serverRuntimeConfig` Removed** - Not used in project
+7. N/A **`.turbo` Config Object Removed** - Not used in project
 
 ## Compatibility Notes
+
+### Node.js Version Requirement
+
+- **Required**: Node.js >= 20.9.0
+- Next.js 16.1.1 has stricter Node.js version requirements than Next.js 15
+- The CI/CD environment and all development machines must have Node.js 20.9.0 or higher
+- Verify your version: `node --version`
 
 ### React 19 Compatibility
 
@@ -196,7 +210,6 @@ The upgrade from 15.5.9 to 16.1.1 includes significant improvements:
 
 1. **Material Tailwind + React 19**: Peer dependency warnings (functionality unaffected)
 2. **Test Warnings**: Some act() warnings in tests (pre-existing, not introduced by upgrade)
-3. **Timepicker ESLint Error**: setState in useEffect warning (pre-existing code quality issue)
 
 ## Recommendations
 
@@ -223,12 +236,27 @@ The upgrade from 15.5.9 to 16.1.1 includes significant improvements:
 If critical issues are discovered:
 
 ```bash
-# Revert all changes
-git checkout HEAD~1 -- package.json eslint.config.mjs next.config.ts pnpm-lock.yaml
+# Revert all changes to their state before the upgrade
+git checkout HEAD~10 -- package.json \
+  eslint.config.mjs \
+  next.config.ts \
+  pnpm-lock.yaml \
+  tsconfig.json \
+  src/app/_components/timepicker.tsx \
+  src/app/_components/datePicker.tsx \
+  src/app/_components/megaMenu.tsx \
+  src/app/_components/selectTreatmentCondition.tsx \
+  jest.config.js \
+  e2e/patient-edit.spec.ts \
+  e2e/therapist-registration.spec.ts \
+  e2e/treatment-registration.spec.ts \
+  UPGRADE_NOTES.md
 
 # Reinstall dependencies
 pnpm install --no-frozen-lockfile
 ```
+
+Note: This will revert to the state before the "Initial plan" commit (d893093). Adjust the number after `HEAD~` if needed based on your commit history.
 
 ## Verification Checklist
 

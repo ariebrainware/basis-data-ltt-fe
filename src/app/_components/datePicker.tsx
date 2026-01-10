@@ -6,8 +6,13 @@ interface DatePickerProps {
   id?: string
 }
 
+interface DateValueType {
+  startDate: Date | string | null
+  endDate: Date | string | null
+}
+
 const DatePicker = ({ id }: DatePickerProps) => {
-  const [value, setValue] = useState<any>({
+  const [value, setValue] = useState<DateValueType>({
     startDate: null,
     endDate: null,
   })
