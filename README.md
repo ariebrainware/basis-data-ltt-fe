@@ -9,7 +9,7 @@ A Next.js 15-based healthcare management system for Lee Tit Tar One Solution—a
 - Next.js 15.5.9 with App Router
 - Tailwind CSS 3.4.19 + Material Tailwind components
 - TypeScript with strict mode
-- pnpm 10.4.1 package manager
+- pnpm 10.27.0 package manager
 
 **Key Features:**
 
@@ -103,6 +103,7 @@ pnpm test:coverage
 ```
 
 See [TESTING.md](./TESTING.md) for detailed testing documentation, including:
+
 - Test structure and organization
 - Writing new tests
 - CI/CD integration

@@ -10,7 +10,7 @@
 - **Styling**: Tailwind CSS 3.4.19 + Material Tailwind components
 - **Auth**: Session tokens stored in localStorage, validated on each API call
 - **Backend API**: RESTful endpoints (host configurable via `NEXT_PUBLIC_API_HOST`)
-- **Package Manager**: pnpm 10.4.1
+- **Package Manager**: pnpm 10.27.0
 
 ---
 
