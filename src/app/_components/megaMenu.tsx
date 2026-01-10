@@ -3,8 +3,8 @@ import React from 'react'
 import {
   Navbar,
   Collapse,
-  Typography,
-  IconButton,
+  Typography as RawTypography,
+  IconButton as RawIconButton,
   List,
   ListItem,
   Menu,
@@ -21,6 +21,12 @@ import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
 import { getUserRole } from '../_functions/userRole'
 import { logout } from '../_functions/logout'
+
+// Workaround: Material Tailwind's `Typography` props typing requires many
+// event-related props in every usage. Cast to `any` so we can use the
+// component without passing a long list of `undefined` props.
+const Typography: any = RawTypography
+const IconButton: any = RawIconButton
 
 const navListMenuItems = [
   {
@@ -56,10 +62,16 @@ const navListMenuItems = [
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const userRole = getUserRole()
+  const [userRole, setUserRole] = React.useState<string | null>(null)
+
+  // Read user role only on the client after mount to avoid server/client
+  // rendering differences that cause hydration mismatches.
+  React.useEffect(() => {
+    setUserRole(getUserRole())
+  }, [])
 
   const filteredMenuItems = navListMenuItems.filter((item) =>
-    item.roles.includes(userRole || '')
+    userRole ? item.roles.includes(userRole) : false
   )
 
   const renderItems = filteredMenuItems.map(
@@ -121,46 +133,36 @@ function NavListMenu() {
         offset={{ mainAxis: 20 }}
         placement="bottom"
       >
-        {typeof window !== 'undefined' &&
-          (userRole === 'super_admin' || userRole === 'therapist') && (
-            <MenuHandler>
-              <Typography
-                as="div"
-                variant="small"
-                className="font-medium"
+        {(userRole === 'super_admin' || userRole === 'therapist') && (
+          <MenuHandler>
+            <Typography as="div" variant="small" className="font-medium">
+              <ListItem
+                className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
+                selected={isMenuOpen || isMobileMenuOpen}
+                onClick={() => setIsMobileMenuOpen((cur) => !cur)}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >
-                <ListItem
-                  className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
-                  selected={isMenuOpen || isMobileMenuOpen}
-                  onClick={() => setIsMobileMenuOpen((cur) => !cur)}
-                  placeholder={undefined}
-                  onPointerEnterCapture={undefined}
-                  onPointerLeaveCapture={undefined}
-                  onResize={undefined}
-                  onResizeCapture={undefined}
-                >
-                  Menu
-                  <ChevronDownIcon
-                    strokeWidth={2.5}
-                    className={`hidden size-3 transition-transform lg:block ${
-                      isMenuOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                  <ChevronDownIcon
-                    strokeWidth={2.5}
-                    className={`block size-3 transition-transform lg:hidden ${
-                      isMobileMenuOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                </ListItem>
-              </Typography>
-            </MenuHandler>
-          )}
+                Menu
+                <ChevronDownIcon
+                  strokeWidth={2.5}
+                  className={`hidden size-3 transition-transform lg:block ${
+                    isMenuOpen ? 'rotate-180' : ''
+                  }`}
+                />
+                <ChevronDownIcon
+                  strokeWidth={2.5}
+                  className={`block size-3 transition-transform lg:hidden ${
+                    isMobileMenuOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </ListItem>
+            </Typography>
+          </MenuHandler>
+        )}
         <MenuList
           className="hidden max-w-screen-xl rounded-xl lg:block"
           placeholder={undefined}
@@ -269,11 +271,6 @@ export default function MegaMenuDefault() {
           href="#"
           variant="h6"
           className="mr-4 cursor-pointer py-1.5 lg:ml-2"
-          placeholder={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
         >
           Lee Tit Tar Dashboard
         </Typography>
@@ -283,11 +280,6 @@ export default function MegaMenuDefault() {
           color="blue-gray"
           className="lg:hidden"
           onClick={() => setOpenNav(!openNav)}
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
         >
           {openNav ? (
             <XMarkIcon className="size-6" strokeWidth={2} />
