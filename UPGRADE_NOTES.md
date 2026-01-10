@@ -20,6 +20,7 @@ Successfully upgraded Next.js from version 15.5.9 to 16.1.1, a major version upg
 
 #### `package.json`
 - Updated Next.js and ESLint-related packages to version 16.1.1
+- **Breaking Change**: Updated `lint` script from `next lint` to `eslint .` due to removal of the `next lint` command in Next.js 16. Ensure local and CI workflows that invoke `pnpm run lint` are updated accordingly.
 
 #### `eslint.config.mjs`
 - **Breaking Change**: Migrated from FlatCompat wrapper to native flat config
