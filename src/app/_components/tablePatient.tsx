@@ -89,11 +89,9 @@ export default function TablePatient({
 }: TablePatientProps) {
   const { patients } = Data
   return (
-    <div className="border-slate-200 mt-4 w-full overflow-x-auto rounded-lg border">
-      <table className="w-full">
-        <TableHeader />
-        <TableBody patients={patients} onDataChange={onDataChange} />
-      </table>
-    </div>
+    <table className="w-full whitespace-nowrap">
+      <TableHeader />
+      <TableBody patients={patients} onDataChange={onDataChange} />
+    </table>
   )
 }
