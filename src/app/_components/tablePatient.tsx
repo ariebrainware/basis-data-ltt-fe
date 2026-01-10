@@ -89,7 +89,7 @@ export default function TablePatient({
 }: TablePatientProps) {
   const { patients } = Data
   return (
-    <div className="border-slate-200 mt-4 w-full overflow-hidden rounded-lg border">
+    <div className="border-slate-200 mt-4 w-full overflow-x-auto rounded-lg border">
       <table className="w-full">
         <TableHeader />
         <TableBody patients={patients} onDataChange={onDataChange} />
