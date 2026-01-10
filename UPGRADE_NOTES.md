@@ -106,8 +106,8 @@ pnpm test
 npx eslint .
 ```
 
-- **Result**: Passes with 1 pre-existing error in timepicker.tsx (unrelated to upgrade)
-- **Note**: The pre-existing error about setState in useEffect was already present before the upgrade
+- **Result**: Passes with no ESLint errors
+- **Note**: The previous `setState` in `useEffect` issue in `timepicker.tsx` was fixed in this PR by converting the component to a fully controlled pattern and removing the internal state synchronization that triggered React hooks ESLint errors.
 
 ### ✅ Development Server
 
