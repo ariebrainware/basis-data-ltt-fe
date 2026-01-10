@@ -27,8 +27,8 @@ import { getSessionToken } from '../_functions/sessionToken'
 interface TreatmentApiResponse {
   data: {
     treatments: TreatmentType[]
+    total: number
   }
-  total: number
 }
 
 const treatmentFetchCache = new Map<string, Promise<TreatmentApiResponse>>()
@@ -102,7 +102,7 @@ function useFetchTreatment(
         setTreatment(treatmentArray)
         console.log(`data: `, data.data.treatments)
         console.log(`treatmentArray: `, treatmentArray)
-        setTotal(data.total)
+        setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           UnauthorizedAccess()
