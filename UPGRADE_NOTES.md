@@ -66,6 +66,10 @@ images: {
 #### `pnpm-lock.yaml`
 - Updated with new dependency resolutions for Next.js 16.1.1
 
+#### `src/app/_components/timepicker.tsx`
+- Fixed a `setState`-inside-`useEffect` pattern that violated React 19 / Next.js 16 linting rules
+- Refactored internal state synchronization logic to avoid side effects during render lifecycle
+- No functional changes to the time selection behavior; UX and public API remain the same
 ## Breaking Changes Addressed
 
 ### 1. ESLint Flat Config (BREAKING)
