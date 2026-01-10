@@ -3,7 +3,16 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ['demos.creative-tim.com', 'www.material-tailwind.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'demos.creative-tim.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.material-tailwind.com',
+      },
+    ],
   },
 }
 

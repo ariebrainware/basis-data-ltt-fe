@@ -16,7 +16,7 @@ test.describe('Treatment Registration', () => {
     // Check if key form elements are present
     // Note: Actual visibility depends on authentication state
     const pageContent = await page.content()
-    
+
     // Basic check to ensure page loaded
     expect(pageContent).toBeTruthy()
   })
@@ -57,7 +57,7 @@ test.describe('Treatment Registration', () => {
     if (await firstCheckbox.isVisible()) {
       await firstCheckbox.check()
       await expect(firstCheckbox).toBeChecked()
-      
+
       // Uncheck it
       await firstCheckbox.uncheck()
       await expect(firstCheckbox).not.toBeChecked()

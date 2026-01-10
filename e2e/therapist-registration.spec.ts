@@ -29,7 +29,7 @@ test.describe('Therapist Registration', () => {
   test('should mask password fields', async ({ page }) => {
     const passwordInput = page.locator('#password')
     const confirmPasswordInput = page.locator('#confirm_password')
-    
+
     await expect(passwordInput).toHaveAttribute('type', 'password')
     await expect(confirmPasswordInput).toHaveAttribute('type', 'password')
   })
@@ -37,10 +37,10 @@ test.describe('Therapist Registration', () => {
   test('should allow filling password fields', async ({ page }) => {
     const passwordInput = page.locator('#password')
     const confirmPasswordInput = page.locator('#confirm_password')
-    
+
     await passwordInput.fill('SecurePass123!')
     await confirmPasswordInput.fill('SecurePass123!')
-    
+
     await expect(passwordInput).toHaveValue('SecurePass123!')
     await expect(confirmPasswordInput).toHaveValue('SecurePass123!')
   })
@@ -81,12 +81,12 @@ test.describe('Therapist Registration', () => {
     // Weight and height inputs (may be in WeightHeightInput component)
     const weightInput = page.locator('[id*="weight"]').first()
     const heightInput = page.locator('[id*="height"]').first()
-    
+
     if (await weightInput.isVisible()) {
       await weightInput.fill('70')
       await expect(weightInput).toHaveValue('70')
     }
-    
+
     if (await heightInput.isVisible()) {
       await heightInput.fill('170')
       await expect(heightInput).toHaveValue('170')
@@ -95,11 +95,11 @@ test.describe('Therapist Registration', () => {
 
   test('should validate email format', async ({ page }) => {
     const emailInput = page.locator('#email')
-    
+
     // Fill with invalid email
     await emailInput.fill('invalid-email')
     await emailInput.blur()
-    
+
     // Fill with valid email
     await emailInput.fill('valid@example.com')
     await expect(emailInput).toHaveValue('valid@example.com')
@@ -112,7 +112,7 @@ test.describe('Therapist Registration', () => {
     await page.locator('#password').fill('SecurePass123!')
     await page.locator('#confirm_password').fill('SecurePass123!')
     await page.locator('#address').fill('Jl. Therapy No. 789, Bandung')
-    
+
     // Note: Actual submission test would require mocking the API
     // and handling authentication
   })
