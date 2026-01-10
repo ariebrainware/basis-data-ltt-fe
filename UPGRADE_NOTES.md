@@ -63,6 +63,11 @@ images: {
 }
 ```
 
+#### `tsconfig.json`
+- Updated TypeScript configuration to align with Next.js 16 defaults:
+  - Changed `compilerOptions.jsx` from `"preserve"` to `"react-jsx"` so TypeScript emits JSX using the modern React JSX transform.
+  - Added `".next/dev/types/**/*.ts"` to the `include` array so that Next.js-generated development type definitions are picked up by the TypeScript compiler.
+- These changes were applied by the Next.js 16 tooling but are documented here for completeness because they affect how JSX is compiled and which type files are included.
 #### `pnpm-lock.yaml`
 - Updated with new dependency resolutions for Next.js 16.1.1
 
