@@ -59,10 +59,13 @@ function useFetchDisease(
           },
         })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
-        const diseasesArray = Array.isArray(data.data) ? data.data : []
+        const responseData = await res.json()
+        // API returns { data: [...], total: ... } for diseases
+        const diseasesArray = Array.isArray(responseData.data)
+          ? responseData.data
+          : []
         setDiseases(diseasesArray)
-        setTotal(data.total || 0)
+        setTotal(responseData.total || 0)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           UnauthorizedAccess()
