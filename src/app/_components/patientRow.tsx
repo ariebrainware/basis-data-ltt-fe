@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { getSessionToken } from '../_functions/sessionToken'
 import { PatientForm } from './patientForm'
 import { PatientType } from '../_types/patient'
