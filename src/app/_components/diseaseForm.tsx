@@ -1,11 +1,7 @@
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { DiseaseType } from '../_types/disease'
 
-interface DiseaseFormProps extends DiseaseType {
-  // No additional props needed for disease form
-}
-
-export function DiseaseForm({ ID, name, description }: DiseaseFormProps) {
+export function DiseaseForm({ ID, name, description }: DiseaseType) {
   return (
     <Card
       color="transparent"
