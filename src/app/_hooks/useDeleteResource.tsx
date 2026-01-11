@@ -3,7 +3,7 @@ import { getApiHost } from '../_functions/apiHost'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 export interface DeleteResourceConfig {
-  resourceType: 'patient' | 'therapist' | 'treatment'
+  resourceType: 'patient' | 'therapist' | 'treatment' | 'disease'
   resourceId: number
   resourceName: string
 }
@@ -36,6 +36,8 @@ export function useDeleteResource(config: DeleteResourceConfig) {
         return `${getApiHost()}/therapist/${resourceId}`
       case 'treatment':
         return `${getApiHost()}/treatment/${resourceId}`
+      case 'disease':
+        return `${getApiHost()}/disease/${resourceId}`
       default:
         throw new Error(`Unsupported resource type: ${resourceType}`)
     }
@@ -60,6 +62,12 @@ export function useDeleteResource(config: DeleteResourceConfig) {
         successText: 'Data penanganan berhasil dihapus.',
         errorText: 'Gagal menghapus data penanganan',
         consoleError: 'Error deleting treatment record:',
+      },
+      disease: {
+        confirmTitle: 'Hapus Data Penyakit?',
+        successText: 'Data penyakit berhasil dihapus.',
+        errorText: 'Gagal menghapus data penyakit',
+        consoleError: 'Error deleting disease record:',
       },
     }
     return messages[resourceType]
