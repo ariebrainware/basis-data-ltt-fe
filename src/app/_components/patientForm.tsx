@@ -46,11 +46,16 @@ export function PatientForm({
     // Only update state when parsed array differs from current selected to avoid
     // unnecessary state updates; schedule update asynchronously to avoid
     // synchronous setState inside the effect which can trigger cascading renders.
+    // Use order-insensitive comparison since disease order doesn't matter semantically.
     const t = setTimeout(() => {
       setSelected((prev) => {
-        const equal =
-          prev.length === initial.length &&
-          prev.every((v, i) => v === initial[i])
+        if (prev.length !== initial.length) return initial
+        
+        // Sort both arrays for order-insensitive comparison
+        const prevSorted = [...prev].sort()
+        const initialSorted = [...initial].sort()
+        const equal = prevSorted.every((v, i) => v === initialSorted[i])
+        
         return equal ? prev : initial
       })
     }, 0)
