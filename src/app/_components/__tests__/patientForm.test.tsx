@@ -55,6 +55,39 @@ jest.mock('../selectGender', () => ({
   ),
 }))
 
+// Mock DiseaseMultiSelect component
+jest.mock('../selectDisease', () => ({
+  DiseaseMultiSelect: ({
+    id,
+    label,
+    value,
+    onChange,
+  }: {
+    id?: string
+    label?: string
+    value?: string[]
+    onChange: (values: string[]) => void
+  }) => (
+    <select
+      id={id}
+      data-testid={id}
+      multiple
+      value={value}
+      onChange={(e) => {
+        const values = Array.from(e.target.selectedOptions).map(
+          (o) => o.value
+        )
+        onChange(values)
+      }}
+      aria-label={label}
+    >
+      <option value="1">Diabetes</option>
+      <option value="2">Hypertension</option>
+      <option value="3">Asthma</option>
+    </select>
+  ),
+}))
+
 describe('PatientForm Component', () => {
   const mockPatient: PatientType = {
     ID: 1,
