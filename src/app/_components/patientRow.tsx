@@ -33,34 +33,35 @@ export default function Patient({
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
   const [diseases, setDiseases] = useState<DiseaseType[]>([])
 
-  const handleOpen = () => {
+  const handleOpen = async () => {
     if (!open) {
       // Reset gender value when opening dialog
       setGenderValue(gender || '')
-      // fetch diseases when opening so label mapping works
-      ;(async () => {
-        try {
-          const res = await fetch(`${getApiHost()}/disease`, {
-            headers: {
-              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': getSessionToken(),
-            },
-          })
-          if (res.status === 401) {
-            UnauthorizedAccess()
-            return
-          }
-          if (!res.ok) return
+      // fetch diseases when opening so label mapping works and await it
+      try {
+        const res = await fetch(`${getApiHost()}/disease`, {
+          headers: {
+            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+            'session-token': getSessionToken(),
+          },
+        })
+        if (res.status === 401) {
+          UnauthorizedAccess()
+          return
+        }
+        if (res.ok) {
           const data = await res.json()
           const list: DiseaseType[] =
             data?.data?.disease ?? data?.data ?? data ?? []
           setDiseases(list)
-        } catch (e) {
-          // ignore
         }
-      })()
+      } catch (e) {
+        // ignore
+      }
+      setOpen(true)
+    } else {
+      setOpen(false)
     }
-    setOpen(!open)
   }
 
   const handleHealthConditionLabelDisplay = (ids: string): string => {
