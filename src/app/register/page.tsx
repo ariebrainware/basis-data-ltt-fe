@@ -107,7 +107,7 @@ async function sendRegisterRequest(
       age: parseInt(age, 10),
       job,
       address,
-      health_history: healthHistory,
+      health_history: healthHistory.join(','),
       surgery_history,
       phone_number: phoneNumber,
       patient_code,
