@@ -31,6 +31,15 @@ export default function DiseaseRow({
       document.querySelector<HTMLTextAreaElement>('#description')?.value ||
       description
 
+    if (!name_input.trim()) {
+      Swal.fire({
+        text: 'Nama penyakit tidak boleh kosong.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      })
+      return
+    }
+
     fetch(`${getApiHost()}/disease/${ID}`, {
       method: 'PATCH',
       mode: 'cors',
@@ -41,8 +50,8 @@ export default function DiseaseRow({
         'session-token': getSessionToken(),
       },
       body: JSON.stringify({
-        name: name_input,
-        description: description_input,
+        name: name_input.trim(),
+        description: description_input.trim(),
       }),
     })
       .then((response) => {
@@ -182,6 +191,7 @@ export default function DiseaseRow({
             className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
             data-shape="default"
             onClick={() => handleOpen()}
+            aria-label="Edit disease"
           >
             <svg
               width="1.5em"

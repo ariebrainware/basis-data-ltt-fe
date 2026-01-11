@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogBody,
   DialogFooter,
+  Textarea,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
 import Pagination from '../_components/pagination'
@@ -25,9 +26,7 @@ import { logout } from '../_functions/logout'
 import Swal from 'sweetalert2'
 
 interface ListDiseaseResponse {
-  data: {
-    diseases: DiseaseType[]
-  }
+  data: DiseaseType[]
   total: number
 }
 
@@ -75,7 +74,7 @@ function useFetchDisease(
     })()
   }, [currentPage, keyword, refreshTrigger])
 
-  return { data: { diseases }, total }
+  return { data: diseases, total }
 }
 
 export default function Disease() {
@@ -100,8 +99,7 @@ export default function Disease() {
   const handleOpenAddDialog = () => {
     // When opening the dialog, clear the add form fields to avoid stale values
     if (!openAddDialog) {
-      const nameInput =
-        document.querySelector<HTMLInputElement>('#add_name')
+      const nameInput = document.querySelector<HTMLInputElement>('#add_name')
       const descInput =
         document.querySelector<HTMLTextAreaElement>('#add_description')
       if (nameInput) nameInput.value = ''
@@ -136,8 +134,8 @@ export default function Disease() {
         'session-token': getSessionToken(),
       },
       body: JSON.stringify({
-        name: name_input,
-        description: description_input,
+        name: name_input.trim(),
+        description: description_input.trim(),
       }),
     })
       .then((response) => {
@@ -213,11 +211,14 @@ export default function Disease() {
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <textarea
+            <Textarea
               id="add_description"
-              placeholder="Deskripsi"
-              className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 focus:border-slate-800 w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none transition-all"
+              label="Deskripsi"
               rows={4}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
           </div>
         </DialogBody>
@@ -351,7 +352,7 @@ export default function Disease() {
         >
           <TableDisease
             Data={{
-              diseases: data.diseases,
+              diseases: data,
             }}
             onDataChange={handleRefresh}
           />

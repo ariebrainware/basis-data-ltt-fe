@@ -10,7 +10,7 @@ interface TableDiseaseProps {
   onDataChange?: () => void
 }
 
-const TABLE_HEAD = ['ID', 'Nama Penyakit', 'Deskripsi', '']
+const TABLE_HEAD = ['ID', 'Nama Penyakit', 'Deskripsi', 'Aksi']
 
 const TableHeader = () => (
   <thead>
