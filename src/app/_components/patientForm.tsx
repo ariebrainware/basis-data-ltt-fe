@@ -138,7 +138,7 @@ export function PatientForm({
             />
             <Input
               id="age"
-              type="email"
+              type="number"
               label="Age"
               defaultValue={age}
               onPointerEnterCapture={undefined}
