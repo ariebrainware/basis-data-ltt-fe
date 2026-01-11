@@ -166,7 +166,7 @@ export default function Disease({
         </td>
         <td className="p-3">
           <div className="flex flex-col">
-            <small className="font-sans text-sm text-current antialiased font-medium">
+            <small className="font-sans text-sm font-medium text-current antialiased">
               {name}
             </small>
           </div>

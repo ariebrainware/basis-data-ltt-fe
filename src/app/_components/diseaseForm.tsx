@@ -5,11 +5,7 @@ interface DiseaseFormProps extends DiseaseType {
   // No additional props needed for disease form
 }
 
-export function DiseaseForm({
-  ID,
-  name,
-  description,
-}: DiseaseFormProps) {
+export function DiseaseForm({ ID, name, description }: DiseaseFormProps) {
   return (
     <Card
       color="transparent"

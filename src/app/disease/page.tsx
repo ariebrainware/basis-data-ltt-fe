@@ -60,9 +60,7 @@ function useFetchDisease(
         })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
-        const diseasesArray = Array.isArray(data.data)
-          ? data.data
-          : []
+        const diseasesArray = Array.isArray(data.data) ? data.data : []
         setDiseases(diseasesArray)
         setTotal(data.total || 0)
       } catch (error) {

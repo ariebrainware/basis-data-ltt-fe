@@ -61,7 +61,10 @@ const TableBody = ({
   </tbody>
 )
 
-export default function TableDisease({ Data, onDataChange }: TableDiseaseProps) {
+export default function TableDisease({
+  Data,
+  onDataChange,
+}: TableDiseaseProps) {
   const { diseases } = Data
   return (
     <table className="w-full whitespace-nowrap">
