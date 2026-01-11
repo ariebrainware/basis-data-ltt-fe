@@ -1,9 +1,13 @@
+'use client'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
+import { DiseaseType } from '../_types/disease'
 import { GenderSelect } from './selectGender'
+import { DiseaseMultiSelect } from './selectDisease'
 
 interface PatientFormProps extends PatientType {
   onGenderChange?: (value: string) => void
+  diseases?: DiseaseType[]
 }
 
 export function PatientForm({
@@ -19,6 +23,7 @@ export function PatientForm({
   surgery_history,
   patient_code,
   onGenderChange,
+  diseases,
 }: PatientFormProps) {
   return (
     <Card
@@ -128,15 +133,35 @@ export function PatientForm({
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <Textarea
+            {/* Hidden input keeps existing DOM id used by other scripts */}
+            <input
               id="health_history"
-              label="Riwayat Penyakit"
-              defaultValue={health_history}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
+              name="health_history"
+              type="hidden"
+              value={health_history ?? ''}
+              readOnly
             />
+            <div>
+              <label className="text-slate-700 mb-1 block text-sm font-medium">
+                Riwayat Penyakit
+              </label>
+              <DiseaseMultiSelect
+                id="health_history_select"
+                label="Riwayat Penyakit"
+                value={
+                  health_history
+                    ? health_history.split(',').map((s) => s.trim())
+                    : []
+                }
+                onChange={(vals) => {
+                  const el = document.getElementById(
+                    'health_history'
+                  ) as HTMLInputElement | null
+                  if (el) el.value = vals.join(',')
+                }}
+                options={diseases}
+              />
+            </div>
             <Textarea
               id="surgery_history"
               label="Riwayat Operasi"

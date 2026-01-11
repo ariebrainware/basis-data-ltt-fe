@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { getSessionToken } from '../_functions/sessionToken'
 import { PatientForm } from './patientForm'
 import { PatientType } from '../_types/patient'
-import { HealthConditionOptions } from '../_types/healthcondition'
+import { getApiHost } from '../_functions/apiHost'
+import { DiseaseType } from '../_types/disease'
 import {
   Button,
   Dialog,
@@ -12,7 +13,6 @@ import {
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { getApiHost } from '../_functions/apiHost'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Patient({
@@ -31,37 +31,69 @@ export default function Patient({
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
+  const [diseases, setDiseases] = useState<DiseaseType[]>([])
 
   const handleOpen = () => {
     if (!open) {
       // Reset gender value when opening dialog
       setGenderValue(gender || '')
+      // fetch diseases when opening so label mapping works
+      ;(async () => {
+        try {
+          const res = await fetch(`${getApiHost()}/disease`, {
+            headers: {
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+              'session-token': getSessionToken(),
+            },
+          })
+          if (res.status === 401) {
+            UnauthorizedAccess()
+            return
+          }
+          if (!res.ok) return
+          const data = await res.json()
+          const list: DiseaseType[] =
+            data?.data?.disease ?? data?.data ?? data ?? []
+          setDiseases(list)
+        } catch (e) {
+          // ignore
+        }
+      })()
     }
     setOpen(!open)
   }
 
   const handleHealthConditionLabelDisplay = (ids: string): string => {
-    const idArray = ids.split(',').map((id) => id.trim())
+    if (!ids) return ''
+    const idArray = ids
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean)
     const labels = idArray
       .map((id) => {
-        const option = HealthConditionOptions.find((opt) => opt.id === id)
-        return option ? option.label : null
+        const option = diseases.find((d) => String(d.ID) === id)
+        return option ? option.name : null
       })
-      .filter((label) => label !== null)
+      .filter((l) => l !== null)
     return labels.join(', ')
   }
 
   const handleHealthConditionInput = (input: string): string => {
     if (!input.trim() || input === '-') return '-'
-    const inputArray = input.split(',').map((item) => item.trim().toLowerCase())
-    const matchedIds = inputArray
-      .map((inputItem) => {
-        const option = HealthConditionOptions.find((opt) =>
-          opt.label.toLowerCase().includes(inputItem)
+    const items = input
+      .split(',')
+      .map((it) => it.trim())
+      .filter(Boolean)
+    const matchedIds = items
+      .map((item) => {
+        // if item looks numeric, assume it's an ID
+        if (/^\d+$/.test(item)) return item
+        const match = diseases.find((d) =>
+          d.name.toLowerCase().includes(item.toLowerCase())
         )
-        return option ? option.id : null
+        return match ? String(match.ID) : null
       })
-      .filter((id) => id !== null)
+      .filter(Boolean)
     return matchedIds.join(',')
   }
 
@@ -203,6 +235,7 @@ export default function Patient({
             gender={genderValue}
             last_visit={''}
             onGenderChange={setGenderValue}
+            diseases={diseases}
           />
         </DialogBody>
         <DialogFooter
