@@ -14,7 +14,7 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { getApiHost } from '../_functions/apiHost'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 
-export default function Disease({
+export default function DiseaseRow({
   ID,
   name,
   description,
