@@ -19,7 +19,7 @@ export default function DiseaseRow({
   name,
   description,
   onDataChange,
-}: DiseaseType) {
+}: DiseaseType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
 
   const handleOpen = () => setOpen(!open)
