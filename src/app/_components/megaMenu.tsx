@@ -16,6 +16,7 @@ import {
   ChevronDownIcon,
   Bars3Icon,
   XMarkIcon,
+  DocumentTextIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
@@ -41,6 +42,13 @@ const navListMenuItems = [
     description: 'Halaman manajemen terapis',
     icon: UserGroupIcon,
     url: '/therapist',
+    roles: ['super_admin'],
+  },
+  {
+    title: 'Penyakit',
+    description: 'Halaman manajemen penyakit',
+    icon: DocumentTextIcon,
+    url: '/disease',
     roles: ['super_admin'],
   },
   {
