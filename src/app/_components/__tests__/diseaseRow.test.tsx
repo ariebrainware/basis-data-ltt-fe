@@ -74,9 +74,9 @@ describe('DiseaseRow Component', () => {
   beforeEach(() => {
     // Reset mocks
     mockOnDataChange.mockReset()
-    // Mock fetch
-    // @ts-ignore
-    global.fetch = jest.fn(() =>
+    // Mock fetch with a typed Jest mock
+    const globalAny = global as typeof globalThis & { fetch: jest.Mock }
+    globalAny.fetch = jest.fn(() =>
       Promise.resolve({ ok: true, status: 200, json: async () => ({}) })
     )
   })
