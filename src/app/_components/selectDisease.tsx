@@ -36,6 +36,13 @@ export function DiseaseMultiSelect({
         mounted = false
       }
     }
+    // avoid network calls during unit tests
+    if (process.env.NODE_ENV === 'test') {
+      return () => {
+        mounted = false
+      }
+    }
+
     ;(async () => {
       try {
         const res = await fetch(`${getApiHost()}/disease`, {

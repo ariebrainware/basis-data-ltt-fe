@@ -173,7 +173,14 @@ export function PatientForm({
               onResizeCapture={undefined}
             />
             {/* Hidden input keeps existing DOM id used by other scripts */}
-            <input id="health_history" name="health_history" type="hidden" />
+            <input
+              id="health_history"
+              name="health_history"
+              type="hidden"
+              data-testid="health_history"
+              defaultValue={health_history ?? ''}
+              readOnly
+            />
             <div>
               <label className="text-slate-700 mb-1 block text-sm font-medium">
                 Riwayat Penyakit
