@@ -1,4 +1,5 @@
 'use client'
+import React, { useEffect, useState } from 'react'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
 import { DiseaseType } from '../_types/disease'
@@ -25,6 +26,44 @@ export function PatientForm({
   onGenderChange,
   diseases,
 }: PatientFormProps) {
+  const [selected, setSelected] = useState<string[]>(() => {
+    return health_history
+      ? health_history
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : []
+  })
+
+  useEffect(() => {
+    const initial = health_history
+      ? health_history
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : []
+
+    // Only update state when parsed array differs from current selected to avoid
+    // unnecessary state updates; schedule update asynchronously to avoid
+    // synchronous setState inside the effect which can trigger cascading renders.
+    const t = setTimeout(() => {
+      setSelected((prev) => {
+        const equal =
+          prev.length === initial.length &&
+          prev.every((v, i) => v === initial[i])
+        return equal ? prev : initial
+      })
+    }, 0)
+
+    return () => clearTimeout(t)
+  }, [health_history])
+
+  useEffect(() => {
+    const el = document.getElementById(
+      'health_history'
+    ) as HTMLInputElement | null
+    if (el) el.value = selected.join(',')
+  }, [selected])
   return (
     <Card
       color="transparent"
@@ -134,13 +173,7 @@ export function PatientForm({
               onResizeCapture={undefined}
             />
             {/* Hidden input keeps existing DOM id used by other scripts */}
-            <input
-              id="health_history"
-              name="health_history"
-              type="hidden"
-              value={health_history ?? ''}
-              readOnly
-            />
+            <input id="health_history" name="health_history" type="hidden" />
             <div>
               <label className="text-slate-700 mb-1 block text-sm font-medium">
                 Riwayat Penyakit
@@ -148,17 +181,8 @@ export function PatientForm({
               <DiseaseMultiSelect
                 id="health_history_select"
                 label="Riwayat Penyakit"
-                value={
-                  health_history
-                    ? health_history.split(',').map((s) => s.trim())
-                    : []
-                }
-                onChange={(vals) => {
-                  const el = document.getElementById(
-                    'health_history'
-                  ) as HTMLInputElement | null
-                  if (el) el.value = vals.join(',')
-                }}
+                value={selected}
+                onChange={(vals) => setSelected(vals)}
                 options={diseases}
               />
             </div>

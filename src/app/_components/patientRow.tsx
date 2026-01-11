@@ -231,7 +231,7 @@ export default function Patient({
             phone_number={phoneNumber}
             email={email}
             address={address}
-            health_history={handleHealthConditionLabelDisplay(health_history)}
+            health_history={health_history}
             surgery_history={surgery_history}
             gender={genderValue}
             last_visit={''}
