@@ -97,7 +97,18 @@ export default function Disease() {
     }
   }
 
-  const handleOpenAddDialog = () => setOpenAddDialog(!openAddDialog)
+  const handleOpenAddDialog = () => {
+    // When opening the dialog, clear the add form fields to avoid stale values
+    if (!openAddDialog) {
+      const nameInput =
+        document.querySelector<HTMLInputElement>('#add_name')
+      const descInput =
+        document.querySelector<HTMLTextAreaElement>('#add_description')
+      if (nameInput) nameInput.value = ''
+      if (descInput) descInput.value = ''
+    }
+    setOpenAddDialog(!openAddDialog)
+  }
 
   const handleAddDisease = () => {
     const name_input =
