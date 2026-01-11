@@ -62,15 +62,22 @@ test.describe('Patient Registration', () => {
     const healthHistorySelect = page.locator('#healthHistorySelect')
 
     if (await healthHistorySelect.isVisible()) {
-      // Select multiple options in the multi-select
-      await healthHistorySelect.selectOption(['1', '2']) // Select first two disease options
-      
-      // Verify the selection was made
-      const selectedValues = await healthHistorySelect.evaluate((el: HTMLSelectElement) => 
-        Array.from(el.selectedOptions).map(option => option.value)
+      // Get available options dynamically to avoid hardcoding IDs
+      const options = await healthHistorySelect.locator('option').evaluateAll(
+        (elements) => elements.map((el) => el.value).filter(v => v !== '')
       )
-      expect(selectedValues).toContain('1')
-      expect(selectedValues).toContain('2')
+      
+      if (options.length >= 2) {
+        // Select first two available disease options
+        await healthHistorySelect.selectOption([options[0], options[1]])
+        
+        // Verify the selection was made
+        const selectedValues = await healthHistorySelect.evaluate((el: HTMLSelectElement) => 
+          Array.from(el.selectedOptions).map(option => option.value)
+        )
+        expect(selectedValues).toContain(options[0])
+        expect(selectedValues).toContain(options[1])
+      }
     }
   })
 

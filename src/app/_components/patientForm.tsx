@@ -51,10 +51,9 @@ export function PatientForm({
       setSelected((prev) => {
         if (prev.length !== initial.length) return initial
         
-        // Sort both arrays for order-insensitive comparison
-        const prevSorted = [...prev].sort()
-        const initialSorted = [...initial].sort()
-        const equal = prevSorted.every((v, i) => v === initialSorted[i])
+        // Use Set-based comparison for better performance with larger arrays
+        const prevSet = new Set(prev)
+        const equal = initial.every((id) => prevSet.has(id))
         
         return equal ? prev : initial
       })
