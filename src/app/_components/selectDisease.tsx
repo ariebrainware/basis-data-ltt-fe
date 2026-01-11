@@ -28,10 +28,7 @@ export function DiseaseMultiSelect({
     let mounted = true
     // If parent provided `options` (even an empty array), do not fetch here.
     if (propOptions !== undefined) {
-      // accept parent's options asynchronously to avoid synchronous setState in effect
-      Promise.resolve().then(() => {
-        if (mounted) setOptions(propOptions)
-      })
+      setOptions(propOptions)
       return () => {
         mounted = false
       }
