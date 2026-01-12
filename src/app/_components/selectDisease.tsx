@@ -21,14 +21,15 @@ export function DiseaseMultiSelect({
   disabled,
   options: propOptions,
 }: MultiSelectProps) {
-  const [options, setOptions] = useState<DiseaseType[]>(propOptions ?? [])
+  // keep fetched options separate from parent-provided options to avoid synchronous setState in effect
+  const [fetchedOptions, setFetchedOptions] = useState<DiseaseType[]>([])
   const selected = propValue ?? []
+  const options = propOptions ?? fetchedOptions
 
   useEffect(() => {
     let mounted = true
     // If parent provided `options` (even an empty array), do not fetch here.
     if (propOptions !== undefined) {
-      setOptions(propOptions)
       return () => {
         mounted = false
       }
@@ -53,7 +54,7 @@ export function DiseaseMultiSelect({
         // backend shape: { data: { disease: [...] } } or just []
         const list: DiseaseType[] =
           data?.data?.disease ?? data?.data ?? data ?? []
-        if (mounted) setOptions(list)
+        if (mounted) setFetchedOptions(list)
       } catch (e) {
         // ignore
       }

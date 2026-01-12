@@ -1,4 +1,4 @@
-'use client'
+;('use client')
 import React, { useEffect, useState } from 'react'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
@@ -50,11 +50,11 @@ export function PatientForm({
     const t = setTimeout(() => {
       setSelected((prev) => {
         if (prev.length !== initial.length) return initial
-        
+
         // Use Set-based comparison for better performance with larger arrays
         const prevSet = new Set(prev)
         const equal = initial.every((id) => prevSet.has(id))
-        
+
         return equal ? prev : initial
       })
     }, 0)
@@ -138,9 +138,11 @@ export function PatientForm({
             />
             <Input
               id="age"
-              type="number"
+              type="text"
               label="Age"
-              defaultValue={age}
+              defaultValue={
+                age !== undefined && age !== null ? String(age) : ''
+              }
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
