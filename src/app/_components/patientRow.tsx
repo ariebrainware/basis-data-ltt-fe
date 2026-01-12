@@ -79,7 +79,13 @@ export default function Patient({
         )
         return match ? String(match.ID) : null
       })
-      .filter(Boolean)
+      .filter(Boolean) as string[]
+
+    // Fallback: if no IDs could be resolved (e.g., diseases not loaded yet),
+    // preserve the original normalized input instead of returning an empty string.
+    if (matchedIds.length === 0) {
+      return items.join(',')
+    }
     return matchedIds.join(',')
   }
 
