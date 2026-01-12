@@ -132,7 +132,7 @@ export function PatientForm({
             />
             <Input
               id="age"
-              type="text"
+              type="number"
               label="Age"
               defaultValue={
                 age !== undefined && age !== null ? String(age) : ''
