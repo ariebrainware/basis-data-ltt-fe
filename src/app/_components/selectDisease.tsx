@@ -3,13 +3,30 @@ import React, { useEffect, useState } from 'react'
 import { getApiHost } from '../_functions/apiHost'
 import { DiseaseType } from '../_types/disease'
 
+/**
+ * Props for {@link DiseaseMultiSelect}.
+ *
+ * Usage notes:
+ * - If the parent component already has a list of diseases (for example from a
+ *   prior fetch, a shared cache, or server‑side data), it should pass that list
+ *   via the {@link MultiSelectProps.options | options} prop. In that case this
+ *   component will **not** perform its own network request, which avoids
+ *   duplicate calls to the `/disease` endpoint.
+ * - If the parent does **not** provide `options`, this component will fetch the
+ *   available diseases on mount and whenever the `options` prop changes from
+ *   `undefined` to a defined value.
+ * - Supplying an empty array (`options={[]}`) explicitly indicates that there
+ *   are no selectable diseases and also prevents the internal fetch.
+ */
 interface MultiSelectProps {
   id?: string
   label?: string
   value?: string[]
   onChange: (values: string[]) => void
   disabled?: boolean
-  // parent may supply options to avoid duplicate network requests
+  // Parent may supply options to avoid duplicate network requests. When this
+  // prop is defined (including an empty array), DiseaseMultiSelect will not
+  // perform a fetch and will render exactly the options provided here.
   options?: DiseaseType[]
 }
 
