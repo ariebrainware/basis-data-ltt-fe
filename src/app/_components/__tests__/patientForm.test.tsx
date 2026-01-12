@@ -3,6 +3,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { PatientForm } from '../patientForm'
 import { PatientType } from '@/app/_types/patient'
+import { DiseaseType } from '@/app/_types/disease'
 
 // Mock Material Tailwind components
 jest.mock('@material-tailwind/react', () => ({
@@ -62,11 +63,13 @@ jest.mock('../selectDisease', () => ({
     label,
     value,
     onChange,
+    options,
   }: {
     id?: string
     label?: string
     value?: string[]
     onChange: (values: string[]) => void
+    options?: DiseaseType[]
   }) => (
     <select
       id={id}
@@ -81,9 +84,19 @@ jest.mock('../selectDisease', () => ({
       }}
       aria-label={label}
     >
-      <option value="1">Diabetes</option>
-      <option value="2">Hypertension</option>
-      <option value="3">Asthma</option>
+      {options && options.length > 0 ? (
+        options.map((opt) => (
+          <option key={opt.ID} value={String(opt.ID)}>
+            {opt.name}
+          </option>
+        ))
+      ) : (
+        <>
+          <option value="1">Diabetes</option>
+          <option value="2">Hypertension</option>
+          <option value="3">Asthma</option>
+        </>
+      )}
     </select>
   ),
 }))
