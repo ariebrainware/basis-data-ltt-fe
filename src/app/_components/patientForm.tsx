@@ -182,9 +182,6 @@ export function PatientForm({
               defaultValue={health_history ?? ''}
             />
             <div>
-              <label className="text-slate-700 mb-1 block text-sm font-medium">
-                Riwayat Penyakit
-              </label>
               <DiseaseMultiSelect
                 id="health_history_select"
                 label="Riwayat Penyakit"

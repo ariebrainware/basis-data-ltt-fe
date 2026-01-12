@@ -56,7 +56,6 @@ function MultipleDiseaseSelect() {
 
   return (
     <div className="flex flex-col space-y-2">
-      <p className="text-base font-normal antialiased">Riwayat Penyakit</p>
       <DiseaseMultiSelect
         id="healthHistorySelect"
         label="Riwayat Penyakit"
