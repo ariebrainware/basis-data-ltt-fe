@@ -32,13 +32,14 @@ export default function Patient({
   const [open, setOpen] = React.useState(false)
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
   const [diseases, setDiseases] = useState<DiseaseType[]>([])
+  const [diseasesFetched, setDiseasesFetched] = useState(false)
 
   const handleOpen = async () => {
     if (!open) {
       // Reset gender value when opening dialog
       setGenderValue(gender || '')
-      // fetch diseases only if not already cached
-      if (diseases.length === 0) {
+      // fetch diseases only if not already fetched
+      if (!diseasesFetched) {
         try {
           const res = await fetch(`${getApiHost()}/disease`, {
             headers: {
@@ -56,8 +57,11 @@ export default function Patient({
               data?.data?.disease ?? data?.data ?? data ?? []
             setDiseases(list)
           }
+          // Mark as fetched even if request fails or list is empty
+          setDiseasesFetched(true)
         } catch (e) {
-          // ignore
+          // Mark as fetched even on error to avoid retry loops
+          setDiseasesFetched(true)
         }
       }
       setOpen(true)

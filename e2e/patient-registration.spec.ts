@@ -64,6 +64,17 @@ test.describe('Patient Registration', () => {
     // Ensure the select is visible
     await expect(healthHistorySelect).toBeVisible()
 
+    // Wait for options to load (when select is not disabled and has options)
+    await expect(healthHistorySelect).not.toBeDisabled()
+    await page.waitForFunction(
+      (selectId) => {
+        const select = document.getElementById(selectId) as HTMLSelectElement | null
+        return select && select.options.length > 1 // More than just placeholder
+      },
+      'healthHistorySelect',
+      { timeout: 5000 }
+    )
+
     // Get available options dynamically to avoid hardcoding IDs
     const options = await healthHistorySelect
       .locator('option')
