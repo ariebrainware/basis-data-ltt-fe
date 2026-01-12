@@ -143,7 +143,7 @@ describe('PatientForm Component', () => {
     expect(screen.getByTestId('full_name')).toHaveValue('John Doe')
     expect(screen.getByTestId('phone_number')).toHaveValue('+628123456789')
     expect(screen.getByTestId('job')).toHaveValue('Software Engineer')
-    expect(screen.getByTestId('age')).toHaveValue('30')
+    expect(screen.getByTestId('age')).toHaveValue(30)
     expect(screen.getByTestId('email')).toHaveValue('john@example.com')
     expect(screen.getByTestId('gender')).toHaveValue('male')
     expect(screen.getByTestId('address')).toHaveValue('Jl. Test No. 123')

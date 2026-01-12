@@ -113,7 +113,10 @@ export function DiseaseMultiSelect({
 
   return (
     <div className="w-full">
-      <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
+      <label
+        htmlFor={id}
+        className="mb-1 block text-sm font-medium text-gray-700"
+      >
         {label}
       </label>
       {error && (
@@ -122,7 +125,11 @@ export function DiseaseMultiSelect({
         </div>
       )}
       {isLoading && propOptions === undefined && (
-        <div className="mb-2 text-sm text-gray-600" role="status" aria-live="polite">
+        <div
+          className="mb-2 text-sm text-gray-600"
+          role="status"
+          aria-live="polite"
+        >
           Loading options...
         </div>
       )}
@@ -134,7 +141,13 @@ export function DiseaseMultiSelect({
         onChange={handleNativeSelectChange}
         disabled={disabled || (isLoading && propOptions === undefined)}
         className="w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50"
-        aria-label={isLoading ? 'Loading disease options' : options.length === 0 ? 'No disease options available' : label}
+        aria-label={
+          isLoading
+            ? 'Loading disease options'
+            : options.length === 0
+              ? 'No disease options available'
+              : label
+        }
       >
         {options.length === 0 && !isLoading ? (
           <option value="" disabled>

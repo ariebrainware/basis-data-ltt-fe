@@ -60,7 +60,7 @@ test.describe('Patient Registration', () => {
   test('should allow selecting health conditions', async ({ page }) => {
     // Health condition multi-select should be present
     const healthHistorySelect = page.locator('#healthHistorySelect')
-    
+
     // Ensure the select is visible
     await expect(healthHistorySelect).toBeVisible()
 
@@ -69,7 +69,9 @@ test.describe('Patient Registration', () => {
     // Wait for at least one option beyond the placeholder/empty state
     await page.waitForFunction(
       (selectId) => {
-        const select = document.getElementById(selectId) as HTMLSelectElement | null
+        const select = document.getElementById(
+          selectId
+        ) as HTMLSelectElement | null
         return select && select.options.length > 1
       },
       'healthHistorySelect',
