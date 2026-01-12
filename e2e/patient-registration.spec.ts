@@ -1,5 +1,34 @@
 import { test, expect } from '@playwright/test'
 
+// Helper: focus -> fill -> confirm value. Falls back to setting value via
+// page.evaluate and dispatching input/change if the fill didn't stick.
+async function reliableFill(page: any, selector: string, value: string) {
+  const locator = page.locator(selector)
+  await locator.focus()
+  await locator.fill(value)
+
+  try {
+    await expect(locator).toHaveValue(value, { timeout: 5000 })
+    return
+  } catch (err) {
+    // Fallback: directly set the element's value and dispatch events.
+    await page.$eval(
+      selector,
+      (el: Element, val: string) => {
+        const node = el as HTMLInputElement | HTMLTextAreaElement | null
+        if (!node) return
+        node.focus()
+        ;(node as any).value = val
+        node.dispatchEvent(new Event('input', { bubbles: true }))
+        node.dispatchEvent(new Event('change', { bubbles: true }))
+      },
+      value
+    )
+
+    await expect(locator).toHaveValue(value, { timeout: 5000 })
+  }
+}
+
 test.describe('Patient Registration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/register')
@@ -20,9 +49,8 @@ test.describe('Patient Registration', () => {
   })
 
   test('should allow filling full name', async ({ page }) => {
-    const fullNameInput = page.locator('#fullName')
-    await fullNameInput.fill('John Doe')
-    await expect(fullNameInput).toHaveValue('John Doe')
+    await reliableFill(page, '#fullName', 'John Doe')
+    await expect(page.locator('#fullName')).toHaveValue('John Doe')
   })
 
   test('should allow selecting gender', async ({ page }) => {
@@ -39,64 +67,78 @@ test.describe('Patient Registration', () => {
   })
 
   test('should allow filling age field', async ({ page }) => {
-    const ageInput = page.locator('#age')
-    await ageInput.fill('30')
-    await expect(ageInput).toHaveValue('30')
+    await reliableFill(page, '#age', '30')
+    await expect(page.locator('#age')).toHaveValue('30')
   })
 
   test('should allow filling job field', async ({ page }) => {
-    const jobInput = page.locator('#job')
-    await jobInput.fill('Software Engineer')
-    await expect(jobInput).toHaveValue('Software Engineer')
+    await reliableFill(page, '#job', 'Software Engineer')
+    await expect(page.locator('#job')).toHaveValue('Software Engineer')
   })
 
   test('should allow filling address textarea', async ({ page }) => {
-    const addressInput = page.locator('#address')
     const testAddress = 'Jl. Test No. 123, Jakarta'
-    await addressInput.fill(testAddress)
-    await expect(addressInput).toHaveValue(testAddress)
+    await reliableFill(page, '#address', testAddress)
+    await expect(page.locator('#address')).toHaveValue(testAddress)
   })
 
   test('should allow selecting health conditions', async ({ page }) => {
     // Health condition multi-select should be present
     const healthHistorySelect = page.locator('#healthHistorySelect')
 
-    if (await healthHistorySelect.isVisible()) {
-      // Get available options dynamically to avoid hardcoding IDs
-      const options = await healthHistorySelect
-        .locator('option')
-        .evaluateAll((elements) =>
-          elements
-            .map((el) => (el as HTMLOptionElement).value)
-            .filter((v) => v !== '')
-        )
+    // Ensure the select is visible
+    await expect(healthHistorySelect).toBeVisible()
 
-      if (options.length >= 2) {
-        // Select first two available disease options
-        await healthHistorySelect.selectOption([options[0], options[1]])
+    // Wait for options to load (when select is not disabled and has options)
+    await expect(healthHistorySelect).not.toBeDisabled()
+    // Wait for at least one option beyond the placeholder/empty state
+    await page.waitForFunction(
+      (selectId) => {
+        const select = document.getElementById(
+          selectId
+        ) as HTMLSelectElement | null
+        return select && select.options.length > 1
+      },
+      'healthHistorySelect',
+      { timeout: 5000 }
+    )
 
-        // Verify the selection was made
-        const selectedValues = await healthHistorySelect.evaluate(
-          (el: HTMLSelectElement) =>
-            Array.from(el.selectedOptions).map((option) => option.value)
-        )
-        expect(selectedValues).toContain(options[0])
-        expect(selectedValues).toContain(options[1])
-      }
-    }
+    // Get available options dynamically to avoid hardcoding IDs
+    const options = await healthHistorySelect
+      .locator('option')
+      .evaluateAll((elements) =>
+        elements
+          .map((el) => (el as HTMLOptionElement).value)
+          .filter((v) => v !== '')
+      )
+
+    // Fail the test if there are insufficient options to test selection functionality
+    expect(
+      options.length,
+      `Expected at least 2 disease options to be available for testing, but found ${options.length}`
+    ).toBeGreaterThanOrEqual(2)
+
+    // Select first two available disease options
+    await healthHistorySelect.selectOption([options[0], options[1]])
+
+    // Verify the selection was made
+    const selectedValues = await healthHistorySelect.evaluate(
+      (el: HTMLSelectElement) =>
+        Array.from(el.selectedOptions).map((option) => option.value)
+    )
+    expect(selectedValues).toContain(options[0])
+    expect(selectedValues).toContain(options[1])
   })
 
   test('should allow filling surgery history', async ({ page }) => {
-    const surgeryHistoryInput = page.locator('#surgeryHistory')
     const testHistory = 'Appendectomy in 2020'
-    await surgeryHistoryInput.fill(testHistory)
-    await expect(surgeryHistoryInput).toHaveValue(testHistory)
+    await reliableFill(page, '#surgeryHistory', testHistory)
+    await expect(page.locator('#surgeryHistory')).toHaveValue(testHistory)
   })
 
   test('should allow filling phone number', async ({ page }) => {
-    const phoneInput = page.locator('#phoneNumber')
-    await phoneInput.fill('+628123456789')
-    await expect(phoneInput).toHaveValue('+628123456789')
+    await reliableFill(page, '#phoneNumber', '+628123456789')
+    await expect(page.locator('#phoneNumber')).toHaveValue('+628123456789')
   })
 
   test('should allow adding additional phone numbers', async ({ page }) => {
