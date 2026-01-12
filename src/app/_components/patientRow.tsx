@@ -64,21 +64,6 @@ export default function Patient({
     }
   }
 
-  const handleHealthConditionLabelDisplay = (ids: string): string => {
-    if (!ids) return ''
-    const idArray = ids
-      .split(',')
-      .map((id) => id.trim())
-      .filter(Boolean)
-    const labels = idArray
-      .map((id) => {
-        const option = diseases.find((d) => String(d.ID) === id)
-        return option ? option.name : null
-      })
-      .filter((l) => l !== null)
-    return labels.join(', ')
-  }
-
   const handleHealthConditionInput = (input: string): string => {
     if (!input.trim() || input === '-') return '-'
     const items = input
