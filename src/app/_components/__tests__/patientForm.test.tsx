@@ -77,9 +77,7 @@ jest.mock('../selectDisease', () => ({
       multiple
       value={value}
       onChange={(e) => {
-        const values = Array.from(e.target.selectedOptions).map(
-          (o) => o.value
-        )
+        const values = Array.from(e.target.selectedOptions).map((o) => o.value)
         onChange(values)
       }}
       aria-label={label}
