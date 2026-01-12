@@ -45,7 +45,12 @@ export default function RootLayout({
                     Object.defineProperty(HTMLInputElement.prototype, 'value', {
                       set: function (v) {
                         originalSet.call(this, v)
-                        try { this.dispatchEvent(new Event('input', { bubbles: true })) } catch (e) {}
+                        try {
+                          this.dispatchEvent(new Event('input', { bubbles: true }))
+                        } catch (e) {}
+                        try {
+                          this.dispatchEvent(new Event('change', { bubbles: true }))
+                        } catch (e) {}
                       },
                       get: desc.get,
                       configurable: true,
@@ -58,13 +63,57 @@ export default function RootLayout({
                     Object.defineProperty(HTMLTextAreaElement.prototype, 'value', {
                       set: function (v) {
                         originalSetT.call(this, v)
-                        try { this.dispatchEvent(new Event('input', { bubbles: true })) } catch (e) {}
+                        try {
+                          this.dispatchEvent(new Event('input', { bubbles: true }))
+                        } catch (e) {}
+                        try {
+                          this.dispatchEvent(new Event('change', { bubbles: true }))
+                        } catch (e) {}
                       },
                       get: tdesc.get,
                       configurable: true,
                       enumerable: true,
                     })
                   }
+
+                  // Hide development overlays (Speed Insights / Next.js dev tools)
+                  // that may intercept pointer events in some browsers (notably WebKit).
+                  try {
+                    const hideByText = (text) => {
+                      Array.from(document.querySelectorAll('button,div,span')).forEach((el) => {
+                        try {
+                          if (el && el.textContent && el.textContent.trim().includes(text)) {
+                            (el as HTMLElement).style.display = 'none'
+                          }
+                        } catch (e) {}
+                      })
+                    }
+                    const hideWrappers = () => {
+                      const wrappers = document.querySelectorAll('[data-speed-insights], .speed-insights, #speed-insights, .next-devtools, .issues-overlay')
+                      wrappers.forEach((w) => { try { (w as HTMLElement).style.display = 'none' } catch (e) {} })
+                    }
+                    // Run immediately and also observe DOM for later additions
+                    hideByText('Open Next.js Dev Tools')
+                    hideByText('Open issues overlay')
+                    hideByText('Open issues')
+                    hideWrappers()
+
+                    const observer = new MutationObserver((mutations) => {
+                      try {
+                        mutations.forEach((m) => {
+                          if (m.addedNodes && m.addedNodes.length) {
+                            hideByText('Open Next.js Dev Tools')
+                            hideByText('Open issues overlay')
+                            hideByText('Open issues')
+                            hideWrappers()
+                          }
+                        })
+                      } catch (e) {}
+                    })
+                    observer.observe(document.documentElement || document.body, { childList: true, subtree: true })
+                    // Stop observing after a short while to avoid overhead
+                    setTimeout(() => { try { observer.disconnect() } catch (e) {} }, 20000)
+                  } catch (e) {}
                 }
               } catch (e) {}
             })();`,
