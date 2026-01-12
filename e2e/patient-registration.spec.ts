@@ -66,10 +66,11 @@ test.describe('Patient Registration', () => {
 
     // Wait for options to load (when select is not disabled and has options)
     await expect(healthHistorySelect).not.toBeDisabled()
+    // Wait for at least one option beyond the placeholder/empty state
     await page.waitForFunction(
       (selectId) => {
         const select = document.getElementById(selectId) as HTMLSelectElement | null
-        return select && select.options.length > 1 // More than just placeholder
+        return select && select.options.length > 1
       },
       'healthHistorySelect',
       { timeout: 5000 }

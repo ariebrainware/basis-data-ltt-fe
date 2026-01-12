@@ -57,10 +57,12 @@ export default function Patient({
               data?.data?.disease ?? data?.data ?? data ?? []
             setDiseases(list)
           }
-          // Mark as fetched even if request fails or list is empty
+          // Mark as fetched even if request fails or list is empty to prevent
+          // redundant API calls on subsequent dialog opens
           setDiseasesFetched(true)
         } catch (e) {
-          // Mark as fetched even on error to avoid retry loops
+          // Mark as fetched even on error to avoid retry loops when API is
+          // consistently unavailable or network is down
           setDiseasesFetched(true)
         }
       }
