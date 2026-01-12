@@ -72,7 +72,6 @@ export function DiseaseMultiSelect({
           },
         })
         if (res.status === 401) {
-          if (mounted) setIsLoading(false)
           UnauthorizedAccess()
           return
         }
@@ -123,7 +122,9 @@ export function DiseaseMultiSelect({
         </div>
       )}
       {isLoading && propOptions === undefined && (
-        <div className="mb-2 text-sm text-gray-600">Loading options...</div>
+        <div className="mb-2 text-sm text-gray-600" role="status" aria-live="polite">
+          Loading options...
+        </div>
       )}
       <select
         id={id}
@@ -133,6 +134,7 @@ export function DiseaseMultiSelect({
         onChange={handleNativeSelectChange}
         disabled={disabled || (isLoading && propOptions === undefined)}
         className="w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50"
+        aria-label={options.length === 0 && !isLoading ? 'No disease options available' : label}
       >
         {options.length === 0 && !isLoading ? (
           <option value="" disabled>

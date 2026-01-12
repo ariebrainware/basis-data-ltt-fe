@@ -60,37 +60,35 @@ test.describe('Patient Registration', () => {
   test('should allow selecting health conditions', async ({ page }) => {
     // Health condition multi-select should be present
     const healthHistorySelect = page.locator('#healthHistorySelect')
+    
+    // Ensure the select is visible
+    await expect(healthHistorySelect).toBeVisible()
 
-    if (await healthHistorySelect.isVisible()) {
-      // Get available options dynamically to avoid hardcoding IDs
-      const options = await healthHistorySelect
-        .locator('option')
-        .evaluateAll((elements) =>
-          elements
-            .map((el) => (el as HTMLOptionElement).value)
-            .filter((v) => v !== '')
-        )
-
-      // Fail the test if there are insufficient options to test selection functionality
-      expect(
-        options.length,
-        `Expected at least 2 disease options to be available for testing, but found ${options.length}`
-      ).toBeGreaterThanOrEqual(2)
-
-      // Select first two available disease options
-      await healthHistorySelect.selectOption([options[0], options[1]])
-
-      // Verify the selection was made
-      const selectedValues = await healthHistorySelect.evaluate(
-        (el: HTMLSelectElement) =>
-          Array.from(el.selectedOptions).map((option) => option.value)
+    // Get available options dynamically to avoid hardcoding IDs
+    const options = await healthHistorySelect
+      .locator('option')
+      .evaluateAll((elements) =>
+        elements
+          .map((el) => (el as HTMLOptionElement).value)
+          .filter((v) => v !== '')
       )
-      expect(selectedValues).toContain(options[0])
-      expect(selectedValues).toContain(options[1])
-    } else {
-      // Fail if the select is not visible
-      throw new Error('Health history select element is not visible')
-    }
+
+    // Fail the test if there are insufficient options to test selection functionality
+    expect(
+      options.length,
+      `Expected at least 2 disease options to be available for testing, but found ${options.length}`
+    ).toBeGreaterThanOrEqual(2)
+
+    // Select first two available disease options
+    await healthHistorySelect.selectOption([options[0], options[1]])
+
+    // Verify the selection was made
+    const selectedValues = await healthHistorySelect.evaluate(
+      (el: HTMLSelectElement) =>
+        Array.from(el.selectedOptions).map((option) => option.value)
+    )
+    expect(selectedValues).toContain(options[0])
+    expect(selectedValues).toContain(options[1])
   })
 
   test('should allow filling surgery history', async ({ page }) => {
