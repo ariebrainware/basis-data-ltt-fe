@@ -134,7 +134,7 @@ export function DiseaseMultiSelect({
         onChange={handleNativeSelectChange}
         disabled={disabled || (isLoading && propOptions === undefined)}
         className="w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50"
-        aria-label={options.length === 0 && !isLoading ? 'No disease options available' : label}
+        aria-label={isLoading ? 'Loading disease options' : options.length === 0 ? 'No disease options available' : label}
       >
         {options.length === 0 && !isLoading ? (
           <option value="" disabled>
