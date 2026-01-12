@@ -105,6 +105,7 @@ jobs:
 
       - name: Run E2E tests
         run: pnpm test:e2e
+          -- -w 4
         env:
           NEXT_PUBLIC_API_HOST: http://localhost:19091
           NEXT_PUBLIC_API_TOKEN: test-token
