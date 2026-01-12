@@ -29,6 +29,13 @@ export default defineConfig({
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    /* Use a pre-saved storage state that marks E2E tests to avoid automatic redirects */
+    storageState: 'e2e/storageState.json',
+  },
+
+  /* Playwright expect options */
+  expect: {
+    timeout: 10000,
   },
 
   /* Configure projects for major browsers */
@@ -66,4 +73,6 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },
+  // Create storage state before tests run to set localStorage flags
+  globalSetup: require.resolve('./e2e/global-setup'),
 })

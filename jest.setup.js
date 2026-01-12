@@ -4,12 +4,18 @@ import '@testing-library/jest-dom'
 // Filter out specific React DOM warnings that occur due to forwarded props
 const _consoleError = console.error.bind(console)
 console.error = (...args) => {
-  const first = args[0]
-  if (
-    typeof first === 'string' &&
-    /Unknown event handler property `onPointer.*Capture`/.test(first)
-  ) {
-    return
+  try {
+    // If any argument contains the React DOM warning about unknown pointer event
+    // handler props, swallow it to keep test output clean.
+    const anyArg = args.find((a) => typeof a === 'string' || a instanceof Error)
+    if (
+      anyArg &&
+      String(anyArg).includes('Unknown event handler property `onPointer')
+    ) {
+      return
+    }
+  } catch (e) {
+    // fall through to default behavior on unexpected errors
   }
   return _consoleError(...args)
 }

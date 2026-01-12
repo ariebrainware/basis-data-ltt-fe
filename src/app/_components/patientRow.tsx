@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { getSessionToken } from '../_functions/sessionToken'
 import { PatientForm } from './patientForm'
 import { PatientType } from '../_types/patient'
-import { HealthConditionOptions } from '../_types/healthcondition'
+import { getApiHost } from '../_functions/apiHost'
+import { DiseaseType } from '../_types/disease'
 import {
   Button,
   Dialog,
@@ -12,7 +13,6 @@ import {
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { getApiHost } from '../_functions/apiHost'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Patient({
@@ -31,37 +31,69 @@ export default function Patient({
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
+  const [diseases, setDiseases] = useState<DiseaseType[]>([])
+  const [diseasesFetched, setDiseasesFetched] = useState(false)
 
-  const handleOpen = () => {
+  const handleOpen = async () => {
     if (!open) {
       // Reset gender value when opening dialog
       setGenderValue(gender || '')
+      // fetch diseases only if not already fetched
+      if (!diseasesFetched) {
+        try {
+          const res = await fetch(`${getApiHost()}/disease`, {
+            headers: {
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+              'session-token': getSessionToken(),
+            },
+          })
+          if (res.status === 401) {
+            UnauthorizedAccess()
+            return
+          }
+          if (res.ok) {
+            const data = await res.json()
+            const list: DiseaseType[] =
+              data?.data?.disease ?? data?.data ?? data ?? []
+            setDiseases(list)
+          }
+          // Mark as fetched even if request fails or list is empty to prevent
+          // redundant API calls on subsequent dialog opens
+          setDiseasesFetched(true)
+        } catch (e) {
+          // Mark as fetched even on error to avoid retry loops when API is
+          // consistently unavailable or network is down
+          setDiseasesFetched(true)
+        }
+      }
+      setOpen(true)
+    } else {
+      setOpen(false)
     }
-    setOpen(!open)
-  }
-
-  const handleHealthConditionLabelDisplay = (ids: string): string => {
-    const idArray = ids.split(',').map((id) => id.trim())
-    const labels = idArray
-      .map((id) => {
-        const option = HealthConditionOptions.find((opt) => opt.id === id)
-        return option ? option.label : null
-      })
-      .filter((label) => label !== null)
-    return labels.join(', ')
   }
 
   const handleHealthConditionInput = (input: string): string => {
     if (!input.trim() || input === '-') return '-'
-    const inputArray = input.split(',').map((item) => item.trim().toLowerCase())
-    const matchedIds = inputArray
-      .map((inputItem) => {
-        const option = HealthConditionOptions.find((opt) =>
-          opt.label.toLowerCase().includes(inputItem)
+    const items = input
+      .split(',')
+      .map((it) => it.trim())
+      .filter(Boolean)
+    const matchedIds = items
+      .map((item) => {
+        // if item looks numeric, assume it's an ID
+        if (/^\d+$/.test(item)) return item
+        const match = diseases.find((d) =>
+          d.name.toLowerCase().includes(item.toLowerCase())
         )
-        return option ? option.id : null
+        return match ? String(match.ID) : null
       })
-      .filter((id) => id !== null)
+      .filter(Boolean) as string[]
+
+    // Fallback: if no IDs could be resolved (e.g., diseases not loaded yet),
+    // preserve the original normalized input instead of returning an empty string.
+    if (matchedIds.length === 0) {
+      return items.join(',')
+    }
     return matchedIds.join(',')
   }
 
@@ -198,11 +230,12 @@ export default function Patient({
             phone_number={phoneNumber}
             email={email}
             address={address}
-            health_history={handleHealthConditionLabelDisplay(health_history)}
+            health_history={health_history}
             surgery_history={surgery_history}
             gender={genderValue}
             last_visit={''}
             onGenderChange={setGenderValue}
+            diseases={diseases}
           />
         </DialogBody>
         <DialogFooter

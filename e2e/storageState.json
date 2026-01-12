@@ -1,0 +1,14 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "__E2E_TEST__",
+          "value": "1"
+        }
+      ]
+    }
+  ]
+}

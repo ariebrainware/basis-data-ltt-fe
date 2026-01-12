@@ -3,9 +3,9 @@ import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
 import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
-import { HealthConditionOptions } from '../_types/healthcondition'
 import { useRef } from 'react'
 import { getApiHost } from '../_functions/apiHost'
+import { DiseaseMultiSelect } from '../_components/selectDisease'
 import { extractErrorMessage } from '../_functions/errorMessage'
 import Swal from 'sweetalert2'
 
@@ -42,74 +42,28 @@ if (typeof window !== 'undefined') {
   window.addEventListener('input', updatePhoneNumbers)
 }
 
-function MultipleCheckboxes() {
-  const [checkedItems, setCheckedItems] = useState<string[]>([])
+function MultipleDiseaseSelect() {
+  const [selected, setSelected] = useState<string[]>([])
   useEffect(() => {
-    healthHistory = checkedItems
-  }, [checkedItems])
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, checked } = e.target
-    setCheckedItems((prev) =>
-      checked ? [...prev, id] : prev.filter((item) => item !== id)
-    )
-  }
-
-  useEffect(() => {
+    healthHistory = selected
     const healthHistoryInputElement = document.getElementById(
       'healthHistory'
     ) as HTMLInputElement | null
     if (healthHistoryInputElement) {
-      healthHistoryInputElement.value = checkedItems.join(', ')
+      healthHistoryInputElement.value = selected.join(',')
     }
-  }, [checkedItems])
+  }, [selected])
+
   return (
-    <div className="flex flex-col space-y-4">
-      <p className="text-base font-normal antialiased">Riwayat Penyakit</p>
-      {HealthConditionOptions.map((option) => (
-        <div key={option.id} className="inline-flex items-center gap-2">
-          <label
-            className="relative flex cursor-pointer items-center"
-            htmlFor={option.id}
-          >
-            <Checkbox
-              id={option.id}
-              name={option.id}
-              checked={checkedItems.includes(option.id)}
-              onChange={handleChange}
-              crossOrigin={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
-              <svg
-                fill="none"
-                width="18px"
-                height="18px"
-                strokeWidth="2"
-                color="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 13L9 17L19 7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                ></path>
-              </svg>
-            </span>
-          </label>
-          <label
-            htmlFor={option.id}
-            className="text-slate-600 ml-2 cursor-pointer font-normal antialiased"
-          >
-            {option.label}
-          </label>
-        </div>
-      ))}
+    <div className="flex flex-col space-y-2">
+      <DiseaseMultiSelect
+        id="healthHistorySelect"
+        label="Riwayat Penyakit"
+        value={selected}
+        onChange={(vals) => setSelected(vals)}
+      />
+      {/* keep hidden input for existing form submission code */}
+      <input id="healthHistory" name="healthHistory" type="hidden" />
     </div>
   )
 }
@@ -152,7 +106,7 @@ async function sendRegisterRequest(
       age: parseInt(age, 10),
       job,
       address,
-      health_history: healthHistory,
+      health_history: healthHistory.join(','),
       surgery_history,
       phone_number: phoneNumber,
       patient_code,
@@ -367,7 +321,7 @@ export default function Register() {
             className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white"
           ></textarea>
         </div>
-        <MultipleCheckboxes />
+        <MultipleDiseaseSelect />
         <div>
           <textarea
             rows={8}
@@ -377,7 +331,7 @@ export default function Register() {
             className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white"
           ></textarea>
         </div>
-        {renderInput('phoneNumber', 'phoneNumber', 'Nomor Telepon')}
+        {renderInput('phoneNumber', 'text', 'Nomor Telepon')}
         <div>
           <Checkbox
             label="Data Pasien Lama (Opsional)"

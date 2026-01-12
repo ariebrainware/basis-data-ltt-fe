@@ -3,6 +3,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { PatientForm } from '../patientForm'
 import { PatientType } from '@/app/_types/patient'
+import { DiseaseType } from '@/app/_types/disease'
 
 // Mock Material Tailwind components
 jest.mock('@material-tailwind/react', () => ({
@@ -55,6 +56,49 @@ jest.mock('../selectGender', () => ({
   ),
 }))
 
+// Mock DiseaseMultiSelect component
+jest.mock('../selectDisease', () => ({
+  DiseaseMultiSelect: ({
+    id,
+    label,
+    value,
+    onChange,
+    options,
+  }: {
+    id?: string
+    label?: string
+    value?: string[]
+    onChange: (values: string[]) => void
+    options?: DiseaseType[]
+  }) => (
+    <select
+      id={id}
+      data-testid={id}
+      multiple
+      value={value}
+      onChange={(e) => {
+        const values = Array.from(e.target.selectedOptions).map((o) => o.value)
+        onChange(values)
+      }}
+      aria-label={label}
+    >
+      {options && options.length > 0 ? (
+        options.map((opt) => (
+          <option key={opt.ID} value={String(opt.ID)}>
+            {opt.name}
+          </option>
+        ))
+      ) : (
+        <>
+          <option value="1">Diabetes</option>
+          <option value="2">Hypertension</option>
+          <option value="3">Asthma</option>
+        </>
+      )}
+    </select>
+  ),
+}))
+
 describe('PatientForm Component', () => {
   const mockPatient: PatientType = {
     ID: 1,
@@ -99,7 +143,7 @@ describe('PatientForm Component', () => {
     expect(screen.getByTestId('full_name')).toHaveValue('John Doe')
     expect(screen.getByTestId('phone_number')).toHaveValue('+628123456789')
     expect(screen.getByTestId('job')).toHaveValue('Software Engineer')
-    expect(screen.getByTestId('age')).toHaveValue('30')
+    expect(screen.getByTestId('age')).toHaveValue(30)
     expect(screen.getByTestId('email')).toHaveValue('john@example.com')
     expect(screen.getByTestId('gender')).toHaveValue('male')
     expect(screen.getByTestId('address')).toHaveValue('Jl. Test No. 123')
