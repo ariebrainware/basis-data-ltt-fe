@@ -43,22 +43,17 @@ export function PatientForm({
       : []
 
     // Only update state when parsed array differs from current selected to avoid
-    // unnecessary state updates; schedule update asynchronously to avoid
-    // synchronous setState inside the effect which can trigger cascading renders.
-    // Use order-insensitive comparison since disease order doesn't matter semantically.
-    const t = setTimeout(() => {
-      setSelected((prev) => {
-        if (prev.length !== initial.length) return initial
+    // unnecessary state updates. Use order-insensitive comparison since disease
+    // order doesn't matter semantically.
+    setSelected((prev) => {
+      if (prev.length !== initial.length) return initial
 
-        // Use Set-based comparison for better performance with larger arrays
-        const prevSet = new Set(prev)
-        const equal = initial.every((id) => prevSet.has(id))
+      // Use Set-based comparison for better performance with larger arrays
+      const prevSet = new Set(prev)
+      const equal = initial.every((id) => prevSet.has(id))
 
-        return equal ? prev : initial
-      })
-    }, 0)
-
-    return () => clearTimeout(t)
+      return equal ? prev : initial
+    })
   }, [health_history])
 
   useEffect(() => {
