@@ -1,9 +1,13 @@
+import React, { useEffect, useState } from 'react'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
+import { DiseaseType } from '../_types/disease'
 import { GenderSelect } from './selectGender'
+import { DiseaseMultiSelect } from './selectDisease'
 
 interface PatientFormProps extends PatientType {
   onGenderChange?: (value: string) => void
+  diseases?: DiseaseType[]
 }
 
 export function PatientForm({
@@ -19,7 +23,45 @@ export function PatientForm({
   surgery_history,
   patient_code,
   onGenderChange,
+  diseases,
 }: PatientFormProps) {
+  const [selected, setSelected] = useState<string[]>(() => {
+    return health_history
+      ? health_history
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : []
+  })
+
+  useEffect(() => {
+    const initial = health_history
+      ? health_history
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : []
+
+    // Only update state when parsed array differs from current selected to avoid
+    // unnecessary state updates. Use order-insensitive comparison since disease
+    // order doesn't matter semantically.
+    setSelected((prev) => {
+      if (prev.length !== initial.length) return initial
+
+      // Use Set-based comparison for better performance with larger arrays
+      const prevSet = new Set(prev)
+      const equal = initial.every((id) => prevSet.has(id))
+
+      return equal ? prev : initial
+    })
+  }, [health_history])
+
+  useEffect(() => {
+    const el = document.getElementById(
+      'health_history'
+    ) as HTMLInputElement | null
+    if (el) el.value = selected.join(',')
+  }, [selected])
   return (
     <Card
       color="transparent"
@@ -90,9 +132,11 @@ export function PatientForm({
             />
             <Input
               id="age"
-              type="email"
+              type="number"
               label="Age"
-              defaultValue={age}
+              defaultValue={
+                age !== undefined && age !== null ? String(age) : ''
+              }
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -128,15 +172,26 @@ export function PatientForm({
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <Textarea
+            {/* Hidden input keeps existing DOM id used by other scripts */}
+            <input
               id="health_history"
-              label="Riwayat Penyakit"
-              defaultValue={health_history}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
+              name="health_history"
+              type="hidden"
+              data-testid="health_history"
+              defaultValue={health_history ?? ''}
             />
+            <div>
+              <label className="text-slate-700 mb-1 block text-sm font-medium">
+                Riwayat Penyakit
+              </label>
+              <DiseaseMultiSelect
+                id="health_history_select"
+                label="Riwayat Penyakit"
+                value={selected}
+                onChange={(vals) => setSelected(vals)}
+                options={diseases}
+              />
+            </div>
             <Textarea
               id="surgery_history"
               label="Riwayat Operasi"

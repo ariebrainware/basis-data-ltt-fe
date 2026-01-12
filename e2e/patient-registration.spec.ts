@@ -58,13 +58,31 @@ test.describe('Patient Registration', () => {
   })
 
   test('should allow selecting health conditions', async ({ page }) => {
-    // Health condition checkboxes should be present (use stable id)
-    const diabetesCheckbox = page.locator('#diabetes') // Based on HealthConditionOptions
+    // Health condition multi-select should be present
+    const healthHistorySelect = page.locator('#healthHistorySelect')
 
-    if (await diabetesCheckbox.isVisible()) {
-      // Force-click the checkbox to avoid any overlay intercepting pointer events
-      await diabetesCheckbox.click({ force: true })
-      await expect(diabetesCheckbox).toBeChecked()
+    if (await healthHistorySelect.isVisible()) {
+      // Get available options dynamically to avoid hardcoding IDs
+      const options = await healthHistorySelect
+        .locator('option')
+        .evaluateAll((elements) =>
+          elements
+            .map((el) => (el as HTMLOptionElement).value)
+            .filter((v) => v !== '')
+        )
+
+      if (options.length >= 2) {
+        // Select first two available disease options
+        await healthHistorySelect.selectOption([options[0], options[1]])
+
+        // Verify the selection was made
+        const selectedValues = await healthHistorySelect.evaluate(
+          (el: HTMLSelectElement) =>
+            Array.from(el.selectedOptions).map((option) => option.value)
+        )
+        expect(selectedValues).toContain(options[0])
+        expect(selectedValues).toContain(options[1])
+      }
     }
   })
 
