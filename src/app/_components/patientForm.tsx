@@ -184,7 +184,6 @@ export function PatientForm({
               type="hidden"
               data-testid="health_history"
               defaultValue={health_history ?? ''}
-              readOnly
             />
             <div>
               <label className="text-slate-700 mb-1 block text-sm font-medium">
