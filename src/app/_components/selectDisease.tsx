@@ -72,11 +72,15 @@ export function DiseaseMultiSelect({
           },
         })
         if (res.status === 401) {
+          if (mounted) setIsLoading(false)
           UnauthorizedAccess()
           return
         }
         if (!res.ok) {
-          setError('Failed to load disease options')
+          if (mounted) {
+            setError('Failed to load disease options')
+            setIsLoading(false)
+          }
           return
         }
         const data = await res.json()
