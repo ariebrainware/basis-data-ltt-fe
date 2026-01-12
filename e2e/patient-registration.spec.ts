@@ -71,18 +71,25 @@ test.describe('Patient Registration', () => {
             .filter((v) => v !== '')
         )
 
-      if (options.length >= 2) {
-        // Select first two available disease options
-        await healthHistorySelect.selectOption([options[0], options[1]])
+      // Fail the test if there are insufficient options to test selection functionality
+      expect(
+        options.length,
+        `Expected at least 2 disease options to be available for testing, but found ${options.length}`
+      ).toBeGreaterThanOrEqual(2)
 
-        // Verify the selection was made
-        const selectedValues = await healthHistorySelect.evaluate(
-          (el: HTMLSelectElement) =>
-            Array.from(el.selectedOptions).map((option) => option.value)
-        )
-        expect(selectedValues).toContain(options[0])
-        expect(selectedValues).toContain(options[1])
-      }
+      // Select first two available disease options
+      await healthHistorySelect.selectOption([options[0], options[1]])
+
+      // Verify the selection was made
+      const selectedValues = await healthHistorySelect.evaluate(
+        (el: HTMLSelectElement) =>
+          Array.from(el.selectedOptions).map((option) => option.value)
+      )
+      expect(selectedValues).toContain(options[0])
+      expect(selectedValues).toContain(options[1])
+    } else {
+      // Fail if the select is not visible
+      throw new Error('Health history select element is not visible')
     }
   })
 

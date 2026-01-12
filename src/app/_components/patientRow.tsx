@@ -37,26 +37,28 @@ export default function Patient({
     if (!open) {
       // Reset gender value when opening dialog
       setGenderValue(gender || '')
-      // fetch diseases when opening so label mapping works and await it
-      try {
-        const res = await fetch(`${getApiHost()}/disease`, {
-          headers: {
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': getSessionToken(),
-          },
-        })
-        if (res.status === 401) {
-          UnauthorizedAccess()
-          return
+      // fetch diseases only if not already cached
+      if (diseases.length === 0) {
+        try {
+          const res = await fetch(`${getApiHost()}/disease`, {
+            headers: {
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
+              'session-token': getSessionToken(),
+            },
+          })
+          if (res.status === 401) {
+            UnauthorizedAccess()
+            return
+          }
+          if (res.ok) {
+            const data = await res.json()
+            const list: DiseaseType[] =
+              data?.data?.disease ?? data?.data ?? data ?? []
+            setDiseases(list)
+          }
+        } catch (e) {
+          // ignore
         }
-        if (res.ok) {
-          const data = await res.json()
-          const list: DiseaseType[] =
-            data?.data?.disease ?? data?.data ?? data ?? []
-          setDiseases(list)
-        }
-      } catch (e) {
-        // ignore
       }
       setOpen(true)
     } else {

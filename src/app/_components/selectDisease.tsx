@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { getApiHost } from '../_functions/apiHost'
 import { DiseaseType } from '../_types/disease'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 /**
  * Props for {@link DiseaseMultiSelect}.
@@ -40,6 +41,8 @@ export function DiseaseMultiSelect({
 }: MultiSelectProps) {
   // keep fetched options separate from parent-provided options to avoid synchronous setState in effect
   const [fetchedOptions, setFetchedOptions] = useState<DiseaseType[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const selected = propValue ?? []
   const options = propOptions ?? fetchedOptions
 
@@ -59,6 +62,8 @@ export function DiseaseMultiSelect({
     }
 
     ;(async () => {
+      setIsLoading(true)
+      setError(null)
       try {
         const res = await fetch(`${getApiHost()}/disease`, {
           headers: {
@@ -66,14 +71,27 @@ export function DiseaseMultiSelect({
             'session-token': localStorage.getItem('session-token') ?? '',
           },
         })
-        if (!res.ok) return
+        if (res.status === 401) {
+          UnauthorizedAccess()
+          return
+        }
+        if (!res.ok) {
+          setError('Failed to load disease options')
+          return
+        }
         const data = await res.json()
         // backend shape: { data: { disease: [...] } } or just []
         const list: DiseaseType[] =
           data?.data?.disease ?? data?.data ?? data ?? []
-        if (mounted) setFetchedOptions(list)
+        if (mounted) {
+          setFetchedOptions(list)
+          setIsLoading(false)
+        }
       } catch (e) {
-        // ignore
+        if (mounted) {
+          setError('Failed to load disease options')
+          setIsLoading(false)
+        }
       }
     })()
     return () => {
@@ -95,20 +113,34 @@ export function DiseaseMultiSelect({
       <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
         {label}
       </label>
+      {error && (
+        <div className="mb-2 text-sm text-red-600" role="alert">
+          {error}
+        </div>
+      )}
+      {isLoading && propOptions === undefined && (
+        <div className="mb-2 text-sm text-gray-600">Loading options...</div>
+      )}
       <select
         id={id}
         data-testid={id}
         multiple
         value={selected}
         onChange={handleNativeSelectChange}
-        disabled={disabled}
-        className="w-full rounded-md border px-3 py-2 text-sm"
+        disabled={disabled || (isLoading && propOptions === undefined)}
+        className="w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50"
       >
-        {options.map((opt) => (
-          <option key={opt.ID} value={String(opt.ID)}>
-            {opt.name}
+        {options.length === 0 && !isLoading ? (
+          <option value="" disabled>
+            No options available
           </option>
-        ))}
+        ) : (
+          options.map((opt) => (
+            <option key={opt.ID} value={String(opt.ID)}>
+              {opt.name}
+            </option>
+          ))
+        )}
       </select>
     </div>
   )
