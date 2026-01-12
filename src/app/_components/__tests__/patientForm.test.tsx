@@ -62,11 +62,13 @@ jest.mock('../selectDisease', () => ({
     label,
     value,
     onChange,
+    options,
   }: {
     id?: string
     label?: string
     value?: string[]
     onChange: (values: string[]) => void
+    options?: Array<{ ID: number; name: string; description: string }>
   }) => (
     <select
       id={id}
@@ -81,9 +83,19 @@ jest.mock('../selectDisease', () => ({
       }}
       aria-label={label}
     >
-      <option value="1">Diabetes</option>
-      <option value="2">Hypertension</option>
-      <option value="3">Asthma</option>
+      {options && options.length > 0 ? (
+        options.map((opt) => (
+          <option key={opt.ID} value={String(opt.ID)}>
+            {opt.name}
+          </option>
+        ))
+      ) : (
+        <>
+          <option value="1">Diabetes</option>
+          <option value="2">Hypertension</option>
+          <option value="3">Asthma</option>
+        </>
+      )}
     </select>
   ),
 }))
