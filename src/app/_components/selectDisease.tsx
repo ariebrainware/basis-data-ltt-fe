@@ -92,7 +92,7 @@ export function DiseaseMultiSelect({
 
   return (
     <div className="w-full">
-      <label htmlFor={id} className="sr-only">
+      <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
         {label}
       </label>
       <select
