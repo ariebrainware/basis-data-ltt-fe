@@ -16,8 +16,17 @@ export default function Login() {
   async function sendLoginRequest() {
     const email = usernameInput ? usernameInput.value : ''
     const password = passwordInput ? passwordInput.value : ''
+    const url = `${getApiHost()}/login`
     try {
-      const response = await fetch(`${getApiHost()}/login`, {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[Login] POST', url)
+        console.log(
+          '[Login] Authorization header:',
+          'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN
+        )
+      }
+
+      const response = await fetch(url, {
         method: 'POST',
         mode: 'cors',
         headers: {

@@ -7,5 +7,12 @@
  * ```
  */
 export function getApiHost(): string {
-  return process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+  const raw = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:19091'
+
+  // Ensure the returned host includes a scheme so fetch() builds a valid URL
+  if (raw.startsWith('http://') || raw.startsWith('https://')) {
+    return raw
+  }
+
+  return `http://${raw}`
 }
