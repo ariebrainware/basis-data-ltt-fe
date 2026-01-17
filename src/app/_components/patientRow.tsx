@@ -19,7 +19,8 @@ import { isAdmin } from '../_functions/userRole'
 // Type for patient update payload.
 // patient_code is made optional because it's conditionally included based on user role.
 // Admin users can update it, but non-admin users cannot.
-type PatientUpdatePayload = Omit<PatientType, 'ID' | 'last_visit' | 'onDataChange'> & {
+// This overrides the required string from PatientType to make it optional in updates.
+type PatientUpdatePayload = Omit<PatientType, 'ID' | 'last_visit' | 'onDataChange' | 'patient_code'> & {
   patient_code?: string
 }
 
