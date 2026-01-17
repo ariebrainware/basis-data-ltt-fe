@@ -346,6 +346,7 @@ test.describe('Patient Edit Functionality', () => {
     }) => {
       // Set up request interception to capture the API call
       let capturedPayload: any = null
+      let requestPromise: Promise<void> | null = null
       
       // Listen for API requests
       page.on('request', (request) => {
@@ -387,12 +388,20 @@ test.describe('Patient Edit Functionality', () => {
         await patientCodeInput.clear()
         await patientCodeInput.fill('ADMIN-CODE-001')
 
+        // Set up promise to wait for the request
+        requestPromise = page.waitForRequest(
+          (request) => 
+            request.url().includes('/patient/') && 
+            request.method() === 'PATCH',
+          { timeout: 5000 }
+        ).then(() => {}).catch(() => {})
+
         // Click confirm to trigger API call
         const confirmButton = page.getByText('Confirm')
         await confirmButton.click()
 
-        // Wait a moment for the request to be captured
-        await page.waitForTimeout(500)
+        // Wait for the request to complete
+        await requestPromise
 
         // Verify patient_code is in the payload for admin
         if (capturedPayload) {
@@ -400,17 +409,19 @@ test.describe('Patient Edit Functionality', () => {
           expect(capturedPayload.patient_code).toBe('ADMIN-CODE-001')
         }
 
-        // Wait for any modal/alert to appear and dismiss it
-        await page.waitForTimeout(1000)
-        const okButton = page.getByText('OK')
-        const okButtonCount = await okButton.count()
-        if (okButtonCount > 0) {
+        // Wait for success modal to appear and dismiss it
+        try {
+          const okButton = page.getByText('OK')
+          await okButton.waitFor({ state: 'visible', timeout: 2000 })
           await okButton.click()
+        } catch (e) {
+          // Modal may not appear in test environment
         }
       }
 
       // Test 2: Non-admin user - patient_code should NOT be in payload
       capturedPayload = null // Reset
+      requestPromise = null
 
       await page.evaluate(() => {
         localStorage.setItem('user-role', 'therapist')
@@ -432,24 +443,33 @@ test.describe('Patient Edit Functionality', () => {
         await fullNameInput.clear()
         await fullNameInput.fill('Test Patient Non-Admin')
 
+        // Set up promise to wait for the request
+        requestPromise = page.waitForRequest(
+          (request) => 
+            request.url().includes('/patient/') && 
+            request.method() === 'PATCH',
+          { timeout: 5000 }
+        ).then(() => {}).catch(() => {})
+
         // Click confirm to trigger API call
         const confirmButton = page.getByText('Confirm')
         await confirmButton.click()
 
-        // Wait a moment for the request to be captured
-        await page.waitForTimeout(500)
+        // Wait for the request to complete
+        await requestPromise
 
         // Verify patient_code is NOT in the payload for non-admin
         if (capturedPayload) {
           expect(capturedPayload).not.toHaveProperty('patient_code')
         }
 
-        // Wait for any modal/alert to appear and dismiss it
-        await page.waitForTimeout(1000)
-        const okButton = page.getByText('OK')
-        const okButtonCount = await okButton.count()
-        if (okButtonCount > 0) {
+        // Wait for success modal to appear and dismiss it
+        try {
+          const okButton = page.getByText('OK')
+          await okButton.waitFor({ state: 'visible', timeout: 2000 })
           await okButton.click()
+        } catch (e) {
+          // Modal may not appear in test environment
         }
       }
     })
