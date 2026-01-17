@@ -68,10 +68,13 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'pnpm run dev',
+    // Use a production start (build + start) for stable E2E runs instead of
+    // the Turbopack-powered dev server which can cause HMR reload loops.
+    command: 'pnpm run build && pnpm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    // Building can take longer locally; increase timeout to 3 minutes.
+    timeout: 180000,
   },
   // Create storage state before tests run to set localStorage flags
   globalSetup: require.resolve('./e2e/global-setup'),
