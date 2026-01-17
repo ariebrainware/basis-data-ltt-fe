@@ -26,12 +26,7 @@ export function PatientForm({
   onGenderChange,
   diseases,
 }: PatientFormProps) {
-  const [admin, setAdmin] = useState(false)
-
-  useEffect(() => {
-    // determine admin status on client
-    setAdmin(isAdmin())
-  }, [])
+  const [admin, setAdmin] = useState(isAdmin())
   const [selected, setSelected] = useState<string[]>(() => {
     return health_history
       ? health_history
