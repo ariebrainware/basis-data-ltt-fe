@@ -16,16 +16,7 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isAdmin } from '../_functions/userRole'
 
-interface PatientUpdatePayload {
-  full_name: string
-  phone_number: string
-  gender: string
-  job: string
-  age: number
-  email: string
-  address: string
-  health_history: string
-  surgery_history: string
+type PatientUpdatePayload = Omit<PatientType, 'ID' | 'last_visit' | 'onDataChange'> & {
   patient_code?: string
 }
 

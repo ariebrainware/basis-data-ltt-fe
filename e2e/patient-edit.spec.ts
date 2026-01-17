@@ -356,7 +356,8 @@ test.describe('Patient Edit Functionality', () => {
               capturedPayload = JSON.parse(postData)
             }
           } catch (e) {
-            // Ignore parse errors
+            // Log unexpected JSON parse errors for debugging
+            console.error('Failed to parse request payload:', e)
           }
         }
       })
