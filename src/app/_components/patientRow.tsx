@@ -14,6 +14,18 @@ import {
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
+import { isAdmin } from '../_functions/userRole'
+
+// Type for patient update payload.
+// patient_code is made optional because it's conditionally included based on user role.
+// Admin users can update it, but non-admin users cannot.
+// This overrides the required string from PatientType to make it optional in updates.
+type PatientUpdatePayload = Omit<
+  PatientType,
+  'ID' | 'last_visit' | 'onDataChange' | 'patient_code'
+> & {
+  patient_code?: string
+}
 
 export default function Patient({
   ID,
@@ -118,6 +130,31 @@ export default function Patient({
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
       surgery_history
     const gender_new_input = genderValue || gender
+    const patient_code_new_input =
+      document.querySelector<HTMLInputElement>('#patient_code')?.value ||
+      patientCode
+
+    const payload: PatientUpdatePayload = {
+      full_name: full_name_new_input,
+      phone_number: phone_number_new_input,
+      gender: gender_new_input,
+      job: job_new_input,
+      age: Number(age_new_input), // Convert age_new_input to number
+      email: email_new_input,
+      address: address_new_input,
+      health_history: handleHealthConditionInput(
+        health_history_new_input || ''
+      ),
+      surgery_history: surgery_history_new_input,
+    }
+
+    // Only include patient_code when current user is admin
+    // ⚠️ SECURITY WARNING: Client-side role checking alone is insufficient for security.
+    // The backend MUST also validate the user's role before accepting any patient_code updates.
+    // This client-side check is for UX only - malicious users can bypass it by modifying requests.
+    if (isAdmin()) {
+      payload.patient_code = patient_code_new_input
+    }
 
     fetch(`${getApiHost()}/patient/${ID}`, {
       method: 'PATCH',
@@ -128,19 +165,7 @@ export default function Patient({
         Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
         'session-token': getSessionToken(),
       },
-      body: JSON.stringify({
-        full_name: full_name_new_input,
-        phone_number: phone_number_new_input,
-        gender: gender_new_input,
-        job: job_new_input,
-        age: Number(age_new_input), // Convert age_new_input to number
-        email: email_new_input,
-        address: address_new_input,
-        health_history: handleHealthConditionInput(
-          health_history_new_input || ''
-        ),
-        surgery_history: surgery_history_new_input,
-      }),
+      body: JSON.stringify(payload),
     })
       .then((response) => {
         if (response.status === 401) {

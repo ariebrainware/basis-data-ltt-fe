@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { isAdmin } from '../_functions/userRole'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PatientType } from '../_types/patient'
 import { DiseaseType } from '../_types/disease'
@@ -25,6 +26,7 @@ export function PatientForm({
   onGenderChange,
   diseases,
 }: PatientFormProps) {
+  const [admin, setAdmin] = useState(isAdmin())
   const [selected, setSelected] = useState<string[]>(() => {
     return health_history
       ? health_history
@@ -92,7 +94,7 @@ export function PatientForm({
               id="patient_code"
               type="text"
               label="Kode Pasien"
-              disabled
+              disabled={!admin}
               defaultValue={patient_code}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
