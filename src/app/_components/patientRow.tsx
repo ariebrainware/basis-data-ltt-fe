@@ -16,6 +16,14 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isAdmin } from '../_functions/userRole'
 
+// Type for patient update payload.
+// patient_code is made optional because it's conditionally included based on user role.
+// Admin users can update it, but non-admin users cannot.
+// This overrides the required string from PatientType to make it optional in updates.
+type PatientUpdatePayload = Omit<PatientType, 'ID' | 'last_visit' | 'onDataChange' | 'patient_code'> & {
+  patient_code?: string
+}
+
 export default function Patient({
   ID,
   full_name: name,
@@ -123,7 +131,7 @@ export default function Patient({
       document.querySelector<HTMLInputElement>('#patient_code')?.value ||
       patientCode
 
-    const payload: any = {
+    const payload: PatientUpdatePayload = {
       full_name: full_name_new_input,
       phone_number: phone_number_new_input,
       gender: gender_new_input,
@@ -138,6 +146,9 @@ export default function Patient({
     }
 
     // Only include patient_code when current user is admin
+    // ⚠️ SECURITY WARNING: Client-side role checking alone is insufficient for security.
+    // The backend MUST also validate the user's role before accepting any patient_code updates.
+    // This client-side check is for UX only - malicious users can bypass it by modifying requests.
     if (isAdmin()) {
       payload.patient_code = patient_code_new_input
     }
