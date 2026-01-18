@@ -83,14 +83,14 @@ export default function RootLayout({
                       Array.from(document.querySelectorAll('button,div,span')).forEach((el) => {
                         try {
                           if (el && el.textContent && el.textContent.trim().includes(text)) {
-                            (el as HTMLElement).style.display = 'none'
+                            try { if (el && el.style) el.style.display = 'none' } catch (e) {}
                           }
                         } catch (e) {}
                       })
                     }
                     const hideWrappers = () => {
                       const wrappers = document.querySelectorAll('[data-speed-insights], .speed-insights, #speed-insights, .next-devtools, .issues-overlay')
-                      wrappers.forEach((w) => { try { (w as HTMLElement).style.display = 'none' } catch (e) {} })
+                      wrappers.forEach((w) => { try { if (w && w.style) w.style.display = 'none' } catch (e) {} })
                     }
                     // Run immediately and also observe DOM for later additions
                     hideByText('Open Next.js Dev Tools')
