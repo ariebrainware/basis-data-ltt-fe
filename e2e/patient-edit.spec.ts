@@ -291,7 +291,7 @@ test.describe('Patient Edit Functionality', () => {
         // Check if patient_code field exists and is enabled
         const patientCodeInput = page.locator('#patient_code')
         await expect(patientCodeInput).toBeVisible()
-        
+
         // For admin users, the field should NOT have the disabled attribute
         const isDisabled = await patientCodeInput.isDisabled()
         expect(isDisabled).toBe(false)
@@ -334,7 +334,7 @@ test.describe('Patient Edit Functionality', () => {
         // Check if patient_code field exists and is disabled
         const patientCodeInput = page.locator('#patient_code')
         await expect(patientCodeInput).toBeVisible()
-        
+
         // For non-admin users, the field should be disabled
         const isDisabled = await patientCodeInput.isDisabled()
         expect(isDisabled).toBe(true)
@@ -346,10 +346,13 @@ test.describe('Patient Edit Functionality', () => {
     }) => {
       // Set up request interception to capture the API call
       let capturedPayload: any = null
-      
+
       // Listen for API requests and capture the payload
       page.on('request', (request) => {
-        if (request.url().includes('/patient/') && request.method() === 'PATCH') {
+        if (
+          request.url().includes('/patient/') &&
+          request.method() === 'PATCH'
+        ) {
           const postData = request.postData()
           if (postData) {
             try {
@@ -388,15 +391,17 @@ test.describe('Patient Edit Functionality', () => {
         await patientCodeInput.fill('ADMIN-CODE-001')
 
         // Set up promise to wait for the request
-        const requestPromise = page.waitForRequest(
-          (request) => 
-            request.url().includes('/patient/') && 
-            request.method() === 'PATCH',
-          { timeout: 5000 }
-        ).catch(() => {
-          // Request may not happen in test environment (e.g., API not running)
-          // Test will verify capturedPayload if request was made
-        })
+        const requestPromise = page
+          .waitForRequest(
+            (request) =>
+              request.url().includes('/patient/') &&
+              request.method() === 'PATCH',
+            { timeout: 5000 }
+          )
+          .catch(() => {
+            // Request may not happen in test environment (e.g., API not running)
+            // Test will verify capturedPayload if request was made
+          })
 
         // Click confirm to trigger API call
         const confirmButton = page.getByText('Confirm')
@@ -440,24 +445,26 @@ test.describe('Patient Edit Functionality', () => {
         await page.locator('[role="dialog"]').waitFor({ state: 'visible' })
 
         // Fill in form fields (but don't try to edit patient_code as it's disabled)
-        const fullNameInput = page.locator('#full_name')
-        await fullNameInput.clear()
-        await fullNameInput.fill('Test Patient Non-Admin')
+        const fullNameInput2 = page.locator('#full_name')
+        await fullNameInput2.clear()
+        await fullNameInput2.fill('Test Patient Non-Admin')
 
         // Set up promise to wait for the request
-        const requestPromise2 = page.waitForRequest(
-          (request) => 
-            request.url().includes('/patient/') && 
-            request.method() === 'PATCH',
-          { timeout: 5000 }
-        ).catch(() => {
-          // Request may not happen in test environment (e.g., API not running)
-          // Test will verify capturedPayload if request was made
-        })
+        const requestPromise2 = page
+          .waitForRequest(
+            (request) =>
+              request.url().includes('/patient/') &&
+              request.method() === 'PATCH',
+            { timeout: 5000 }
+          )
+          .catch(() => {
+            // Request may not happen in test environment (e.g., API not running)
+            // Test will verify capturedPayload if request was made
+          })
 
         // Click confirm to trigger API call
-        const confirmButton = page.getByText('Confirm')
-        await confirmButton.click()
+        const confirmButton2 = page.getByText('Confirm')
+        await confirmButton2.click()
 
         // Wait for the request to complete
         await requestPromise2
