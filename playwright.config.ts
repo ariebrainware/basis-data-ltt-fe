@@ -47,7 +47,12 @@ export default defineConfig({
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        browserName: 'firefox',
+        launchOptions: {
+          args: ['--no-sandbox'],
+        },
+      },
     },
 
     {
