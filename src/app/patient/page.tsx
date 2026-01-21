@@ -26,7 +26,9 @@ function usePatients(
   currentPage: number,
   keyword: string,
   refreshTrigger: number,
-  dateKeyword?: string
+  dateKeyword?: string,
+  sortBy?: string,
+  sortDir?: string
 ): ListPatientsResponse {
   const [patients, setPatients] = useState<PatientType[]>([])
   const [total, setTotal] = useState(0)
@@ -42,6 +44,13 @@ function usePatients(
           params += `&group_by_date=${encodeURIComponent(dateKeyword)}`
         else if (keyword && keyword.trim() !== '')
           params += `&keyword=${encodeURIComponent(keyword)}`
+
+        // Add sorting params when provided (backend expects sort_by and sort_dir)
+        if (sortBy && sortBy.trim() !== '') {
+          params += `&sort_by=${encodeURIComponent(sortBy)}`
+          if (sortDir && (sortDir === 'asc' || sortDir === 'desc'))
+            params += `&sort_dir=${encodeURIComponent(sortDir)}`
+        }
 
         const res = await fetch(`${getApiHost()}/patient?${params}`, {
           method: 'GET',
@@ -67,7 +76,7 @@ function usePatients(
         console.error('Error fetching patients:', error)
       }
     })()
-  }, [currentPage, keyword, refreshTrigger, dateKeyword])
+  }, [currentPage, keyword, refreshTrigger, dateKeyword, sortBy, sortDir])
 
   return { data: { patients }, total }
 }
@@ -77,15 +86,31 @@ export default function Patient() {
   const [groupingDate, setGroupingDate] = useState('')
   const [keyword, setKeyword] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [sortBy, setSortBy] = useState('')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const { data, total } = usePatients(
     currentPage,
     keyword,
     refreshTrigger,
-    groupingDate
+    groupingDate,
+    sortBy,
+    sortDir
   )
 
   const handleRefresh = () => {
     setRefreshTrigger((prev) => prev + 1)
+  }
+
+  const handleSortChange = (newSortBy: string) => {
+    if (sortBy === newSortBy) {
+      // toggle direction
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortBy(newSortBy)
+      setSortDir('asc')
+    }
+    // reset to first page when sorting changes
+    setCurrentPage(1)
   }
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -145,6 +170,9 @@ export default function Patient() {
             patients: data.patients,
           }}
           onDataChange={handleRefresh}
+          sortBy={sortBy}
+          sortDir={sortDir}
+          onSortChange={handleSortChange}
         />
       </CardBody>
       <CardFooter

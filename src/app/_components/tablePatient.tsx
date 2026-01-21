@@ -1,3 +1,5 @@
+'use client'
+import React, { useState, useEffect, useMemo } from 'react'
 import Patient from '../_components/patientRow'
 import { PatientType } from '../_types/patient'
 
@@ -6,52 +8,93 @@ interface TablePatientProps {
     patients: PatientType[]
   }
   onDataChange?: () => void
+  sortBy?: string
+  sortDir?: 'asc' | 'desc'
+  onSortChange?: (sortBy: string) => void
 }
-const TableHeader = () => (
+
+const SortIcon = ({ dir }: { dir: 'asc' | 'desc' | null }) => {
+  if (!dir) return null
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="ml-2"
+    >
+      {dir === 'asc' ? (
+        <path
+          d="M6 15l6-6 6 6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        <path
+          d="M18 9l-6 6-6-6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
+    </svg>
+  )
+}
+
+const TableHeader = ({
+  sortBy,
+  sortDir,
+  onSortChange,
+}: {
+  sortBy?: string
+  sortDir?: 'asc' | 'desc'
+  onSortChange?: (s: string) => void
+}) => (
   <thead className="border-slate-200 bg-slate-100 text-slate-600 dark:bg-slate-900 border-b text-sm font-medium">
     <tr>
-      {renderHeaderCell('Pasien/Nomor Telepon')}
-      {renderHeaderCell('Pekerjaan/Umur')}
-      {renderHeaderCell('Jenis Kelamin')}
-      {renderHeaderCell('Kode Pasien')}
-      <th className="cursor-pointer px-2.5 py-2 text-start font-medium">
+      <th className="px-2.5 py-2 text-start font-medium">
+        <button
+          type="button"
+          onClick={() => onSortChange && onSortChange('full_name')}
+          className="flex items-center gap-2 text-sm text-current antialiased opacity-70"
+        >
+          Pasien/Nomor Telepon
+          <SortIcon dir={sortBy === 'full_name' ? (sortDir ?? 'asc') : null} />
+        </button>
+      </th>
+      <th className="px-2.5 py-2 text-start font-medium">
+        <small className="flex items-center gap-2 font-sans text-sm text-current antialiased opacity-70">
+          Pekerjaan/Umur
+        </small>
+      </th>
+      <th className="px-2.5 py-2 text-start font-medium">
+        <small className="flex items-center gap-2 font-sans text-sm text-current antialiased opacity-70">
+          Jenis Kelamin
+        </small>
+      </th>
+      <th className="px-2.5 py-2 text-start font-medium">
+        <button
+          type="button"
+          onClick={() => onSortChange && onSortChange('patient_code')}
+          className="flex items-center gap-2 text-sm text-current antialiased opacity-70"
+        >
+          Kode Pasien
+          <SortIcon
+            dir={sortBy === 'patient_code' ? (sortDir ?? 'asc') : null}
+          />
+        </button>
+      </th>
+      <th className="px-2.5 py-2 text-start font-medium">
         <small className="flex items-center justify-between gap-2 font-sans text-sm text-current antialiased opacity-70">
           {' '}
         </small>
       </th>
     </tr>
   </thead>
-)
-
-const renderHeaderCell = (label: string) => (
-  <th className="cursor-pointer px-2.5 py-2 text-start font-medium">
-    <small className="flex items-center justify-between gap-2 font-sans text-sm text-current antialiased opacity-70">
-      {label}{' '}
-      <svg
-        width="1.5em"
-        height="1.5em"
-        viewBox="0 0 24 24"
-        strokeWidth="2"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        color="currentColor"
-        className="size-4"
-      >
-        <path
-          d="M17 8L12 3L7 8"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        ></path>
-        <path
-          d="M17 16L12 21L7 16"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        ></path>
-      </svg>
-    </small>
-  </th>
 )
 
 const TableBody = ({
@@ -72,7 +115,7 @@ const TableBody = ({
         age={patient.age}
         gender={patient.gender}
         patient_code={patient.patient_code}
-        last_visit={''}
+        last_visit={patient.last_visit ?? ''}
         email={patient.email}
         health_history={patient.health_history}
         surgery_history={patient.surgery_history}
@@ -82,16 +125,71 @@ const TableBody = ({
     ))}
   </tbody>
 )
-
 export default function TablePatient({
   Data,
   onDataChange,
+  sortBy,
+  sortDir,
+  onSortChange,
 }: TablePatientProps) {
   const { patients } = Data
+
+  // local sorting state (used when parent doesn't control sorting)
+  const [localSortBy, setLocalSortBy] = useState<string | undefined>(
+    sortBy ?? undefined
+  )
+  const [localSortDir, setLocalSortDir] = useState<'asc' | 'desc' | undefined>(
+    sortDir ?? 'asc'
+  )
+
+  // parent-controlled props are used directly via appliedSortBy/appliedSortDir;
+  // avoid syncing props into local state inside effects to prevent cascading renders
+
+  const handleSortChange = (col: string) => {
+    // notify parent (backwards compatible)
+    if (onSortChange) {
+      onSortChange(col)
+    }
+
+    // determine next direction and update local state so component re-renders
+    const currentBy = sortBy ?? localSortBy
+    const currentDir = sortDir ?? localSortDir ?? 'asc'
+    const nextDir: 'asc' | 'desc' =
+      currentBy === col ? (currentDir === 'asc' ? 'desc' : 'asc') : 'asc'
+    setLocalSortBy(col)
+    setLocalSortDir(nextDir)
+  }
+
+  const appliedSortBy = sortBy ?? localSortBy
+  const appliedSortDir = sortDir ?? localSortDir ?? 'asc'
+
+  const sortedPatients = useMemo(() => {
+    if (!patients) return []
+    const arr = [...patients]
+    if (!appliedSortBy) return arr
+    arr.sort((a: PatientType, b: PatientType) => {
+      const aVal = (a as any)[appliedSortBy] ?? ''
+      const bVal = (b as any)[appliedSortBy] ?? ''
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return appliedSortDir === 'asc' ? aVal - bVal : bVal - aVal
+      }
+      const aS = String(aVal).toLowerCase()
+      const bS = String(bVal).toLowerCase()
+      if (aS < bS) return appliedSortDir === 'asc' ? -1 : 1
+      if (aS > bS) return appliedSortDir === 'asc' ? 1 : -1
+      return 0
+    })
+    return arr
+  }, [patients, appliedSortBy, appliedSortDir])
+
   return (
     <table className="w-full whitespace-nowrap">
-      <TableHeader />
-      <TableBody patients={patients} onDataChange={onDataChange} />
+      <TableHeader
+        sortBy={appliedSortBy}
+        sortDir={appliedSortDir}
+        onSortChange={handleSortChange}
+      />
+      <TableBody patients={sortedPatients} onDataChange={onDataChange} />
     </table>
   )
 }
