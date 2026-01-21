@@ -12,7 +12,7 @@ permissions:
 jobs:
   unit-tests:
     name: Unit and Component Tests
-    runs-on: ubuntu-latest
+    runs-on: evolto3-fe-runner
 
     permissions:
       contents: read
@@ -64,7 +64,7 @@ jobs:
 
   e2e-tests:
     name: E2E Tests with Playwright
-    runs-on: ubuntu-latest
+    runs-on: evolto3-fe-runner
 
     permissions:
       contents: read
@@ -120,7 +120,7 @@ jobs:
 
   lint:
     name: Lint Check
-    runs-on: ubuntu-latest
+    runs-on: evolto3-fe-runner
 
     permissions:
       contents: read
@@ -147,7 +147,7 @@ jobs:
 
   build:
     name: Build Check
-    runs-on: ubuntu-latest
+    runs-on: evolto3-fe-runner
 
     permissions:
       contents: read
