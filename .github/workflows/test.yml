@@ -67,6 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:latest
+      options: --user 1001
 
     permissions:
       contents: read
