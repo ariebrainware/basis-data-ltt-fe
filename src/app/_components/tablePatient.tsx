@@ -55,21 +55,22 @@ const TableHeader = ({
   onSortChange?: (s: string) => void
 }) => {
   const patientNameSortDir = sortBy === 'full_name' ? (sortDir ?? 'asc') : null
-  const patientCodeSortDir = sortBy === 'patient_code' ? (sortDir ?? 'asc') : null
+  const patientCodeSortDir =
+    sortBy === 'patient_code' ? (sortDir ?? 'asc') : null
 
   const patientNameAriaSort =
     patientNameSortDir === 'desc'
       ? 'descending'
       : patientNameSortDir === 'asc'
-      ? 'ascending'
-      : 'none'
+        ? 'ascending'
+        : 'none'
 
   const patientCodeAriaSort =
     patientCodeSortDir === 'desc'
       ? 'descending'
       : patientCodeSortDir === 'asc'
-      ? 'ascending'
-      : 'none'
+        ? 'ascending'
+        : 'none'
 
   const patientNameButtonAriaLabel =
     patientNameSortDir === null
@@ -173,62 +174,14 @@ export default function TablePatient({
 }: TablePatientProps) {
   const { patients } = Data
 
-  // local sorting state (used when parent doesn't control sorting)
-  const [localSortBy, setLocalSortBy] = useState<string | undefined>(
-    sortBy ?? undefined
-  )
-  const [localSortDir, setLocalSortDir] = useState<'asc' | 'desc' | undefined>(
-    sortDir ?? 'asc'
-  )
-
-  // parent-controlled props are used directly via appliedSortBy/appliedSortDir;
-  // avoid syncing props into local state inside effects to prevent cascading renders
-
-  const handleSortChange = (col: string) => {
-    // notify parent (backwards compatible)
-    if (onSortChange) {
-      onSortChange(col)
-    }
-
-    // determine next direction and update local state so component re-renders
-    const currentBy = sortBy ?? localSortBy
-    const currentDir = sortDir ?? localSortDir ?? 'asc'
-    const nextDir: 'asc' | 'desc' =
-      currentBy === col ? (currentDir === 'asc' ? 'desc' : 'asc') : 'asc'
-    setLocalSortBy(col)
-    setLocalSortDir(nextDir)
-  }
-
-  const appliedSortBy = sortBy ?? localSortBy
-  const appliedSortDir = sortDir ?? localSortDir ?? 'asc'
-
-  const sortedPatients = useMemo(() => {
-    if (!patients) return []
-    const arr = [...patients]
-    if (!appliedSortBy) return arr
-    arr.sort((a: PatientType, b: PatientType) => {
-      const aVal = (a as any)[appliedSortBy] ?? ''
-      const bVal = (b as any)[appliedSortBy] ?? ''
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return appliedSortDir === 'asc' ? aVal - bVal : bVal - aVal
-      }
-      const aS = String(aVal).toLowerCase()
-      const bS = String(bVal).toLowerCase()
-      if (aS < bS) return appliedSortDir === 'asc' ? -1 : 1
-      if (aS > bS) return appliedSortDir === 'asc' ? 1 : -1
-      return 0
-    })
-    return arr
-  }, [patients, appliedSortBy, appliedSortDir])
-
   return (
     <table className="w-full whitespace-nowrap">
       <TableHeader
-        sortBy={appliedSortBy}
-        sortDir={appliedSortDir}
-        onSortChange={handleSortChange}
+        sortBy={sortBy}
+        sortDir={sortDir}
+        onSortChange={onSortChange}
       />
-      <TableBody patients={sortedPatients} onDataChange={onDataChange} />
+      <TableBody patients={patients} onDataChange={onDataChange} />
     </table>
   )
 }
