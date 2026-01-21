@@ -65,6 +65,9 @@ jobs:
   e2e-tests:
     name: E2E Tests with Playwright
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-jammy
+      options: --user 1001
 
     permissions:
       contents: read
@@ -72,6 +75,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Clear Corepack Cache
+        run: |
+          rm -rf ~/.cache/corepack
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -83,25 +90,11 @@ jobs:
         with:
           version: 10.27.0
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+        run: npx playwright install
 
       - name: Run E2E tests
         run: pnpm test:e2e
