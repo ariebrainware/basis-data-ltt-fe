@@ -75,6 +75,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Clear Corepack Cache
+        run: |
+          rm -rf ~/.cache/corepack
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.27.0
+
       - name: Enable pnpm via Corepack
         run: |
           corepack enable
