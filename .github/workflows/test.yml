@@ -65,6 +65,9 @@ jobs:
   e2e-tests:
     name: E2E Tests with Playwright
     runs-on: evolto3-fe-runner
+    container:
+      image: mcr.microsoft.com/playwright:latest
+      options: --user=github
 
     permissions:
       contents: read
@@ -73,35 +76,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.27.0
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
+      - name: Enable pnpm via Corepack
         run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          corepack enable
+          corepack prepare pnpm@10.27.0 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install
+      - name: (Browsers provided by container)
+        run: echo "Using Playwright container image with browsers preinstalled"
 
       - name: Run E2E tests
         run: pnpm test:e2e
