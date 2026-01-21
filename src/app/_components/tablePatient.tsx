@@ -96,7 +96,7 @@ const TableHeader = ({
           <button
             type="button"
             onClick={() => onSortChange && onSortChange('full_name')}
-            className="flex items-center gap-2 text-sm text-current antialiased opacity-70"
+            className="flex items-center gap-2 text-sm text-current antialiased opacity-70 hover:opacity-100 focus:outline focus:outline-2 focus:outline-offset-2"
             aria-label={patientNameButtonAriaLabel}
           >
             Pasien/Nomor Telepon
@@ -120,7 +120,7 @@ const TableHeader = ({
           <button
             type="button"
             onClick={() => onSortChange && onSortChange('patient_code')}
-            className="flex items-center gap-2 text-sm text-current antialiased opacity-70"
+            className="flex items-center gap-2 text-sm text-current antialiased opacity-70 hover:opacity-100 focus:outline focus:outline-2 focus:outline-offset-2"
             aria-label={patientCodeButtonAriaLabel}
           >
             Kode Pasien
