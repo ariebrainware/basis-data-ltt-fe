@@ -48,8 +48,9 @@ function usePatients(
         // Add sorting params when provided (backend expects sort_by and sort_dir)
         if (sortBy && sortBy.trim() !== '') {
           params += `&sort_by=${encodeURIComponent(sortBy)}`
-          if (sortDir && (sortDir === 'asc' || sortDir === 'desc'))
-            params += `&sort_dir=${encodeURIComponent(sortDir)}`
+          const normalizedSortDir =
+            sortDir === 'asc' || sortDir === 'desc' ? sortDir : 'asc'
+          params += `&sort_dir=${encodeURIComponent(normalizedSortDir)}`
         }
 
         const res = await fetch(`${getApiHost()}/patient?${params}`, {
