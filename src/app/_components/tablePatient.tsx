@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, useMemo } from 'react'
+import React from 'react'
 import Patient from '../_components/patientRow'
 import { PatientType } from '../_types/patient'
 
