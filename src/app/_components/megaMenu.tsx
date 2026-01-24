@@ -194,6 +194,7 @@ function NavListMenu() {
 }
 
 function NavList() {
+  const router = useRouter()
   return (
     <List
       className="mb-6 mt-4 p-0 lg:my-0 lg:flex-row lg:p-1"
