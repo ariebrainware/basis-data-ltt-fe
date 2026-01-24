@@ -179,8 +179,8 @@ export default function ProfilePage() {
       }
 
       if (changingPassword) {
-        body.current_password = currentPassword
-        body.new_password = newPassword
+        body.old_password = currentPassword
+        body.password = newPassword
       }
 
       const res = await apiFetch(UPDATE_PROFILE_ENDPOINT, {
