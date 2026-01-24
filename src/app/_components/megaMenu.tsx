@@ -224,6 +224,30 @@ function NavList() {
           Home
         </ListItem>
       </Typography>
+      <Typography
+        as="a"
+        href="#"
+        variant="small"
+        color="blue-gray"
+        className="font-medium"
+        placeholder={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
+      >
+        <ListItem
+          className="flex cursor-pointer items-center gap-2 py-2 pr-4"
+          placeholder={undefined}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
+          onClick={() => (window.location.href = '/profile')}
+        >
+          Profile
+        </ListItem>
+      </Typography>
       <NavListMenu />
       <Typography
         as="a"

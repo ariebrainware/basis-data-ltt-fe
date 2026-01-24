@@ -59,6 +59,14 @@ export default function Header() {
         >
           Logout
         </button>
+        <button
+          onClick={() => (window.location.href = '/profile')}
+          className="inline-flex select-none items-center justify-center rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-white shadow-sm transition-all duration-300 ease-in hover:border-blue-500 hover:bg-blue-500 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
+          data-shape="default"
+          data-width="default"
+        >
+          Profile
+        </button>
       </div>
     </div>
   )
