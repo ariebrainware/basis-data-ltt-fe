@@ -11,6 +11,8 @@ import {
   CardFooter,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import Pagination from '../_components/pagination'
 import TableTreatment from '../_components/tableTreatment'
 import { TreatmentType } from '../_types/treatment'
@@ -36,18 +38,9 @@ function useFetchTreatment(
   useEffect(() => {
     ;(async () => {
       try {
-        const res = await fetch(
-          `${getApiHost()}/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
-          {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': getSessionToken(),
-            },
-          }
+        const res = await apiFetch(
+          `/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
+          { method: 'GET' }
         )
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
@@ -62,7 +55,8 @@ function useFetchTreatment(
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
+          const router = useRouter()
+          UnauthorizedAccess(router)
         }
         console.error('Error fetching treatment:', error)
       }
@@ -76,6 +70,7 @@ export default function ListTreatment() {
   const [currentPage, setCurrentPage] = useState(1)
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [keyword, setKeyword] = useState('')
+  const router = useRouter()
   const { data, total } = useFetchTreatment(currentPage, keyword)
   useEffect(() => {
     setTreatment(data.treatment)

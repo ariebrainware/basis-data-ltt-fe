@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { getApiHost } from '@/app/_functions/apiHost'
 import { apiFetch } from '@/app/_functions/apiFetch'
 import { UnauthorizedAccess } from '@/app/_functions/unauthorized'
@@ -14,6 +15,7 @@ function isValidEmail(email: string) {
 }
 
 export default function ProfilePage() {
+  const router = useRouter()
   const CURRENT_USER_ENDPOINT =
     process.env.NEXT_PUBLIC_CURRENT_USER_ENDPOINT || '/user'
   const UPDATE_PROFILE_ENDPOINT =
@@ -60,7 +62,7 @@ export default function ProfilePage() {
         const res = await apiFetch(`/user/${userId}`)
 
         if (res.status === 401) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
           return
         }
 
@@ -130,7 +132,7 @@ export default function ProfilePage() {
       })
 
       if (res.status === 401) {
-        UnauthorizedAccess()
+        UnauthorizedAccess(router)
         return
       }
 
@@ -198,7 +200,7 @@ export default function ProfilePage() {
       })
 
       if (res.status === 401) {
-        UnauthorizedAccess()
+        UnauthorizedAccess(router)
         return
       }
 

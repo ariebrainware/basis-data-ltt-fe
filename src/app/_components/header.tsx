@@ -1,6 +1,14 @@
+'use client'
+import { useRouter } from 'next/navigation'
 import { logout } from '../_functions/logout'
 
 export default function Header() {
+  const router = useRouter()
+  const handleLogout = async () => {
+    await logout()
+    router.push('/login')
+  }
+
   return (
     <div className="mb-8 flex items-center justify-between gap-8">
       <div>
@@ -12,10 +20,10 @@ export default function Header() {
         </p>
       </div>
       <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-        <button
-          onClick={() =>
-            window.open('/register', '_blank', 'noopener,noreferrer')
-          }
+        <a
+          href="/register"
+          target="_blank"
+          rel="noopener noreferrer"
           className="border-slate-800 bg-slate-800 text-slate-50 hover:border-slate-700 hover:bg-slate-700 flex select-none items-center justify-center gap-3 rounded-md border px-3 py-1.5 text-center align-middle font-sans text-sm font-medium shadow-sm transition-all duration-300 ease-in hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
           data-shape="default"
           data-width="default"
@@ -50,9 +58,9 @@ export default function Header() {
             ></path>
           </svg>{' '}
           Tambah Pasien
-        </button>
+        </a>
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="border-slate-200 bg-slate-200 text-slate-800 hover:bg-slate-100 inline-flex select-none items-center justify-center rounded-md border px-3 py-1.5 text-center align-middle font-sans text-sm font-medium shadow-sm transition-all duration-300 ease-in hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
           data-shape="default"
           data-width="default"
@@ -60,7 +68,7 @@ export default function Header() {
           Logout
         </button>
         <button
-          onClick={() => (window.location.href = '/profile')}
+          onClick={() => router.push('/profile')}
           className="inline-flex select-none items-center justify-center rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-white shadow-sm transition-all duration-300 ease-in hover:border-blue-500 hover:bg-blue-500 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
           data-shape="default"
           data-width="default"

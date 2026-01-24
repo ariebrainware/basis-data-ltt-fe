@@ -14,6 +14,8 @@ import {
   Tab,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import Pagination from '../_components/pagination'
 import TableTherapist from '../_components/tableTherapist'
 import { TherapistType } from '../_types/therapist'
@@ -35,22 +37,14 @@ function useFetchTherapist(
 ): ListTherapistResponse {
   const [therapist, setTherapist] = useState<TherapistType[]>([])
   const [total, setTotal] = useState(0)
+  const router = useRouter()
 
   useEffect(() => {
     ;(async () => {
       try {
-        const res = await fetch(
-          `${getApiHost()}/therapist?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
-          {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': getSessionToken(),
-            },
-          }
+        const res = await apiFetch(
+          `/therapist?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
+          { method: 'GET' }
         )
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
@@ -59,7 +53,7 @@ function useFetchTherapist(
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
         }
         console.error('Error fetching therapist:', error)
       }
@@ -89,6 +83,7 @@ export default function ListTherapist() {
   const [therapists, setTherapists] = useState<TherapistType[]>([])
   const [, setTotal] = useState(0)
   const [keyword, setKeyword] = useState('')
+  const router = useRouter()
   const { data, total } = useFetchTherapist(currentPage, keyword)
   useEffect(() => {
     setTherapists(data.therapist)
@@ -101,19 +96,9 @@ export default function ListTherapist() {
       const newKeyword = (e.target as HTMLInputElement).value
       setKeyword(newKeyword)
       try {
-        const res = await fetch(
-          `${getApiHost()}/therapist?keyword=${newKeyword}`,
-          {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': getSessionToken(),
-            },
-          }
-        )
+        const res = await apiFetch(`/therapist?keyword=${newKeyword}`, {
+          method: 'GET',
+        })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
         const therapistArray = Array.isArray(therapists)
@@ -123,7 +108,7 @@ export default function ListTherapist() {
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
         }
         console.error('Error fetching therapist:', error)
       }

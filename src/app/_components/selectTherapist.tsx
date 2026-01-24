@@ -1,8 +1,9 @@
 'use client'
 import React from 'react'
 import * as MT from '@material-tailwind/react'
-import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 interface ControlledSelectProps {
   id?: string
@@ -18,6 +19,7 @@ export function ControlledSelect({
   onChange,
   disabled,
 }: ControlledSelectProps) {
+  const router = useRouter()
   const [selectedValue, setSelectedValue] = React.useState<string | undefined>(
     undefined
   )
@@ -39,20 +41,14 @@ export function ControlledSelect({
       setTherapists([])
       return
     }
-
-    fetch(`${getApiHost()}/therapist`, {
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
-      credentials: 'include',
-      redirect: 'follow',
-    })
-      .then((res) => res.json())
+    apiFetch('/therapist', { method: 'GET' })
+      .then((res) => {
+        if (res.status === 401) {
+          UnauthorizedAccess(router)
+          return Promise.reject(new Error('Unauthorized'))
+        }
+        return res.json()
+      })
       .then((data) => {
         const therapistsArray = Array.isArray(data.data.therapists)
           ? data.data.therapists

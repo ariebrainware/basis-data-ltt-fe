@@ -1,5 +1,6 @@
+'use client'
 import React from 'react'
-import { getSessionToken } from '../_functions/sessionToken'
+import { useRouter } from 'next/navigation'
 import { TreatmentType } from '../_types/treatment'
 import {
   Button,
@@ -10,7 +11,7 @@ import {
 } from '@material-tailwind/react'
 import { TreatmentForm } from './treatmentForm'
 import Swal from 'sweetalert2'
-import { getApiHost } from '../_functions/apiHost'
+import { apiFetch } from '../_functions/apiFetch'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isTherapist } from '../_functions/userRole'
 import { getUserId } from '../_functions/userId'
@@ -34,6 +35,7 @@ export default function Treatment({
   )
   const isTherapistRole = isTherapist()
   const currentUserId = getUserId()
+  const router = useRouter()
   const normalizedTherapistId =
     therapistId !== null && therapistId !== undefined
       ? String(therapistId)
@@ -129,15 +131,8 @@ export default function Treatment({
     const next_visit_new_input =
       document.querySelector<HTMLTextAreaElement>('#next_visit')?.value ||
       nextVisit
-    fetch(`${getApiHost()}/treatment/${ID}`, {
+    apiFetch(`/treatment/${ID}`, {
       method: 'PATCH',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
       body: JSON.stringify({
         treatment_date: treatment_date_new_input,
         patient_code: patient_code_new_input,
@@ -166,8 +161,8 @@ export default function Treatment({
       icon: 'success',
       confirmButtonText: 'OK',
     }).then(() => {
-      // Reload the page after user clicks "OK"
-      if (typeof window !== 'undefined') window.location.reload()
+      // refresh the current route
+      router.refresh()
     })
 
     setOpen(!open)

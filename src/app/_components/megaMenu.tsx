@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Navbar,
   Collapse,
@@ -71,6 +72,7 @@ function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [userRole, setUserRole] = React.useState<string | null>(null)
+  const router = useRouter()
 
   // Read user role only on the client after mount to avoid server/client
   // rendering differences that cause hydration mismatches.
@@ -91,7 +93,7 @@ function NavListMenu() {
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
           onClick={() => {
-            window.location.href = url
+            router.push(url)
           }}
           onResize={undefined}
           onResizeCapture={undefined}
@@ -243,7 +245,7 @@ function NavList() {
           onPointerLeaveCapture={undefined}
           onResize={undefined}
           onResizeCapture={undefined}
-          onClick={() => (window.location.href = '/profile')}
+          onClick={() => router.push('/profile')}
         >
           Profile
         </ListItem>
@@ -266,7 +268,10 @@ function NavList() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
-          onClick={logout}
+          onClick={async () => {
+            await logout()
+            router.push('/login')
+          }}
           onResize={undefined}
           onResizeCapture={undefined}
         >

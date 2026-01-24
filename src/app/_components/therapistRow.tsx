@@ -1,5 +1,7 @@
 import React from 'react'
-import { getSessionToken } from '../_functions/sessionToken'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { TherapistType } from '../_types/therapist'
 import { TherapistForm } from '../_components/therapistForm'
 import Swal from 'sweetalert2'
@@ -27,6 +29,7 @@ export default function Therapist({
   role: initialRole,
 }: TherapistType) {
   const [open, setOpen] = React.useState(false)
+  const router = useRouter()
   const [role, setRole] = React.useState<string>(initialRole || '')
 
   React.useEffect(() => {
@@ -66,15 +69,8 @@ export default function Therapist({
       document.querySelector<HTMLTextAreaElement>('#height')?.value || height
     const role_input =
       document.querySelector<HTMLTextAreaElement>('#role')?.value || role
-    fetch(`${getApiHost()}/therapist/${ID}`, {
+    apiFetch(`/therapist/${ID}`, {
       method: 'PATCH',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
       body: JSON.stringify({
         full_name: full_name_input,
         email: email_input,
@@ -88,6 +84,10 @@ export default function Therapist({
       }),
     })
       .then((response) => {
+        if (response.status === 401) {
+          UnauthorizedAccess(router)
+          return Promise.reject(new Error('Unauthorized'))
+        }
         if (!response.ok || response.status !== 200) {
           return response.json().then((data) => {
             Swal.fire({
@@ -103,8 +103,7 @@ export default function Therapist({
             icon: 'success',
             confirmButtonText: 'OK',
           }).then(() => {
-            // Reload the page after user clicks "OK"
-            if (typeof window !== 'undefined') window.location.reload()
+            router.refresh()
           })
         }
 
@@ -264,19 +263,15 @@ export default function Therapist({
                 if (!isApproved) {
                   // Logic to update the approval status can be added here
                   console.log('Set to Approved')
-                  fetch(`${getApiHost()}/therapist/${ID}`, {
+                  apiFetch(`/therapist/${ID}`, {
                     method: 'PUT',
-                    mode: 'cors',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization:
-                        'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token': getSessionToken(),
-                    },
                     body: JSON.stringify({ is_approved: true }),
                   })
                     .then((response) => {
+                      if (response.status === 401) {
+                        UnauthorizedAccess(router)
+                        return Promise.reject(new Error('Unauthorized'))
+                      }
                       if (!response.ok) {
                         throw new Error('Failed to update approval status')
                       }

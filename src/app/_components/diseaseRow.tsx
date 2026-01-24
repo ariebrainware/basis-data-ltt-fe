@@ -1,5 +1,6 @@
 import React from 'react'
-import { getSessionToken } from '../_functions/sessionToken'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import { DiseaseForm } from './diseaseForm'
 import { DiseaseType } from '../_types/disease'
 import {
@@ -21,6 +22,7 @@ export default function DiseaseRow({
   onDataChange,
 }: DiseaseType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
+  const router = useRouter()
 
   const handleOpen = () => setOpen(!open)
 
@@ -40,15 +42,8 @@ export default function DiseaseRow({
       return
     }
 
-    fetch(`${getApiHost()}/disease/${ID}`, {
+    apiFetch(`/disease/${ID}`, {
       method: 'PATCH',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
       body: JSON.stringify({
         name: name_input.trim(),
         description: description_input.trim(),
@@ -56,7 +51,7 @@ export default function DiseaseRow({
     })
       .then((response) => {
         if (response.status === 401) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
           return Promise.reject(new Error('Unauthorized'))
         }
         if (!response.ok) {

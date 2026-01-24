@@ -16,6 +16,8 @@ import {
   Textarea,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import Pagination from '../_components/pagination'
 import TableDisease from '../_components/tableDisease'
 import { DiseaseType } from '../_types/disease'
@@ -37,6 +39,7 @@ function useFetchDisease(
 ): ListDiseaseResponse {
   const [diseases, setDiseases] = useState<DiseaseType[]>([])
   const [total, setTotal] = useState(0)
+  const router = useRouter()
 
   useEffect(() => {
     ;(async () => {
@@ -47,16 +50,7 @@ function useFetchDisease(
         if (keyword && keyword.trim() !== '')
           params += `&keyword=${encodeURIComponent(keyword)}`
 
-        const res = await fetch(`${getApiHost()}/disease?${params}`, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': getSessionToken(),
-          },
-        })
+        const res = await apiFetch(`/disease?${params}`, { method: 'GET' })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const responseData = await res.json()
         // API returns { data: [...], total: ... } for diseases
@@ -67,7 +61,7 @@ function useFetchDisease(
         setTotal(responseData.total || 0)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
         }
         console.error('Error fetching diseases:', error)
       }
@@ -83,6 +77,7 @@ export default function Disease() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [openAddDialog, setOpenAddDialog] = useState(false)
   const { data, total } = useFetchDisease(currentPage, keyword, refreshTrigger)
+  const router = useRouter()
 
   const handleRefresh = () => {
     setRefreshTrigger((prev) => prev + 1)
@@ -124,15 +119,8 @@ export default function Disease() {
       return
     }
 
-    fetch(`${getApiHost()}/disease`, {
+    apiFetch('/disease', {
       method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
       body: JSON.stringify({
         name: name_input.trim(),
         description: description_input.trim(),
@@ -140,7 +128,7 @@ export default function Disease() {
     })
       .then((response) => {
         if (response.status === 401) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
           return Promise.reject(new Error('Unauthorized'))
         }
         if (!response.ok) {

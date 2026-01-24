@@ -8,8 +8,7 @@ import Footer from '../../_components/footer'
 import { ControlledSelect } from '../../_components/selectTherapist'
 import { TreatmentConditionMultiSelect } from '@/app/_components/selectTreatmentCondition'
 import TimePicker from '@/app/_components/timepicker'
-import { getApiHost } from '@/app/_functions/apiHost'
-import { getSessionToken } from '@/app/_functions/sessionToken'
+import { apiFetch } from '@/app/_functions/apiFetch'
 import Swal from 'sweetalert2'
 
 let treatmentDateInput: HTMLInputElement | null = null
@@ -69,16 +68,8 @@ export default function RegisterTreatment() {
             .filter(Boolean)
         : []
 
-    const response = await fetch(`${getApiHost()}/treatment`, {
+    const response = await apiFetch('/treatment', {
       method: 'POST',
-      mode: 'cors',
-      credentials: 'omit',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
       body: JSON.stringify({
         treatment_date: `${treatmentDate} ${treatmentTime}`,
         patient_code: patientCode,

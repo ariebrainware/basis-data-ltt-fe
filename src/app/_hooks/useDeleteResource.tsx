@@ -1,5 +1,7 @@
+'use client'
 import Swal from 'sweetalert2'
-import { getApiHost } from '../_functions/apiHost'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 export interface DeleteResourceConfig {
@@ -27,6 +29,7 @@ export interface DeleteResourceConfig {
  */
 export function useDeleteResource(config: DeleteResourceConfig) {
   const { resourceType, resourceId } = config
+  const router = useRouter()
 
   const getEndpoint = (): string => {
     switch (resourceType) {
@@ -84,37 +87,28 @@ export function useDeleteResource(config: DeleteResourceConfig) {
       cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(getEndpoint(), {
-          method: 'DELETE',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
-          },
-        })
-          .then((response) => {
-            if (response.status === 401) {
-              UnauthorizedAccess()
-              return Promise.reject(new Error('Unauthorized'))
-            }
-            if (!response.ok) throw new Error('Failed to delete')
-            Swal.fire({
-              text: messages.successText,
-              icon: 'success',
-              confirmButtonText: 'OK',
-            }).then(() => {
-              if (typeof window !== 'undefined') window.location.reload()
-            })
+      apetch(getEndpoint(), { method: 'DELETE' })
+      .then((response) => {
+            response.status === 401) {
+            UnthorizedAccess(router)
+           retrn Promise.reject(new Error('Unauthorized'))
+          }
+           i!response.ok) throw new Error('Failed to delete')
+         Swa.fire({
+            te: messages.successText,
+             i: 'success',
+            coirmButtonText: 'OK',
+        }).then(() => {
+              er.refresh()
           })
-          .catch((error) => {
-            console.error(messages.consoleError, error)
-            // Don't show error for unauthorized access since UnauthorizedAccess handles it
-            if (error.message !== 'Unauthorized') {
-              Swal.fire('Error', messages.errorText, 'error')
-            }
-          })
+      })
+          ch((error) => {
+           cole.error(messages.consoleError, error)
+         // on't show error for unauthorized access since UnauthorizedAccess handles it
+          iferror.message !== 'Unauthorized') {
+             S.fire('Error', messages.errorText, 'error')
+         }
+      })
       }
     })
   }

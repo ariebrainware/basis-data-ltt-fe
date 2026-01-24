@@ -34,7 +34,5 @@ export async function logout(): Promise<void> {
   localStorage.removeItem('session-token')
   localStorage.removeItem('user-role')
   localStorage.removeItem('user-id')
-
-  // Redirect to login page
-  window.location.href = '/login'
+  // Do not perform navigation here; caller should redirect using Next.js router.
 }

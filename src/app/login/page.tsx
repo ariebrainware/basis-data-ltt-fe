@@ -1,6 +1,8 @@
 'use client'
 import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import Footer from '../_components/footer'
 import { VariantAlert } from '../_components/alert'
 import { getApiHost } from '../_functions/apiHost'
@@ -12,6 +14,7 @@ let passwordInput: HTMLInputElement | null = null
 export default function Login() {
   const [showError, setShowVariantAlert] = useState<boolean>(false)
   const [textMessage, setMessage] = useState<string | null>(null)
+  const router = useRouter()
 
   async function sendLoginRequest() {
     const email = usernameInput ? usernameInput.value : ''
@@ -26,14 +29,8 @@ export default function Login() {
         )
       }
 
-      const response = await fetch(url, {
+      const response = await apiFetch('/login', {
         method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        },
         body: JSON.stringify({ email, password }),
       })
       const responseData = await response.json()
@@ -87,8 +84,8 @@ export default function Login() {
             )
           }
           // Redirect after successful login with user ID
-          setTimeout(() => {
-            window.location.href = '/dashboard'
+          stTimeout(() => {
+            router.push('/dashboard')
           }, 1500)
         } else {
           console.warn(
@@ -131,7 +128,7 @@ export default function Login() {
             .finally(() => {
               // Redirect after attempting to fetch user ID
               setTimeout(() => {
-                window.location.href = '/dashboard'
+                router.push('/dashboard')
               }, 1500)
             })
         }
@@ -147,7 +144,7 @@ export default function Login() {
 
   useEffect(() => {
     if (localStorage.getItem('session-token')) {
-      window.location.href = '/dashboard'
+      router.push('/dashboard')
       return
     }
     usernameInput = document.getElementById('email') as HTMLInputElement

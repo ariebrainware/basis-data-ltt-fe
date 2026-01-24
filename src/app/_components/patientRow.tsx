@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { getSessionToken } from '../_functions/sessionToken'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import { PatientForm } from './patientForm'
 import { PatientType } from '../_types/patient'
 import { getApiHost } from '../_functions/apiHost'
@@ -42,6 +43,7 @@ export default function Patient({
   onDataChange,
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
+  const router = useRouter()
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
   const [diseases, setDiseases] = useState<DiseaseType[]>([])
   const [diseasesFetched, setDiseasesFetched] = useState(false)
@@ -53,14 +55,9 @@ export default function Patient({
       // fetch diseases only if not already fetched
       if (!diseasesFetched) {
         try {
-          const res = await fetch(`${getApiHost()}/disease`, {
-            headers: {
-              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': getSessionToken(),
-            },
-          })
+          const res = await apiFetch('/disease', { method: 'GET' })
           if (res.status === 401) {
-            UnauthorizedAccess()
+            UnauthorizedAccess(router)
             return
           }
           if (res.ok) {
@@ -69,12 +66,8 @@ export default function Patient({
               data?.data?.disease ?? data?.data ?? data ?? []
             setDiseases(list)
           }
-          // Mark as fetched even if request fails or list is empty to prevent
-          // redundant API calls on subsequent dialog opens
           setDiseasesFetched(true)
         } catch (e) {
-          // Mark as fetched even on error to avoid retry loops when API is
-          // consistently unavailable or network is down
           setDiseasesFetched(true)
         }
       }
@@ -156,20 +149,13 @@ export default function Patient({
       payload.patient_code = patient_code_new_input
     }
 
-    fetch(`${getApiHost()}/patient/${ID}`, {
+    apiFetch(`/patient/${ID}`, {
       method: 'PATCH',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
       body: JSON.stringify(payload),
     })
       .then((response) => {
         if (response.status === 401) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
           return Promise.reject(new Error('Unauthorized'))
         }
         if (!response.ok) {
