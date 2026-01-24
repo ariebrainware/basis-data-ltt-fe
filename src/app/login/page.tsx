@@ -84,7 +84,7 @@ export default function Login() {
             )
           }
           // Redirect after successful login with user ID
-          stTimeout(() => {
+          setTimeout(() => {
             router.push('/dashboard')
           }, 1500)
         } else {
