@@ -1,6 +1,13 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
 
+// Mock `next/navigation` so `useRouter()` is available in tests
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    pathname: '/',
+  }),
+}))
+
 // Filter out specific React DOM warnings that occur due to forwarded props
 const _consoleError = console.error.bind(console)
 console.error = (...args) => {

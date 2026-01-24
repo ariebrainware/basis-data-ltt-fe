@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getApiHost } from '@/app/_functions/apiHost'
 import { apiFetch } from '@/app/_functions/apiFetch'
 import { UnauthorizedAccess } from '@/app/_functions/unauthorized'
 import { getUserId } from '@/app/_functions/userId'
 import { fetchCurrentUserId } from '@/app/_functions/fetchCurrentUser'
 import { verifyPassword } from '@/app/_functions/verifyPassword'
 import Swal from 'sweetalert2'
+import StatusIcon from '@/app/_components/statusIcon'
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -35,6 +35,21 @@ export default function ProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [pwMessage, setPwMessage] = useState<string | null>(null)
   const [pwError, setPwError] = useState<string | null>(null)
+
+  // Live password requirement booleans
+  const lengthOk = newPassword.length >= 8
+  const lowerOk = /[a-z]/.test(newPassword)
+  const upperOk = /[A-Z]/.test(newPassword)
+  const digitOk = /\d/.test(newPassword)
+  const specialOk = /[^A-Za-z0-9]/.test(newPassword)
+  const strengthCount = [lengthOk, lowerOk, upperOk, digitOk, specialOk].filter(
+    Boolean
+  ).length
+  const [strengthAnnounce, setStrengthAnnounce] = useState('')
+
+  useEffect(() => {
+    setStrengthAnnounce(`${strengthCount} of 5 password requirements met`)
+  }, [strengthCount])
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -105,30 +120,72 @@ export default function ProfilePage() {
       return
     }
 
-    try {
-      // Optional: verify current password before attempting change if backend supports it
+    const changingPassword = Boolean(
+      currentPassword || newPassword || confirmPassword
+    )
+
+    // If user wants to change password as part of this save, validate password fields
+    if (changingPassword) {
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        setError(
+          'To change your password, fill all password fields or leave them all empty'
+        )
+        return
+      }
+
+      if (newPassword.length < 8) {
+        setError('New password must be at least 8 characters')
+        return
+      }
+
+      if (newPassword !== confirmPassword) {
+        setError('New password and confirmation do not match')
+        return
+      }
+
+      const strongPwd = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/
+      if (!strongPwd.test(newPassword)) {
+        setError(
+          'Password must include uppercase, lowercase, number, and special character'
+        )
+        return
+      }
+
+      // Verify current password with backend if available
       try {
         const vp = await verifyPassword(currentPassword)
         if (vp.status === 401) return
-        if (!vp.available) {
-          // verification endpoint not available or returned error; fall back to attempting change
-        } else {
+        if (vp.available) {
           if (!vp.verified) {
             setPwError('Current password is incorrect')
             return
           }
         }
       } catch (verifyErr) {
-        // network or unexpected error while verifying — fall back to attempting change
         console.warn(
           'verify password error, will attempt change directly',
           verifyErr
         )
       }
+    }
+
+    try {
+      // Only verify password if caller explicitly provided a current password
+      // (we already return above if any password fields are present).
+
+      const body: Record<string, unknown> = {
+        name: name.trim(),
+        email: email.trim(),
+      }
+
+      if (changingPassword) {
+        body.current_password = currentPassword
+        body.new_password = newPassword
+      }
 
       const res = await apiFetch(UPDATE_PROFILE_ENDPOINT, {
         method: 'PATCH',
-        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+        body: JSON.stringify(body),
       })
 
       if (res.status === 401) {
@@ -138,7 +195,15 @@ export default function ProfilePage() {
 
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        setError(j?.message || 'Failed to update profile')
+        const serverMsg = (j?.message || '').toString().toLowerCase()
+        if (
+          changingPassword &&
+          (serverMsg.includes('current') || serverMsg.includes('incorrect'))
+        ) {
+          setPwError('Current password is incorrect')
+        } else {
+          setError(j?.message || 'Failed to update profile')
+        }
         return
       }
 
@@ -147,6 +212,11 @@ export default function ProfilePage() {
         icon: 'success',
         confirmButtonText: 'OK',
       })
+      if (changingPassword) {
+        setCurrentPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+      }
     } catch (err) {
       console.error(err)
       setError('Network error while updating profile')
@@ -161,73 +231,7 @@ export default function ProfilePage() {
     } as unknown as React.FormEvent)
   }
 
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setPwMessage(null)
-    setPwError(null)
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setPwError('All password fields are required')
-      return
-    }
-
-    if (newPassword.length < 8) {
-      setPwError('New password must be at least 8 characters')
-      return
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPwError('New password and confirmation do not match')
-      return
-    }
-
-    // Password strength: at least one lowercase, one uppercase, one digit, one special char
-    const strongPwd = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/
-    if (!strongPwd.test(newPassword)) {
-      setPwError(
-        'Password must include uppercase, lowercase, number, and special character'
-      )
-      return
-    }
-
-    try {
-      const res = await apiFetch(UPDATE_PROFILE_ENDPOINT, {
-        method: 'PATCH',
-        body: JSON.stringify({
-          current_password: currentPassword,
-          new_password: newPassword,
-        }),
-      })
-
-      if (res.status === 401) {
-        UnauthorizedAccess(router)
-        return
-      }
-
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}))
-        const serverMsg = (j?.message || '').toString().toLowerCase()
-        if (serverMsg.includes('current') || serverMsg.includes('incorrect')) {
-          setPwError('Current password is incorrect')
-        } else {
-          setPwError(j?.message || 'Failed to change password')
-        }
-        return
-      }
-
-      await Swal.fire({
-        text: 'Profile successfully updated',
-        icon: 'success',
-        confirmButtonText: 'OK',
-      })
-      setCurrentPassword('')
-      setNewPassword('')
-      setConfirmPassword('')
-    } catch (err) {
-      console.error(err)
-      setPwError('Network error while changing password')
-    }
-  }
+  // helper removed: password change is handled by `handleUpdateProfile`
 
   return (
     <div className="mx-auto max-w-3xl p-6">
@@ -265,56 +269,100 @@ export default function ProfilePage() {
 
           <section className="border-t pt-6">
             <h2 className="mb-3 text-xl font-medium">Change Password</h2>
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  Current Password
-                </label>
-                <input
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full rounded border px-3 py-2"
-                  type="password"
-                />
-              </div>
+            {/* inputs only — submit via Save Changes */}
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Current Password
+              </label>
+              <input
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full rounded border px-3 py-2"
+                type="password"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                New Password
+              </label>
+              <input
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full rounded border px-3 py-2"
+                type="password"
+                placeholder="At least 8 characters"
+              />
+              <div className="mt-2 text-sm">
+                <p className="mb-2 font-medium">Password requirements:</p>
+                <ul className="space-y-1">
+                  {[
+                    { ok: lengthOk, text: 'At least 8 characters' },
+                    { ok: lowerOk, text: 'Lowercase letter' },
+                    { ok: upperOk, text: 'Uppercase letter' },
+                    { ok: digitOk, text: 'Number' },
+                    { ok: specialOk, text: 'Special character (e.g. !@#$%)' },
+                  ].map((r) => (
+                    <li
+                      key={r.text}
+                      className={`flex items-center gap-2 text-sm transition-colors duration-150 ${
+                        r.ok ? 'text-green-600' : 'text-red-600'
+                      }`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-xs text-white ${
+                          r.ok ? 'bg-green-600' : 'bg-red-600'
+                        } transition-colors duration-150`}
+                      >
+                        <StatusIcon
+                          ok={r.ok}
+                          title={
+                            r.ok ? 'requirement met' : 'requirement not met'
+                          }
+                        />
+                      </span>
+                      <span>{r.text}</span>
+                    </li>
+                  ))}
+                </ul>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  New Password
-                </label>
-                <input
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full rounded border px-3 py-2"
-                  type="password"
-                  placeholder="At least 8 characters"
-                />
+                {/* Strength bar */}
+                <div className="mt-3">
+                  <div className="h-2 w-full overflow-hidden rounded bg-gray-200">
+                    <div
+                      className="h-2 rounded transition-all duration-300"
+                      style={{
+                        width: `${(strengthCount / 5) * 100}%`,
+                        background:
+                          'linear-gradient(90deg, #ef4444, #f59e0b, #10b981)',
+                        backgroundSize: `${(strengthCount / 5) * 100}% 100%`,
+                        backgroundRepeat: 'no-repeat',
+                      }}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-600">
+                    {strengthCount}/5 requirements met
+                  </p>
+                  <div aria-live="polite" className="sr-only">
+                    {strengthAnnounce}
+                  </div>
+                </div>
               </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  Confirm New Password
-                </label>
-                <input
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded border px-3 py-2"
-                  type="password"
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="bg-rose-600 rounded px-4 py-2 text-white"
-                >
-                  Change Password
-                </button>
-              </div>
-
-              {pwMessage && <p className="text-green-600">{pwMessage}</p>}
-              {pwError && <p className="text-red-600">{pwError}</p>}
-            </form>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Confirm New Password
+              </label>
+              <input
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded border px-3 py-2"
+                type="password"
+              />
+            </div>
+            {/* removed separate Change Password submit — use "Save Changes" instead */}
+            {pwMessage && <p className="text-green-600">{pwMessage}</p>}
+            {pwError && <p className="text-red-600">{pwError}</p>}
           </section>
           <div className="mt-6 flex justify-end">
             <button
