@@ -115,7 +115,7 @@ export function DiseaseMultiSelect({
     return () => {
       mounted = false
     }
-  }, [propOptions])
+  }, [propOptions, router])
 
   const handleNativeSelectChange = (
     e: React.ChangeEvent<HTMLSelectElement>

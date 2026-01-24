@@ -60,7 +60,7 @@ function useFetchTreatment(
         console.error('Error fetching treatment:', error)
       }
     })()
-  }, [currentPage, keyword])
+  }, [currentPage, keyword, router])
 
   return { data: { treatment: treatment }, total }
 }

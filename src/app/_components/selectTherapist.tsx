@@ -81,7 +81,7 @@ export function ControlledSelect({
         setTherapists(uniqueById)
       })
       .catch(() => setTherapists([]))
-  }, [])
+  }, [router])
 
   React.useEffect(() => {
     if ((propValue ?? '') !== '') {

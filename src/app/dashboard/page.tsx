@@ -57,9 +57,9 @@ function useFetchTreatment(
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
+  const router = useRouter()
 
   useEffect(() => {
-    const router = useRouter()
     ;(async () => {
       try {
         const today = new Date()
@@ -104,7 +104,7 @@ function useFetchTreatment(
         console.error('Error fetching treatment:', error)
       }
     })()
-  }, [currentPage, keyword])
+  }, [currentPage, keyword, router])
 
   return { data: { treatment: treatment }, total }
 }

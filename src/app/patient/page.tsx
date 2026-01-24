@@ -71,7 +71,15 @@ function usePatients(
         console.error('Error fetching patients:', error)
       }
     })()
-  }, [currentPage, keyword, refreshTrigger, dateKeyword, sortBy, sortDir])
+  }, [
+    currentPage,
+    keyword,
+    refreshTrigger,
+    dateKeyword,
+    sortBy,
+    sortDir,
+    router,
+  ])
 
   return { data: { patients }, total }
 }

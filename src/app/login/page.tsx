@@ -149,7 +149,7 @@ export default function Login() {
     }
     usernameInput = document.getElementById('email') as HTMLInputElement
     passwordInput = document.getElementById('password') as HTMLInputElement
-  }, [])
+  }, [router])
 
   return (
     <div className={styles.page}>

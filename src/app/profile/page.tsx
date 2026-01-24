@@ -88,7 +88,7 @@ export default function ProfilePage() {
     }
 
     fetchProfile()
-  }, [])
+  }, [router])
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()

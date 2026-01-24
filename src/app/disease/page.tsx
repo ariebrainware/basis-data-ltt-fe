@@ -66,7 +66,7 @@ function useFetchDisease(
         console.error('Error fetching diseases:', error)
       }
     })()
-  }, [currentPage, keyword, refreshTrigger])
+  }, [currentPage, keyword, refreshTrigger, router])
 
   return { data: diseases, total }
 }

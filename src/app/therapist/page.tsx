@@ -58,7 +58,7 @@ function useFetchTherapist(
         console.error('Error fetching therapist:', error)
       }
     })()
-  }, [currentPage, keyword])
+  }, [currentPage, keyword, router])
 
   return { data: { therapist: therapist }, total }
 }

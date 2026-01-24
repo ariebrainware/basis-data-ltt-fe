@@ -34,6 +34,7 @@ function useFetchTreatment(
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
+  const router = useRouter()
 
   useEffect(() => {
     ;(async () => {
@@ -55,13 +56,12 @@ function useFetchTreatment(
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          const router = useRouter()
           UnauthorizedAccess(router)
         }
         console.error('Error fetching treatment:', error)
       }
     })()
-  }, [currentPage, keyword])
+  }, [currentPage, keyword, router])
 
   return { data: { treatment: treatment }, total }
 }
