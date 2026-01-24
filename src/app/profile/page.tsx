@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { getApiHost } from '@/app/_functions/apiHost'
-import { getSessionToken } from '@/app/_functions/sessionToken'
+import { apiFetch } from '@/app/_functions/apiFetch'
 import { UnauthorizedAccess } from '@/app/_functions/unauthorized'
 import { getUserId } from '@/app/_functions/userId'
 import { fetchCurrentUserId } from '@/app/_functions/fetchCurrentUser'
@@ -57,14 +57,7 @@ export default function ProfilePage() {
           return
         }
 
-        const res = await fetch(`${getApiHost()}/user/${userId}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': getSessionToken(),
-          },
-        })
+        const res = await apiFetch(`/user/${userId}`)
 
         if (res.status === 401) {
           UnauthorizedAccess()
@@ -131,14 +124,8 @@ export default function ProfilePage() {
         )
       }
 
-      const res = await fetch(`${getApiHost()}${UPDATE_PROFILE_ENDPOINT}`, {
+      const res = await apiFetch(UPDATE_PROFILE_ENDPOINT, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-          'session-token': getSessionToken(),
-        },
         body: JSON.stringify({ name: name.trim(), email: email.trim() }),
       })
 
@@ -202,14 +189,8 @@ export default function ProfilePage() {
     }
 
     try {
-      const res = await fetch(`${getApiHost()}${UPDATE_PROFILE_ENDPOINT}`, {
+      const res = await apiFetch(UPDATE_PROFILE_ENDPOINT, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-          'session-token': getSessionToken(),
-        },
         body: JSON.stringify({
           current_password: currentPassword,
           new_password: newPassword,

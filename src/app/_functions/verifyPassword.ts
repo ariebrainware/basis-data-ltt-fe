@@ -1,6 +1,5 @@
-import { getApiHost } from './apiHost'
-import { getSessionToken } from './sessionToken'
 import { UnauthorizedAccess } from './unauthorized'
+import { apiFetch } from './apiFetch'
 
 export async function verifyPassword(password: string): Promise<{
   available: boolean
@@ -12,13 +11,8 @@ export async function verifyPassword(password: string): Promise<{
     const endpoint =
       process.env.NEXT_PUBLIC_VERIFY_PASSWORD_ENDPOINT || '/verify-password'
     const params = new URLSearchParams({ password })
-    const res = await fetch(`${getApiHost()}${endpoint}?${params.toString()}`, {
+    const res = await apiFetch(`${endpoint}?${params.toString()}`, {
       method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
     })
 
     if (res.status === 401) {
