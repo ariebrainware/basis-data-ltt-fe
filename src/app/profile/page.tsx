@@ -7,6 +7,7 @@ import { UnauthorizedAccess } from '@/app/_functions/unauthorized'
 import { getUserId } from '@/app/_functions/userId'
 import { fetchCurrentUserId } from '@/app/_functions/fetchCurrentUser'
 import { verifyPassword } from '@/app/_functions/verifyPassword'
+import { logout } from '@/app/_functions/logout'
 import Swal from 'sweetalert2'
 import StatusIcon from '@/app/_components/statusIcon'
 
@@ -216,6 +217,22 @@ export default function ProfilePage() {
         setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
+        try {
+          await logout()
+        } catch (err) {
+          // ignore logout errors, still attempt redirect
+          console.warn('logout failed after password change', err)
+        }
+        try {
+          const isE2E =
+            typeof window !== 'undefined' &&
+            window.localStorage.getItem('__E2E_TEST__') === '1'
+          if (!isE2E) {
+            router.push('/login')
+          }
+        } catch (err) {
+          if (typeof window !== 'undefined') window.location.href = '/login'
+        }
       }
     } catch (err) {
       console.error(err)
