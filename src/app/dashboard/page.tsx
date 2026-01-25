@@ -22,7 +22,6 @@ import { apiFetch } from '../_functions/apiFetch'
 import { useRouter } from 'next/navigation'
 import Pagination from '../_components/pagination'
 import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
 
 // Simple in-module cache to deduplicate concurrent identical fetches
 // API response interface (what the backend returns)
