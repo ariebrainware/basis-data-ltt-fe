@@ -10,9 +10,12 @@ export async function verifyPassword(password: string): Promise<{
   try {
     const endpoint =
       process.env.NEXT_PUBLIC_VERIFY_PASSWORD_ENDPOINT || '/verify-password'
-    const params = new URLSearchParams({ password })
-    const res = await apiFetch(`${endpoint}?${params.toString()}`, {
-      method: 'GET',
+    const res = await apiFetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password }),
     })
 
     if (res.status === 401) {
