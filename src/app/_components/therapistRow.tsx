@@ -31,10 +31,12 @@ export default function Therapist({
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
   const [role, setRole] = React.useState<string>(initialRole || '')
+  const [approved, setApproved] = React.useState<boolean>(isApproved)
 
   React.useEffect(() => {
     setRole(initialRole || '')
-  }, [initialRole])
+    setApproved(isApproved)
+  }, [initialRole, isApproved])
 
   const handleRoleChange = (newRole: string) => {
     setRole(newRole)
@@ -260,8 +262,7 @@ export default function Therapist({
               data-open="true"
               data-shape="pill"
               onClick={() => {
-                if (!isApproved) {
-                  // Logic to update the approval status can be added here
+                if (!approved) {
                   console.log('Set to Approved')
                   apiFetch(`/therapist/${ID}`, {
                     method: 'PUT',
@@ -279,12 +280,8 @@ export default function Therapist({
                     })
                     .then((data) => {
                       console.log('Approval status updated:', data)
-                      document
-                        .querySelector(`[data-id="${ID}"]`)
-                        ?.classList.remove('border-red-500', 'bg-red-500')
-                      document
-                        .querySelector(`[data-id="${ID}"]`)
-                        ?.classList.add('border-green-500', 'bg-green-500')
+                      setApproved(true)
+                      router.refresh()
                     })
                     .catch((error) => {
                       console.error('Error:', error)
@@ -292,7 +289,7 @@ export default function Therapist({
                 }
               }}
               className={`relative inline-flex w-max items-center rounded-md border p-0.5 font-sans text-xs font-medium text-green-50 shadow-sm data-[shape=pill]:rounded-full ${
-                isApproved
+                approved
                   ? 'border-green-500 bg-green-500'
                   : 'border-red-500 bg-red-500'
               }`}
@@ -301,7 +298,7 @@ export default function Therapist({
                 id="text-approve"
                 className="mx-1.5 my-0.5 font-sans leading-none text-current"
               >
-                {isApproved ? 'Approved' : 'Not Approved'}
+                {approved ? 'Approved' : 'Not Approved'}
               </span>
             </div>
           </div>
