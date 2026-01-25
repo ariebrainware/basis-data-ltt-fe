@@ -270,7 +270,6 @@ export default function ProfilePage() {
             />
           </div>
 
-          {message && <p className="text-green-600">{message}</p>}
           {error && <p className="text-red-600">{error}</p>}
 
           <section className="border-t pt-6">
