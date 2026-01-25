@@ -1,8 +1,42 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { TreatmentForm } from '../treatmentForm'
 import { TreatmentType } from '@/app/_types/treatment'
 import { isTherapist } from '@/app/_functions/userRole'
+
+// Mock select components (synchronous) before importing the tested component
+jest.mock('../selectTherapist', () => ({
+  ControlledSelect: ({ id, label, value, disabled, onChange }: any) => (
+    <input
+      id={id}
+      data-testid={id}
+      aria-label={label}
+      defaultValue={value}
+      disabled={disabled}
+      onChange={(e) => onChange && onChange(e.target.value)}
+    />
+  ),
+}))
+
+jest.mock('../selectTreatmentCondition', () => ({
+  TreatmentConditionMultiSelect: ({
+    id,
+    label,
+    value,
+    onChange,
+    disabled,
+  }: any) => (
+    <input
+      id={id}
+      data-testid={id}
+      aria-label={label}
+      defaultValue={Array.isArray(value) ? value.join(',') : value}
+      disabled={disabled}
+      onChange={(e) => onChange && onChange(String(e.target.value).split(','))}
+    />
+  ),
+}))
+
+import { TreatmentForm } from '../treatmentForm'
 
 const _origConsoleError = console.error.bind(console)
 jest.spyOn(console, 'error').mockImplementation((msg, ...args) => {
