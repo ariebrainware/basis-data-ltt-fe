@@ -1,5 +1,7 @@
 import React from 'react'
-import { getSessionToken } from '../_functions/sessionToken'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { TherapistType } from '../_types/therapist'
 import { TherapistForm } from '../_components/therapistForm'
 import Swal from 'sweetalert2'
@@ -10,7 +12,6 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
-import { getApiHost } from '../_functions/apiHost'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Therapist({
@@ -27,11 +28,14 @@ export default function Therapist({
   role: initialRole,
 }: TherapistType) {
   const [open, setOpen] = React.useState(false)
+  const router = useRouter()
   const [role, setRole] = React.useState<string>(initialRole || '')
+  const [approved, setApproved] = React.useState<boolean>(isApproved)
 
   React.useEffect(() => {
     setRole(initialRole || '')
-  }, [initialRole])
+    setApproved(isApproved)
+  }, [initialRole, isApproved])
 
   const handleRoleChange = (newRole: string) => {
     setRole(newRole)
@@ -66,15 +70,8 @@ export default function Therapist({
       document.querySelector<HTMLTextAreaElement>('#height')?.value || height
     const role_input =
       document.querySelector<HTMLTextAreaElement>('#role')?.value || role
-    fetch(`${getApiHost()}/therapist/${ID}`, {
+    apiFetch(`/therapist/${ID}`, {
       method: 'PATCH',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
       body: JSON.stringify({
         full_name: full_name_input,
         email: email_input,
@@ -88,6 +85,10 @@ export default function Therapist({
       }),
     })
       .then((response) => {
+        if (response.status === 401) {
+          UnauthorizedAccess(router)
+          return Promise.reject(new Error('Unauthorized'))
+        }
         if (!response.ok || response.status !== 200) {
           return response.json().then((data) => {
             Swal.fire({
@@ -103,8 +104,7 @@ export default function Therapist({
             icon: 'success',
             confirmButtonText: 'OK',
           }).then(() => {
-            // Reload the page after user clicks "OK"
-            if (typeof window !== 'undefined') window.location.reload()
+            router.refresh()
           })
         }
 
@@ -261,22 +261,17 @@ export default function Therapist({
               data-open="true"
               data-shape="pill"
               onClick={() => {
-                if (!isApproved) {
-                  // Logic to update the approval status can be added here
+                if (!approved) {
                   console.log('Set to Approved')
-                  fetch(`${getApiHost()}/therapist/${ID}`, {
+                  apiFetch(`/therapist/${ID}`, {
                     method: 'PUT',
-                    mode: 'cors',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Accept: 'application/json',
-                      Authorization:
-                        'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-                      'session-token': getSessionToken(),
-                    },
                     body: JSON.stringify({ is_approved: true }),
                   })
                     .then((response) => {
+                      if (response.status === 401) {
+                        UnauthorizedAccess(router)
+                        return Promise.reject(new Error('Unauthorized'))
+                      }
                       if (!response.ok) {
                         throw new Error('Failed to update approval status')
                       }
@@ -284,12 +279,8 @@ export default function Therapist({
                     })
                     .then((data) => {
                       console.log('Approval status updated:', data)
-                      document
-                        .querySelector(`[data-id="${ID}"]`)
-                        ?.classList.remove('border-red-500', 'bg-red-500')
-                      document
-                        .querySelector(`[data-id="${ID}"]`)
-                        ?.classList.add('border-green-500', 'bg-green-500')
+                      setApproved(true)
+                      router.refresh()
                     })
                     .catch((error) => {
                       console.error('Error:', error)
@@ -297,7 +288,7 @@ export default function Therapist({
                 }
               }}
               className={`relative inline-flex w-max items-center rounded-md border p-0.5 font-sans text-xs font-medium text-green-50 shadow-sm data-[shape=pill]:rounded-full ${
-                isApproved
+                approved
                   ? 'border-green-500 bg-green-500'
                   : 'border-red-500 bg-red-500'
               }`}
@@ -306,7 +297,7 @@ export default function Therapist({
                 id="text-approve"
                 className="mx-1.5 my-0.5 font-sans leading-none text-current"
               >
-                {isApproved ? 'Approved' : 'Not Approved'}
+                {approved ? 'Approved' : 'Not Approved'}
               </span>
             </div>
           </div>

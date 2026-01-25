@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Navbar,
   Collapse,
@@ -71,6 +72,7 @@ function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [userRole, setUserRole] = React.useState<string | null>(null)
+  const router = useRouter()
 
   // Read user role only on the client after mount to avoid server/client
   // rendering differences that cause hydration mismatches.
@@ -91,7 +93,7 @@ function NavListMenu() {
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
           onClick={() => {
-            window.location.href = url
+            router.push(url)
           }}
           onResize={undefined}
           onResizeCapture={undefined}
@@ -192,6 +194,7 @@ function NavListMenu() {
 }
 
 function NavList() {
+  const router = useRouter()
   return (
     <List
       className="mb-6 mt-4 p-0 lg:my-0 lg:flex-row lg:p-1"
@@ -224,6 +227,30 @@ function NavList() {
           Home
         </ListItem>
       </Typography>
+      <Typography
+        as="a"
+        href="#"
+        variant="small"
+        color="blue-gray"
+        className="font-medium"
+        placeholder={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
+      >
+        <ListItem
+          className="flex cursor-pointer items-center gap-2 py-2 pr-4"
+          placeholder={undefined}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
+          onClick={() => router.push('/profile')}
+        >
+          Profile
+        </ListItem>
+      </Typography>
       <NavListMenu />
       <Typography
         as="a"
@@ -242,7 +269,10 @@ function NavList() {
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
-          onClick={logout}
+          onClick={async () => {
+            await logout()
+            router.push('/login')
+          }}
           onResize={undefined}
           onResizeCapture={undefined}
         >

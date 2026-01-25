@@ -18,9 +18,10 @@ import {
 } from '@material-tailwind/react'
 import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
+import { apiFetch } from '../_functions/apiFetch'
+import { useRouter } from 'next/navigation'
 import Pagination from '../_components/pagination'
 import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
 
 // Simple in-module cache to deduplicate concurrent identical fetches
 // API response interface (what the backend returns)
@@ -55,6 +56,7 @@ function useFetchTreatment(
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
+  const router = useRouter()
 
   useEffect(() => {
     ;(async () => {
@@ -71,16 +73,7 @@ function useFetchTreatment(
         if (treatmentFetchCache.has(url)) {
           jsonData = await treatmentFetchCache.get(url)
         } else {
-          const p = fetch(url, {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-              'session-token': getSessionToken(),
-            },
-          })
+          const p = apiFetch(url, { method: 'GET' })
             .then((r) => {
               if (!r.ok) throw new Error(`HTTP error! Status: ${r.status}`)
               return r.json()
@@ -105,12 +98,12 @@ function useFetchTreatment(
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
         }
         console.error('Error fetching treatment:', error)
       }
     })()
-  }, [currentPage, keyword])
+  }, [currentPage, keyword, router])
 
   return { data: { treatment: treatment }, total }
 }

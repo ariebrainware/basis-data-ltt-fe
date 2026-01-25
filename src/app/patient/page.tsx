@@ -1,5 +1,7 @@
 'use client'
 import { SetStateAction, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import {
   Card,
   CardHeader,
@@ -12,8 +14,6 @@ import SubHeader from '../_components/subheader'
 import TablePatient from '../_components/tablePatient'
 import { PatientType } from '../_types/patient'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
 
 interface ListPatientsResponse {
   data: {
@@ -32,6 +32,7 @@ function usePatients(
 ): ListPatientsResponse {
   const [patients, setPatients] = useState<PatientType[]>([])
   const [total, setTotal] = useState(0)
+  const router = useRouter()
 
   useEffect(() => {
     ;(async () => {
@@ -53,16 +54,7 @@ function usePatients(
           params += `&sort_dir=${encodeURIComponent(normalizedSortDir)}`
         }
 
-        const res = await fetch(`${getApiHost()}/patient?${params}`, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': getSessionToken(),
-          },
-        })
+        const res = await apiFetch(`/patient?${params}`, { method: 'GET' })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
         const patientsArray = Array.isArray(data.data.patients)
@@ -72,12 +64,20 @@ function usePatients(
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
         }
         console.error('Error fetching patients:', error)
       }
     })()
-  }, [currentPage, keyword, refreshTrigger, dateKeyword, sortBy, sortDir])
+  }, [
+    currentPage,
+    keyword,
+    refreshTrigger,
+    dateKeyword,
+    sortBy,
+    sortDir,
+    router,
+  ])
 
   return { data: { patients }, total }
 }

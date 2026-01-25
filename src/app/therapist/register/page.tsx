@@ -9,8 +9,7 @@ import PhoneInput from '../../_components/phoneInput'
 import IDCardInput from '../../_components/idCardInput'
 import WeightHeightInput from '../../_components/weightHeightInput'
 import { VariantAlert } from '../../_components/alert'
-import { getApiHost } from '../../_functions/apiHost'
-import { getSessionToken } from '../../_functions/sessionToken'
+import { apiFetch } from '../../_functions/apiFetch'
 
 let fullNameInput: HTMLInputElement | null = null
 let emailInput: HTMLInputElement | null = null
@@ -40,16 +39,8 @@ export default function RegisterTherapist() {
     const weight = weightInput ? weightInput.value : ''
     const height = heightInput ? heightInput.value : ''
     const password = passwordInput ? passwordInput.value : ''
-    const response = await fetch(`${getApiHost()}/therapist`, {
+    const response = await apiFetch('/therapist', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
-      credentials: 'include',
-      redirect: 'follow',
       body: JSON.stringify({
         full_name: fullName,
         email: email,

@@ -2,12 +2,14 @@ import { getApiHost } from './apiHost'
 import { getSessionToken } from './sessionToken'
 
 /**
- * Perform logout by calling the logout API endpoint and cleaning up local storage
+ * Perform logout by calling the logout API endpoint and cleaning up local storage.
+ * NOTE: This function does NOT perform navigation. The caller must redirect to the login page
+ * using Next.js router after calling this function.
  * @returns Promise that resolves when logout is complete
  * @example
  * ```typescript
  * await logout()
- * // User is now logged out and redirected to login page
+ * router.push('/login')
  * ```
  */
 export async function logout(): Promise<void> {
@@ -34,7 +36,5 @@ export async function logout(): Promise<void> {
   localStorage.removeItem('session-token')
   localStorage.removeItem('user-role')
   localStorage.removeItem('user-id')
-
-  // Redirect to login page
-  window.location.href = '/login'
+  // Do not perform navigation here; caller should redirect using Next.js router.
 }

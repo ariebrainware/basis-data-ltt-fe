@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { getApiHost } from '../_functions/apiHost'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../_functions/apiFetch'
 import { DiseaseType } from '../_types/disease'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
@@ -43,6 +44,7 @@ export function DiseaseMultiSelect({
   const [fetchedOptions, setFetchedOptions] = useState<DiseaseType[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
   const selected = propValue ?? []
   const options = propOptions ?? fetchedOptions
   // Detect E2E testing mode from localStorage so we can provide deterministic
@@ -79,14 +81,9 @@ export function DiseaseMultiSelect({
       setIsLoading(true)
       setError(null)
       try {
-        const res = await fetch(`${getApiHost()}/disease`, {
-          headers: {
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': localStorage.getItem('session-token') ?? '',
-          },
-        })
+        const res = await apiFetch('/disease', { method: 'GET' })
         if (res.status === 401) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
           if (mounted) {
             // clear loading state so UI does not stay permanently disabled in E2E
             setIsLoading(false)
@@ -118,7 +115,7 @@ export function DiseaseMultiSelect({
     return () => {
       mounted = false
     }
-  }, [propOptions])
+  }, [propOptions, router])
 
   const handleNativeSelectChange = (
     e: React.ChangeEvent<HTMLSelectElement>
