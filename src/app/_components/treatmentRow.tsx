@@ -12,6 +12,7 @@ import {
 import { TreatmentForm } from './treatmentForm'
 import Swal from 'sweetalert2'
 import { apiFetch } from '../_functions/apiFetch'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isTherapist } from '../_functions/userRole'
 import { getUserId } from '../_functions/userId'
@@ -145,27 +146,39 @@ export default function Treatment({
       }),
     })
       .then((response) => {
+        if (response.status === 401) {
+          UnauthorizedAccess(router)
+          return Promise.reject(new Error('Unauthorized'))
+        }
         if (!response.ok) {
-          throw new Error('Failed to update patient information')
+          throw new Error('Failed to update treatment information')
         }
         return response.json()
       })
       .then((data) => {
-        console.log('Patient information updated successfully:', data)
+        console.log('Treatment information updated successfully:', data)
+        // Close modal and show success message
+        setOpen(false)
+        Swal.fire({
+          text: 'Data penanganan pasien berhasil diperbarui.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          // refresh the current route
+          router.refresh()
+        })
       })
       .catch((error) => {
-        console.error('Error updating patient information:', error)
+        console.error('Error updating treatment information:', error)
+        // Don't show error for unauthorized access since UnauthorizedAccess handles it
+        if (error.message !== 'Unauthorized') {
+          Swal.fire({
+            text: 'Gagal memperbarui data penanganan.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          })
+        }
       })
-    Swal.fire({
-      text: 'Data penanganan pasien berhasil diperbarui.',
-      icon: 'success',
-      confirmButtonText: 'OK',
-    }).then(() => {
-      // refresh the current route
-      router.refresh()
-    })
-
-    setOpen(!open)
   }
 
   return (
