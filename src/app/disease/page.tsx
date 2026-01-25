@@ -307,7 +307,10 @@ export default function Disease() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
-                onClick={logout}
+                onClick={async () => {
+                  await logout()
+                  router.push('/login')
+                }}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >

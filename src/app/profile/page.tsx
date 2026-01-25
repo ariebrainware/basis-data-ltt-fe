@@ -17,8 +17,7 @@ function isValidEmail(email: string) {
 
 export default function ProfilePage() {
   const router = useRouter()
-  const CURRENT_USER_ENDPOINT =
-    process.env.NEXT_PUBLIC_CURRENT_USER_ENDPOINT || '/user'
+  const USER_ENDPOINT = process.env.NEXT_PUBLIC_CURRENT_USER_ENDPOINT || '/user'
   const UPDATE_PROFILE_ENDPOINT =
     process.env.NEXT_PUBLIC_UPDATE_PROFILE_ENDPOINT || '/user'
 
@@ -72,7 +71,7 @@ export default function ProfilePage() {
           return
         }
 
-        const res = await apiFetch(`${CURRENT_USER_ENDPOINT}/${userId}`)
+        const res = await apiFetch(`${USER_ENDPOINT}/${userId}`)
 
         if (res.status === 401) {
           UnauthorizedAccess(router)
@@ -101,10 +100,10 @@ export default function ProfilePage() {
     }
 
     fetchProfile()
-  }, [router, CURRENT_USER_ENDPOINT])
+  }, [router, USER_ENDPOINT])
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleUpdateProfile = async (e?: React.FormEvent) => {
+    e?.preventDefault()
     setMessage(null)
     setError(null)
 
@@ -242,10 +241,7 @@ export default function ProfilePage() {
 
   // Helper to trigger profile update from outside the profile form
   const triggerUpdateProfile = () => {
-    // call handler with a dummy event that has preventDefault
-    void handleUpdateProfile({
-      preventDefault: () => {},
-    } as unknown as React.FormEvent)
+    void handleUpdateProfile()
   }
 
   // helper removed: password change is handled by `handleUpdateProfile`
