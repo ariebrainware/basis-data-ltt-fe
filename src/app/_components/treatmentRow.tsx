@@ -152,20 +152,25 @@ export default function Treatment({
       })
       .then((data) => {
         console.log('Patient information updated successfully:', data)
+        // Close modal and show success message
+        setOpen(false)
+        Swal.fire({
+          text: 'Data penanganan pasien berhasil diperbarui.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          // refresh the current route
+          router.refresh()
+        })
       })
       .catch((error) => {
         console.error('Error updating patient information:', error)
+        Swal.fire({
+          text: 'Gagal memperbarui data penanganan.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        })
       })
-    Swal.fire({
-      text: 'Data penanganan pasien berhasil diperbarui.',
-      icon: 'success',
-      confirmButtonText: 'OK',
-    }).then(() => {
-      // refresh the current route
-      router.refresh()
-    })
-
-    setOpen(!open)
   }
 
   return (
