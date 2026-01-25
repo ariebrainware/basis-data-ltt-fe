@@ -147,6 +147,7 @@ export default function ProfilePage() {
           'Password must include uppercase, lowercase, number, and special character'
         )
         return
+      }
       if (currentPassword.trim()) {
         try {
           const vp = await verifyPassword(currentPassword)
