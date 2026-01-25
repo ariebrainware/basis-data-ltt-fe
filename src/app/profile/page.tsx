@@ -212,26 +212,19 @@ export default function ProfilePage() {
         icon: 'success',
         confirmButtonText: 'OK',
       })
-      if (changingPassword) {
-        setCurrentPassword('')
-        setNewPassword('')
-        setConfirmPassword('')
-        try {
-          await logout()
-        } catch (err) {
-          // ignore logout errors, still attempt redirect
-          console.warn('logout failed after password change', err)
+      // Clear password fields regardless of change
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+      try {
+        const isE2E =
+          typeof window !== 'undefined' &&
+          window.localStorage.getItem('__E2E_TEST__') === '1'
+        if (!isE2E) {
+          router.push('/dashboard')
         }
-        try {
-          const isE2E =
-            typeof window !== 'undefined' &&
-            window.localStorage.getItem('__E2E_TEST__') === '1'
-          if (!isE2E) {
-            router.push('/login')
-          }
-        } catch (err) {
-          if (typeof window !== 'undefined') window.location.href = '/login'
-        }
+      } catch (err) {
+        if (typeof window !== 'undefined') window.location.href = '/dashboard'
       }
     } catch (err) {
       console.error(err)
