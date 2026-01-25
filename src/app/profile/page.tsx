@@ -146,6 +146,7 @@ export default function ProfilePage() {
           'Password must include uppercase, lowercase, number, and special character'
         )
         return
+      }
       if (currentPassword.trim()) {
         try {
           const vp = await verifyPassword(currentPassword)
@@ -373,6 +374,7 @@ export default function ProfilePage() {
               />
             </div>
             {/* removed separate Change Password submit — use "Save Changes" instead */}
+            {message && <p className="text-green-600">{message}</p>}
             {pwError && <p className="text-red-600">{pwError}</p>}
           </section>
           <div className="mt-6 flex justify-end">
