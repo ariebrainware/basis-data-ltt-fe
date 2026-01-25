@@ -79,7 +79,7 @@ export function PasswordStrengthIndicator({
             {getStrengthLabel()}
           </span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+        <div className="bg-slate-200 h-2 w-full overflow-hidden rounded-full">
           <div
             className={`h-full transition-all duration-300 ${getStrengthColor()}`}
             style={{ width: `${strengthPercentage}%` }}
@@ -95,7 +95,7 @@ export function PasswordStrengthIndicator({
               className={`flex size-4 items-center justify-center rounded-full ${
                 requirement.met
                   ? 'bg-green-500 text-white'
-                  : 'border border-slate-300 bg-transparent text-slate-300'
+                  : 'border-slate-300 text-slate-300 border bg-transparent'
               }`}
             >
               {requirement.met ? (
@@ -130,7 +130,7 @@ export function PasswordStrengthIndicator({
       </div>
 
       {/* Security note */}
-      <div className="text-slate-600 flex gap-1.5 rounded border border-blue-100 bg-blue-50 p-2 dark:border-blue-900 dark:bg-blue-950">
+      <div className="text-slate-600 dark:bg-blue-950 flex gap-1.5 rounded border border-blue-100 bg-blue-50 p-2 dark:border-blue-900">
         <svg
           width="1.5em"
           height="1.5em"
