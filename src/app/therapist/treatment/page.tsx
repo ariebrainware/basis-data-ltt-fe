@@ -16,8 +16,6 @@ import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
 import { UnauthorizedAccess } from '../../_functions/unauthorized'
-import { getApiHost } from '../../_functions/apiHost'
-import { getSessionToken } from '../../_functions/sessionToken'
 import { logout } from '../../_functions/logout'
 
 interface ListTreatmentResponse {
@@ -135,7 +133,10 @@ export default function TherapistTreatmentList() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
-                onClick={logout}
+                onClick={async () => {
+                  await logout()
+                  window.location.href = '/login'
+                }}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >

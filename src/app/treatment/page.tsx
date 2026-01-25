@@ -17,8 +17,6 @@ import Pagination from '../_components/pagination'
 import TableTreatment from '../_components/tableTreatment'
 import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
 import { logout } from '../_functions/logout'
 
 interface ListTreatmentResponse {
@@ -70,7 +68,6 @@ export default function ListTreatment() {
   const [currentPage, setCurrentPage] = useState(1)
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [keyword, setKeyword] = useState('')
-  const router = useRouter()
   const { data, total } = useFetchTreatment(currentPage, keyword)
   useEffect(() => {
     setTreatment(data.treatment)
@@ -149,7 +146,10 @@ export default function ListTreatment() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
-                onClick={logout}
+                onClick={async () => {
+                  await logout()
+                  window.location.href = '/login'
+                }}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >

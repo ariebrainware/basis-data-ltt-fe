@@ -14,8 +14,6 @@ import SubHeader from '../_components/subheader'
 import TablePatient from '../_components/tablePatient'
 import { PatientType } from '../_types/patient'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
 
 interface ListPatientsResponse {
   data: {
