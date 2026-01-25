@@ -239,11 +239,6 @@ export default function ProfilePage() {
     }
   }
 
-  // Helper to trigger profile update from outside the profile form
-  const triggerUpdateProfile = () => {
-    void handleUpdateProfile()
-  }
-
   // helper removed: password change is handled by `handleUpdateProfile`
 
   return (
@@ -379,7 +374,7 @@ export default function ProfilePage() {
           </section>
           <div className="mt-6 flex justify-end">
             <button
-              onClick={triggerUpdateProfile}
+              onClick={() => void handleUpdateProfile()}
               className="rounded bg-blue-600 px-4 py-2 text-white"
             >
               Save Changes

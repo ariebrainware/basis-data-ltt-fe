@@ -64,6 +64,7 @@ function useFetchTreatment(
 }
 
 export default function TherapistTreatmentList() {
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [keyword, setKeyword] = useState('')
@@ -135,7 +136,7 @@ export default function TherapistTreatmentList() {
                 onPointerLeaveCapture={undefined}
                 onClick={async () => {
                   await logout()
-                  window.location.href = '/login'
+                  router.push('/login')
                 }}
                 onResize={undefined}
                 onResizeCapture={undefined}
