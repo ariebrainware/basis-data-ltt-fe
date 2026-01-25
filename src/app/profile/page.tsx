@@ -378,7 +378,7 @@ export default function ProfilePage() {
               />
             </div>
             {/* removed separate Change Password submit — use "Save Changes" instead */}
-            {pwMessage && <p className="text-green-600">{pwMessage}</p>}
+            {message && <p className="text-green-600">{message}</p>}
             {pwError && <p className="text-red-600">{pwError}</p>}
           </section>
           <div className="mt-6 flex justify-end">
