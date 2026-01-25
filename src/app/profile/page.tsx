@@ -248,32 +248,29 @@ export default function ProfilePage() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <>
-          <form onSubmit={handleUpdateProfile} className="mb-8 space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium">Name</label>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded border px-3 py-2"
-                placeholder="Full name"
-              />
-            </div>
+        <form onSubmit={handleUpdateProfile} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium">Name</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded border px-3 py-2"
+              placeholder="Full name"
+            />
+          </div>
 
-            <div>
-              <label className="mb-1 block text-sm font-medium">Email</label>
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded border px-3 py-2"
-                placeholder="email@example.com"
-                type="email"
-              />
-            </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Email</label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded border px-3 py-2"
+              placeholder="email@example.com"
+              type="email"
+            />
+          </div>
 
-            {message && <p className="text-green-600">{message}</p>}
-            {error && <p className="text-red-600">{error}</p>}
-          </form>
+          {error && <p className="text-red-600">{error}</p>}
 
           <section className="border-t pt-6">
             <h2 className="mb-3 text-xl font-medium">Change Password</h2>
@@ -369,18 +366,17 @@ export default function ProfilePage() {
               />
             </div>
             {/* removed separate Change Password submit — use "Save Changes" instead */}
-            {message && <p className="text-green-600">{message}</p>}
             {pwError && <p className="text-red-600">{pwError}</p>}
           </section>
           <div className="mt-6 flex justify-end">
             <button
-              onClick={() => void handleUpdateProfile()}
+              type="submit"
               className="rounded bg-blue-600 px-4 py-2 text-white"
             >
               Save Changes
             </button>
           </div>
-        </>
+        </form>
       )}
     </div>
   )
