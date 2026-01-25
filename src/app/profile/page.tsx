@@ -150,23 +150,25 @@ export default function ProfilePage() {
           'Password must include uppercase, lowercase, number, and special character'
         )
         return
-      }
-
-      // Verify current password with backend if available
-      try {
-        const vp = await verifyPassword(currentPassword)
-        if (vp.status === 401) return
-        if (vp.available) {
-          if (!vp.verified) {
-            setPwError('Current password is incorrect')
-            return
+      if (currentPassword.trim()) {
+        try {
+          const vp = await verifyPassword(currentPassword)
+          if (vp.status === 401) return
+          if (!vp.available) {
+            // verification endpoint not available or returned error; fall back to attempting change
+          } else {
+            if (!vp.verified) {
+              setPwError('Current password is incorrect')
+              return
+            }
           }
+        } catch (verifyErr) {
+          // network or unexpected error while verifying — fall back to attempting change
+          console.warn(
+            'verify password error, will attempt change directly',
+            verifyErr
+          )
         }
-      } catch (verifyErr) {
-        console.warn(
-          'verify password error, will attempt change directly',
-          verifyErr
-        )
       }
     }
 
