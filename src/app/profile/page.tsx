@@ -32,7 +32,6 @@ export default function ProfilePage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [pwMessage, setPwMessage] = useState<string | null>(null)
   const [pwError, setPwError] = useState<string | null>(null)
 
   // Live password requirement booleans
