@@ -190,7 +190,7 @@ export function validatePasswordStrength(password: string): boolean {
     SPECIAL_CHAR_REGEX.test(password),
   ]
 
-  return requirements.every((req) => req === true)
+  return requirements.every((req) => req)
 }
 
 /**
