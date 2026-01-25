@@ -12,7 +12,6 @@ import {
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { getApiHost } from '../_functions/apiHost'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function DiseaseRow({

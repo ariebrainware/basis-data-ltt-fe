@@ -12,7 +12,6 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
-import { getApiHost } from '../_functions/apiHost'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function Therapist({

@@ -20,8 +20,6 @@ import Pagination from '../_components/pagination'
 import TableTherapist from '../_components/tableTherapist'
 import { TherapistType } from '../_types/therapist'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
 import { logout } from '../_functions/logout'
 
 interface ListTherapistResponse {
@@ -180,7 +178,10 @@ export default function ListTherapist() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
-                onClick={logout}
+                onClick={async () => {
+                  await logout()
+                  router.push('/login')
+                }}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >

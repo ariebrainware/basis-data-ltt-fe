@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import { PatientForm } from './patientForm'
 import { PatientType } from '../_types/patient'
-import { getApiHost } from '../_functions/apiHost'
 import { DiseaseType } from '../_types/disease'
 import {
   Button,
