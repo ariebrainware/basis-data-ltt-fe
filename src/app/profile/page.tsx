@@ -75,7 +75,7 @@ export default function ProfilePage() {
           return
         }
 
-        const res = await apiFetch(`/user/${userId}`)
+        const res = await apiFetch(`${CURRENT_USER_ENDPOINT}/${userId}`)
 
         if (res.status === 401) {
           UnauthorizedAccess(router)
@@ -104,7 +104,7 @@ export default function ProfilePage() {
     }
 
     fetchProfile()
-  }, [router])
+  }, [router, CURRENT_USER_ENDPOINT])
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
