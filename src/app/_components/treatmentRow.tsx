@@ -151,12 +151,12 @@ export default function Treatment({
           return Promise.reject(new Error('Unauthorized'))
         }
         if (!response.ok) {
-          throw new Error('Failed to update patient information')
+          throw new Error('Failed to update treatment information')
         }
         return response.json()
       })
       .then((data) => {
-        console.log('Patient information updated successfully:', data)
+        console.log('Treatment information updated successfully:', data)
         // Close modal and show success message
         setOpen(false)
         Swal.fire({
@@ -169,7 +169,7 @@ export default function Treatment({
         })
       })
       .catch((error) => {
-        console.error('Error updating patient information:', error)
+        console.error('Error updating treatment information:', error)
         // Don't show error for unauthorized access since UnauthorizedAccess handles it
         if (error.message !== 'Unauthorized') {
           Swal.fire({
