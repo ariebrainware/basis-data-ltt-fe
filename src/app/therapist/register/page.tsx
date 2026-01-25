@@ -18,8 +18,6 @@ import {
 
 let fullNameInput: HTMLInputElement | null = null
 let emailInput: HTMLInputElement | null = null
-let passwordInput: HTMLInputElement | null = null
-let confirmPasswordInput: HTMLInputElement | null = null
 let addressInput: HTMLInputElement | null = null
 let dateOfBirthInput: HTMLInputElement | null = null
 let phoneInput: HTMLInputElement | null = null

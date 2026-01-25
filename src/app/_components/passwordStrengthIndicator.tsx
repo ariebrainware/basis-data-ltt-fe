@@ -10,29 +10,36 @@ interface PasswordRequirement {
   met: boolean
 }
 
+// Password validation constants
+const MIN_PASSWORD_LENGTH = 8
+const UPPERCASE_REGEX = /[A-Z]/
+const LOWERCASE_REGEX = /[a-z]/
+const NUMBER_REGEX = /\d/
+const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/
+
 export function PasswordStrengthIndicator({
   password,
 }: PasswordStrengthIndicatorProps) {
   const requirements: PasswordRequirement[] = [
     {
       label: 'Minimal 8 karakter',
-      met: password.length >= 8,
+      met: password.length >= MIN_PASSWORD_LENGTH,
     },
     {
       label: 'Mengandung huruf besar (A-Z)',
-      met: /[A-Z]/.test(password),
+      met: UPPERCASE_REGEX.test(password),
     },
     {
       label: 'Mengandung huruf kecil (a-z)',
-      met: /[a-z]/.test(password),
+      met: LOWERCASE_REGEX.test(password),
     },
     {
       label: 'Mengandung angka (0-9)',
-      met: /\d/.test(password),
+      met: NUMBER_REGEX.test(password),
     },
     {
       label: 'Mengandung karakter khusus (!@#$%^&*)',
-      met: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
+      met: SPECIAL_CHAR_REGEX.test(password),
     },
   ]
 
@@ -161,7 +168,7 @@ export function PasswordStrengthIndicator({
           ></path>
         </svg>
         <small className="font-sans text-xs leading-relaxed text-blue-700 dark:text-blue-300">
-          Kata sandi Anda akan dienkripsi dengan aman di server. Jangan gunakan
+          Kata sandi Anda akan di-hash dengan aman di server. Jangan gunakan
           kata sandi yang sama dengan akun lain.
         </small>
       </div>
@@ -176,11 +183,11 @@ export function PasswordStrengthIndicator({
  */
 export function validatePasswordStrength(password: string): boolean {
   const requirements = [
-    password.length >= 8,
-    /[A-Z]/.test(password),
-    /[a-z]/.test(password),
-    /\d/.test(password),
-    /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
+    password.length >= MIN_PASSWORD_LENGTH,
+    UPPERCASE_REGEX.test(password),
+    LOWERCASE_REGEX.test(password),
+    NUMBER_REGEX.test(password),
+    SPECIAL_CHAR_REGEX.test(password),
   ]
 
   return requirements.every((req) => req === true)
@@ -194,19 +201,19 @@ export function validatePasswordStrength(password: string): boolean {
 export function getUnmetPasswordRequirements(password: string): string[] {
   const unmet: string[] = []
 
-  if (password.length < 8) {
+  if (password.length < MIN_PASSWORD_LENGTH) {
     unmet.push('Minimal 8 karakter')
   }
-  if (!/[A-Z]/.test(password)) {
+  if (!UPPERCASE_REGEX.test(password)) {
     unmet.push('Mengandung huruf besar (A-Z)')
   }
-  if (!/[a-z]/.test(password)) {
+  if (!LOWERCASE_REGEX.test(password)) {
     unmet.push('Mengandung huruf kecil (a-z)')
   }
-  if (!/\d/.test(password)) {
+  if (!NUMBER_REGEX.test(password)) {
     unmet.push('Mengandung angka (0-9)')
   }
-  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+  if (!SPECIAL_CHAR_REGEX.test(password)) {
     unmet.push('Mengandung karakter khusus (!@#$%^&*)')
   }
 
