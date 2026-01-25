@@ -54,10 +54,16 @@ pnpm install
 Copy `sample.env` to `.env.local` and set:
 
 ```bash
+# Development
 NEXT_PUBLIC_API_HOST=http://localhost:19091
+
+# Production - ALWAYS use HTTPS
+NEXT_PUBLIC_API_HOST=https://api.example.com
 ```
 
 The `NEXT_PUBLIC_API_HOST` variable configures your backend API endpoint.
+
+⚠️ **Security Note**: See [SECURITY.md](./SECURITY.md) for important security guidelines before deploying to production.
 
 ### 4. Start the Development Server
 
@@ -115,6 +121,8 @@ See [TESTING.md](./TESTING.md) for detailed testing documentation, including:
 - **Token Management**: Each API request includes `session-token` header for authentication
 - **Authorization**: User roles are stored in localStorage as `user-role` for client-side access control
 - **Error Handling**: 401 responses trigger automatic re-authentication flow
+
+⚠️ **Security**: See [SECURITY.md](./SECURITY.md) for comprehensive security guidelines, password hashing requirements, and deployment best practices.
 
 ## Key Patterns
 

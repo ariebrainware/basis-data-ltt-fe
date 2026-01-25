@@ -11,6 +11,10 @@ import WeightHeightInput from '../../_components/weightHeightInput'
 import { VariantAlert } from '../../_components/alert'
 import { getApiHost } from '../../_functions/apiHost'
 import { getSessionToken } from '../../_functions/sessionToken'
+import {
+  PasswordStrengthIndicator,
+  validatePasswordStrength,
+} from '../../_components/passwordStrengthIndicator'
 
 let fullNameInput: HTMLInputElement | null = null
 let emailInput: HTMLInputElement | null = null
@@ -30,6 +34,8 @@ export default function RegisterTherapist() {
   const [nik, setNik] = useState<string>('')
   const [weight, setWeight] = useState<string>('')
   const [height, setHeight] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [confirmPassword, setConfirmPassword] = useState<string>('')
 
   async function sendRegisterTherapistRequest() {
     const fullName = fullNameInput ? fullNameInput.value : ''
@@ -39,7 +45,24 @@ export default function RegisterTherapist() {
     const phone = phoneInput ? phoneInput.value : ''
     const weight = weightInput ? weightInput.value : ''
     const height = heightInput ? heightInput.value : ''
-    const password = passwordInput ? passwordInput.value : ''
+
+    // Validate password strength before submission
+    if (!validatePasswordStrength(password)) {
+      setShowVariantAlert(true)
+      setAlertVariant('error')
+      setMessage(
+        'Kata sandi tidak memenuhi persyaratan keamanan. Pastikan semua kriteria terpenuhi.'
+      )
+      return
+    }
+
+    // Validate password confirmation
+    if (password !== confirmPassword) {
+      setShowVariantAlert(true)
+      setAlertVariant('error')
+      setMessage('Kata sandi tidak sesuai dengan konfirmasi')
+      return
+    }
     const response = await fetch(`${getApiHost()}/therapist`, {
       method: 'POST',
       headers: {
@@ -78,14 +101,14 @@ export default function RegisterTherapist() {
       // Clear form fields after successful registration
       if (fullNameInput) fullNameInput.value = ''
       if (emailInput) emailInput.value = ''
-      if (passwordInput) passwordInput.value = ''
-      if (confirmPasswordInput) confirmPasswordInput.value = ''
       if (addressInput) addressInput.value = ''
       if (dateOfBirthInput) dateOfBirthInput.value = ''
       if (phoneInput) phoneInput.value = ''
       setNik('')
       setWeight('')
       setHeight('')
+      setPassword('')
+      setConfirmPassword('')
       // Clear the ControlledSelect state (role)
       setRole('')
     }
@@ -94,10 +117,6 @@ export default function RegisterTherapist() {
   useEffect(() => {
     fullNameInput = document.getElementById('fullName') as HTMLInputElement
     emailInput = document.getElementById('email') as HTMLInputElement
-    passwordInput = document.getElementById('password') as HTMLInputElement
-    confirmPasswordInput = document.getElementById(
-      'confirm_password'
-    ) as HTMLInputElement
     addressInput = document.getElementById('address') as HTMLInputElement
     dateOfBirthInput = document.getElementById(
       'date_of_birth'
@@ -164,7 +183,7 @@ export default function RegisterTherapist() {
 
           <div className="w-72 space-y-1">
             <label
-              htmlFor="email"
+              htmlFor="password"
               className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               Kata Sandi
@@ -174,50 +193,18 @@ export default function RegisterTherapist() {
                 id="password"
                 placeholder="Kata sandi"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
                 data-error="false"
                 data-success="false"
                 data-icon-placement=""
               />
-              <div className="text-slate-600 flex gap-1.5">
-                <svg
-                  width="1.5em"
-                  height="1.5em"
-                  strokeWidth="1.5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  color="currentColor"
-                  className="size-3.5 shrink-0 translate-y-[3px] stroke-2"
-                >
-                  <path
-                    d="M12 11.5V16.5"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  ></path>
-                  <path
-                    d="M12 7.51L12.01 7.49889"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  ></path>
-                  <path
-                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  ></path>
-                </svg>
-                <small className="font-sans text-sm text-current antialiased">
-                  Kata sandi minimal 8 karakter, kombinasi huruf besar, kecil,
-                  angka, dan karakter.
-                </small>
-              </div>
+              <PasswordStrengthIndicator password={password} />
             </div>
 
             <label
-              htmlFor="email"
+              htmlFor="confirm_password"
               className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white"
             >
               Konfirmasi Kata Sandi
@@ -227,35 +214,56 @@ export default function RegisterTherapist() {
                 id="confirm_password"
                 placeholder="Konfirmasi Kata Sandi"
                 type="password"
-                onChange={() => {
-                  document
-                    .getElementById('registerTherapistButton')
-                    ?.removeAttribute('disabled')
-                  const confirmPassword = (
-                    document.getElementById(
-                      'confirm_password'
-                    ) as HTMLInputElement
-                  ).value
-                  const password = (
-                    document.getElementById('password') as HTMLInputElement
-                  ).value
-                  if (confirmPassword !== password) {
-                    // alert('Kata sandi tidak sesuai')
-                    setShowVariantAlert(true)
-                    setAlertVariant('error')
-                    setMessage('Kata sandi tidak sesuai')
-                    document
-                      .getElementById('registerTherapistButton')
-                      ?.setAttribute('disabled', 'true')
-                  } else {
-                    console.log('Passwords match')
-                  }
-                }}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
                 data-error="false"
                 data-success="false"
                 data-icon-placement=""
               />
+              {confirmPassword.length > 0 && (
+                <div className="mt-2">
+                  {password === confirmPassword ? (
+                    <div className="flex items-center gap-1 text-xs text-green-600">
+                      <svg
+                        width="16px"
+                        height="16px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M5 13L9 17L19 7"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span>Kata sandi cocok</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-xs text-red-600">
+                      <svg
+                        width="16px"
+                        height="16px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6 18L18 6M6 6L18 18"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span>Kata sandi tidak cocok</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="w-72 space-y-1">
