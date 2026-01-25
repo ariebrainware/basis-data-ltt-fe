@@ -21,8 +21,6 @@ export default function ProfilePage() {
     process.env.NEXT_PUBLIC_CURRENT_USER_ENDPOINT || '/user'
   const UPDATE_PROFILE_ENDPOINT =
     process.env.NEXT_PUBLIC_UPDATE_PROFILE_ENDPOINT || '/user'
-  const CHANGE_PASSWORD_ENDPOINT =
-    process.env.NEXT_PUBLIC_CHANGE_PASSWORD_ENDPOINT || UPDATE_PROFILE_ENDPOINT
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
