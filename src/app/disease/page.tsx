@@ -22,8 +22,6 @@ import Pagination from '../_components/pagination'
 import TableDisease from '../_components/tableDisease'
 import { DiseaseType } from '../_types/disease'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { getApiHost } from '../_functions/apiHost'
-import { getSessionToken } from '../_functions/sessionToken'
 import { logout } from '../_functions/logout'
 import Swal from 'sweetalert2'
 
