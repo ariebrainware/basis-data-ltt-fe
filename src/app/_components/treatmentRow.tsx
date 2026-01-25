@@ -12,6 +12,7 @@ import {
 import { TreatmentForm } from './treatmentForm'
 import Swal from 'sweetalert2'
 import { apiFetch } from '../_functions/apiFetch'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isTherapist } from '../_functions/userRole'
 import { getUserId } from '../_functions/userId'
@@ -145,6 +146,10 @@ export default function Treatment({
       }),
     })
       .then((response) => {
+        if (response.status === 401) {
+          UnauthorizedAccess(router)
+          return Promise.reject(new Error('Unauthorized'))
+        }
         if (!response.ok) {
           throw new Error('Failed to update patient information')
         }
@@ -165,11 +170,14 @@ export default function Treatment({
       })
       .catch((error) => {
         console.error('Error updating patient information:', error)
-        Swal.fire({
-          text: 'Gagal memperbarui data penanganan.',
-          icon: 'error',
-          confirmButtonText: 'OK',
-        })
+        // Don't show error for unauthorized access since UnauthorizedAccess handles it
+        if (error.message !== 'Unauthorized') {
+          Swal.fire({
+            text: 'Gagal memperbarui data penanganan.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          })
+        }
       })
   }
 
