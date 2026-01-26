@@ -10,12 +10,12 @@ import {
   CardFooter,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { apiFetch } from '../../_functions/apiFetch'
 import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
 import { UnauthorizedAccess } from '../../_functions/unauthorized'
-import { getApiHost } from '../../_functions/apiHost'
-import { getSessionToken } from '../../_functions/sessionToken'
 import { logout } from '../../_functions/logout'
 
 interface ListTreatmentResponse {
@@ -31,6 +31,7 @@ function useFetchTreatment(
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
+  const router = useRouter()
 
   useEffect(() => {
     ;(async () => {
@@ -38,15 +39,8 @@ function useFetchTreatment(
         const baseParams = keyword
           ? `keyword=${keyword}`
           : `limit=20&offset=${(currentPage - 1) * 20}`
-        const res = await fetch(`${getApiHost()}/treatment?${baseParams}`, {
+        const res = await apiFetch(`/treatment?${baseParams}`, {
           method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-            'session-token': getSessionToken(),
-          },
         })
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
         const data = await res.json()
@@ -59,17 +53,18 @@ function useFetchTreatment(
         setTotal(data.data.total)
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess()
+          UnauthorizedAccess(router)
         }
         console.error('Error fetching treatment:', error)
       }
     })()
-  }, [currentPage, keyword])
+  }, [currentPage, keyword, router])
 
   return { data: { treatment: treatment }, total }
 }
 
 export default function TherapistTreatmentList() {
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [keyword, setKeyword] = useState('')
@@ -139,7 +134,10 @@ export default function TherapistTreatmentList() {
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
-                onClick={logout}
+                onClick={async () => {
+                  await logout()
+                  router.push('/login')
+                }}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >

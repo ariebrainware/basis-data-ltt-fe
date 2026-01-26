@@ -1,17 +1,32 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
 
+// Mock `next/navigation` so `useRouter()` is available in tests
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    pathname: '/',
+    push: jest.fn(),
+    replace: jest.fn(),
+    refresh: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+}))
+
 // Filter out specific React DOM warnings that occur due to forwarded props
 const _consoleError = console.error.bind(console)
 console.error = (...args) => {
   try {
-    // If any argument contains the React DOM warning about unknown pointer event
-    // handler props, swallow it to keep test output clean.
+    // If any argument contains known React DOM warnings that are noisy in tests,
+    // swallow them to keep test output focused on real failures.
     const anyArg = args.find((a) => typeof a === 'string' || a instanceof Error)
-    if (
-      anyArg &&
-      String(anyArg).includes('Unknown event handler property `onPointer')
-    ) {
+    const s = anyArg ? String(anyArg) : ''
+    const ignoredSubstrings = [
+      'Unknown event handler property `onPointer',
+      '<tbody> cannot contain',
+      'cannot be a child of <tbody>',
+      'not wrapped in act(',
+    ]
+    if (ignoredSubstrings.some((sub) => s.includes(sub))) {
       return
     }
   } catch (e) {

@@ -15,6 +15,7 @@ import {
   PasswordStrengthIndicator,
   validatePasswordStrength,
 } from '../../_components/passwordStrengthIndicator'
+import { apiFetch } from '../../_functions/apiFetch'
 
 let fullNameInput: HTMLInputElement | null = null
 let emailInput: HTMLInputElement | null = null
@@ -63,14 +64,6 @@ export default function RegisterTherapist() {
     }
     const response = await fetch(`${getApiHost()}/therapist`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
-      credentials: 'include',
-      redirect: 'follow',
       body: JSON.stringify({
         full_name: fullName,
         email: email,

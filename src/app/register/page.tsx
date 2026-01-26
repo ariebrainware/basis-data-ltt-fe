@@ -1,10 +1,11 @@
 'use client'
 import styles from '../page.module.css'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
 import { useRef } from 'react'
-import { getApiHost } from '../_functions/apiHost'
+import { apiFetch } from '../_functions/apiFetch'
 import { DiseaseMultiSelect } from '../_components/selectDisease'
 import { extractErrorMessage } from '../_functions/errorMessage'
 import Swal from 'sweetalert2'
@@ -92,14 +93,8 @@ async function sendRegisterRequest(
   }
   console.log(`patient_code_ref_value:: `, patient_code)
   console.log(`full_name`, full_name)
-  const data = await fetch(`${getApiHost()}/patient`, {
+  const data = await apiFetch('/patient', {
     method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-    },
     body: JSON.stringify({
       full_name,
       gender: genderInput,
@@ -124,7 +119,7 @@ async function sendRegisterRequest(
       icon: 'success',
       confirmButtonText: 'OK',
     })
-    window.location.href = '/register'
+    return { ok: true, data: responseData }
   } else {
     const errorMessage = extractErrorMessage(responseData, 'Registrasi gagal')
     await Swal.fire({
@@ -217,6 +212,7 @@ function renderInput(id: string, type: string, placeHolder: string) {
 export default function Register() {
   const [showPatientCode, setShowPatientCode] = useState(false)
   const patientCodeRef = useRef<HTMLInputElement | null>(null)
+  const router = useRouter()
   useEffect(() => {
     fullnameInput = document.getElementById('fullName') as HTMLInputElement
     ageInput = document.getElementById('age') as HTMLInputElement
@@ -366,13 +362,16 @@ export default function Register() {
             className="bg-slate-200 cursor-not-allowed"
             id="registerBtn"
             href="/login"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault()
               const termCheckbox = document.getElementById(
                 'termConditionCheckbox'
               ) as HTMLInputElement | null
               if (!termCheckbox?.checked) return
-              sendRegisterRequest(patientCodeRef)
+              const res = await sendRegisterRequest(patientCodeRef)
+              if (res?.ok) {
+                router.push('/register')
+              }
             }}
           >
             DAFTAR

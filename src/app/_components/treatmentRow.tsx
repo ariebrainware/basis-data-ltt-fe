@@ -1,5 +1,6 @@
+'use client'
 import React from 'react'
-import { getSessionToken } from '../_functions/sessionToken'
+import { useRouter } from 'next/navigation'
 import { TreatmentType } from '../_types/treatment'
 import {
   Button,
@@ -10,7 +11,8 @@ import {
 } from '@material-tailwind/react'
 import { TreatmentForm } from './treatmentForm'
 import Swal from 'sweetalert2'
-import { getApiHost } from '../_functions/apiHost'
+import { apiFetch } from '../_functions/apiFetch'
+import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isTherapist } from '../_functions/userRole'
 import { getUserId } from '../_functions/userId'
@@ -34,6 +36,7 @@ export default function Treatment({
   )
   const isTherapistRole = isTherapist()
   const currentUserId = getUserId()
+  const router = useRouter()
   const normalizedTherapistId =
     therapistId !== null && therapistId !== undefined
       ? String(therapistId)
@@ -129,15 +132,8 @@ export default function Treatment({
     const next_visit_new_input =
       document.querySelector<HTMLTextAreaElement>('#next_visit')?.value ||
       nextVisit
-    fetch(`${getApiHost()}/treatment/${ID}`, {
+    apiFetch(`/treatment/${ID}`, {
       method: 'PATCH',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
-        'session-token': getSessionToken(),
-      },
       body: JSON.stringify({
         treatment_date: treatment_date_new_input,
         patient_code: patient_code_new_input,
@@ -150,27 +146,39 @@ export default function Treatment({
       }),
     })
       .then((response) => {
+        if (response.status === 401) {
+          UnauthorizedAccess(router)
+          return Promise.reject(new Error('Unauthorized'))
+        }
         if (!response.ok) {
-          throw new Error('Failed to update patient information')
+          throw new Error('Failed to update treatment information')
         }
         return response.json()
       })
       .then((data) => {
-        console.log('Patient information updated successfully:', data)
+        console.log('Treatment information updated successfully:', data)
+        // Close modal and show success message
+        setOpen(false)
+        Swal.fire({
+          text: 'Data penanganan pasien berhasil diperbarui.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          // refresh the current route
+          router.refresh()
+        })
       })
       .catch((error) => {
-        console.error('Error updating patient information:', error)
+        console.error('Error updating treatment information:', error)
+        // Don't show error for unauthorized access since UnauthorizedAccess handles it
+        if (error.message !== 'Unauthorized') {
+          Swal.fire({
+            text: 'Gagal memperbarui data penanganan.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          })
+        }
       })
-    Swal.fire({
-      text: 'Data penanganan pasien berhasil diperbarui.',
-      icon: 'success',
-      confirmButtonText: 'OK',
-    }).then(() => {
-      // Reload the page after user clicks "OK"
-      if (typeof window !== 'undefined') window.location.reload()
-    })
-
-    setOpen(!open)
   }
 
   return (
