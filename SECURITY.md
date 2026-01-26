@@ -240,7 +240,10 @@ Add real-time password strength indicator (see implementation below).
 
 #### 2. Content Security Policy
 
-Add CSP headers in `next.config.ts`:
+Add CSP headers in `next.config.ts` to mitigate XSS attacks:
+
+**⚠️ Important**: Avoid `'unsafe-inline'` and `'unsafe-eval'` in production as they defeat the purpose of CSP. Use nonces or hashes for inline scripts/styles.
+
 ```typescript
 async headers() {
   return [
@@ -249,13 +252,41 @@ async headers() {
       headers: [
         {
           key: 'Content-Security-Policy',
-          value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+          value: [
+            "default-src 'self'",
+            "script-src 'self'", // Remove 'unsafe-inline' and 'unsafe-eval'
+            "style-src 'self'",  // Remove 'unsafe-inline'
+            "img-src 'self' data: https:",
+            "font-src 'self' data:",
+            "connect-src 'self'",
+            "frame-ancestors 'none'",
+            "base-uri 'self'",
+            "form-action 'self'"
+          ].join('; ')
         }
       ]
     }
   ]
 }
 ```
+
+**For Next.js with inline scripts/styles**, you may need to use nonces:
+```typescript
+// In middleware or server component
+const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+
+// CSP with nonce
+const csp = `
+  default-src 'self';
+  script-src 'self' 'nonce-${nonce}';
+  style-src 'self' 'nonce-${nonce}';
+`.replace(/\s{2,}/g, ' ').trim()
+
+// Then use nonce in inline scripts/styles
+<script nonce={nonce}>...</script>
+```
+
+See [Next.js CSP documentation](https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy) for implementation details.
 
 #### 3. Input Sanitization
 
