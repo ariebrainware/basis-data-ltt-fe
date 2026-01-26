@@ -47,16 +47,18 @@ export function PasswordStrengthIndicator({
   const strengthPercentage = (metCount / requirements.length) * 100
 
   const getStrengthColor = () => {
-    if (strengthPercentage >= 80) return 'bg-green-500'
-    if (strengthPercentage >= 60) return 'bg-yellow-500'
-    if (strengthPercentage >= 40) return 'bg-orange-500'
+    // Only show the strongest color when all requirements are met
+    if (metCount === requirements.length) return 'bg-green-500'
+    if (metCount >= 3) return 'bg-yellow-500'
+    if (metCount >= 2) return 'bg-orange-500'
     return 'bg-red-500'
   }
 
   const getStrengthLabel = () => {
-    if (strengthPercentage >= 80) return 'Kuat'
-    if (strengthPercentage >= 60) return 'Sedang'
-    if (strengthPercentage >= 40) return 'Lemah'
+    // Ensure "Kuat" is only shown when all requirements are satisfied
+    if (metCount === requirements.length) return 'Kuat'
+    if (metCount >= 3) return 'Sedang'
+    if (metCount >= 2) return 'Lemah'
     return 'Sangat Lemah'
   }
 
