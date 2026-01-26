@@ -136,7 +136,7 @@ headers: {
 **Issue**: Password strength requirements only checked in browser.
 
 **Files Affected**:
-- `src/app/therapist/register/page.tsx` (lines 212-216)
+- `src/app/therapist/register/page.tsx` (therapist registration form password validation logic)
 
 **Risk**: Attackers can bypass frontend validation by sending direct API requests.
 
