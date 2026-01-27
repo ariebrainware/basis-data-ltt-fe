@@ -29,30 +29,28 @@ export default function RegisterTreatment() {
     treatmentHistoryInput = selectedTreatmentConditions
   }, [selectedTreatmentConditions])
 
-  async function sendRegisterTreatmentRequest() {
-    // Validate that a therapist has been selected
+  const showSwal = async (
+    title: string,
+    text: string,
+    icon: 'error' | 'success'
+  ) => Swal.fire({ title, text, icon, confirmButtonText: 'OK' })
+
+  const ensureTherapistId = async (): Promise<number | null> => {
     if (!therapistID) {
-      await Swal.fire({
-        title: 'Gagal',
-        text: 'Silakan pilih terapis terlebih dahulu',
-        icon: 'error',
-        confirmButtonText: 'OK',
-      })
-      return
+      await showSwal('Gagal', 'Silakan pilih terapis terlebih dahulu', 'error')
+      return null
     }
 
-    // Validate that therapist_id can be converted to a valid number
     const therapistIdNumber = Number(therapistID)
     if (isNaN(therapistIdNumber) || therapistIdNumber <= 0) {
-      await Swal.fire({
-        title: 'Gagal',
-        text: 'ID terapis tidak valid',
-        icon: 'error',
-        confirmButtonText: 'OK',
-      })
-      return
+      await showSwal('Gagal', 'ID terapis tidak valid', 'error')
+      return null
     }
 
+    return therapistIdNumber
+  }
+
+  const getFormValues = () => {
     const treatmentDate = treatmentDateInput ? treatmentDateInput.value : ''
     const treatmentTime = treatmentTimeInput ? treatmentTimeInput.value : ''
     const patientCode = patientCodeInput ? patientCodeInput.value : ''
@@ -68,22 +66,34 @@ export default function RegisterTreatment() {
             .filter(Boolean)
         : []
 
-    const response = await apiFetch('/treatment', {
-      method: 'POST',
-      body: JSON.stringify({
-        treatment_date: `${treatmentDate} ${treatmentTime}`,
-        patient_code: patientCode,
-        therapist_id: therapistIdNumber,
-        issues: issues,
-        treatment: treatmentHistory,
-        remarks: remarks,
-        next_visit: nextVisit,
-      }),
-    })
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(treatmentDate)
+    return {
+      treatmentDate,
+      treatmentTime,
+      patientCode,
+      issues,
+      remarks,
+      nextVisit,
+      treatmentHistory,
     }
+  }
+
+  const clearFormFields = () => {
+    if (treatmentDateInput) treatmentDateInput.value = ''
+    if (treatmentTimeInput) treatmentTimeInput.value = ''
+    if (patientCodeInput) patientCodeInput.value = ''
+    setTherapistID('')
+    if (issuesInput) issuesInput.value = ''
+    if (treatmentHistoryInput) treatmentHistoryInput = []
+    setSelectedTreatmentConditions([])
+    if (remarksInput) remarksInput.value = ''
+    if (nextVisitInput) nextVisitInput.value = ''
+  }
+
+  const handleApiResponse = async (response: Response) => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(getFormValues().treatmentDate)
+    }
+
     if (!response.ok) {
       let errorMessage = 'Gagal mendaftarkan penanganan'
 
@@ -100,34 +110,46 @@ export default function RegisterTreatment() {
           }
         }
       } catch {
-        // Ignore JSON parsing errors and fall back to the default message
+        // ignore
       }
 
-      await Swal.fire({
-        title: 'Gagal',
-        text: errorMessage,
-        icon: 'error',
-        confirmButtonText: 'OK',
-      })
-    } else {
-      await Swal.fire({
-        title: 'Sukses',
-        text: 'Penanganan berhasil didaftarkan',
-        icon: 'success',
-        confirmButtonText: 'OK',
-      })
-
-      // Clear form fields after successful registration
-      if (treatmentDateInput) treatmentDateInput.value = ''
-      if (treatmentTimeInput) treatmentTimeInput.value = ''
-      if (patientCodeInput) patientCodeInput.value = ''
-      setTherapistID('')
-      if (issuesInput) issuesInput.value = ''
-      if (treatmentHistoryInput) treatmentHistoryInput = []
-      setSelectedTreatmentConditions([])
-      if (remarksInput) remarksInput.value = ''
-      if (nextVisitInput) nextVisitInput.value = ''
+      await showSwal('Gagal', errorMessage, 'error')
+      return false
     }
+
+    await showSwal('Sukses', 'Penanganan berhasil didaftarkan', 'success')
+    clearFormFields()
+    return true
+  }
+
+  async function sendRegisterTreatmentRequest() {
+    const therapistIdNumber = await ensureTherapistId()
+    if (!therapistIdNumber) return
+
+    const {
+      treatmentDate,
+      treatmentTime,
+      patientCode,
+      issues,
+      remarks,
+      nextVisit,
+      treatmentHistory,
+    } = getFormValues()
+
+    const response = await apiFetch('/treatment', {
+      method: 'POST',
+      body: JSON.stringify({
+        treatment_date: `${treatmentDate} ${treatmentTime}`,
+        patient_code: patientCode,
+        therapist_id: therapistIdNumber,
+        issues: issues,
+        treatment: treatmentHistory,
+        remarks: remarks,
+        next_visit: nextVisit,
+      }),
+    })
+
+    await handleApiResponse(response)
   }
 
   useEffect(() => {
