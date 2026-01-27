@@ -32,9 +32,6 @@ export async function tryVerifyCurrentPassword(currentPassword: string) {
   try {
     const vp = await verifyPassword(currentPassword)
     return {
-     
-     ,
-   
       available: Boolean(vp?.available),
       verified: Boolean(vp?.verified),
     }
