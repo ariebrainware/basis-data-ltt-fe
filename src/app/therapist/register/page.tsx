@@ -9,8 +9,7 @@ import PhoneInput from '../../_components/phoneInput'
 import IDCardInput from '../../_components/idCardInput'
 import WeightHeightInput from '../../_components/weightHeightInput'
 import { VariantAlert } from '../../_components/alert'
-import { getApiHost } from '../../_functions/apiHost'
-import { getSessionToken } from '../../_functions/sessionToken'
+import { registerTherapist } from '../../_functions/therapistService'
 import {
   PasswordStrengthIndicator,
   validatePasswordStrength,
@@ -62,47 +61,48 @@ export default function RegisterTherapist() {
       setMessage('Kata sandi tidak sesuai dengan konfirmasi')
       return
     }
-    const response = await fetch(`${getApiHost()}/therapist`, {
-      method: 'POST',
-      body: JSON.stringify({
-        full_name: fullName,
-        email: email,
-        password: password,
-        address: address,
-        date_of_birth: dateOfBirth,
-        phone_number: `62${phone}`, // Assuming phone is in the format '81234567890'
-        nik: nik,
-        weight: parseInt(weight, 10),
-        height: parseInt(height, 10),
-        role: role,
-      }),
-    })
+    const payload = {
+      full_name: fullName,
+      email: email,
+      password: password,
+      address: address,
+      date_of_birth: dateOfBirth,
+      phone_number: `62${phone}`,
+      nik: nik,
+      weight: parseInt(weight, 10),
+      height: parseInt(height, 10),
+      role: role,
+    }
 
-    if (!response.ok) {
+    const res = await registerTherapist(payload)
+
+    if (!res.ok) {
       setShowVariantAlert(true)
       setAlertVariant('error')
-      setMessage('Gagal mendaftarkan terapis')
-      console.error('Gagal mendaftarkan terapis')
-    } else {
-      setShowVariantAlert(true)
-      setAlertVariant('success')
-      setMessage('Terapis berhasil didaftarkan')
-      console.log('Terapis berhasil didaftarkan')
-
-      // Clear form fields after successful registration
-      if (fullNameInput) fullNameInput.value = ''
-      if (emailInput) emailInput.value = ''
-      if (addressInput) addressInput.value = ''
-      if (dateOfBirthInput) dateOfBirthInput.value = ''
-      if (phoneInput) phoneInput.value = ''
-      setNik('')
-      setWeight('')
-      setHeight('')
-      setPassword('')
-      setConfirmPassword('')
-      // Clear the ControlledSelect state (role)
-      setRole('')
+      setMessage(
+        typeof res.error === 'string' ? res.error : 'Gagal mendaftarkan terapis'
+      )
+      console.error('Gagal mendaftarkan terapis', res.error)
+      return
     }
+
+    setShowVariantAlert(true)
+    setAlertVariant('success')
+    setMessage('Terapis berhasil didaftarkan')
+
+    // Clear form fields after successful registration
+    if (fullNameInput) fullNameInput.value = ''
+    if (emailInput) emailInput.value = ''
+    if (addressInput) addressInput.value = ''
+    if (dateOfBirthInput) dateOfBirthInput.value = ''
+    if (phoneInput) phoneInput.value = ''
+    setNik('')
+    setWeight('')
+    setHeight('')
+    setPassword('')
+    setConfirmPassword('')
+    // Clear the ControlledSelect state (role)
+    setRole('')
   }
 
   useEffect(() => {
