@@ -5,13 +5,8 @@ import {
   Card,
   CardHeader,
   Input,
-  Typography,
-  Button,
   CardBody,
   CardFooter,
-  Tabs,
-  TabsHeader,
-  Tab,
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -21,46 +16,8 @@ import TableTherapist from '../_components/tableTherapist'
 import { TherapistType } from '../_types/therapist'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { logout } from '../_functions/logout'
-
-interface ListTherapistResponse {
-  data: {
-    therapist: TherapistType[]
-  }
-  total: number
-}
-
-function useFetchTherapist(
-  currentPage: number,
-  keyword: string
-): ListTherapistResponse {
-  const [therapist, setTherapist] = useState<TherapistType[]>([])
-  const [total, setTotal] = useState(0)
-  const router = useRouter()
-
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const res = await apiFetch(
-          `/therapist?${keyword ? `keyword=${keyword}` : `limit=10&offset=${(currentPage - 1) * 10}`}`,
-          { method: 'GET' }
-        )
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
-        setTherapist(data.data.therapists)
-        // console.log(`therapistArray: `, data.data.therapists)
-        setTotal(data.data.total)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess(router)
-        }
-        console.error('Error fetching therapist:', error)
-      }
-    })()
-  }, [currentPage, keyword, router])
-
-  return { data: { therapist: therapist }, total }
-}
-
+import { useFetchTherapist } from '@/app/_hooks/useFetchTherapist'
+import TherapistHeader from '@/app/_components/therapistHeader'
 const TABS = [
   {
     label: 'All',
@@ -134,97 +91,15 @@ export default function ListTherapist() {
           onResizeCapture={undefined}
         >
           <div className="mb-8 flex items-center justify-between gap-8">
-            <div>
-              <Typography
-                variant="h5"
-                color="blue-gray"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Daftar Terapis
-              </Typography>
-              <Typography
-                color="gray"
-                className="mt-1 font-normal"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Lihat semua informasi mengenai terapis
-              </Typography>
-            </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                className="flex items-center gap-3"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={() => window.open('/therapist/register', '_blank')}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                <UserPlusIcon strokeWidth={2} className="size-4" /> Tambah
-                Terapis
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.push('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
-              </Button>
-            </div>
-          </div>
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <Tabs value="all" className="w-full md:w-max">
-              <TabsHeader
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                {TABS.map(({ label, value }) => (
-                  <Tab
-                    key={value}
-                    value={value}
-                    placeholder={undefined}
-                    onPointerEnterCapture={undefined}
-                    onPointerLeaveCapture={undefined}
-                    onResize={undefined}
-                    onResizeCapture={undefined}
-                  >
-                    &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                  </Tab>
-                ))}
-              </TabsHeader>
-            </Tabs>
-            <div className="w-full md:w-72">
-              <Input
-                label="Cari Terapis"
-                icon={<MagnifyingGlassIcon className="size-5" />}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                crossOrigin={undefined}
-                onKeyDown={handleInputKeyDown}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              />
-            </div>
+            <TherapistHeader
+              tabs={TABS}
+              onAddClick={() => window.open('/therapist/register', '_blank')}
+              onLogoutClick={async () => {
+                await logout()
+                router.push('/login')
+              }}
+              onSearchEnter={handleInputKeyDown}
+            />
           </div>
         </CardHeader>
         <CardBody

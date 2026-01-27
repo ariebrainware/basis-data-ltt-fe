@@ -15,7 +15,7 @@ import {
 async function performProfileUpdateHelper(params: {
   endpoint: string
   body: Record<string, unknown>
-  changingPassword: boolean
+  changingPasswordFlag: boolean
   router: any
   clearPasswords: () => void
   setPwError: (s: string | null) => void
@@ -24,19 +24,19 @@ async function performProfileUpdateHelper(params: {
   const {
     endpoint,
     body,
-    changingPassword,
+    changingPasswordFlag,
     router,
     clearPasswords,
     setPwError,
     setError,
   } = params
 
-  const result = await submitProfileUpdate(
+  const result = await submitProfileUpdate({
     endpoint,
     body,
-    changingPassword,
-    router
-  )
+    changingPasswordFlag,
+    router,
+  })
 
   if (!result.success) {
     if (result.pwError) setPwError(result.pwError)
@@ -91,7 +91,7 @@ export function useProfile() {
   useEffect(() => {
     const load = async () => {
       try {
-        const r = await fetchUserProfile(USER_ENDPOINT, router)
+        const r = await fetchUserProfile({ endpoint: USER_ENDPOINT, router })
         if ((r as any).unauthorized) return
         if ((r as any).error) {
           setError('Failed to load profile')
@@ -185,7 +185,7 @@ export function useProfile() {
     await performProfileUpdateHelper({
       endpoint: UPDATE_PROFILE_ENDPOINT,
       body,
-      changingPassword,
+      changingPasswordFlag: changingPassword,
       router,
       clearPasswords: clearPasswordFields,
       setPwError,
