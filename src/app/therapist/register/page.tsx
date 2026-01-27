@@ -11,10 +11,14 @@ import WeightHeightInput from '../../_components/weightHeightInput'
 import { VariantAlert } from '../../_components/alert'
 import { registerTherapist } from '../../_functions/therapistService'
 import {
+  validatePasswords,
+  buildTherapistPayload,
+  clearTherapistForm,
+} from '../../_functions/therapistHelpers'
+import {
   PasswordStrengthIndicator,
   validatePasswordStrength,
 } from '../../_components/passwordStrengthIndicator'
-import { apiFetch } from '../../_functions/apiFetch'
 
 let fullNameInput: HTMLInputElement | null = null
 let emailInput: HTMLInputElement | null = null
@@ -35,74 +39,100 @@ export default function RegisterTherapist() {
   const [password, setPassword] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
 
-  async function sendRegisterTherapistRequest() {
-    const fullName = fullNameInput ? fullNameInput.value : ''
-    const email = emailInput ? emailInput.value : ''
-    const address = addressInput ? addressInput.value : ''
-    const dateOfBirth = dateOfBirthInput ? dateOfBirthInput.value : ''
-    const phone = phoneInput ? phoneInput.value : ''
-    const weight = weightInput ? weightInput.value : ''
-    const height = heightInput ? heightInput.value : ''
-
-    // Validate password strength before submission
-    if (!validatePasswordStrength(password)) {
-      setShowVariantAlert(true)
-      setAlertVariant('error')
-      setMessage(
-        'Kata sandi tidak memenuhi persyaratan keamanan. Pastikan semua kriteria terpenuhi.'
-      )
-      return
+  const getFormValues = () => {
+    return {
+      fullName: fullNameInput ? fullNameInput.value : '',
+      email: emailInput ? emailInput.value : '',
+      address: addressInput ? addressInput.value : '',
+      dateOfBirth: dateOfBirthInput ? dateOfBirthInput.value : '',
+      phone: phoneInput ? phoneInput.value : '',
+      weight: weightInput ? weightInput.value : '',
+      height: heightInput ? heightInput.value : '',
     }
+  }
 
-    // Validate password confirmation
-    if (password !== confirmPassword) {
-      setShowVariantAlert(true)
-      setAlertVariant('error')
-      setMessage('Kata sandi tidak sesuai dengan konfirmasi')
-      return
-    }
-    const payload = {
-      full_name: fullName,
-      email: email,
-      password: password,
-      address: address,
-      date_of_birth: dateOfBirth,
-      phone_number: `62${phone}`,
-      nik: nik,
-      weight: parseInt(weight, 10),
-      height: parseInt(height, 10),
-      role: role,
-    }
+  const showError = (msg: string | null) => {
+    setShowVariantAlert(true)
+    setAlertVariant('error')
+    setMessage(msg)
+  }
 
+  const showSuccess = (msg: string) => {
+    setShowVariantAlert(true)
+    setAlertVariant('success')
+    setMessage(msg)
+  }
+
+  const handleRegisterResponse = async (payload: any) => {
     const res = await registerTherapist(payload)
 
     if (!res.ok) {
-      setShowVariantAlert(true)
-      setAlertVariant('error')
-      setMessage(
+      showError(
         typeof res.error === 'string' ? res.error : 'Gagal mendaftarkan terapis'
       )
       console.error('Gagal mendaftarkan terapis', res.error)
+      return false
+    }
+
+    showSuccess('Terapis berhasil didaftarkan')
+
+    clearTherapistForm(
+      {
+        fullNameInput,
+        emailInput,
+        addressInput,
+        dateOfBirthInput,
+        phoneInput,
+      },
+      {
+        setNik,
+        setWeight,
+        setHeight,
+        setPassword,
+        setConfirmPassword,
+        setRole,
+      }
+    )
+
+    return true
+  }
+
+  async function sendRegisterTherapistRequest() {
+    const {
+      fullName,
+      email,
+      address,
+      dateOfBirth,
+      phone,
+      weight: w,
+      height: h,
+    } = getFormValues()
+
+    const pwValidation = validatePasswords(
+      password,
+      confirmPassword,
+      validatePasswordStrength
+    )
+
+    if (!pwValidation.ok) {
+      showError(pwValidation.message ?? null)
       return
     }
 
-    setShowVariantAlert(true)
-    setAlertVariant('success')
-    setMessage('Terapis berhasil didaftarkan')
+    const payload = buildTherapistPayload({
+      fullName,
+      email,
+      password,
+      address,
+      dateOfBirth,
+      phone,
+      nik,
+      weight: w,
+      height: h,
+      role,
+    })
 
-    // Clear form fields after successful registration
-    if (fullNameInput) fullNameInput.value = ''
-    if (emailInput) emailInput.value = ''
-    if (addressInput) addressInput.value = ''
-    if (dateOfBirthInput) dateOfBirthInput.value = ''
-    if (phoneInput) phoneInput.value = ''
-    setNik('')
-    setWeight('')
-    setHeight('')
-    setPassword('')
-    setConfirmPassword('')
-    // Clear the ControlledSelect state (role)
-    setRole('')
+    await handleRegisterResponse(payload)
   }
 
   useEffect(() => {
