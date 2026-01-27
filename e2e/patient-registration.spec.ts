@@ -44,7 +44,7 @@ test.describe('Patient Registration', () => {
     await expect(page.locator('#job')).toBeVisible()
     await expect(page.locator('#address')).toBeVisible()
     await expect(page.locator('#surgeryHistory')).toBeVisible()
-    await expect(page.locator('#phoneNumber')).toBeVisible()
+    await expect(page.locator('#phone-0')).toBeVisible()
     await expect(page.locator('#registerBtn')).toBeVisible()
   })
 
@@ -137,8 +137,8 @@ test.describe('Patient Registration', () => {
   })
 
   test('should allow filling phone number', async ({ page }) => {
-    await reliableFill(page, '#phoneNumber', '+628123456789')
-    await expect(page.locator('#phoneNumber')).toHaveValue('+628123456789')
+    await reliableFill(page, '#phone-0', '+628123456789')
+    await expect(page.locator('#phone-0')).toHaveValue('+628123456789')
   })
 
   test('should allow adding additional phone numbers', async ({ page }) => {
@@ -148,7 +148,7 @@ test.describe('Patient Registration', () => {
     await addPhoneButton.click()
 
     // Check if optional input was added
-    const optionalPhone1 = page.locator('#phoneNumberOptional-1')
+    const optionalPhone1 = page.locator('#phone-1')
     await expect(optionalPhone1).toBeVisible()
 
     // Fill the optional phone number
@@ -158,7 +158,7 @@ test.describe('Patient Registration', () => {
     // Click to add second optional phone number
     await addPhoneButton.click()
 
-    const optionalPhone2 = page.locator('#phoneNumberOptional-2')
+    const optionalPhone2 = page.locator('#phone-2')
     await expect(optionalPhone2).toBeVisible()
   })
 
@@ -198,7 +198,7 @@ test.describe('Patient Registration', () => {
     await page.locator('#age').fill('30')
     await page.locator('#job').fill('Engineer')
     await page.locator('#address').fill('Test Address')
-    await page.locator('#phoneNumber').fill('+628123456789')
+    await page.locator('#phone-0').fill('+628123456789')
     await page.locator('#surgeryHistory').fill('None')
 
     // Force-click the checkbox to avoid any overlay intercepting pointer events
