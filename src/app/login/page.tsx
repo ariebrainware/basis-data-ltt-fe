@@ -7,6 +7,9 @@ import Footer from '../_components/footer'
 import { VariantAlert } from '../_components/alert'
 import { getApiHost } from '../_functions/apiHost'
 import { fetchCurrentUserId } from '../_functions/fetchCurrentUser'
+import Swal from 'sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
+import { format as formatDate } from 'date-fns'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
@@ -36,11 +39,62 @@ export default function Login() {
       const responseData = await response.json()
 
       if (!response.ok) {
+        // Handle user-not-found
         if (responseData.error === 'user not found') {
-          setShowVariantAlert(true)
-          setMessage('User not found!')
+          await Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: 'User not found!',
+          })
           return
         }
+
+        // Handle locked account responses from backend
+        // Check common fields or error messages for lock information
+        const lockedField =
+          responseData.data?.locked_until ||
+          responseData.data?.lockedUntil ||
+          responseData.data?.lock_expires_at ||
+          responseData.data?.locked_at
+
+        if (lockedField) {
+          let lockedDate: Date | null = null
+          try {
+            lockedDate = new Date(lockedField)
+          } catch (e) {
+            lockedDate = null
+          }
+          const formatted = lockedDate
+            ? formatDate(lockedDate, 'yyyy/MM/dd HH:mm')
+            : String(lockedField)
+
+          await Swal.fire({
+            icon: 'warning',
+            title: 'Account Locked',
+            html: `Your account is locked until <strong>${formatted}</strong>.`,
+          })
+          return
+        }
+
+        // Try to parse a date from the error message text if present
+        if (typeof responseData.error === 'string') {
+          const dateMatch = responseData.error.match(
+            /(20\d{2}[-\/]\d{2}[-\/]\d{2}[ T]\d{2}:\d{2}(:\d{2})?)/
+          )
+          if (dateMatch) {
+            const parsed = new Date(dateMatch[1])
+            const formatted = isNaN(parsed.getTime())
+              ? dateMatch[1]
+              : formatDate(parsed, 'yyyy/MM/dd HH:mm')
+            await Swal.fire({
+              icon: 'warning',
+              title: 'Account Locked',
+              html: `Your account is locked until <strong>${formatted}</strong>.`,
+            })
+            return
+          }
+        }
+
         throw new Error(`HTTP error! Status: ${response.status}`)
       }
 
@@ -67,16 +121,24 @@ export default function Login() {
         console.log('Extracted userId:', userId, 'role:', role)
       }
       if (token) {
-        setShowVariantAlert(false)
-        setMessage('Login Successful!')
-
         // Store token and role immediately
         localStorage.setItem('session-token', token)
         localStorage.setItem('user-role', role)
 
+        // Show sweetalert2 success modal then redirect
+        await Swal.fire({
+          icon: 'success',
+          title: 'Login Successful!',
+          text: 'Redirecting to your dashboard...',
+          timer: 1400,
+          showConfirmButton: false,
+          willClose: () => {},
+        })
+
         // Handle user ID storage
         if (userId) {
           localStorage.setItem('user-id', userId.toString())
+
           if (process.env.NODE_ENV !== 'production') {
             console.log(
               '[Login] Successfully stored user-id:',
@@ -86,7 +148,7 @@ export default function Login() {
           // Redirect after successful login with user ID
           setTimeout(() => {
             router.push('/dashboard')
-          }, 1500)
+          }, 500)
         } else {
           console.warn(
             '[Login] No user ID received from backend. Attempting fallback fetch...',
@@ -97,7 +159,7 @@ export default function Login() {
           // Try to fetch user ID from profile endpoint as fallback
           // Wait for the fetch to complete before redirecting to avoid race condition
           fetchCurrentUserId()
-            .then((fetchedUserId) => {
+            .then(async (fetchedUserId) => {
               if (fetchedUserId) {
                 localStorage.setItem('user-id', fetchedUserId)
                 if (process.env.NODE_ENV !== 'production') {
@@ -111,19 +173,21 @@ export default function Login() {
                   '[Login] Failed to fetch user ID. User may not be able to edit their treatments.'
                 )
                 // Inform the user that their session may have limited functionality
-                setShowVariantAlert(true)
-                setMessage(
-                  'You are logged in, but we could not load your profile. Some actions, like editing treatments, may not be available.'
-                )
+                await Swal.fire({
+                  icon: 'info',
+                  title: 'Partial Login',
+                  html: 'You are logged in, but we could not load your profile. Some actions may not be available.',
+                })
               }
             })
             .catch((error) => {
               console.error('[Login] Error fetching user ID:', error)
               // Inform the user that their session may have limited functionality
-              setShowVariantAlert(true)
-              setMessage(
-                'You are logged in, but we could not load your profile due to a network or server error. Some actions, like editing treatments, may not be available.'
-              )
+              Swal.fire({
+                icon: 'info',
+                title: 'Partial Login',
+                html: 'You are logged in, but we could not load your profile due to a network or server error. Some actions may not be available.',
+              })
             })
             .finally(() => {
               // Redirect after attempting to fetch user ID
