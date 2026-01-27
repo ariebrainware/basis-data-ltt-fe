@@ -1,4 +1,3 @@
-// ...existing code...
 'use client'
 import styles from '../page.module.css'
 import { useState, useRef, type ComponentProps, type RefObject } from 'react'
