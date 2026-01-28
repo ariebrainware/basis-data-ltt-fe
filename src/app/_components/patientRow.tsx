@@ -104,9 +104,19 @@ export default function Patient({
   const handleUpdatePatientInfo = () => {
     const full_name_new_input =
       document.querySelector<HTMLInputElement>('#full_name')?.value || name
-    const phone_number_new_input =
-      document.querySelector<HTMLInputElement>('#phone_number')?.value ||
-      phoneNumber
+    const rawPhoneInput =
+      document.querySelector<HTMLInputElement>('#phone_number')?.value
+    // Normalize phone numbers into a string[] for payload
+    const phone_number_new_input_arr: string[] = rawPhoneInput
+      ? rawPhoneInput
+          .split(',')
+          .map((p) => p.trim())
+          .filter(Boolean)
+      : Array.isArray(phoneNumber)
+        ? phoneNumber
+        : phoneNumber
+          ? [phoneNumber]
+          : []
     const job_new_input =
       document.querySelector<HTMLInputElement>('#job')?.value || job
     const age_new_input =
@@ -128,7 +138,7 @@ export default function Patient({
 
     const payload: PatientUpdatePayload = {
       full_name: full_name_new_input,
-      phone_number: phone_number_new_input,
+      phone_number: phone_number_new_input_arr,
       gender: gender_new_input,
       job: job_new_input,
       age: Number(age_new_input), // Convert age_new_input to number

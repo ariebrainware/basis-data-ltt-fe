@@ -116,7 +116,11 @@ export function PatientForm({
             <Textarea
               id="phone_number"
               label="Nomor Telepon"
-              defaultValue={phone_number}
+              defaultValue={
+                Array.isArray(phone_number)
+                  ? phone_number.join(', ')
+                  : (phone_number ?? '')
+              }
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               onResize={undefined}
