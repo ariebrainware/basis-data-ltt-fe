@@ -34,6 +34,22 @@ async function safeJson(resp: Response): Promise<any> {
   return resp.json().catch(() => null)
 }
 
+async function fetchUserData(
+  endpoint: string,
+  userId: string,
+  router: any
+): Promise<{ unauthorized: true } | { error: string } | { source: any }> {
+  const resp = await apiFetch(`${endpoint}/${userId}`)
+  if (resp.status === 401) {
+    UnauthorizedAccess(router)
+    return { unauthorized: true }
+  }
+
+  if (!resp.ok) return { error: `HTTP ${resp.status}` }
+  const json = await safeJson(resp)
+  return { source: parseUserSource(json) }
+}
+
 export async function fetchUserProfile(opts: {
   endpoint: string
   router: any
@@ -45,16 +61,10 @@ export async function fetchUserProfile(opts: {
     const userId = await resolveUserId()
     if (!userId) return { error: 'Unable to determine current user' }
 
-    const userIdResp = await apiFetch(`${USER_ENDPOINT}/${userId}`)
-
-    if (userIdResp.status === 401) {
-      UnauthorizedAccess(router)
-      return { unauthorized: true }
-    }
-
-    if (!userIdResp.ok) return { error: `HTTP ${userIdResp.status}` }
-    const json = await safeJson(userIdResp)
-    const source = parseUserSource(json)
+    const result = await fetchUserData(USER_ENDPOINT, userId, router)
+    if ('unauthorized' in result) return { unauthorized: true }
+    if ('error' in result) return { error: result.error }
+    const source = result.source
     return {
       name: typeof source?.name === 'string' ? source.name : undefined,
       email: typeof source?.email === 'string' ? source.email : undefined,
