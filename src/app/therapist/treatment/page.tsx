@@ -16,7 +16,6 @@ import TherapistTreatmentHeader from '../../_components/therapistTreatmentHeader
 import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
-import { UnauthorizedAccess } from '../../_functions/unauthorized'
 import { logout } from '../../_functions/logout'
 
 // `useFetchTreatment` moved to `src/app/_hooks/useFetchTreatment.ts`
