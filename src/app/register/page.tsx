@@ -38,53 +38,47 @@ export default function Register() {
   const [termsAccepted, setTermsAccepted] = useState(false)
 
   async function sendRegisterRequest() {
-    if (!fullName.trim()) {
-      await Swal.fire('Gagal', 'Nama lengkap wajib diisi', 'error')
-      return
-    }
-    if (!termsAccepted) {
-      await Swal.fire(
-        'Gagal',
-        'Anda harus menyetujui syarat dan ketentuan',
-        'error'
-      )
+    const validationError = validateRegistration(
+      fullName,
+      gender,
+      phoneNumbers,
+      termsAccepted
+    )
+    if (validationError) {
+      await Swal.fire('Gagal', validationError, 'error')
       return
     }
 
-    const payload = {
-      full_name: fullName,
+    const payload = buildRegistrationPayload(
+      fullName,
       gender,
-      age: normalizeAge(age),
+      age,
       job,
       address,
-      health_history: healthHistory,
-      surgery_history: surgeryHistory,
-      phone_number: phoneNumbers.filter((p) => p && p.trim()),
-      patient_code: patientCodeRef.current?.value || '',
+      healthHistory,
+      surgeryHistory,
+      phoneNumbers,
+      patientCodeRef.current?.value || ''
+    )
+
+    const result = await submitRegistration(payload)
+    if (result.ok) {
+      await Swal.fire({
+        title: 'Sukses',
+        text: 'Registrasi berhasil. Silakan login dengan akun baru Anda.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      })
+      router.push('/login')
+      return { ok: true }
     }
 
-    try {
-      const res = await apiFetch('/patient', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
-      const responseData = await res.json()
-      if (res.ok) {
-        await Swal.fire({
-          title: 'Sukses',
-          text: 'Registrasi berhasil. Silakan login dengan akun baru Anda.',
-          icon: 'success',
-          confirmButtonText: 'OK',
-        })
-        router.push('/login')
-      }
-      const msg = extractErrorMessage(responseData, 'Registrasi gagal')
-      await Swal.fire('Gagal', msg, 'error')
-      return { ok: false, data: responseData }
-    } catch (err) {
-      await Swal.fire('Gagal', 'Terjadi kesalahan jaringan', 'error')
-      return { ok: false, error: err }
-    }
+    const msg = extractErrorMessage(
+      result.data ?? result.error,
+      'Registrasi gagal'
+    )
+    await Swal.fire('Gagal', msg, 'error')
+    return result
   }
 
   return (
@@ -112,12 +106,12 @@ export default function Register() {
           value={age === '' ? '' : String(age)}
           onValueChange={(value) => {
             if (value === '') {
-              setAge('');
-              return;
+              setAge('')
+              return
             }
 
             if (/^\d+$/.test(value)) {
-              setAge(Number(value));
+              setAge(Number(value))
             }
             // Ignore invalid numeric strings to avoid setting age to NaN
           }}
@@ -201,10 +195,61 @@ export default function Register() {
   )
 }
 
+function validateRegistration(
+  fullName: string,
+  gender: GenderValue,
+  phoneNumbers: string[],
+  termsAccepted: boolean
+): string | null {
+  if (!fullName.trim()) return 'Nama lengkap wajib diisi'
+  if (!gender) return 'Jenis kelamin wajib dipilih'
+  const validPhones = phoneNumbers.filter((p) => p && p.trim())
+  if (validPhones.length === 0) return 'Minimal satu nomor telepon wajib diisi'
+  if (!termsAccepted) return 'Anda harus menyetujui syarat dan ketentuan'
+  return null
+}
+
+function buildRegistrationPayload(
+  fullName: string,
+  gender: GenderValue,
+  age: number | '',
+  job: string,
+  address: string,
+  healthHistory: string[],
+  surgeryHistory: string,
+  phoneNumbers: string[],
+  patientCode: string
+) {
+  const validPhones = phoneNumbers.filter((p) => p && p.trim())
+  return {
+    full_name: fullName,
+    gender,
+    age: normalizeAge(age),
+    job,
+    address,
+    health_history: healthHistory,
+    surgery_history: surgeryHistory,
+    phone_number: validPhones.join(', '),
+    patient_code: patientCode,
+  }
+}
+
+async function submitRegistration(payload: any) {
+  try {
+    const res = await apiFetch('/patient', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+    const responseData = await res.json().catch(() => null)
+    if (res.ok) return { ok: true, data: responseData }
+    return { ok: false, data: responseData }
+  } catch (err) {
+    return { ok: false, error: err }
+  }
+}
+
 function normalizeAge(value: number | ''): number {
-  return typeof value === 'number'
-    ? value
-    : parseInt(String(value || '0'), 10) || 0
+  return typeof value === 'number' ? value : 0
 }
 
 function usePhoneFields(maxInputs = 3) {
@@ -308,14 +353,12 @@ function GenderSelector({ value, onChange }: GenderSelectorProps) {
       <GenderRadio
         id="gender_male"
         label="Pria"
-        value="male"
         checked={value === 'male'}
         onSelect={() => onChange('male')}
       />
       <GenderRadio
         id="gender_female"
         label="Wanita"
-        value="female"
         checked={value === 'female'}
         onSelect={() => onChange('female')}
       />
@@ -326,7 +369,6 @@ function GenderSelector({ value, onChange }: GenderSelectorProps) {
 type GenderRadioProps = {
   id: string
   label: string
-  value: GenderValue
   checked: boolean
   onSelect: () => void
 }
@@ -367,11 +409,12 @@ function PhoneNumberList({
 }: PhoneNumberListProps) {
   return (
     <div>
-      <label className="text-slate-700 mb-2 block text-sm font-medium">
-        Nomor Telepon
-      </label>
+      <label>Nomor Telepon</label>
       {phones.map((phone, idx) => (
-        <div key={phone || `phone-${idx}`} className="mb-2 flex items-center gap-2">
+        <div
+          key={phone || `phone-${idx}`}
+          className="mb-2 flex items-center gap-2"
+        >
           <input
             id={`phone-${idx}`}
             name={`phone-${idx}`}

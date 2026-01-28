@@ -6,11 +6,93 @@ import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import {
   tryVerifyCurrentPassword,
-  validatePasswordFields,
   navigateAfterSuccess,
+} from '@/app/_functions/userHelpers'
+import { validatePasswordFields } from '@/app/_functions/passwordUtils'
+import {
   fetchUserProfile,
   submitProfileUpdate,
-} from '@/app/_functions/profileHelpers'
+} from '@/app/_functions/profileService'
+
+function isEmailValid(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function getPasswordStrength(password: string) {
+  const lengthOk = password.length >= 8
+  const lowerOk = /[a-z]/.test(password)
+  const upperOk = /[A-Z]/.test(password)
+  const digitOk = /\d/.test(password)
+  const specialOk = /[^A-Za-z0-9]/.test(password)
+  const strengthCount = [lengthOk, lowerOk, upperOk, digitOk, specialOk].filter(
+    Boolean
+  ).length
+  return { lengthOk, lowerOk, upperOk, digitOk, specialOk, strengthCount }
+}
+
+function buildProfileBody(params: {
+  name: string
+  email: string
+  currentPassword: string
+  newPassword: string
+  changingPassword: boolean
+}) {
+  const { name, email, currentPassword, newPassword, changingPassword } = params
+  const b: Record<string, unknown> = {
+    name: name.trim(),
+    email: email.trim(),
+  }
+  if (changingPassword) {
+    b.old_password = currentPassword
+    b.password = newPassword
+  }
+  return b
+}
+
+function validateProfileInputs(params: {
+  name: string
+  email: string
+  changingPassword: boolean
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}): string | null {
+  const {
+    name,
+    email,
+    changingPassword,
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  } = params
+
+  if (!name.trim()) return 'Name is required'
+  if (!isEmailValid(email)) return 'Please enter a valid email'
+
+  const pwdValidation = validatePasswordFields(
+    changingPassword,
+    currentPassword,
+    newPassword,
+    confirmPassword
+  )
+  if (!pwdValidation.ok) return pwdValidation.error || 'Invalid password'
+
+  return null
+}
+
+async function verifyCurrentIfNeeded(
+  changingPassword: boolean,
+  currentPassword: string,
+  setPwError: (s: string | null) => void
+): Promise<boolean> {
+  if (!changingPassword || !currentPassword.trim()) return true
+  const vp = await tryVerifyCurrentPassword(currentPassword)
+  if (vp.available && vp.verified === false) {
+    setPwError('Current password is incorrect')
+    return false
+  }
+  return true
+}
 
 async function performProfileUpdateHelper(params: {
   endpoint: string
@@ -74,14 +156,8 @@ export function useProfile() {
   const [pwError, setPwError] = useState<string | null>(null)
 
   // Live password requirement booleans
-  const lengthOk = newPassword.length >= 8
-  const lowerOk = /[a-z]/.test(newPassword)
-  const upperOk = /[A-Z]/.test(newPassword)
-  const digitOk = /\d/.test(newPassword)
-  const specialOk = /[^A-Za-z0-9]/.test(newPassword)
-  const strengthCount = [lengthOk, lowerOk, upperOk, digitOk, specialOk].filter(
-    Boolean
-  ).length
+  const { lengthOk, lowerOk, upperOk, digitOk, specialOk, strengthCount } =
+    getPasswordStrength(newPassword)
   const [strengthAnnounce, setStrengthAnnounce] = useState('')
 
   useEffect(() => {
@@ -111,59 +187,10 @@ export function useProfile() {
     load()
   }, [router, USER_ENDPOINT])
 
-  // validateAndPrepare removed: validations are performed inline in handleUpdateProfile
-
-  const buildProfileBody = (changingPassword: boolean) => {
-    const b: Record<string, unknown> = {
-      name: name.trim(),
-      email: email.trim(),
-    }
-    if (changingPassword) {
-      b.old_password = currentPassword
-      b.password = newPassword
-    }
-    return b
-  }
-
   const clearPasswordFields = () => {
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
-  }
-
-  const validateInputs = (changingPassword: boolean) => {
-    if (!name.trim()) {
-      setError('Name is required')
-      return false
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email')
-      return false
-    }
-
-    const pwdValidation = validatePasswordFields(
-      changingPassword,
-      currentPassword,
-      newPassword,
-      confirmPassword
-    )
-    if (!pwdValidation.ok) {
-      setError(pwdValidation.error || 'Invalid password')
-      return false
-    }
-
-    return true
-  }
-
-  const verifyCurrentIfNeeded = async (changingPassword: boolean) => {
-    if (!changingPassword || !currentPassword.trim()) return true
-    const vp = await tryVerifyCurrentPassword(currentPassword)
-    if (vp.available && vp.verified === false) {
-      setPwError('Current password is incorrect')
-      return false
-    }
-    return true
   }
 
   const handleUpdateProfile = async (e?: React.FormEvent) => {
@@ -176,12 +203,33 @@ export function useProfile() {
       currentPassword || newPassword || confirmPassword
     )
 
-    if (!validateInputs(changingPassword)) return
+    const validationError = validateProfileInputs({
+      name,
+      email,
+      changingPassword,
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    })
+    if (validationError) {
+      setError(validationError)
+      return
+    }
 
-    const verified = await verifyCurrentIfNeeded(changingPassword)
+    const verified = await verifyCurrentIfNeeded(
+      changingPassword,
+      currentPassword,
+      setPwError
+    )
     if (!verified) return
 
-    const body = buildProfileBody(changingPassword)
+    const body = buildProfileBody({
+      name,
+      email,
+      currentPassword,
+      newPassword,
+      changingPassword,
+    })
     await performProfileUpdateHelper({
       endpoint: UPDATE_PROFILE_ENDPOINT,
       body,

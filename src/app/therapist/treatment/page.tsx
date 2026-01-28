@@ -11,15 +11,16 @@ import {
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import useFetchTreatment from '../../_hooks/useFetchTreatment'
+import { apiFetch } from '../../_functions/apiFetch'
+import { UnauthorizedAccess } from '../../_functions/unauthorized'
 import TherapistTreatmentHeader from '../../_components/therapistTreatmentHeader'
 import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
 import { logout } from '../../_functions/logout'
+import { useFetchTreatment } from '../../_hooks/useFetchTreatment'
 
 // `useFetchTreatment` moved to `src/app/_hooks/useFetchTreatment.ts`
-
 export default function TherapistTreatmentList() {
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)

@@ -30,6 +30,9 @@ export function buildTherapistPayload(values: {
   height: string
   role: string
 }) {
+  const parseWeight = parseInt(values.weight || '', 10)
+  const parseHeight = parseInt(values.height || '', 10)
+
   return {
     full_name: values.fullName,
     email: values.email,
@@ -38,8 +41,8 @@ export function buildTherapistPayload(values: {
     date_of_birth: values.dateOfBirth,
     phone_number: `62${values.phone}`,
     nik: values.nik,
-    weight: parseInt(values.weight || '', 10) || undefined,
-    height: parseInt(values.height || '', 10) || undefined,
+    weight: isNaN(parseWeight) ? undefined : parseWeight,
+    height: isNaN(parseHeight) ? undefined : parseHeight,
     role: values.role,
   }
 }

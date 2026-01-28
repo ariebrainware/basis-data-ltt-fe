@@ -19,34 +19,76 @@ export function useFetchTreatment(
   const [total, setTotal] = useState(0)
   const router = useRouter()
 
+  const updateState = (payload: {
+    treatments: TreatmentType[]
+    total: number
+  }) => {
+    setTreatment(payload.treatments)
+    setTotal(payload.total)
+  }
+
   useEffect(() => {
-    ;(async () => {
+    let cancelled = false
+
+    const fetchData = async () => {
       try {
-        const baseParams = keyword
-          ? `keyword=${keyword}`
-          : `limit=20&offset=${(currentPage - 1) * 20}`
-        const res = await apiFetch(`/treatment?${baseParams}`, {
-          method: 'GET',
-        })
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
-        const treatmentArray: TreatmentType[] = Array.isArray(
-          data.data.treatments
-        )
-          ? data.data.treatments
-          : []
-        setTreatment(treatmentArray)
-        setTotal(data.data.total)
+        const baseParams = buildTreatmentQuery(keyword, currentPage)
+        const payload = await fetchTreatments(baseParams)
+        if (!cancelled) {
+          updateState(payload)
+        }
       } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
+        if (error instanceof UnauthorizedFetchError) {
           UnauthorizedAccess(router)
+          return
         }
         console.error('Error fetching treatment:', error)
       }
-    })()
+    }
+
+    void fetchData()
+
+    return () => {
+      cancelled = true
+    }
   }, [currentPage, keyword, router])
 
-  return { data: { treatment: treatment }, total }
+  return { data: { treatment }, total }
 }
 
-export default useFetchTreatment
+class UnauthorizedFetchError extends Error {}
+
+function buildTreatmentQuery(keyword: string, currentPage: number): string {
+  return keyword
+    ? `keyword=${encodeURIComponent(keyword)}`
+    : `limit=20&offset=${(currentPage - 1) * 20}`
+}
+
+function parseTreatmentData(data: any): {
+  treatments: TreatmentType[]
+  total: number
+} {
+  const treatments = Array.isArray(data?.data?.treatments)
+    ? data.data.treatments
+    : []
+  const total = typeof data?.data?.total === 'number' ? data.data.total : 0
+  return { treatments, total }
+}
+
+async function fetchTreatments(query: string): Promise<{
+  treatments: TreatmentType[]
+  total: number
+}> {
+  const res = await apiFetch(`/treatment?${query}`, { method: 'GET' })
+
+  if (res.status === 401) {
+    throw new UnauthorizedFetchError('unauthorized')
+  }
+
+  if (!res.ok) {
+    throw new Error(`HTTP error! Status: ${res.status}`)
+  }
+
+  const data = await res.json()
+  return parseTreatmentData(data)
+}

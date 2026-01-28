@@ -85,7 +85,7 @@ async function ensureAndStoreUserId(
     localStorage.setItem('user-id', userId.toString())
     if (process.env.NODE_ENV !== 'production')
       console.log('[Login] Stored user-id:', userId.toString())
-    setTimeout(() => router.push('/dashboard'), 500)
+    router.push('/dashboard')
     return
   }
 
@@ -117,7 +117,7 @@ async function ensureAndStoreUserId(
       html: 'You are logged in, but we could not load your profile due to a network or server error. Some actions may not be available.',
     })
   } finally {
-    setTimeout(() => router.push('/dashboard'), 1500)
+    router.push('/dashboard')
   }
 }
 
