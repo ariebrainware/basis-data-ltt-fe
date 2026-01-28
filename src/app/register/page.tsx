@@ -354,7 +354,7 @@ function PhoneNumberList({
         Nomor Telepon
       </label>
       {phones.map((phone, idx) => (
-        <div key={idx} className="mb-2 flex items-center gap-2">
+        <div key={phone || `phone-${idx}`} className="mb-2 flex items-center gap-2">
           <input
             id={`phone-${idx}`}
             name={`phone-${idx}`}
