@@ -57,7 +57,7 @@ async function tryHandleErrorResponse(responseData: any) {
 
   if (typeof responseData.error === 'string') {
     const dateMatch = responseData.error.match(
-      /(20\d{2}[-\/]\d{2}[-\/]\d{2}[ T]\d{2}:\d{2}(:\d{2})?)/
+      /(\d{4}[-\/]\d{2}[-\/]\d{2}[ T]\d{2}:\d{2}(:\d{2})?)/
     )
     if (dateMatch) {
       const parsed = new Date(dateMatch[1])
