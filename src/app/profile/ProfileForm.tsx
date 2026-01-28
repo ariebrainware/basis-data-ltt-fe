@@ -4,7 +4,31 @@ import React from 'react'
 import PasswordRequirements from './PasswordRequirements'
 import StrengthBar from './StrengthBar'
 
-export default function ProfileForm(props: any) {
+interface ProfileFormProps {
+  name: string
+  setName: React.Dispatch<React.SetStateAction<string>>
+  email: string
+  setEmail: React.Dispatch<React.SetStateAction<string>>
+  loading: boolean
+  error: string | null | undefined
+  pwError: string | null | undefined
+  currentPassword: string
+  setCurrentPassword: React.Dispatch<React.SetStateAction<string>>
+  newPassword: string
+  setNewPassword: React.Dispatch<React.SetStateAction<string>>
+  confirmPassword: string
+  setConfirmPassword: React.Dispatch<React.SetStateAction<string>>
+  lengthOk: boolean
+  lowerOk: boolean
+  upperOk: boolean
+  digitOk: boolean
+  specialOk: boolean
+  strengthCount: number
+  strengthAnnounce: string
+  handleUpdateProfile: (event: React.FormEvent<HTMLFormElement>) => void
+}
+
+export default function ProfileForm(props: ProfileFormProps) {
   const {
     name,
     setName,
