@@ -315,14 +315,12 @@ function GenderSelector({ value, onChange }: GenderSelectorProps) {
       <GenderRadio
         id="gender_male"
         label="Pria"
-        value="male"
         checked={value === 'male'}
         onSelect={() => onChange('male')}
       />
       <GenderRadio
         id="gender_female"
         label="Wanita"
-        value="female"
         checked={value === 'female'}
         onSelect={() => onChange('female')}
       />

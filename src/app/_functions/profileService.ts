@@ -20,12 +20,19 @@ export async function fetchUserProfile(opts: {
   const { endpoint: USER_ENDPOINT, router } = opts
   try {
     // Resolve user ID from localStorage or fallback fetch
-    let userId = localStorage.getItem('user-id')
+    let userId: string | null = null
+    
+    if (typeof window !== 'undefined') {
+      userId = localStorage.getItem('user-id')
+    }
+    
     if (!userId) {
       const fetched = await fetchCurrentUserId()
       if (fetched) {
         userId = String(fetched)
-        localStorage.setItem('user-id', userId)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user-id', userId)
+        }
       }
     }
 
