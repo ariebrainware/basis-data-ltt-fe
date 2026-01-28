@@ -47,29 +47,37 @@ export default function Patient({
   const [diseases, setDiseases] = useState<DiseaseType[]>([])
   const [diseasesFetched, setDiseasesFetched] = useState(false)
 
+  // Helper: fetch diseases once when needed
+  const fetchDiseasesIfNeeded = async () => {
+    if (diseasesFetched) return
+    try {
+      const res = await apiFetch('/disease', { method: 'GET' })
+      if (res.status === 401) {
+        UnauthorizedAccess(router)
+        return
+      }
+      if (res.ok) {
+        const data = await res.json()
+        // Expecting backend shape: { data: { disease: [...] }, total: number }
+        const list: DiseaseType[] =
+          data && data.data && Array.isArray(data.data.disease)
+            ? (data.data.disease as DiseaseType[])
+            : Array.isArray(data)
+              ? (data as DiseaseType[])
+              : []
+        setDiseases(list)
+      }
+    } catch (e) {
+      // swallow network errors; we'll mark fetched to avoid retry storms
+    } finally {
+      setDiseasesFetched(true)
+    }
+  }
+
   const handleOpen = async () => {
     if (!open) {
-      // Reset gender value when opening dialog
       setGenderValue(gender || '')
-      // fetch diseases only if not already fetched
-      if (!diseasesFetched) {
-        try {
-          const res = await apiFetch('/disease', { method: 'GET' })
-          if (res.status === 401) {
-            UnauthorizedAccess(router)
-            return
-          }
-          if (res.ok) {
-            const data = await res.json()
-            const list: DiseaseType[] =
-              data?.data?.disease ?? data?.data ?? data ?? []
-            setDiseases(list)
-          }
-          setDiseasesFetched(true)
-        } catch (e) {
-          setDiseasesFetched(true)
-        }
-      }
+      await fetchDiseasesIfNeeded()
       setOpen(true)
     } else {
       setOpen(false)
@@ -101,26 +109,32 @@ export default function Patient({
     return matchedIds.join(',')
   }
 
-  const handleUpdatePatientInfo = () => {
+  // Helper: normalize phone input into string[]
+
+  const normalizePhoneInput = (
+    raw?: string | string[] | undefined
+  ): string[] => {
+    if (!raw) return []
+    if (Array.isArray(raw)) return raw.map((p) => p.trim()).filter(Boolean)
+    return raw
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean)
+  }
+
+  // Helper: build update payload from form fields
+  const buildUpdatePayload = (): PatientUpdatePayload => {
     const full_name_new_input =
       document.querySelector<HTMLInputElement>('#full_name')?.value || name
     const rawPhoneInput =
       document.querySelector<HTMLInputElement>('#phone_number')?.value
-    // Normalize phone numbers into a string[] for payload
-    const phone_number_new_input_arr: string[] = rawPhoneInput
-      ? rawPhoneInput
-          .split(',')
-          .map((p) => p.trim())
-          .filter(Boolean)
-      : Array.isArray(phoneNumber)
-        ? phoneNumber
-        : phoneNumber
-          ? [phoneNumber]
-          : []
+    const phone_number_new_input_arr: string[] = normalizePhoneInput(
+      rawPhoneInput ?? phoneNumber
+    )
     const job_new_input =
       document.querySelector<HTMLInputElement>('#job')?.value || job
     const age_new_input =
-      document.querySelector<HTMLInputElement>('#age')?.value || age
+      document.querySelector<HTMLInputElement>('#age')?.value || String(age)
     const email_new_input =
       document.querySelector<HTMLInputElement>('#email')?.value || email
     const address_new_input =
@@ -141,7 +155,7 @@ export default function Patient({
       phone_number: phone_number_new_input_arr,
       gender: gender_new_input,
       job: job_new_input,
-      age: Number(age_new_input), // Convert age_new_input to number
+      age: Number(age_new_input),
       email: email_new_input,
       address: address_new_input,
       health_history: handleHealthConditionInput(
@@ -150,14 +164,15 @@ export default function Patient({
       surgery_history: surgery_history_new_input,
     }
 
-    // Only include patient_code when current user is admin
-    // ⚠️ SECURITY WARNING: Client-side role checking alone is insufficient for security.
-    // The backend MUST also validate the user's role before accepting any patient_code updates.
-    // This client-side check is for UX only - malicious users can bypass it by modifying requests.
     if (isAdmin()) {
       payload.patient_code = patient_code_new_input
     }
 
+    return payload
+  }
+
+  const handleUpdatePatientInfo = () => {
+    const payload = buildUpdatePayload()
     apiFetch(`/patient/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
@@ -173,21 +188,16 @@ export default function Patient({
         return response.json()
       })
       .then((data) => {
-        console.log('Patient information updated successfully:', data)
-        // Close modal and show success message
         setOpen(false)
         Swal.fire({
           text: 'Data pasien berhasil diperbarui.',
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
-          // Refresh data using callback instead of page reload
           if (onDataChange) onDataChange()
         })
       })
       .catch((error) => {
-        console.error('Error updating patient information:', error)
-        // Don't show error for unauthorized access since UnauthorizedAccess handles it
         if (error.message !== 'Unauthorized') {
           Swal.fire({
             text: 'Gagal memperbarui data pasien.',
@@ -301,7 +311,9 @@ export default function Patient({
                 {name}
               </small>
               <small className="font-sans text-sm text-current antialiased opacity-70">
-                {phoneNumber}
+                {Array.isArray(phoneNumber)
+                  ? phoneNumber.join(', ')
+                  : phoneNumber}
               </small>
             </div>
           </div>
