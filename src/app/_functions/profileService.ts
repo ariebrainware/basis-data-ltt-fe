@@ -21,11 +21,11 @@ export async function fetchUserProfile(opts: {
   try {
     // Resolve user ID from localStorage or fallback fetch
     let userId: string | null = null
-    
+
     if (typeof window !== 'undefined') {
       userId = localStorage.getItem('user-id')
     }
-    
+
     if (!userId) {
       const fetched = await fetchCurrentUserId()
       if (fetched) {
@@ -41,12 +41,12 @@ export async function fetchUserProfile(opts: {
     }
 
     const userIdResp = await apiFetch(`${USER_ENDPOINT}/${userId}`)
-    
+
     if (userIdResp.status === 401) {
       UnauthorizedAccess(router)
       return { unauthorized: true }
     }
-    
+
     if (!userIdResp.ok) return { error: `HTTP ${userIdResp.status}` }
     const json = await userIdResp.json().catch(() => null)
     const source = parseUserSource(json)

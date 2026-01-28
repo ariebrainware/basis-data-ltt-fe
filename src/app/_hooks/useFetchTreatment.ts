@@ -20,31 +20,45 @@ export function useFetchTreatment(
   const router = useRouter()
 
   useEffect(() => {
-    ;(async () => {
+    let cancelled = false
+
+    const fetchData = async () => {
       try {
         const baseParams = keyword
-          ? `keyword=${keyword}`
+          ? `keyword=${encodeURIComponent(keyword)}`
           : `limit=20&offset=${(currentPage - 1) * 20}`
+
         const res = await apiFetch(`/treatment?${baseParams}`, {
           method: 'GET',
         })
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`)
+        }
+
         const data = await res.json()
-        const treatmentArray: TreatmentType[] = Array.isArray(
-          data.data.treatments
-        )
+        const arr: TreatmentType[] = Array.isArray(data?.data?.treatments)
           ? data.data.treatments
           : []
-        setTreatment(treatmentArray)
-        setTotal(data.data.total)
+
+        if (!cancelled) {
+          setTreatment(arr)
+          setTotal(typeof data?.data?.total === 'number' ? data.data.total : 0)
+        }
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           UnauthorizedAccess(router)
         }
         console.error('Error fetching treatment:', error)
       }
-    })()
+    }
+
+    void fetchData()
+
+    return () => {
+      cancelled = true
+    }
   }, [currentPage, keyword, router])
 
-  return { data: { treatment: treatment }, total }
+  return { data: { treatment }, total }
 }

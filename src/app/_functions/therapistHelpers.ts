@@ -32,7 +32,7 @@ export function buildTherapistPayload(values: {
 }) {
   const parseWeight = parseInt(values.weight || '', 10)
   const parseHeight = parseInt(values.height || '', 10)
-  
+
   return {
     full_name: values.fullName,
     email: values.email,

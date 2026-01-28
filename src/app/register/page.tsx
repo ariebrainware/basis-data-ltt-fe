@@ -48,7 +48,11 @@ export default function Register() {
     }
     const validPhones = phoneNumbers.filter((p) => p && p.trim())
     if (validPhones.length === 0) {
-      await Swal.fire('Gagal', 'Minimal satu nomor telepon wajib diisi', 'error')
+      await Swal.fire(
+        'Gagal',
+        'Minimal satu nomor telepon wajib diisi',
+        'error'
+      )
       return
     }
     if (!termsAccepted) {
@@ -117,16 +121,16 @@ export default function Register() {
           id="age"
           name="age"
           type="number"
-          placeholder="Umur"
+          placeholder="Uur"
           value={age === '' ? '' : String(age)}
           onValueChange={(value) => {
             if (value === '') {
-              setAge('');
-              return;
+              setAge('')
+              return
             }
 
             if (/^\d+$/.test(value)) {
-              setAge(Number(value));
+              setAge(Number(value))
             }
             // Ignore invalid numeric strings to avoid setting age to NaN
           }}
@@ -371,11 +375,17 @@ function PhoneNumberList({
 }: PhoneNumberListProps) {
   return (
     <div>
-      <label className="text-slate-700 mb-2 block text-sm font-medium">
+      <label
+        className="text-slate-700 mb-
+         2 block text-sm font-medium"
+      >
         Nomor Telepon
       </label>
       {phones.map((phone, idx) => (
-        <div key={phone || `phone-${idx}`} className="mb-2 flex items-center gap-2">
+        <div
+          key={phone || `phone-${idx}`}
+          className="mb-2 flex items-center gap-2"
+        >
           <input
             id={`phone-${idx}`}
             name={`phone-${idx}`}
