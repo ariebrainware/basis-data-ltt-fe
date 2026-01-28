@@ -59,6 +59,28 @@ export async function fetchUserSource(
   return parseUserSource(json)
 }
 
+function mapProfile(source: any): { name?: string; email?: string } {
+  return {
+    name: typeof source?.name === 'string' ? source.name : undefined,
+    email: typeof source?.email === 'string' ? source.email : undefined,
+  }
+}
+
+function handleProfileError(
+  error: unknown,
+  router: any
+): { error: string } | { unauthorized: true } {
+  if (error instanceof UnauthorizedError) {
+    UnauthorizedAccess(router)
+    return { unauthorized: true }
+  }
+  if (error instanceof HttpError) {
+    return { error: error.message }
+  }
+  console.error('fetchUserProfile unexpected error', error)
+  return { error: 'Failed to load profile' }
+}
+
 export async function getProfileResult(opts: {
   endpoint: string
   router: any
@@ -72,19 +94,8 @@ export async function getProfileResult(opts: {
 
   try {
     const source = await fetchUserSource(endpoint, userId)
-    return {
-      name: typeof source?.name === 'string' ? source.name : undefined,
-      email: typeof source?.email === 'string' ? source.email : undefined,
-    }
-  } catch (e: any) {
-    if (e instanceof UnauthorizedError) {
-      UnauthorizedAccess(router)
-      return { unauthorized: true }
-    }
-    if (e instanceof HttpError) {
-      return { error: e.message }
-    }
-    console.error('fetchUserProfile unexpected error', e)
-    return { error: 'Failed to load profile' }
+    return mapProfile(source)
+  } catch (error) {
+    return handleProfileError(error, router)
   }
 }
