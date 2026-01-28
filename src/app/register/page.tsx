@@ -77,7 +77,6 @@ export default function Register() {
           confirmButtonText: 'OK',
         })
         router.push('/login')
-        return { ok: true, data: responseData }
       }
       const msg = extractErrorMessage(responseData, 'Registrasi gagal')
       await Swal.fire('Gagal', msg, 'error')
