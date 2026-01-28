@@ -10,18 +10,6 @@ function extractMessage(json: any): string {
   return ''
 }
 
-async function getJsonOrHandleUnauthorized(res: Response, router: any) {
-  if (res.status === 401) {
-    UnauthorizedAccess(router)
-    return { unauthorized: true }
-  }
-
-  if (!res.ok) return { error: `HTTP ${res.status}` }
-
-  const json = await res.json().catch(() => null)
-  return { json }
-}
-
 export async function fetchUserProfile(opts: {
   endpoint: string
   router: any
