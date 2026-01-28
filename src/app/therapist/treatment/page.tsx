@@ -12,57 +12,15 @@ import {
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch } from '../../_functions/apiFetch'
+import { UnauthorizedAccess } from '../../_functions/unauthorized'
+import TherapistTreatmentHeader from '../../_components/therapistTreatmentHeader'
 import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
-import { UnauthorizedAccess } from '../../_functions/unauthorized'
 import { logout } from '../../_functions/logout'
+import { useFetchTreatment } from '../../_hooks/useFetchTreatment'
 
-interface ListTreatmentResponse {
-  data: {
-    treatment: TreatmentType[]
-  }
-  total: number
-}
-
-function useFetchTreatment(
-  currentPage: number,
-  keyword: string
-): ListTreatmentResponse {
-  const [treatment, setTreatment] = useState<TreatmentType[]>([])
-  const [total, setTotal] = useState(0)
-  const router = useRouter()
-
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const baseParams = keyword
-          ? `keyword=${keyword}`
-          : `limit=20&offset=${(currentPage - 1) * 20}`
-        const res = await apiFetch(`/treatment?${baseParams}`, {
-          method: 'GET',
-        })
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
-        const treatmentArray: TreatmentType[] = Array.isArray(
-          data.data.treatments
-        )
-          ? data.data.treatments
-          : []
-        setTreatment(treatmentArray)
-        setTotal(data.data.total)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess(router)
-        }
-        console.error('Error fetching treatment:', error)
-      }
-    })()
-  }, [currentPage, keyword, router])
-
-  return { data: { treatment: treatment }, total }
-}
-
+// `useFetchTreatment` moved to `src/app/_hooks/useFetchTreatment.ts`
 export default function TherapistTreatmentList() {
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
@@ -92,74 +50,13 @@ export default function TherapistTreatmentList() {
         onResize={undefined}
         onResizeCapture={undefined}
       >
-        <CardHeader
-          floated={false}
-          shadow={false}
-          className="rounded-none"
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-        >
-          <div className="mb-8 flex items-center justify-between gap-8">
-            <div>
-              <Typography
-                variant="h5"
-                color="blue-gray"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Daftar Penanganan
-              </Typography>
-              <Typography
-                color="gray"
-                className="mt-1 font-normal"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Lihat dan lengkapi informasi penanganan pasien
-              </Typography>
-            </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.push('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
-              </Button>
-            </div>
-          </div>
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <div className="w-full md:w-72">
-              <Input
-                label="Cari Penanganan"
-                icon={<MagnifyingGlassIcon className="size-5" />}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                crossOrigin={undefined}
-                onKeyDown={handleInputKeyDown}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              />
-            </div>
-          </div>
-        </CardHeader>
+        <TherapistTreatmentHeader
+          onLogout={async () => {
+            await logout()
+            router.push('/login')
+          }}
+          onSearchEnter={handleInputKeyDown}
+        />
         <CardBody
           className="overflow-scroll px-0"
           placeholder={undefined}

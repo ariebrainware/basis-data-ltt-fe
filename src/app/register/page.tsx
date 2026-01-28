@@ -1,228 +1,85 @@
 'use client'
 import styles from '../page.module.css'
-import { useEffect, useState } from 'react'
+import { useState, useRef, type ComponentProps, type RefObject } from 'react'
 import { useRouter } from 'next/navigation'
 import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
-import { useRef } from 'react'
 import { apiFetch } from '../_functions/apiFetch'
 import { DiseaseMultiSelect } from '../_components/selectDisease'
 import { extractErrorMessage } from '../_functions/errorMessage'
 import Swal from 'sweetalert2'
 
-let fullnameInput: HTMLInputElement | null = null
-let ageInput: HTMLInputElement | null = null
-let jobInput: HTMLInputElement | null = null
-let addressInput: HTMLInputElement | null = null
-let phoneNumber: string[] = []
-let healthHistory: string[] = []
-let surgeryHistory: HTMLInputElement | null = null
+type GenderValue = 'male' | 'female' | ''
 
-if (typeof window !== 'undefined') {
-  const updatePhoneNumbers = () => {
-    phoneNumber = []
-    const mainPhone = document.getElementById(
-      'phoneNumber'
-    ) as HTMLInputElement | null
-    if (mainPhone && mainPhone.value.trim()) {
-      phoneNumber.push(mainPhone.value.trim())
-    }
-    const optional1 = document.getElementById(
-      'phoneNumberOptional-1'
-    ) as HTMLInputElement | null
-    if (optional1 && optional1.value.trim()) {
-      phoneNumber.push(optional1.value.trim())
-    }
-    const optional2 = document.getElementById(
-      'phoneNumberOptional-2'
-    ) as HTMLInputElement | null
-    if (optional2 && optional2.value.trim()) {
-      phoneNumber.push(optional2.value.trim())
-    }
-  }
-  window.addEventListener('input', updatePhoneNumbers)
-}
+const INPUT_CLASS =
+  'border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-lg border bg-transparent p-3 text-base shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white'
 
-function MultipleDiseaseSelect() {
-  const [selected, setSelected] = useState<string[]>([])
-  useEffect(() => {
-    healthHistory = selected
-    const healthHistoryInputElement = document.getElementById(
-      'healthHistory'
-    ) as HTMLInputElement | null
-    if (healthHistoryInputElement) {
-      healthHistoryInputElement.value = selected.join(',')
-    }
-  }, [selected])
+const TEXTAREA_CLASS =
+  'border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white'
 
-  return (
-    <div className="flex flex-col space-y-2">
-      <DiseaseMultiSelect
-        id="healthHistorySelect"
-        label="Riwayat Penyakit"
-        value={selected}
-        onChange={(vals) => setSelected(vals)}
-      />
-      {/* keep hidden input for existing form submission code */}
-      <input id="healthHistory" name="healthHistory" type="hidden" />
-    </div>
-  )
-}
-async function sendRegisterRequest(
-  patientCodeRef?: React.RefObject<HTMLInputElement | null>
-) {
-  const genderInput =
-    (document.querySelector('input[name="gender"]:checked') as HTMLInputElement)
-      ?.value || ''
-  const full_name = fullnameInput ? fullnameInput.value : ''
-  const age = ageInput ? ageInput.value : ''
-  const job = jobInput ? jobInput.value : ''
-  const address = addressInput ? addressInput.value : ''
-  const surgery_history = surgeryHistory ? surgeryHistory.value : ''
-  // Always try to get the value from the patientCode input field if it exists in the DOM
-  let patient_code = ''
-  if (patientCodeRef && patientCodeRef.current) {
-    patient_code = patientCodeRef.current.value
-  } else {
-    const patientCodeInputEl = document.getElementById(
-      'patientCode'
-    ) as HTMLInputElement | null
-    if (patientCodeInputEl) {
-      patient_code = patientCodeInputEl.value
-    }
-  }
-  console.log(`patient_code_ref_value:: `, patient_code)
-  console.log(`full_name`, full_name)
-  const data = await apiFetch('/patient', {
-    method: 'POST',
-    body: JSON.stringify({
-      full_name,
-      gender: genderInput,
-      age: parseInt(age, 10),
-      job,
-      address,
-      health_history: healthHistory,
-      surgery_history,
-      phone_number: phoneNumber,
-      patient_code,
-    }),
-  })
-  const responseData = await data.json()
-  console.log(`responseData`, responseData)
-
-  // Using response.ok checks for all 2xx success status codes (200-299)
-  // This is more robust than checking response.status === 200
-  if (data.ok) {
-    await Swal.fire({
-      title: 'Sukses',
-      text: 'Registrasi berhasil. Silakan login dengan akun baru Anda.',
-      icon: 'success',
-      confirmButtonText: 'OK',
-    })
-    return { ok: true, data: responseData }
-  } else {
-    const errorMessage = extractErrorMessage(responseData, 'Registrasi gagal')
-    await Swal.fire({
-      title: 'Gagal',
-      text: errorMessage,
-      icon: 'error',
-      confirmButtonText: 'OK',
-    })
-  }
-  return responseData
-}
-
-function renderInput(id: string, type: string, placeHolder: string) {
-  if (id === 'phoneNumber') {
-    if (typeof window !== 'undefined') {
-      const phoneInput = document.getElementById(
-        'phoneNumber'
-      ) as HTMLInputElement | null
-      phoneInput?.addEventListener('input', () => {
-        phoneInput.value = phoneInput.value.replace(/[^+\d-]/g, '')
-      })
-    }
-  }
-  return (
-    <div className="relative w-full">
-      <input
-        required
-        type={type}
-        id={id}
-        name={id}
-        className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-lg border bg-transparent p-3 text-base shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
-        data-error="false"
-        data-success="false"
-        data-icon-placement=""
-        placeholder={placeHolder}
-      />
-      {id === 'phoneNumber' && (
-        <div id="phoneNumberContainer">
-          <div id="optional-inputs"></div>
-          <button
-            type="button"
-            onClick={(e) => {
-              // Update click count stored in the button's dataset
-              const btn = e.currentTarget as HTMLButtonElement
-              let count = parseInt(
-                btn.getAttribute('data-click-count') || '0',
-                10
-              )
-              count++
-              btn.setAttribute('data-click-count', count.toString())
-              if (count === 2) {
-                btn.style.display = 'none'
-              }
-              // Get the container that holds the optional inputs and the button
-              const container =
-                document.getElementById('optional-inputs')?.parentElement
-              if (container) {
-                // Create a new input element with the same attributes as the phone number input
-                const newInput = document.createElement('input')
-                newInput.required = true
-                newInput.type = 'text'
-                const existingOptionalInputs = container.querySelectorAll(
-                  'input[id^="phoneNumberOptional"]'
-                ).length
-                newInput.id = `phoneNumberOptional-${existingOptionalInputs + 1}`
-                newInput.name = `phoneNumberOptional-${existingOptionalInputs + 1}`
-                newInput.placeholder = 'Nomor Telepon (Opsional)'
-                newInput.className =
-                  'peer w-full rounded-lg border border-slate-200 bg-transparent p-3 my-2 text-base text-slate-800 shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:outline-none focus:ring-slate-800/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement:end]:pe-11 data-[icon-placement:start]:ps-11 dark:text-white'
-                // Always insert the new input right after the optional-inputs div so it stays below it
-                const optionalInputsDiv =
-                  document.getElementById('optional-inputs')
-                if (optionalInputsDiv) {
-                  container.insertBefore(
-                    newInput,
-                    optionalInputsDiv.nextSibling
-                  )
-                }
-              }
-            }}
-            className="mt-2 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          >
-            Tambah Nomor Telepon
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
 export default function Register() {
+  const router = useRouter()
+  const [fullName, setFullName] = useState('')
+  const [gender, setGender] = useState<GenderValue>('')
+  const [age, setAge] = useState<number | ''>('')
+  const [job, setJob] = useState('')
+  const [address, setAddress] = useState('')
+  const [surgeryHistory, setSurgeryHistory] = useState('')
+  const [healthHistory, setHealthHistory] = useState<string[]>([])
+  const {
+    phones: phoneNumbers,
+    updatePhoneAt,
+    addPhoneInput,
+    removePhoneAt,
+    maxInputs: maxPhoneInputs,
+  } = usePhoneFields()
   const [showPatientCode, setShowPatientCode] = useState(false)
   const patientCodeRef = useRef<HTMLInputElement | null>(null)
-  const router = useRouter()
-  useEffect(() => {
-    fullnameInput = document.getElementById('fullName') as HTMLInputElement
-    ageInput = document.getElementById('age') as HTMLInputElement
-    jobInput = document.getElementById('job') as HTMLInputElement
-    addressInput = document.getElementById('address') as HTMLInputElement
-    surgeryHistory = document.getElementById(
-      'surgeryHistory'
-    ) as HTMLInputElement
-    // patientCodeInput is now handled by ref
-  }, [])
+  const [termsAccepted, setTermsAccepted] = useState(false)
+
+  async function sendRegisterRequest() {
+    const validationError = validateRegistration(
+      fullName,
+      gender,
+      phoneNumbers,
+      termsAccepted
+    )
+    if (validationError) {
+      await Swal.fire('Gagal', validationError, 'error')
+      return
+    }
+
+    const payload = buildRegistrationPayload(
+      fullName,
+      gender,
+      age,
+      job,
+      address,
+      healthHistory,
+      surgeryHistory,
+      phoneNumbers,
+      patientCodeRef.current?.value || ''
+    )
+
+    const result = await submitRegistration(payload)
+    if (result.ok) {
+      await Swal.fire({
+        title: 'Sukses',
+        text: 'Registrasi berhasil. Silakan login dengan akun baru Anda.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      })
+      router.push('/login')
+      return { ok: true }
+    }
+
+    const msg = extractErrorMessage(
+      result.data ?? result.error,
+      'Registrasi gagal'
+    )
+    await Swal.fire('Gagal', msg, 'error')
+    return result
+  }
 
   return (
     <div className={styles.page}>
@@ -230,219 +87,465 @@ export default function Register() {
         <h1 className="text-3xl font-bold antialiased">
           Form Registrasi Pasien
         </h1>
-        {renderInput('fullName', 'text', 'Nama Lengkap')}
-        <div
-          className="flex gap-2 data-[orientation=horizontal]:flex-row data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start data-[orientation=horizontal]:items-center"
-          data-value=""
-          data-orientation="vertical"
-        >
-          <div className="flex items-center gap-2">
-            <Radio
-              id="gender_male"
-              name="gender"
-              value="male"
-              crossOrigin={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            />
-            <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
-              <svg
-                width="10px"
-                height="10px"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M11 0.25C5.06294 0.25 0.25 5.06294 0.25 11C0.25 16.9371 5.06294 21.75 11 21.75C16.9371 21.75 21.75 16.9371 21.75 11C21.75 5.06294 16.9371 0.25 11 0.25Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </span>
 
-            <label
-              htmlFor="gender_male"
-              className="text-slate-600 font-sans text-base antialiased"
-            >
-              Pria
-            </label>
-          </div>
-          <div className="flex items-center gap-2">
-            <Radio
-              id="gender_female"
-              name="gender"
-              value="female"
-              crossOrigin={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            />
-            <span className="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 scale-75 text-current opacity-0 transition-all duration-200 ease-in group-data-[checked=true]:scale-100 group-data-[checked=true]:opacity-100">
-              <svg
-                width="10px"
-                height="10px"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M11 0.25C5.06294 0.25 0.25 5.06294 0.25 11C0.25 16.9371 5.06294 21.75 11 21.75C16.9371 21.75 21.75 16.9371 21.75 11C21.75 5.06294 16.9371 0.25 11 0.25Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </span>
-            <label
-              htmlFor="gender_female"
-              className="text-slate-600 font-sans text-base antialiased"
-            >
-              Wanita
-            </label>
-          </div>
-        </div>
-        {renderInput('age', 'number', 'Umur')}
-        {renderInput('job', 'text', 'Pekerjaan')}
-        <div>
-          <textarea
-            rows={8}
-            id="address"
-            name="address"
-            placeholder="Alamat"
-            className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white"
-          ></textarea>
-        </div>
-        <MultipleDiseaseSelect />
-        <div>
-          <textarea
-            rows={8}
-            id="surgeryHistory"
-            name="surgeryHistory"
-            placeholder="Riwayat Operasi / Penyakit Tambahan (Jika ada)"
-            className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer block w-full resize-none rounded-lg border bg-transparent p-3.5 text-base leading-none outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-white"
-          ></textarea>
-        </div>
-        {renderInput('phoneNumber', 'text', 'Nomor Telepon')}
-        <div>
-          <Checkbox
-            label="Data Pasien Lama (Opsional)"
-            id="legacyPatientCodeCheckbox"
-            crossOrigin={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            checked={showPatientCode}
-            onChange={() => setShowPatientCode((prev) => !prev)}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          />
-          {showPatientCode && (
-            <div className="relative w-full">
-              <input
-                required
-                type="text"
-                id="patientCode"
-                name="patientCode"
-                className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-lg border bg-transparent p-3 text-base shadow-sm outline-none ring-4 ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[shape=pill]:rounded-full data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-11 data-[icon-placement=start]:ps-11 dark:text-white"
-                data-error="false"
-                data-success="false"
-                data-icon-placement=""
-                placeholder="Kode Pasien"
-                ref={patientCodeRef}
-              />
-            </div>
-          )}
-        </div>
+        <LabeledField
+          id="fullName"
+          required
+          placeholder="Nama Lengkap"
+          value={fullName}
+          onValueChange={setFullName}
+        />
+
+        <GenderSelector value={gender} onChange={setGender} />
+
+        <LabeledField
+          id="age"
+          name="age"
+          type="number"
+          placeholder="Umur"
+          value={age === '' ? '' : String(age)}
+          onValueChange={(value) => {
+            if (value === '') {
+              setAge('')
+              return
+            }
+
+            if (/^\d+$/.test(value)) {
+              setAge(Number(value))
+            }
+            // Ignore invalid numeric strings to avoid setting age to NaN
+          }}
+        />
+
+        <LabeledField
+          id="job"
+          name="job"
+          placeholder="Pekerjaan"
+          value={job}
+          onValueChange={setJob}
+        />
+
+        <LabeledField
+          as="textarea"
+          id="address"
+          name="address"
+          rows={8}
+          placeholder="Alamat"
+          value={address}
+          onValueChange={setAddress}
+        />
+
+        <DiseaseMultiSelect
+          id="healthHistorySelect"
+          label="Riwayat Penyakit"
+          value={healthHistory}
+          onChange={setHealthHistory}
+        />
+
+        <LabeledField
+          as="textarea"
+          id="surgeryHistory"
+          name="surgeryHistory"
+          rows={8}
+          placeholder="Riwayat Operasi / Penyakit Tambahan (Jika ada)"
+          value={surgeryHistory}
+          onValueChange={setSurgeryHistory}
+        />
+
+        <PhoneNumberList
+          phones={phoneNumbers}
+          onChange={updatePhoneAt}
+          onAdd={addPhoneInput}
+          onRemove={removePhoneAt}
+          max={maxPhoneInputs}
+        />
+
+        <LegacyPatientCodeSection
+          show={showPatientCode}
+          toggle={() => setShowPatientCode((prev) => !prev)}
+          inputRef={patientCodeRef}
+        />
+
         <div className={styles.ctas}>
           <a
-            className="bg-slate-200 cursor-not-allowed"
+            className={
+              termsAccepted ? styles.primary : 'bg-slate-200 cursor-not-allowed'
+            }
             id="registerBtn"
-            href="/login"
+            href="#"
             onClick={async (e) => {
               e.preventDefault()
-              const termCheckbox = document.getElementById(
-                'termConditionCheckbox'
-              ) as HTMLInputElement | null
-              if (!termCheckbox?.checked) return
-              const res = await sendRegisterRequest(patientCodeRef)
-              if (res?.ok) {
-                router.push('/register')
+              if (!termsAccepted) {
+                return
               }
+              await sendRegisterRequest()
             }}
           >
             DAFTAR
           </a>
         </div>
 
-        <div className="flex items-center gap-2">
-          <label
-            className="relative flex cursor-pointer items-center"
-            htmlFor="termConditionCheckbox"
-          >
-            <Checkbox
-              id="termConditionCheckbox"
-              onClick={() => {
-                if (
-                  (
-                    document.getElementById(
-                      'termConditionCheckbox'
-                    ) as HTMLInputElement
-                  ).checked
-                ) {
-                  document.getElementById('registerBtn')!.className =
-                    styles.primary
-                } else {
-                  document.getElementById('registerBtn')!.className =
-                    'bg-slate-200 cursor-default'
-                }
-              }}
-              crossOrigin={undefined}
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
-              <svg
-                fill="none"
-                width="18px"
-                height="18px"
-                strokeWidth="2"
-                color="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 13L9 17L19 7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                ></path>
-              </svg>
-            </span>
-          </label>
-          <label
-            className="text-slate-600 cursor-pointer antialiased"
-            htmlFor="termConditionCheckbox"
-          >
-            Saya setuju dengan{' '}
-            <a
-              href="/termcondition"
-              target="_blank"
-              rel="noreferrer"
-              className="text-slate-800 underline"
-            >
-              syarat dan ketentuan
-            </a>
-          </label>
-        </div>
+        <TermsAgreement
+          checked={termsAccepted}
+          onToggle={() => setTermsAccepted((prev) => !prev)}
+        />
       </main>
       <Footer />
+    </div>
+  )
+}
+
+function validateRegistration(
+  fullName: string,
+  gender: GenderValue,
+  phoneNumbers: string[],
+  termsAccepted: boolean
+): string | null {
+  if (!fullName.trim()) return 'Nama lengkap wajib diisi'
+  if (!gender) return 'Jenis kelamin wajib dipilih'
+  const validPhones = phoneNumbers.filter((p) => p && p.trim())
+  if (validPhones.length === 0) return 'Minimal satu nomor telepon wajib diisi'
+  if (!termsAccepted) return 'Anda harus menyetujui syarat dan ketentuan'
+  return null
+}
+
+function buildRegistrationPayload(
+  fullName: string,
+  gender: GenderValue,
+  age: number | '',
+  job: string,
+  address: string,
+  healthHistory: string[],
+  surgeryHistory: string,
+  phoneNumbers: string[],
+  patientCode: string
+) {
+  const validPhones = phoneNumbers.filter((p) => p && p.trim())
+  return {
+    full_name: fullName,
+    gender,
+    age: normalizeAge(age),
+    job,
+    address,
+    health_history: healthHistory,
+    surgery_history: surgeryHistory,
+    phone_number: validPhones.join(', '),
+    patient_code: patientCode,
+  }
+}
+
+async function submitRegistration(payload: any) {
+  try {
+    const res = await apiFetch('/patient', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+    const responseData = await res.json().catch(() => null)
+    if (res.ok) return { ok: true, data: responseData }
+    return { ok: false, data: responseData }
+  } catch (err) {
+    return { ok: false, error: err }
+  }
+}
+
+function normalizeAge(value: number | ''): number {
+  return typeof value === 'number' ? value : 0
+}
+
+function usePhoneFields(maxInputs = 3) {
+  const [phones, setPhones] = useState<string[]>([''])
+
+  const sanitizePhone = (val: string) => val.replace(/[^\d+]/g, '')
+
+  const updatePhoneAt = (index: number, value: string) => {
+    setPhones((prev) => {
+      const copy = [...prev]
+      copy[index] = sanitizePhone(value)
+      return copy
+    })
+  }
+
+  const addPhoneInput = () => {
+    setPhones((prev) => {
+      if (prev.length >= maxInputs) return prev
+      return [...prev, '']
+    })
+  }
+
+  const removePhoneAt = (index: number) => {
+    setPhones((prev) => {
+      // Prevent removing the last remaining phone entry and ignore invalid indices
+      if (prev.length <= 1) return prev
+      if (index < 0 || index >= prev.length) return prev
+      return prev.filter((_, i) => i !== index)
+    })
+  }
+
+  return { phones, updatePhoneAt, addPhoneInput, removePhoneAt, maxInputs }
+}
+
+type BaseFieldProps = {
+  onValueChange: (value: string) => void
+  containerClassName?: string
+  label?: string
+}
+
+type InputFieldProps = BaseFieldProps &
+  Omit<ComponentProps<'input'>, 'onChange' | 'className'> & {
+    as?: 'input'
+  }
+
+type TextareaFieldProps = BaseFieldProps &
+  Omit<ComponentProps<'textarea'>, 'onChange' | 'className'> & {
+    as: 'textarea'
+  }
+
+type LabeledFieldProps = InputFieldProps | TextareaFieldProps
+
+function LabeledField({
+  onValueChange,
+  containerClassName,
+  label,
+  as = 'input',
+  ...props
+}: LabeledFieldProps) {
+  const className = as === 'textarea' ? TEXTAREA_CLASS : INPUT_CLASS
+
+  return (
+    <div className={containerClassName ?? 'relative w-full'}>
+      {label ? (
+        <label
+          htmlFor={props.id}
+          className="text-slate-600 mb-1 block text-sm font-medium"
+        >
+          {label}
+        </label>
+      ) : null}
+      {as === 'textarea' ? (
+        <textarea
+          {...(props as ComponentProps<'textarea'>)}
+          className={className}
+          onChange={(event) => onValueChange(event.target.value)}
+        />
+      ) : (
+        <input
+          {...(props as ComponentProps<'input'>)}
+          className={className}
+          onChange={(event) => onValueChange(event.target.value)}
+        />
+      )}
+    </div>
+  )
+}
+
+type GenderSelectorProps = {
+  value: GenderValue
+  onChange: (value: GenderValue) => void
+}
+
+function GenderSelector({ value, onChange }: GenderSelectorProps) {
+  return (
+    <div
+      className="flex items-center gap-4"
+      role="radiogroup"
+      aria-label="gender"
+    >
+      <GenderRadio
+        id="gender_male"
+        label="Pria"
+        checked={value === 'male'}
+        onSelect={() => onChange('male')}
+      />
+      <GenderRadio
+        id="gender_female"
+        label="Wanita"
+        checked={value === 'female'}
+        onSelect={() => onChange('female')}
+      />
+    </div>
+  )
+}
+
+type GenderRadioProps = {
+  id: string
+  label: string
+  checked: boolean
+  onSelect: () => void
+}
+
+function GenderRadio({ id, label, checked, onSelect }: GenderRadioProps) {
+  return (
+    <label htmlFor={id} className="text-slate-600 flex items-center gap-2">
+      <Radio
+        id={id}
+        name="gender"
+        checked={checked}
+        onChange={onSelect}
+        crossOrigin={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
+      />
+      <span className="font-sans text-base antialiased">{label}</span>
+    </label>
+  )
+}
+
+type PhoneNumberListProps = {
+  phones: string[]
+  onChange: (index: number, value: string) => void
+  onAdd: () => void
+  onRemove: (index: number) => void
+  max: number
+}
+
+function PhoneNumberList({
+  phones,
+  onChange,
+  onAdd,
+  onRemove,
+  max,
+}: PhoneNumberListProps) {
+  return (
+    <div>
+      <label>Nomor Telepon</label>
+      {phones.map((phone, idx) => (
+        <div
+          key={phone || `phone-${idx}`}
+          className="mb-2 flex items-center gap-2"
+        >
+          <input
+            id={`phone-${idx}`}
+            name={`phone-${idx}`}
+            value={phone}
+            onChange={(e) => onChange(idx, e.target.value)}
+            type="text"
+            placeholder={
+              idx === 0 ? 'Nomor Telepon' : 'Nomor Telepon (Opsional)'
+            }
+            className={INPUT_CLASS}
+          />
+          {idx > 0 && (
+            <button
+              type="button"
+              onClick={() => onRemove(idx)}
+              className="rounded bg-red-500 px-3 py-2 text-white"
+            >
+              Hapus
+            </button>
+          )}
+        </div>
+      ))}
+      {phones.length < max && (
+        <button
+          type="button"
+          onClick={onAdd}
+          className="mt-2 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+        >
+          Tambah Nomor Telepon
+        </button>
+      )}
+    </div>
+  )
+}
+
+type LegacyPatientCodeSectionProps = {
+  show: boolean
+  toggle: () => void
+  inputRef: RefObject<HTMLInputElement | null>
+}
+
+function LegacyPatientCodeSection({
+  show,
+  toggle,
+  inputRef,
+}: LegacyPatientCodeSectionProps) {
+  return (
+    <div>
+      <Checkbox
+        label="Data Pasien Lama (Opsional)"
+        id="legacyPatientCodeCheckbox"
+        checked={show}
+        onChange={toggle}
+        crossOrigin={undefined}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
+      />
+      {show && (
+        <div className="relative mt-2 w-full">
+          <input
+            type="text"
+            id="patientCode"
+            name="patientCode"
+            placeholder="Kode Pasien"
+            ref={inputRef}
+            className={INPUT_CLASS}
+          />
+        </div>
+      )}
+    </div>
+  )
+}
+
+type TermsAgreementProps = {
+  checked: boolean
+  onToggle: () => void
+}
+
+function TermsAgreement({ checked, onToggle }: TermsAgreementProps) {
+  return (
+    <div className="flex items-center gap-2">
+      <label
+        className="relative flex cursor-pointer items-center"
+        htmlFor="termConditionCheckbox"
+      >
+        <Checkbox
+          id="termConditionCheckbox"
+          checked={checked}
+          onChange={onToggle}
+          crossOrigin={undefined}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
+        />
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
+          <svg
+            fill="none"
+            width="18px"
+            height="18px"
+            strokeWidth="2"
+            color="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 13L9 17L19 7"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      </label>
+      <label
+        className="text-slate-600 cursor-pointer antialiased"
+        htmlFor="termConditionCheckbox"
+      >
+        Saya setuju dengan{' '}
+        <a
+          href="/termcondition"
+          target="_blank"
+          rel="noreferrer"
+          className="text-slate-800 underline"
+        >
+          syarat dan ketentuan
+        </a>
+      </label>
     </div>
   )
 }
