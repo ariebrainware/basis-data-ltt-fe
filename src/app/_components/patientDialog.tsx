@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import { PatientForm } from './patientForm'
-import { PatientType } from '../_types/patient'
 import { DiseaseType } from '../_types/disease'
 import {
   Button,
@@ -13,42 +12,50 @@ import {
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isAdmin } from '../_functions/userRole'
-import PatientDialog from './patientDialog'
 
-// Type for patient update payload.
-// patient_code is made optional because it's conditionally included based on user role.
-// Admin users can update it, but non-admin users cannot.
-// This overrides the required string from PatientType to make it optional in updates.
+type PatientProps = {
+  ID: number
+  patient_code?: string | null
+  full_name?: string
+  job?: string
+  age?: number | string
+  phone_number?: string | string[]
+  email?: string
+  address?: string
+  health_history?: string
+  surgery_history?: string
+  gender?: string
+  onDataChange?: () => void
+}
+
 type PatientUpdatePayload = Omit<
-  PatientType,
-  'ID' | 'last_visit' | 'onDataChange' | 'patient_code'
+  PatientProps & { ID: number },
+  'ID' | 'patient_code'
 > & {
   patient_code?: string
 }
 
-export default function Patient({
+export default function PatientDialog({
   ID,
+  patient_code: patientCode,
   full_name: name,
-  phone_number: phoneNumber,
   job,
   age,
+  phone_number: phoneNumber,
   email,
-  gender,
   address,
   health_history,
   surgery_history,
-  patient_code: patientCode,
+  gender,
   onDataChange,
-}: PatientType) {
+}: PatientProps) {
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
-  const [diseases, setDiseases] = useState<DiseaseType[]>([])
-  const [diseasesFetched, setDiseasesFetched] = useState(false)
+  const [diseases, setDiseases] = React.useState<DiseaseType[]>([])
+  const [diseasesFetched, setDiseasesFetched] = React.useState(false)
 
-  // Helper: fetch diseases once when needed
   const fetchDiseasesIfNeeded = async () => {
     if (diseasesFetched) return
     try {
@@ -59,7 +66,6 @@ export default function Patient({
       }
       if (res.ok) {
         const data = await res.json()
-        // Expecting backend shape: { data: { disease: [...] }, total: number }
         const list: DiseaseType[] =
           data && data.data && Array.isArray(data.data.disease)
             ? (data.data.disease as DiseaseType[])
@@ -69,7 +75,7 @@ export default function Patient({
         setDiseases(list)
       }
     } catch (e) {
-      // swallow network errors; we'll mark fetched to avoid retry storms
+      // ignore
     } finally {
       setDiseasesFetched(true)
     }
@@ -93,7 +99,6 @@ export default function Patient({
       .filter(Boolean)
     const matchedIds = items
       .map((item) => {
-        // if item looks numeric, assume it's an ID
         if (/^\d+$/.test(item)) return item
         const match = diseases.find((d) =>
           d.name.toLowerCase().includes(item.toLowerCase())
@@ -102,15 +107,11 @@ export default function Patient({
       })
       .filter(Boolean) as string[]
 
-    // Fallback: if no IDs could be resolved (e.g., diseases not loaded yet),
-    // preserve the original normalized input instead of returning an empty string.
     if (matchedIds.length === 0) {
       return items.join(',')
     }
     return matchedIds.join(',')
   }
-
-  // Helper: normalize phone input into string[]
 
   const normalizePhoneInput = (
     raw?: string | string[] | undefined
@@ -123,10 +124,9 @@ export default function Patient({
       .filter(Boolean)
   }
 
-  // DOM helpers to read form values with fallbacks
   const getInputValue = (
     selector: string,
-    fallback?: string | number | undefined
+    fallback?: string | number | null
   ): string => {
     const val = document.querySelector<HTMLInputElement>(selector)?.value
     if (typeof val === 'string' && val !== '') return val
@@ -143,11 +143,8 @@ export default function Patient({
     return fallback ?? ''
   }
 
-  // Helper: build update payload from form fields
   const buildUpdatePayload = (): PatientUpdatePayload => {
     const full_name_new_input = getInputValue('#full_name', name)
-
-    // Normalize phone field: backend accepts array of strings
     const rawPhoneInput = getInputValue(
       '#phone_number',
       Array.isArray(phoneNumber) ? phoneNumber.join(',') : phoneNumber
@@ -206,7 +203,7 @@ export default function Patient({
         }
         return response.json()
       })
-      .then((data) => {
+      .then(() => {
         setOpen(false)
         Swal.fire({
           text: 'Data pasien berhasil diperbarui.',
@@ -227,22 +224,33 @@ export default function Patient({
       })
   }
 
-  const handleDeletePatient = useDeleteResource({
-    resourceType: 'patient',
-    resourceId: ID,
-    resourceName: 'Data Pasien',
-  })
-  const getGenderLabel = (gVal?: string) => {
-    const g = (gVal || '').toString().trim().toLowerCase()
-    if (g === 'female' || g === 'perempuan') return 'Perempuan'
-    if (g === 'male' || g === 'laki-laki' || g === 'laki laki')
-      return 'Laki-laki'
-    return gVal ? String(g.charAt(0).toUpperCase() + g.slice(1)) : ''
-  }
-
-  const genderLabel = getGenderLabel(gender)
   return (
     <>
+      <button
+        data-open={open}
+        className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
+        data-shape="default"
+        onClick={() => handleOpen()}
+      >
+        <svg
+          width="1.5em"
+          height="1.5em"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          color="currentColor"
+          className="text-slate-800 size-4 dark:text-white"
+        >
+          <path
+            d="M14.3632 5.65156L15.8431 4.17157C16.6242 3.39052 17.8905 3.39052 18.6716 4.17157L20.0858 5.58579C20.8668 6.36683 20.8668 7.63316 20.0858 8.41421L18.6058 9.8942M14.3632 5.65156L4.74749 15.2672C4.41542 15.5993 4.21079 16.0376 4.16947 16.5054L3.92738 19.2459C3.87261 19.8659 4.39148 20.3848 5.0115 20.33L7.75191 20.0879C8.21972 20.0466 8.65806 19.8419 8.99013 19.5099L18.6058 9.8942M14.3632 5.65156L18.6058 9.8942"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          ></path>
+        </svg>
+      </button>
+
       <Dialog
         size={'xl'}
         className="max-h-[90vh] overflow-y-auto"
@@ -273,15 +281,24 @@ export default function Patient({
         >
           <PatientForm
             ID={ID}
-            patient_code={patientCode}
-            full_name={name}
-            job={job}
-            age={age}
-            phone_number={phoneNumber}
-            email={email}
-            address={address}
-            health_history={health_history}
-            surgery_history={surgery_history}
+            patient_code={patientCode ?? ''}
+            full_name={name ?? ''}
+            job={job ?? ''}
+            age={typeof age === 'string' ? Number(age) : (age ?? 0)}
+            phone_number={
+              Array.isArray(phoneNumber)
+                ? phoneNumber
+                : typeof phoneNumber === 'string' && phoneNumber.trim()
+                  ? phoneNumber
+                      .split(',')
+                      .map((p) => p.trim())
+                      .filter(Boolean)
+                  : []
+            }
+            email={email ?? ''}
+            address={address ?? ''}
+            health_history={health_history ?? ''}
+            surgery_history={surgery_history ?? ''}
             gender={genderValue}
             last_visit={''}
             onGenderChange={setGenderValue}
@@ -322,85 +339,6 @@ export default function Patient({
           </Button>
         </DialogFooter>
       </Dialog>
-
-      <tr className="border-slate-200 border-b last:border-0">
-        <td className="p-3">
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col">
-              <small className="font-sans text-sm text-current antialiased">
-                {name}
-              </small>
-              <small className="font-sans text-sm text-current antialiased opacity-70">
-                {Array.isArray(phoneNumber)
-                  ? phoneNumber.join(', ')
-                  : phoneNumber}
-              </small>
-            </div>
-          </div>
-        </td>
-        <td className="p-3">
-          <div className="flex flex-col">
-            <small className="font-sans text-sm text-current antialiased">
-              {job}
-            </small>
-            <small className="font-sans text-sm text-current antialiased opacity-70">
-              {age}
-            </small>
-          </div>
-        </td>
-        <td className="p-3">
-          <div className="w-max">
-            <span className="font-sans text-sm text-current antialiased">
-              {genderLabel}
-            </span>
-          </div>
-        </td>
-        <td className="p-3">
-          <small className="font-sans text-sm text-current antialiased">
-            {patientCode}
-          </small>
-        </td>
-        <td className="p-3">
-          <PatientDialog
-            ID={ID}
-            patient_code={patientCode}
-            full_name={name}
-            job={job}
-            age={age}
-            phone_number={phoneNumber}
-            email={email}
-            address={address}
-            health_history={health_history}
-            surgery_history={surgery_history}
-            gender={gender}
-            onDataChange={onDataChange}
-          />
-          <button
-            className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
-            data-shape="default"
-            onClick={() => handleDeletePatient()}
-            aria-label="Delete patient"
-          >
-            <svg
-              width="1.5em"
-              height="1.5em"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              color="currentColor"
-              className="text-slate-800 size-4 dark:text-white"
-            >
-              <path
-                d="M19.5 6H16.5M19.5 6H4.5M19.5 6V19.5C19.5 20.2956 18.8284 21 18 21H6C5.17157 21 4.5 20.2956 4.5 19.5V6M9 10.5V16.5M15 10.5V16.5M9 6V4.5C9 3.67157 9.67157 3 10.5 3H13.5C14.3284 3 15 3.67157 15 4.5V6"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></path>
-            </svg>
-          </button>
-        </td>
-      </tr>
     </>
   )
 }
