@@ -311,11 +311,14 @@ function LabeledField({
 }: LabeledFieldProps) {
   const className = as === 'textarea' ? TEXTAREA_CLASS : INPUT_CLASS
 
+  // Exclude ref from spread to avoid cross-version React Ref type incompatibility
+  const { ref: _ref, ...elementProps } = props as any
+
   return (
     <div className={containerClassName ?? 'relative w-full'}>
       {label ? (
         <label
-          htmlFor={props.id}
+          htmlFor={(props as any).id}
           className="text-slate-600 mb-1 block text-sm font-medium"
         >
           {label}
@@ -323,13 +326,13 @@ function LabeledField({
       ) : null}
       {as === 'textarea' ? (
         <textarea
-          {...(props as ComponentProps<'textarea'>)}
+          {...(elementProps as any)}
           className={className}
           onChange={(event) => onValueChange(event.target.value)}
         />
       ) : (
         <input
-          {...(props as ComponentProps<'input'>)}
+          {...(elementProps as any)}
           className={className}
           onChange={(event) => onValueChange(event.target.value)}
         />
@@ -411,10 +414,7 @@ function PhoneNumberList({
     <div>
       <label>Nomor Telepon</label>
       {phones.map((phone, idx) => (
-        <div
-          key={phone || `phone-${idx}`}
-          className="mb-2 flex items-center gap-2"
-        >
+        <div className="mb-2 flex items-center gap-2" key={`phone-${idx}`}>
           <input
             id={`phone-${idx}`}
             name={`phone-${idx}`}
