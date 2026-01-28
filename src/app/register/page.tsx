@@ -226,7 +226,12 @@ function usePhoneFields(maxInputs = 3) {
   }
 
   const removePhoneAt = (index: number) => {
-    setPhones((prev) => prev.filter((_, i) => i !== index))
+    setPhones((prev) => {
+      // Prevent removing the last remaining phone entry and ignore invalid indices
+      if (prev.length <= 1) return prev
+      if (index < 0 || index >= prev.length) return prev
+      return prev.filter((_, i) => i !== index)
+    })
   }
 
   return { phones, updatePhoneAt, addPhoneInput, removePhoneAt, maxInputs }
