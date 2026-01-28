@@ -181,6 +181,9 @@ export default function Register() {
             href="#"
             onClick={async (e) => {
               e.preventDefault()
+              if (!termsAccepted) {
+                return
+              }
               await sendRegisterRequest()
             }}
           >
