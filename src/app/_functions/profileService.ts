@@ -1,54 +1,7 @@
 import { apiFetch } from '@/app/_functions/apiFetch'
 import { UnauthorizedAccess } from '@/app/_functions/unauthorized'
-import { parseUserSource } from './userHelpers'
-import { fetchCurrentUserId } from './fetchCurrentUser'
+import { extractMessage, getProfileResult } from './profileHelpers'
 import { isPasswordError } from './passwordUtils'
-
-function extractMessage(json: any): string {
-  if (!json) return ''
-  if (typeof json === 'string') return json
-  if (json.message) return String(json.message)
-  return ''
-}
-
-async function resolveUserId(): Promise<string | null> {
-  let userId: string | null = null
-  if (typeof window !== 'undefined') {
-    userId = localStorage.getItem('user-id')
-  }
-
-  if (!userId) {
-    const fetched = await fetchCurrentUserId()
-    if (fetched) {
-      userId = String(fetched)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user-id', userId)
-      }
-    }
-  }
-
-  return userId
-}
-
-async function safeJson(resp: Response): Promise<any> {
-  return resp.json().catch(() => null)
-}
-
-async function fetchUserData(
-  endpoint: string,
-  userId: string,
-  router: any
-): Promise<{ unauthorized: true } | { error: string } | { source: any }> {
-  const resp = await apiFetch(`${endpoint}/${userId}`)
-  if (resp.status === 401) {
-    UnauthorizedAccess(router)
-    return { unauthorized: true }
-  }
-
-  if (!resp.ok) return { error: `HTTP ${resp.status}` }
-  const json = await safeJson(resp)
-  return { source: parseUserSource(json) }
-}
 
 export async function fetchUserProfile(opts: {
   endpoint: string
@@ -56,23 +9,7 @@ export async function fetchUserProfile(opts: {
 }): Promise<
   { name?: string; email?: string } | { error: string } | { unauthorized: true }
 > {
-  const { endpoint: USER_ENDPOINT, router } = opts
-  try {
-    const userId = await resolveUserId()
-    if (!userId) return { error: 'Unable to determine current user' }
-
-    const result = await fetchUserData(USER_ENDPOINT, userId, router)
-    if ('unauthorized' in result) return { unauthorized: true }
-    if ('error' in result) return { error: result.error }
-    const source = result.source
-    return {
-      name: typeof source?.name === 'string' ? source.name : undefined,
-      email: typeof source?.email === 'string' ? source.email : undefined,
-    }
-  } catch (err) {
-    console.error('fetchUserProfile error', err)
-    return { error: 'Failed to load profile' }
-  }
+  return getProfileResult(opts)
 }
 
 export async function submitProfileUpdate(opts: {
