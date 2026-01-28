@@ -16,7 +16,7 @@ export async function fetchUserProfile(opts: {
 }): Promise<
   { name?: string; email?: string } | { error: string } | { unauthorized: true }
 > {
-  const { endpoint: USER_ENDPOINT, router } = opts
+  const { endpoint: USER_ENDPOINT } = opts
   try {
     const userIdResp = await apiFetch(`${USER_ENDPOINT}`)
     // The caller should resolve user id; keep this minimal and let higher layers decide
