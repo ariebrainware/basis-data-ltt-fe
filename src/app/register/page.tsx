@@ -229,7 +229,7 @@ function buildRegistrationPayload(
     address,
     health_history: healthHistory,
     surgery_history: surgeryHistory,
-    phone_number: validPhones.join(', '),
+    phone_number: validPhones,
     patient_code: patientCode,
   }
 }

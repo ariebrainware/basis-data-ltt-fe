@@ -29,6 +29,16 @@ async function reliableFill(page: any, selector: string, value: string) {
   }
 }
 
+// Helper to assert and dismiss SweetAlert error dialogs with a given message
+async function assertSweetAlertError(page: any, expectedText: string) {
+  await page.waitForSelector('.swal2-popup', { timeout: 5000 })
+  const errorTitle = page.locator('.swal2-title')
+  await expect(errorTitle).toHaveText('Gagal')
+  const errorContent = page.locator('.swal2-html-container')
+  await expect(errorContent).toHaveText(expectedText)
+  await page.locator('.swal2-confirm').click()
+}
+
 test.describe('Patient Registration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/register')
@@ -210,12 +220,38 @@ test.describe('Patient Registration', () => {
     // Note: Actual submission test would require mocking the API
   })
 
-  test('should show error when submitting without gender selected', async ({
-    page,
-  }) => {
-    // Fill required fields except gender
-    await page.locator('#fullName').fill('John Doe')
-    await page.locator('#phone-0').fill('+628123456789')
+  // Helper to fill basic required fields and submit, then assert expected SweetAlert error.
+  async function submitAndExpectError(
+    page: any,
+    {
+      fullName = 'John Doe',
+      gender, // 'male' | 'female' | undefined (omit to simulate not selected)
+      phoneValue, // string | undefined: undefined => don't touch phone; '' => focus+blur to leave empty
+      expectedError,
+    }: {
+      fullName?: string
+      gender?: 'male' | 'female'
+      phoneValue?: string
+      expectedError: string
+    }
+  ) {
+    await reliableFill(page, '#fullName', fullName)
+
+    if (gender === 'male') {
+      await page.locator('#gender_male').check()
+    } else if (gender === 'female') {
+      await page.locator('#gender_female').check()
+    }
+
+    if (phoneValue === undefined) {
+      // Do not touch the phone field to simulate missing phone number
+    } else if (phoneValue === '') {
+      // Leave the phone input empty but touched
+      await page.locator('#phone-0').focus()
+      await page.locator('#phone-0').blur()
+    } else {
+      await page.locator('#phone-0').fill(phoneValue)
+    }
 
     // Accept terms and conditions
     await page.locator('#termConditionCheckbox').click({ force: true })
@@ -224,81 +260,36 @@ test.describe('Patient Registration', () => {
     const registerBtn = page.locator('#registerBtn')
     await registerBtn.click()
 
-    // Wait for SweetAlert error dialog to appear
-    await page.waitForSelector('.swal2-popup', { timeout: 5000 })
+    await assertSweetAlertError(page, expectedError)
+  }
 
-    // Verify error message for missing gender
-    const errorTitle = page.locator('.swal2-title')
-    await expect(errorTitle).toHaveText('Gagal')
-
-    const errorContent = page.locator('.swal2-html-container')
-    await expect(errorContent).toHaveText('Jenis kelamin wajib dipilih')
-
-    // Close the alert
-    await page.locator('.swal2-confirm').click()
+  test('should show error when submitting without gender selected', async ({
+    page,
+  }) => {
+    await submitAndExpectError(page, {
+      gender: undefined,
+      phoneValue: '+628123456789',
+      expectedError: 'Jenis kelamin wajib dipilih',
+    })
   })
 
   test('should show error when submitting without phone number', async ({
     page,
   }) => {
-    // Fill required fields except phone number
-    await page.locator('#fullName').fill('John Doe')
-    await page.locator('#gender_male').check()
-
-    // Accept terms and conditions
-    await page.locator('#termConditionCheckbox').click({ force: true })
-
-    // Click register button
-    const registerBtn = page.locator('#registerBtn')
-    await registerBtn.click()
-
-    // Wait for SweetAlert error dialog to appear
-    await page.waitForSelector('.swal2-popup', { timeout: 5000 })
-
-    // Verify error message for missing phone number
-    const errorTitle = page.locator('.swal2-title')
-    await expect(errorTitle).toHaveText('Gagal')
-
-    const errorContent = page.locator('.swal2-html-container')
-    await expect(errorContent).toHaveText(
-      'Minimal satu nomor telepon wajib diisi'
-    )
-
-    // Close the alert
-    await page.locator('.swal2-confirm').click()
+    await submitAndExpectError(page, {
+      gender: 'male',
+      phoneValue: undefined,
+      expectedError: 'Minimal satu nomor telepon wajib diisi',
+    })
   })
 
   test('should show error when submitting with empty phone number field', async ({
     page,
   }) => {
-    // Fill required fields
-    await page.locator('#fullName').fill('John Doe')
-    await page.locator('#gender_female').check()
-
-    // Leave phone field empty (just focus and blur without entering value)
-    await page.locator('#phone-0').focus()
-    await page.locator('#phone-0').blur()
-
-    // Accept terms and conditions
-    await page.locator('#termConditionCheckbox').click({ force: true })
-
-    // Click register button
-    const registerBtn = page.locator('#registerBtn')
-    await registerBtn.click()
-
-    // Wait for SweetAlert error dialog to appear
-    await page.waitForSelector('.swal2-popup', { timeout: 5000 })
-
-    // Verify error message for empty phone number
-    const errorTitle = page.locator('.swal2-title')
-    await expect(errorTitle).toHaveText('Gagal')
-
-    const errorContent = page.locator('.swal2-html-container')
-    await expect(errorContent).toHaveText(
-      'Minimal satu nomor telepon wajib diisi'
-    )
-
-    // Close the alert
-    await page.locator('.swal2-confirm').click()
+    await submitAndExpectError(page, {
+      gender: 'female',
+      phoneValue: '',
+      expectedError: 'Minimal satu nomor telepon wajib diisi',
+    })
   })
 })

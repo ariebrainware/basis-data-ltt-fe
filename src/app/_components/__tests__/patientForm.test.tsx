@@ -103,7 +103,7 @@ describe('PatientForm Component', () => {
   const mockPatient: PatientType = {
     ID: 1,
     full_name: 'John Doe',
-    phone_number: '+628123456789',
+    phone_number: ['+628123456789'],
     job: 'Software Engineer',
     age: 30,
     email: 'john@example.com',
@@ -163,7 +163,7 @@ describe('PatientForm Component', () => {
     const emptyPatient: PatientType = {
       ID: 0,
       full_name: '',
-      phone_number: '',
+      phone_number: [],
       job: '',
       age: 0,
       email: '',
