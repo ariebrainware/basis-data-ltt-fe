@@ -14,19 +14,12 @@ import {
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
-import { isAdmin } from '../_functions/userRole'
 import PatientDialog from './patientDialog'
-
-// Type for patient update payload.
-// patient_code is made optional because it's conditionally included based on user role.
-// Admin users can update it, but non-admin users cannot.
-// This overrides the required string from PatientType to make it optional in updates.
-type PatientUpdatePayload = Omit<
-  PatientType,
-  'ID' | 'last_visit' | 'onDataChange' | 'patient_code'
-> & {
-  patient_code?: string
-}
+import {
+  buildPatientUpdatePayload,
+  fetchDiseaseList,
+  PatientUpdatePayload,
+} from '../_functions/patientRowHelpers'
 
 export default function Patient({
   ID,
@@ -51,28 +44,9 @@ export default function Patient({
   // Helper: fetch diseases once when needed
   const fetchDiseasesIfNeeded = async () => {
     if (diseasesFetched) return
-    try {
-      const res = await apiFetch('/disease', { method: 'GET' })
-      if (res.status === 401) {
-        UnauthorizedAccess(router)
-        return
-      }
-      if (res.ok) {
-        const data = await res.json()
-        // Expecting backend shape: { data: { disease: [...] }, total: number }
-        const list: DiseaseType[] =
-          data && data.data && Array.isArray(data.data.disease)
-            ? (data.data.disease as DiseaseType[])
-            : Array.isArray(data)
-              ? (data as DiseaseType[])
-              : []
-        setDiseases(list)
-      }
-    } catch (e) {
-      // swallow network errors; we'll mark fetched to avoid retry storms
-    } finally {
-      setDiseasesFetched(true)
-    }
+    const list = await fetchDiseaseList(router)
+    setDiseases(list)
+    setDiseasesFetched(true)
   }
 
   const handleOpen = async () => {
@@ -85,113 +59,21 @@ export default function Patient({
     }
   }
 
-  const handleHealthConditionInput = (input: string): string => {
-    if (!input.trim() || input === '-') return '-'
-    const items = input
-      .split(',')
-      .map((it) => it.trim())
-      .filter(Boolean)
-    const matchedIds = items
-      .map((item) => {
-        // if item looks numeric, assume it's an ID
-        if (/^\d+$/.test(item)) return item
-        const match = diseases.find((d) =>
-          d.name.toLowerCase().includes(item.toLowerCase())
-        )
-        return match ? String(match.ID) : null
-      })
-      .filter(Boolean) as string[]
-
-    // Fallback: if no IDs could be resolved (e.g., diseases not loaded yet),
-    // preserve the original normalized input instead of returning an empty string.
-    if (matchedIds.length === 0) {
-      return items.join(',')
-    }
-    return matchedIds.join(',')
-  }
-
-  // Helper: normalize phone input into string[]
-
-  const normalizePhoneInput = (
-    raw?: string | string[] | undefined
-  ): string[] => {
-    if (!raw) return []
-    if (Array.isArray(raw)) return raw.map((p) => p.trim()).filter(Boolean)
-    return raw
-      .split(',')
-      .map((p) => p.trim())
-      .filter(Boolean)
-  }
-
-  // DOM helpers to read form values with fallbacks
-  const getInputValue = (
-    selector: string,
-    fallback?: string | number | undefined
-  ): string => {
-    const val = document.querySelector<HTMLInputElement>(selector)?.value
-    if (typeof val === 'string' && val !== '') return val
-    if (fallback === undefined || fallback === null) return ''
-    return String(fallback)
-  }
-
-  const getTextAreaValue = (
-    selector: string,
-    fallback?: string | undefined
-  ): string => {
-    const val = document.querySelector<HTMLTextAreaElement>(selector)?.value
-    if (typeof val === 'string' && val !== '') return val
-    return fallback ?? ''
-  }
-
-  // Helper: build update payload from form fields
-  const buildUpdatePayload = (): PatientUpdatePayload => {
-    const full_name_new_input = getInputValue('#full_name', name)
-
-    // Normalize phone field: backend accepts array of strings
-    const rawPhoneInput = getInputValue(
-      '#phone_number',
-      Array.isArray(phoneNumber) ? phoneNumber.join(',') : phoneNumber
-    )
-    const phone_number_new_input_arr: string[] =
-      normalizePhoneInput(rawPhoneInput)
-    const job_new_input = getInputValue('#job', job)
-    const age_new_input = getInputValue('#age', String(age))
-    const email_new_input = getInputValue('#email', email)
-    const address_new_input = getInputValue('#address', address)
-    const health_history_new_input = getTextAreaValue(
-      '#health_history',
-      health_history || ''
-    )
-    const surgery_history_new_input = getTextAreaValue(
-      '#surgery_history',
-      surgery_history
-    )
-    const gender_new_input = genderValue || gender
-    const patient_code_new_input = getInputValue('#patient_code', patientCode)
-
-    const payload: PatientUpdatePayload = {
-      full_name: full_name_new_input,
-      phone_number: phone_number_new_input_arr,
-      gender: gender_new_input,
-      job: job_new_input,
-      age: Number(age_new_input),
-      email: email_new_input,
-      address: address_new_input,
-      health_history: handleHealthConditionInput(
-        health_history_new_input || ''
-      ),
-      surgery_history: surgery_history_new_input,
-    }
-
-    if (isAdmin()) {
-      payload.patient_code = patient_code_new_input
-    }
-
-    return payload
-  }
-
   const handleUpdatePatientInfo = () => {
-    const payload = buildUpdatePayload()
+    const payload: PatientUpdatePayload = buildPatientUpdatePayload({
+      name,
+      phoneNumber,
+      job,
+      age,
+      email,
+      address,
+      healthHistory: health_history,
+      surgeryHistory: surgery_history,
+      genderValue,
+      gender,
+      patientCode,
+      diseases,
+    })
     apiFetch(`/patient/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),

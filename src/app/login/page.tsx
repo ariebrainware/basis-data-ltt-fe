@@ -10,68 +10,33 @@ import { fetchCurrentUserId } from '../_functions/fetchCurrentUser'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import { format as formatDate } from 'date-fns'
+import {
+  getLockedFieldFromResponse,
+  getUserIdFromResponse,
+} from '../_functions/loginParsing'
+import {
+  handleUserNotFound,
+  handleErrorString,
+  storeSession,
+  showLoginSuccess,
+  showAccountLockedModal,
+} from '../_functions/loginUi'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
 
-async function showAccountLockedModal(lockedField: any) {
-  let lockedDate: Date | null = null
-  try {
-    lockedDate = new Date(lockedField)
-  } catch (e) {
-    lockedDate = null
-  }
-  const formatted = lockedDate
-    ? formatDate(lockedDate, 'yyyy/MM/dd HH:mm')
-    : String(lockedField)
-
-  await Swal.fire({
-    icon: 'warning',
-    title: 'Account Locked',
-    html: `Your account is locked until <strong>${formatted}</strong>.`,
-  })
-}
-
 async function tryHandleErrorResponse(responseData: any) {
   if (!responseData) return false
 
-  if (responseData.error === 'user not found') {
-    await Swal.fire({
-      icon: 'error',
-      title: 'Login Failed',
-      text: 'User not found!',
-    })
-    return true
-  }
+  if (await handleUserNotFound(responseData)) return true
 
-  const lockedField =
-    responseData.data?.locked_until ||
-    responseData.data?.lockedUntil ||
-    responseData.data?.lock_expires_at ||
-    responseData.data?.locked_at
-
+  const lockedField = getLockedFieldFromResponse(responseData)
   if (lockedField) {
     await showAccountLockedModal(lockedField)
     return true
   }
 
-  if (typeof responseData.error === 'string') {
-    const dateMatch = responseData.error.match(
-      /(\d{4}[-\/]\d{2}[-\/]\d{2}[ T]\d{2}:\d{2}(:\d{2})?)/
-    )
-    if (dateMatch) {
-      const parsed = new Date(dateMatch[1])
-      const formatted = isNaN(parsed.getTime())
-        ? dateMatch[1]
-        : formatDate(parsed, 'yyyy/MM/dd HH:mm')
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Account Locked',
-        html: `Your account is locked until <strong>${formatted}</strong>.`,
-      })
-      return true
-    }
-  }
+  if (await handleErrorString(responseData)) return true
 
   return false
 }
@@ -129,16 +94,21 @@ export default function Login() {
   async function sendLoginRequest() {
     const email = usernameInput ? usernameInput.value : ''
     const password = passwordInput ? passwordInput.value : ''
-    const url = `${getApiHost()}/login`
-    try {
+
+    async function performRequest() {
+      const url = `${getApiHost()}/login`
       if (process.env.NODE_ENV !== 'production')
         console.log('[Login] POST', url)
-
       const response = await apiFetch('/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       })
       const responseData = await response.json()
+      return { response, responseData }
+    }
+
+    try {
+      const { response, responseData } = await performRequest()
 
       if (!response.ok) {
         const handled = await tryHandleErrorResponse(responseData)
@@ -146,43 +116,27 @@ export default function Login() {
         throw new Error(`HTTP error! Status: ${response.status}`)
       }
 
-      const token = responseData.data.token
-      const role = responseData.data.role
-
-      const userId =
-        responseData.data.id ||
-        responseData.data.user_id ||
-        responseData.data.therapist_id ||
-        responseData.data.ID ||
-        responseData.data.therapist?.ID ||
-        responseData.data.therapist?.id ||
-        responseData.data.user?.ID ||
-        responseData.data.user?.id
-
-      if (process.env.NODE_ENV !== 'production')
-        console.log('token', token, 'userId', userId, 'role', role)
-
-      if (token) {
-        localStorage.setItem('session-token', token)
-        localStorage.setItem('user-role', role)
-
-        await Swal.fire({
-          icon: 'success',
-          title: 'Login Successful!',
-          text: 'Redirecting to your dashboard...',
-          timer: 1400,
-          showConfirmButton: false,
-        })
-
-        await ensureAndStoreUserId(userId, responseData, router)
-        return
-      }
+      await handleSuccessfulLogin(responseData, router)
       return response
     } catch (error) {
       console.error('Failed to fetch:', error)
       setMessage('Login failed due to network error!')
       return null
     }
+  }
+
+  async function handleSuccessfulLogin(responseData: any, router: any) {
+    const token = responseData.data?.token
+    const role = responseData.data?.role
+    const userId = getUserIdFromResponse(responseData)
+
+    if (process.env.NODE_ENV !== 'production')
+      console.log('token', token, 'userId', userId, 'role', role)
+
+    if (!token) return
+    storeSession(token, role)
+    await showLoginSuccess()
+    await ensureAndStoreUserId(userId, responseData, router)
   }
 
   useEffect(() => {
