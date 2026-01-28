@@ -12,7 +12,7 @@ function allPasswordFieldsFilled(
 }
 
 function isStrongPassword(pwd: string) {
-  const strongPwd = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/u
+  const strongPwd = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/
   return strongPwd.test(pwd)
 }
 
