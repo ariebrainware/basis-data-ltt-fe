@@ -11,6 +11,29 @@ function extractMessage(json: any): string {
   return ''
 }
 
+async function resolveUserId(): Promise<string | null> {
+  let userId: string | null = null
+  if (typeof window !== 'undefined') {
+    userId = localStorage.getItem('user-id')
+  }
+
+  if (!userId) {
+    const fetched = await fetchCurrentUserId()
+    if (fetched) {
+      userId = String(fetched)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user-id', userId)
+      }
+    }
+  }
+
+  return userId
+}
+
+async function safeJson(resp: Response): Promise<any> {
+  return resp.json().catch(() => null)
+}
+
 export async function fetchUserProfile(opts: {
   endpoint: string
   router: any
@@ -19,26 +42,8 @@ export async function fetchUserProfile(opts: {
 > {
   const { endpoint: USER_ENDPOINT, router } = opts
   try {
-    // Resolve user ID from localStorage or fallback fetch
-    let userId: string | null = null
-
-    if (typeof window !== 'undefined') {
-      userId = localStorage.getItem('user-id')
-    }
-
-    if (!userId) {
-      const fetched = await fetchCurrentUserId()
-      if (fetched) {
-        userId = String(fetched)
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('user-id', userId)
-        }
-      }
-    }
-
-    if (!userId) {
-      return { error: 'Unable to determine current user' }
-    }
+    const userId = await resolveUserId()
+    if (!userId) return { error: 'Unable to determine current user' }
 
     const userIdResp = await apiFetch(`${USER_ENDPOINT}/${userId}`)
 
@@ -48,7 +53,7 @@ export async function fetchUserProfile(opts: {
     }
 
     if (!userIdResp.ok) return { error: `HTTP ${userIdResp.status}` }
-    const json = await userIdResp.json().catch(() => null)
+    const json = await safeJson(userIdResp)
     const source = parseUserSource(json)
     return {
       name: typeof source?.name === 'string' ? source.name : undefined,
