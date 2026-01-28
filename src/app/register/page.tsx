@@ -111,7 +111,17 @@ export default function Register() {
           type="number"
           placeholder="Umur"
           value={age === '' ? '' : String(age)}
-          onValueChange={(value) => setAge(value === '' ? '' : Number(value))}
+          onValueChange={(value) => {
+            if (value === '') {
+              setAge('');
+              return;
+            }
+
+            if (/^\d+$/.test(value)) {
+              setAge(Number(value));
+            }
+            // Ignore invalid numeric strings to avoid setting age to NaN
+          }}
         />
 
         <LabeledField
