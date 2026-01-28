@@ -409,11 +409,7 @@ function PhoneNumberList({
 }: PhoneNumberListProps) {
   return (
     <div>
-      <label
-        className="text-slate-700 mb-2 block text-sm font-medium"
-      >
-        Nomor Telepon
-      </label>
+      <label>Nomor Telepon</label>
       {phones.map((phone, idx) => (
         <div
           key={phone || `phone-${idx}`}

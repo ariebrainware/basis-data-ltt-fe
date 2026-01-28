@@ -260,7 +260,9 @@ test.describe('Patient Registration', () => {
     await expect(errorTitle).toHaveText('Gagal')
 
     const errorContent = page.locator('.swal2-html-container')
-    await expect(errorContent).toHaveText('Minimal satu nomor telepon wajib diisi')
+    await expect(errorContent).toHaveText(
+      'Minimal satu nomor telepon wajib diisi'
+    )
 
     // Close the alert
     await page.locator('.swal2-confirm').click()
@@ -292,7 +294,9 @@ test.describe('Patient Registration', () => {
     await expect(errorTitle).toHaveText('Gagal')
 
     const errorContent = page.locator('.swal2-html-container')
-    await expect(errorContent).toHaveText('Minimal satu nomor telepon wajib diisi')
+    await expect(errorContent).toHaveText(
+      'Minimal satu nomor telepon wajib diisi'
+    )
 
     // Close the alert
     await page.locator('.swal2-confirm').click()
