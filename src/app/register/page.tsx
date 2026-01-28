@@ -102,7 +102,7 @@ export default function Register() {
           id="age"
           name="age"
           type="number"
-          placeholder="Uur"
+          placeholder="Umur"
           value={age === '' ? '' : String(age)}
           onValueChange={(value) => {
             if (value === '') {
