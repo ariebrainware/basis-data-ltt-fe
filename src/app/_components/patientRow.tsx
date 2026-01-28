@@ -122,33 +122,51 @@ export default function Patient({
       .filter(Boolean)
   }
 
+  // DOM helpers to read form values with fallbacks
+  const getInputValue = (
+    selector: string,
+    fallback?: string | number | undefined
+  ): string => {
+    const val = document.querySelector<HTMLInputElement>(selector)?.value
+    if (typeof val === 'string' && val !== '') return val
+    if (fallback === undefined || fallback === null) return ''
+    return String(fallback)
+  }
+
+  const getTextAreaValue = (
+    selector: string,
+    fallback?: string | undefined
+  ): string => {
+    const val = document.querySelector<HTMLTextAreaElement>(selector)?.value
+    if (typeof val === 'string' && val !== '') return val
+    return fallback ?? ''
+  }
+
   // Helper: build update payload from form fields
   const buildUpdatePayload = (): PatientUpdatePayload => {
-    const full_name_new_input =
-      document.querySelector<HTMLInputElement>('#full_name')?.value || name
-    const rawPhoneInput =
-      document.querySelector<HTMLInputElement>('#phone_number')?.value
-    const phone_number_new_input_arr: string[] = normalizePhoneInput(
-      rawPhoneInput ?? phoneNumber
+    const full_name_new_input = getInputValue('#full_name', name)
+
+    // Normalize phone field: backend accepts array of strings
+    const rawPhoneInput = getInputValue(
+      '#phone_number',
+      Array.isArray(phoneNumber) ? phoneNumber.join(',') : phoneNumber
     )
-    const job_new_input =
-      document.querySelector<HTMLInputElement>('#job')?.value || job
-    const age_new_input =
-      document.querySelector<HTMLInputElement>('#age')?.value || String(age)
-    const email_new_input =
-      document.querySelector<HTMLInputElement>('#email')?.value || email
-    const address_new_input =
-      document.querySelector<HTMLInputElement>('#address')?.value || address
-    const health_history_new_input =
-      document.querySelector<HTMLTextAreaElement>('#health_history')?.value ||
-      ''
-    const surgery_history_new_input =
-      document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ||
+    const phone_number_new_input_arr: string[] =
+      normalizePhoneInput(rawPhoneInput)
+    const job_new_input = getInputValue('#job', job)
+    const age_new_input = getInputValue('#age', String(age))
+    const email_new_input = getInputValue('#email', email)
+    const address_new_input = getInputValue('#address', address)
+    const health_history_new_input = getTextAreaValue(
+      '#health_history',
+      health_history || ''
+    )
+    const surgery_history_new_input = getTextAreaValue(
+      '#surgery_history',
       surgery_history
+    )
     const gender_new_input = genderValue || gender
-    const patient_code_new_input =
-      document.querySelector<HTMLInputElement>('#patient_code')?.value ||
-      patientCode
+    const patient_code_new_input = getInputValue('#patient_code', patientCode)
 
     const payload: PatientUpdatePayload = {
       full_name: full_name_new_input,
@@ -213,14 +231,15 @@ export default function Patient({
     resourceId: ID,
     resourceName: 'Data Pasien',
   })
-  const genderLabel = (() => {
-    const g = (gender || '').toString().trim().toLowerCase()
+  const getGenderLabel = (gVal?: string) => {
+    const g = (gVal || '').toString().trim().toLowerCase()
     if (g === 'female' || g === 'perempuan') return 'Perempuan'
     if (g === 'male' || g === 'laki-laki' || g === 'laki laki')
       return 'Laki-laki'
-    // Fallback: capitalize first letter
-    return gender ? String(g.charAt(0).toUpperCase() + g.slice(1)) : ''
-  })()
+    return gVal ? String(g.charAt(0).toUpperCase() + g.slice(1)) : ''
+  }
+
+  const genderLabel = getGenderLabel(gender)
   return (
     <>
       <Dialog
