@@ -42,6 +42,15 @@ export default function Register() {
       await Swal.fire('Gagal', 'Nama lengkap wajib diisi', 'error')
       return
     }
+    if (!gender) {
+      await Swal.fire('Gagal', 'Jenis kelamin wajib dipilih', 'error')
+      return
+    }
+    const validPhones = phoneNumbers.filter((p) => p && p.trim())
+    if (validPhones.length === 0) {
+      await Swal.fire('Gagal', 'Minimal satu nomor telepon wajib diisi', 'error')
+      return
+    }
     if (!termsAccepted) {
       await Swal.fire(
         'Gagal',
@@ -59,7 +68,7 @@ export default function Register() {
       address,
       health_history: healthHistory,
       surgery_history: surgeryHistory,
-      phone_number: phoneNumbers.filter((p) => p && p.trim()),
+      phone_number: validPhones.join(', '),
       patient_code: patientCodeRef.current?.value || '',
     }
 
@@ -202,9 +211,7 @@ export default function Register() {
 }
 
 function normalizeAge(value: number | ''): number {
-  return typeof value === 'number'
-    ? value
-    : parseInt(String(value || '0'), 10) || 0
+  return typeof value === 'number' ? value : 0
 }
 
 function usePhoneFields(maxInputs = 3) {
@@ -326,7 +333,6 @@ function GenderSelector({ value, onChange }: GenderSelectorProps) {
 type GenderRadioProps = {
   id: string
   label: string
-  value: GenderValue
   checked: boolean
   onSelect: () => void
 }

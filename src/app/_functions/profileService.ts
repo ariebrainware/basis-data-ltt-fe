@@ -1,6 +1,7 @@
 import { apiFetch } from '@/app/_functions/apiFetch'
 import { UnauthorizedAccess } from '@/app/_functions/unauthorized'
 import { parseUserSource } from './userHelpers'
+import { fetchCurrentUserId } from './fetchCurrentUser'
 import { isPasswordError } from './passwordUtils'
 
 function extractMessage(json: any): string {
@@ -16,10 +17,29 @@ export async function fetchUserProfile(opts: {
 }): Promise<
   { name?: string; email?: string } | { error: string } | { unauthorized: true }
 > {
-  const { endpoint: USER_ENDPOINT } = opts
+  const { endpoint: USER_ENDPOINT, router } = opts
   try {
-    const userIdResp = await apiFetch(`${USER_ENDPOINT}`)
-    // The caller should resolve user id; keep this minimal and let higher layers decide
+    // Resolve user ID from localStorage or fallback fetch
+    let userId = localStorage.getItem('user-id')
+    if (!userId) {
+      const fetched = await fetchCurrentUserId()
+      if (fetched) {
+        userId = String(fetched)
+        localStorage.setItem('user-id', userId)
+      }
+    }
+
+    if (!userId) {
+      return { error: 'Unable to determine current user' }
+    }
+
+    const userIdResp = await apiFetch(`${USER_ENDPOINT}/${userId}`)
+    
+    if (userIdResp.status === 401) {
+      UnauthorizedAccess(router)
+      return { unauthorized: true }
+    }
+    
     if (!userIdResp.ok) return { error: `HTTP ${userIdResp.status}` }
     const json = await userIdResp.json().catch(() => null)
     const source = parseUserSource(json)

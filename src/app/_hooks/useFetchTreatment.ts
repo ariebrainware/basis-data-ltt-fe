@@ -48,5 +48,3 @@ export function useFetchTreatment(
 
   return { data: { treatment: treatment }, total }
 }
-
-export default useFetchTreatment

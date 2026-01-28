@@ -1,11 +1,12 @@
 'use client'
-import { UserPlusIcon } from '@heroicons/react/24/solid'
+import { UserPlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 import {
   Typography,
   Button,
   Tabs,
   TabsHeader,
   Tab,
+  Input,
 } from '@material-tailwind/react'
 import React from 'react'
 
@@ -103,11 +104,15 @@ export default function TherapistHeader({
           </TabsHeader>
         </Tabs>
         <div className="w-full md:w-72">
-          <input
-            aria-label="Cari Terapis"
-            placeholder="Cari Terapis"
+          <Input
+            label="Cari Terapis"
             onKeyDown={onSearchEnter}
-            className="w-full rounded border px-3 py-2"
+            icon={<MagnifyingGlassIcon className="h-5 w-5" />}
+            crossOrigin={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           />
         </div>
       </div>

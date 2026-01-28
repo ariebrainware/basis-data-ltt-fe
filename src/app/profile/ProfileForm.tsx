@@ -35,6 +35,7 @@ export default function ProfileForm(props: ProfileFormProps) {
     email,
     setEmail,
     loading,
+    error,
     pwError,
     currentPassword,
     setCurrentPassword,
@@ -56,6 +57,8 @@ export default function ProfileForm(props: ProfileFormProps) {
 
   return (
     <form onSubmit={handleUpdateProfile} className="space-y-4">
+      {error && <p className="text-red-600">{error}</p>}
+      
       <div>
         <label className="mb-1 block text-sm font-medium">Name</label>
         <input

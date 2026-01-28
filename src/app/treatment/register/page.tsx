@@ -83,7 +83,6 @@ export default function RegisterTreatment() {
     if (patientCodeInput) patientCodeInput.value = ''
     setTherapistID('')
     if (issuesInput) issuesInput.value = ''
-    if (treatmentHistoryInput) treatmentHistoryInput = []
     setSelectedTreatmentConditions([])
     if (remarksInput) remarksInput.value = ''
     if (nextVisitInput) nextVisitInput.value = ''
