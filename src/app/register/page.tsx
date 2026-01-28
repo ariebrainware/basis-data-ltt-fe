@@ -208,7 +208,7 @@ function normalizeAge(value: number | ''): number {
 function usePhoneFields(maxInputs = 3) {
   const [phones, setPhones] = useState<string[]>([''])
 
-  const sanitizePhone = (val: string) => val.replace(/[^+\d-]/g, '')
+  const sanitizePhone = (val: string) => val.replace(/[^\d+]/g, '')
 
   const updatePhoneAt = (index: number, value: string) => {
     setPhones((prev) => {
