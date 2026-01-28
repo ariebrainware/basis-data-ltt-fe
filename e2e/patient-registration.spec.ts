@@ -235,7 +235,7 @@ test.describe('Patient Registration', () => {
       expectedError: string
     }
   ) {
-    await page.locator('#fullName').fill(fullName)
+    await reliableFill(page, '#fullName', fullName)
 
     if (gender === 'male') {
       await page.locator('#gender_male').check()
