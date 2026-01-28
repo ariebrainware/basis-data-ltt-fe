@@ -35,7 +35,6 @@ export default function ProfileForm(props: ProfileFormProps) {
     email,
     setEmail,
     loading,
-    error,
     pwError,
     currentPassword,
     setCurrentPassword,
