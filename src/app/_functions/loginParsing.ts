@@ -61,7 +61,7 @@ const USER_ID_ACCESSORS = [
 /**
  * Extracts user ID from various possible locations in the login response
  * @param responseData - The API response data from login endpoint
- * @returns The user ID (number or string), or undefined if not found
+ * @returns The user ID as a number, or undefined if not found
  * @example
  * ```typescript
  * const response = { data: { id: 123 } }

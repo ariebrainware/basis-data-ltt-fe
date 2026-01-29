@@ -6,7 +6,7 @@ import { LoginResponseData } from '../_types/login'
 
 /**
  * Displays a modal dialog informing the user that their account is locked
- * @param lockedField - The locked date/time value (string or Date)
+ * @param lockedField - The locked date/time value as a string
  * @returns Promise that resolves when the modal is closed
  * @example
  * ```typescript
