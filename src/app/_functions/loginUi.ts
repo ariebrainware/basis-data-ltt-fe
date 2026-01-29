@@ -2,6 +2,7 @@ import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import { format as formatDate } from 'date-fns'
 import { extractDateStringFromText } from './loginParsing'
+import { LoginResponseData } from '../_types/login'
 
 /**
  * Displays a modal dialog informing the user that their account is locked
@@ -13,7 +14,7 @@ import { extractDateStringFromText } from './loginParsing'
  * // Shows modal: "Your account is locked until 2024/01/01 12:00"
  * ```
  */
-export async function showAccountLockedModal(lockedField: any) {
+export async function showAccountLockedModal(lockedField: string) {
   let lockedDate: Date | null = null
   try {
     lockedDate = new Date(lockedField)
@@ -42,7 +43,7 @@ export async function showAccountLockedModal(lockedField: any) {
  * // handled: true, shows "User not found!" modal
  * ```
  */
-export async function handleUserNotFound(responseData: any) {
+export async function handleUserNotFound(responseData: LoginResponseData) {
   if (responseData?.error === 'user not found') {
     await Swal.fire({
       icon: 'error',
@@ -65,7 +66,7 @@ export async function handleUserNotFound(responseData: any) {
  * // handled: true, shows account locked modal with formatted date
  * ```
  */
-export async function handleErrorString(responseData: any) {
+export async function handleErrorString(responseData: LoginResponseData) {
   // Guard against null/undefined responseData
   if (!responseData || typeof responseData.error !== 'string') return false
 

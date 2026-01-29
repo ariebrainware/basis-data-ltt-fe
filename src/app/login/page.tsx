@@ -22,31 +22,7 @@ import {
   showAccountLockedModal,
 } from '../_functions/loginUi'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
-
-// Type definitions for login responses
-type LoginResponseData = {
-  data?: {
-    token?: string
-    role?: string
-    id?: number
-    user_id?: number
-    therapist_id?: number
-    ID?: number
-    therapist?: {
-      ID?: number
-      id?: number
-    }
-    user?: {
-      ID?: number
-      id?: number
-    }
-    locked_until?: string
-    lockedUntil?: string
-    lock_expires_at?: string
-    locked_at?: string
-  }
-  error?: string
-}
+import { LoginResponseData } from '../_types/login'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null

@@ -1,3 +1,5 @@
+import { LoginResponseData } from '../_types/login'
+
 const LOCKED_FIELD_KEYS = [
   'locked_until',
   'lockedUntil',
@@ -16,7 +18,7 @@ const LOCKED_FIELD_KEYS = [
  * // lockedField: '2024-01-01T12:00:00'
  * ```
  */
-export function getLockedFieldFromResponse(responseData: any) {
+export function getLockedFieldFromResponse(responseData: LoginResponseData) {
   const data = responseData?.data
   if (!data) return undefined
   for (const key of LOCKED_FIELD_KEYS) {
@@ -71,7 +73,7 @@ const USER_ID_ACCESSORS = [
  * // userId2: 456
  * ```
  */
-export function getUserIdFromResponse(responseData: any) {
+export function getUserIdFromResponse(responseData: LoginResponseData) {
   const data = responseData?.data
   if (!data) return undefined
   for (const getValue of USER_ID_ACCESSORS) {
