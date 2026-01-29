@@ -50,6 +50,10 @@ export async function handleErrorString(responseData: any) {
 }
 
 export function storeSession(tokenVal: string, roleVal: any) {
+  // Guard against storing invalid or empty tokens
+  if (typeof tokenVal !== 'string' || tokenVal.trim() === '') {
+    return
+  }
   localStorage.setItem('session-token', tokenVal)
   if (roleVal) localStorage.setItem('user-role', roleVal)
 }
