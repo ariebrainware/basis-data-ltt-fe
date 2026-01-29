@@ -11,6 +11,24 @@ export type PatientUpdatePayload = Omit<
 
 const LOCKED_HEALTH_INPUT = '-'
 
+/**
+ * Resolves health condition input by converting disease names to IDs
+ * @param input - Comma-separated disease names or IDs
+ * @param diseases - Array of available disease types with IDs and names
+ * @returns Comma-separated disease IDs, or '-' if locked/empty, or original input if no matches found
+ * @example
+ * ```typescript
+ * const diseases = [{ ID: 1, name: 'Diabetes' }, { ID: 2, name: 'Hypertension' }]
+ * resolveHealthConditionInput('diabetes, hypertension', diseases)
+ * // returns: '1,2'
+ *
+ * resolveHealthConditionInput('1,2', diseases)
+ * // returns: '1,2'
+ *
+ * resolveHealthConditionInput('-', diseases)
+ * // returns: '-'
+ * ```
+ */
 export function resolveHealthConditionInput(
   input: string,
   diseases: DiseaseType[]
@@ -36,6 +54,22 @@ export function resolveHealthConditionInput(
   return matchedIds.join(',')
 }
 
+/**
+ * Normalizes phone number input from various formats into an array
+ * @param raw - Phone number(s) as string, array, or undefined
+ * @returns Array of trimmed phone number strings, empty array if no valid input
+ * @example
+ * ```typescript
+ * normalizePhoneInput('123-456-7890, 098-765-4321')
+ * // returns: ['123-456-7890', '098-765-4321']
+ *
+ * normalizePhoneInput(['123-456-7890', '098-765-4321'])
+ * // returns: ['123-456-7890', '098-765-4321']
+ *
+ * normalizePhoneInput(undefined)
+ * // returns: []
+ * ```
+ */
 export function normalizePhoneInput(
   raw?: string | string[] | undefined
 ): string[] {
@@ -47,6 +81,21 @@ export function normalizePhoneInput(
     .filter(Boolean)
 }
 
+/**
+ * Gets the value from an HTML input element or CSS selector
+ * @param target - CSS selector string or HTMLInputElement reference
+ * @param fallback - Optional fallback value if element value is empty
+ * @returns The input value as string, or fallback value, or empty string
+ * @example
+ * ```typescript
+ * getInputValue('#email', 'default@example.com')
+ * // returns: value from #email input or 'default@example.com' if empty
+ *
+ * const inputEl = document.querySelector('#name')
+ * getInputValue(inputEl, 'John Doe')
+ * // returns: value from inputEl or 'John Doe' if empty
+ * ```
+ */
 export function getInputValue(
   target: string | HTMLInputElement | null | undefined,
   fallback?: string | number | undefined
@@ -60,6 +109,17 @@ export function getInputValue(
   return String(fallback)
 }
 
+/**
+ * Gets the value from an HTML textarea element or CSS selector
+ * @param target - CSS selector string or HTMLTextAreaElement reference
+ * @param fallback - Optional fallback value if element value is empty
+ * @returns The textarea value as string, or fallback value, or empty string
+ * @example
+ * ```typescript
+ * getTextAreaValue('#description', 'No description')
+ * // returns: value from #description textarea or 'No description' if empty
+ * ```
+ */
 export function getTextAreaValue(
   target: string | HTMLTextAreaElement | null | undefined,
   fallback?: string | undefined
@@ -87,6 +147,27 @@ type PatientUpdatePayloadArgs = {
   diseases: DiseaseType[]
 }
 
+/**
+ * Builds a patient update payload by extracting form values and normalizing data
+ * @param args - Patient data arguments including form field references and disease list
+ * @returns PatientUpdatePayload object ready for API submission
+ * @example
+ * ```typescript
+ * const payload = buildPatientUpdatePayload({
+ *   name: 'John Doe',
+ *   phoneNumber: '123-456-7890',
+ *   job: 'Engineer',
+ *   age: 30,
+ *   email: 'john@example.com',
+ *   address: '123 Main St',
+ *   healthHistory: 'diabetes',
+ *   surgeryHistory: 'none',
+ *   genderValue: 'male',
+ *   diseases: [{ ID: 1, name: 'Diabetes' }]
+ * })
+ * // Returns normalized payload with resolved health conditions
+ * ```
+ */
 export function buildPatientUpdatePayload(
   args: PatientUpdatePayloadArgs
 ): PatientUpdatePayload {
