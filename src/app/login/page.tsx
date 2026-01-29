@@ -21,11 +21,37 @@ import {
   showLoginSuccess,
   showAccountLockedModal,
 } from '../_functions/loginUi'
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+
+// Type definitions for login responses
+type LoginResponseData = {
+  data?: {
+    token?: string
+    role?: string
+    id?: number
+    user_id?: number
+    therapist_id?: number
+    ID?: number
+    therapist?: {
+      ID?: number
+      id?: number
+    }
+    user?: {
+      ID?: number
+      id?: number
+    }
+    locked_until?: string
+    lockedUntil?: string
+    lock_expires_at?: string
+    locked_at?: string
+  }
+  error?: string
+}
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
 
-async function tryHandleErrorResponse(responseData: any) {
+async function tryHandleErrorResponse(responseData: LoginResponseData | null) {
   if (!responseData) return false
 
   if (await handleUserNotFound(responseData)) return true
@@ -42,9 +68,9 @@ async function tryHandleErrorResponse(responseData: any) {
 }
 
 async function ensureAndStoreUserId(
-  userId: any,
-  responseData: any,
-  router: any
+  userId: number | string | undefined,
+  responseData: LoginResponseData,
+  router: AppRouterInstance
 ) {
   if (userId) {
     localStorage.setItem('user-id', userId.toString())
@@ -125,7 +151,10 @@ export default function Login() {
     }
   }
 
-  async function handleSuccessfulLogin(responseData: any, router: any) {
+  async function handleSuccessfulLogin(
+    responseData: LoginResponseData,
+    router: AppRouterInstance
+  ) {
     const token = responseData.data?.token
     const role = responseData.data?.role
     const userId = getUserIdFromResponse(responseData)
