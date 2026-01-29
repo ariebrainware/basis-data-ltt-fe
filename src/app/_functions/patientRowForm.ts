@@ -48,20 +48,26 @@ export function normalizePhoneInput(
 }
 
 export function getInputValue(
-  selector: string,
+  target: string | HTMLInputElement | null | undefined,
   fallback?: string | number | undefined
 ): string {
-  const val = document.querySelector<HTMLInputElement>(selector)?.value
+  const val =
+    typeof target === 'string'
+      ? document.querySelector<HTMLInputElement>(target)?.value
+      : target?.value
   if (typeof val === 'string' && val !== '') return val
   if (fallback === undefined || fallback === null) return ''
   return String(fallback)
 }
 
 export function getTextAreaValue(
-  selector: string,
+  target: string | HTMLTextAreaElement | null | undefined,
   fallback?: string | undefined
 ): string {
-  const val = document.querySelector<HTMLTextAreaElement>(selector)?.value
+  const val =
+    typeof target === 'string'
+      ? document.querySelector<HTMLTextAreaElement>(target)?.value
+      : target?.value
   if (typeof val === 'string' && val !== '') return val
   return fallback ?? ''
 }
