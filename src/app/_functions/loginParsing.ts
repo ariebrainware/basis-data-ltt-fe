@@ -48,14 +48,14 @@ export function extractDateStringFromText(text: string) {
 }
 
 const USER_ID_ACCESSORS = [
-  (data: any) => data?.id,
-  (data: any) => data?.user_id,
-  (data: any) => data?.therapist_id,
-  (data: any) => data?.ID,
-  (data: any) => data?.therapist?.ID,
-  (data: any) => data?.therapist?.id,
-  (data: any) => data?.user?.ID,
-  (data: any) => data?.user?.id,
+  (data: LoginResponseData['data']) => data?.id,
+  (data: LoginResponseData['data']) => data?.user_id,
+  (data: LoginResponseData['data']) => data?.therapist_id,
+  (data: LoginResponseData['data']) => data?.ID,
+  (data: LoginResponseData['data']) => data?.therapist?.ID,
+  (data: LoginResponseData['data']) => data?.therapist?.id,
+  (data: LoginResponseData['data']) => data?.user?.ID,
+  (data: LoginResponseData['data']) => data?.user?.id,
 ]
 
 /**

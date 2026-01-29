@@ -96,7 +96,7 @@ export async function handleErrorString(responseData: LoginResponseData) {
  * // Sets localStorage['user-role'] = 'therapist'
  * ```
  */
-export function storeSession(tokenVal: string, roleVal: any) {
+export function storeSession(tokenVal: string, roleVal: string | undefined) {
   // Guard against storing invalid or empty tokens
   if (typeof tokenVal !== 'string' || tokenVal.trim() === '') {
     return
