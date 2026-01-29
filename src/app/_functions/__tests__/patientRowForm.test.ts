@@ -15,12 +15,18 @@ describe('patientRowForm helpers', () => {
     ]
 
     test('converts disease names to IDs', () => {
-      const result = resolveHealthConditionInput('diabetes, hypertension', mockDiseases)
+      const result = resolveHealthConditionInput(
+        'diabetes, hypertension',
+        mockDiseases
+      )
       expect(result).toBe('1,2')
     })
 
     test('handles case-insensitive disease name matching', () => {
-      const result = resolveHealthConditionInput('DIABETES, HyPeRtEnSiOn', mockDiseases)
+      const result = resolveHealthConditionInput(
+        'DIABETES, HyPeRtEnSiOn',
+        mockDiseases
+      )
       expect(result).toBe('1,2')
     })
 
@@ -50,7 +56,10 @@ describe('patientRowForm helpers', () => {
     })
 
     test('returns original input for unmatched disease names', () => {
-      const result = resolveHealthConditionInput('unknown disease', mockDiseases)
+      const result = resolveHealthConditionInput(
+        'unknown disease',
+        mockDiseases
+      )
       expect(result).toBe('unknown disease')
     })
 
@@ -60,7 +69,10 @@ describe('patientRowForm helpers', () => {
     })
 
     test('filters out empty strings after splitting', () => {
-      const result = resolveHealthConditionInput('diabetes,,hypertension', mockDiseases)
+      const result = resolveHealthConditionInput(
+        'diabetes,,hypertension',
+        mockDiseases
+      )
       expect(result).toBe('1,2')
     })
   })
@@ -156,8 +168,8 @@ describe('patientRowForm helpers', () => {
       expect(result).toBe('fallback')
     })
 
-    test('returns empty string for null/undefined fallback', () => {
-      const result = getInputValue('#nonexistent', null)
+    test('returns empty string for undefined fallback', () => {
+      const result = getInputValue('#nonexistent', undefined)
       expect(result).toBe('')
     })
   })
