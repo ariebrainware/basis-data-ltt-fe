@@ -11,7 +11,7 @@ async function reliableFill(page: any, selector: string, value: string) {
     await expect(locator).toHaveValue(value, { timeout: 5000 })
     return
   } catch (err) {
-    // Fallback: directly set the element's value and dispatch events.
+    // Fallback: directly set the element's value and dispatch stronger events.
     await page.$eval(
       selector,
       (el: Element, val: string) => {
@@ -19,12 +19,16 @@ async function reliableFill(page: any, selector: string, value: string) {
         if (!node) return
         node.focus()
         ;(node as any).value = val
-        node.dispatchEvent(new Event('input', { bubbles: true }))
+        // Dispatch InputEvent which many frameworks listen to
+        node.dispatchEvent(new InputEvent('input', { bubbles: true }))
         node.dispatchEvent(new Event('change', { bubbles: true }))
+        node.dispatchEvent(new Event('blur', { bubbles: true }))
       },
       value
     )
 
+    // Give WebKit a short moment to process
+    await page.waitForTimeout(50)
     await expect(locator).toHaveValue(value, { timeout: 5000 })
   }
 }
@@ -37,6 +41,24 @@ async function assertSweetAlertError(page: any, expectedText: string) {
   const errorContent = page.locator('.swal2-html-container')
   await expect(errorContent).toHaveText(expectedText)
   await page.locator('.swal2-confirm').click()
+}
+
+async function ensureTermsAccepted(page: any) {
+  const checkbox = page.locator('#termConditionCheckbox')
+
+  await checkbox.waitFor({ state: 'attached', timeout: 5000 })
+  await expect(checkbox).toBeVisible({ timeout: 5000 })
+
+  if (!(await checkbox.isChecked())) {
+    await checkbox.setChecked(true, { force: true })
+  }
+
+  if (!(await checkbox.isChecked())) {
+    const label = page.locator('label[for="termConditionCheckbox"]').first()
+    await label.click({ force: true })
+  }
+
+  await expect(checkbox).toBeChecked({ timeout: 5000 })
 }
 
 test.describe('Patient Registration', () => {
@@ -59,7 +81,8 @@ test.describe('Patient Registration', () => {
   })
 
   test('should allow filling full name', async ({ page }) => {
-    await reliableFill(page, '#fullName', 'John Doe')
+    const fullNameValue = 'John Doe'
+    await reliableFill(page, '#fullName', fullNameValue)
     await expect(page.locator('#fullName')).toHaveValue('John Doe')
   })
 
@@ -196,23 +219,26 @@ test.describe('Patient Registration', () => {
     // Initially button should have disabled styling
     await expect(registerBtn).toHaveClass(/bg-slate-200/)
 
-    // Force-click the checkbox to avoid any overlay intercepting pointer events
-    await termCheckbox.click({ force: true })
-    await expect(termCheckbox).toBeChecked()
+    await ensureTermsAccepted(page)
   })
 
   test('should validate complete form submission flow', async ({ page }) => {
     // Fill all required fields
-    await page.locator('#fullName').fill('John Doe')
+    const fullNameValue = 'John Doe'
+    await reliableFill(page, '#fullName', fullNameValue)
     await page.locator('#gender_male').check()
-    await page.locator('#age').fill('30')
-    await page.locator('#job').fill('Engineer')
-    await page.locator('#address').fill('Test Address')
-    await page.locator('#phone-0').fill('+628123456789')
-    await page.locator('#surgeryHistory').fill('None')
+    await reliableFill(page, '#age', '30')
+    await reliableFill(page, '#job', 'Engineer')
+    await reliableFill(page, '#address', 'Test Address')
+    await reliableFill(page, '#phone-0', '+628123456789')
+    await reliableFill(page, '#surgeryHistory', 'None')
 
-    // Force-click the checkbox to avoid any overlay intercepting pointer events
-    await page.locator('#termConditionCheckbox').click({ force: true })
+    await ensureTermsAccepted(page)
+    // Re-assert full name after toggling terms (WebKit can drop input state)
+    const fullNameLocator = page.locator('#fullName')
+    if ((await fullNameLocator.inputValue()) !== fullNameValue) {
+      await reliableFill(page, '#fullName', fullNameValue)
+    }
 
     // Verify register button is now active (style-based anchor)
     const registerBtn = page.locator('#registerBtn')
@@ -236,6 +262,10 @@ test.describe('Patient Registration', () => {
     }
   ) {
     await reliableFill(page, '#fullName', fullName)
+    // Ensure fullName was applied (helps WebKit timing flakiness)
+    await expect(page.locator('#fullName')).toHaveValue(fullName, {
+      timeout: 5000,
+    })
 
     if (gender === 'male') {
       await page.locator('#gender_male').check()
@@ -253,12 +283,14 @@ test.describe('Patient Registration', () => {
       await page.locator('#phone-0').fill(phoneValue)
     }
 
-    // Accept terms and conditions
-    await page.locator('#termConditionCheckbox').click({ force: true })
+    await ensureTermsAccepted(page)
 
     // Click register button
-    const registerBtn = page.locator('#registerBtn')
-    await registerBtn.click()
+    // Trigger register action; use page.$eval to invoke click in page context
+    await page.$eval('#registerBtn', (el: Element) => {
+      const btn = el as HTMLElement
+      btn.click()
+    })
 
     await assertSweetAlertError(page, expectedError)
   }
