@@ -1,8 +1,9 @@
 import { apiFetch } from './apiFetch'
 import { UnauthorizedAccess } from './unauthorized'
 import { DiseaseType } from '../_types/disease'
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
-export async function fetchDiseaseList(router: any) {
+export async function fetchDiseaseList(router: AppRouterInstance) {
   try {
     const res = await apiFetch('/disease', { method: 'GET' })
     if (res.status === 401) {
