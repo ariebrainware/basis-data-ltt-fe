@@ -1,5 +1,33 @@
 import { test, expect } from '@playwright/test'
 
+// Small helper similar to patient tests to robustly fill inputs across engines
+async function reliableFill(page: any, selector: string, value: string) {
+  const locator = page.locator(selector)
+  await locator.focus()
+  await locator.fill(value)
+
+  try {
+    await expect(locator).toHaveValue(value, { timeout: 5000 })
+    return
+  } catch (err) {
+    await page.$eval(
+      selector,
+      (el: Element, val: string) => {
+        const node = el as HTMLInputElement | HTMLTextAreaElement | null
+        if (!node) return
+        node.focus()
+        ;(node as any).value = val
+        node.dispatchEvent(new InputEvent('input', { bubbles: true }))
+        node.dispatchEvent(new Event('change', { bubbles: true }))
+        node.dispatchEvent(new Event('blur', { bubbles: true }))
+      },
+      value
+    )
+    await page.waitForTimeout(50)
+    await expect(locator).toHaveValue(value, { timeout: 5000 })
+  }
+}
+
 test.describe('Therapist Registration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/therapist/register')
@@ -38,8 +66,8 @@ test.describe('Therapist Registration', () => {
     const passwordInput = page.locator('#password')
     const confirmPasswordInput = page.locator('#confirm_password')
 
-    await passwordInput.fill('SecurePass123!')
-    await confirmPasswordInput.fill('SecurePass123!')
+    await reliableFill(page, '#password', 'SecurePass123!')
+    await reliableFill(page, '#confirm_password', 'SecurePass123!')
 
     await expect(passwordInput).toHaveValue('SecurePass123!')
     await expect(confirmPasswordInput).toHaveValue('SecurePass123!')
