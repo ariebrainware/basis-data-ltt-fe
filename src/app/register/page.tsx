@@ -65,11 +65,34 @@ export default function Register() {
     if (result.ok) {
       await Swal.fire({
         title: 'Sukses',
-        text: 'Registrasi berhasil. Silakan login dengan akun baru Anda.',
+        text: 'Registrasi berhasil.',
         icon: 'success',
         confirmButtonText: 'OK',
       })
-      router.push('/login')
+
+      // Clear form fields instead of redirecting
+      setFullName('')
+      setGender('')
+      setAge('')
+      setJob('')
+      setAddress('')
+      setSurgeryHistory('')
+      setHealthHistory([])
+      setShowPatientCode(false)
+      setTermsAccepted(false)
+
+      // Clear phone inputs: reset values and remove extras leaving one empty input
+      try {
+        phoneNumbers.forEach((_, idx) => updatePhoneAt(idx, ''))
+        for (let i = phoneNumbers.length - 1; i >= 1; i--) {
+          removePhoneAt(i)
+        }
+      } catch (e) {
+        // noop: defensive in case hook internals change
+      }
+
+      if (patientCodeRef.current) patientCodeRef.current.value = ''
+
       return { ok: true }
     }
 
