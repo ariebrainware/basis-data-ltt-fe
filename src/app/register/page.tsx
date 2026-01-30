@@ -81,12 +81,12 @@ export default function Register() {
       setShowPatientCode(false)
       setTermsAccepted(false)
 
-      // Clear phone inputs: reset values and remove extras leaving one empty input
+      // Clear phone inputs: remove extras and leave a single empty input
       try {
-        phoneNumbers.forEach((_, idx) => updatePhoneAt(idx, ''))
         for (let i = phoneNumbers.length - 1; i >= 1; i--) {
           removePhoneAt(i)
         }
+        updatePhoneAt(0, '')
       } catch (e) {
         // noop: defensive in case hook internals change
       }
