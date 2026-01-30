@@ -88,7 +88,11 @@ export default function Register() {
         }
         updatePhoneAt(0, '')
       } catch (e) {
-        // noop: defensive in case hook internals change
+        // Log defensively in case hook internals change, without breaking UX
+        console.error(
+          'Error while clearing phone numbers after successful registration:',
+          e
+        )
       }
 
       if (patientCodeRef.current) patientCodeRef.current.value = ''
