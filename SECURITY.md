@@ -88,7 +88,7 @@ body: JSON.stringify({ email, password })  // ← Password in plain text
 
 **Current Default**:
 ```bash
-NEXT_PUBLIC_API_HOST=http://localhost:19091  # ← HTTP not HTTPS
+NEXT_PUBLIC_API_HOST=https://localhost:19091
 ```
 
 **Risk**: Development habits may carry over to production, exposing credentials.

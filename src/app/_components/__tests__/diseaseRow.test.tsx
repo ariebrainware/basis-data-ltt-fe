@@ -52,7 +52,7 @@ jest.mock('../../_functions/sessionToken', () => ({
 }))
 
 jest.mock('../../_functions/apiHost', () => ({
-  getApiHost: () => 'http://localhost:19091',
+  getApiHost: () => 'https://localhost:19091',
 }))
 
 jest.mock('../../_functions/unauthorized', () => ({

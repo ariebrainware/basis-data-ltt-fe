@@ -185,7 +185,7 @@ The GitHub Actions workflow (`.github/workflows/test.yml`) runs automatically on
 The following environment variables are used during testing:
 
 ```env
-NEXT_PUBLIC_API_HOST=http://localhost:19091
+NEXT_PUBLIC_API_HOST=https://localhost:19091
 NEXT_PUBLIC_API_TOKEN=test-token
 BASE_URL=http://localhost:3000
 ```

@@ -34,7 +34,7 @@ User Input → Frontend → Backend API (via HTTP POST)
    - **Impact**: Credentials can be stolen during transmission
 
 2. **No HTTPS Enforcement**
-   - Default configuration uses `http://localhost:19091`
+   - Default configuration uses `https://localhost:19091`
    - No validation to reject HTTP URLs in production
    - **Impact**: Development practices may leak into production
 

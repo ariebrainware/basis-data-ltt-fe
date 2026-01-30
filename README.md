@@ -55,7 +55,7 @@ Copy `sample.env` to `.env.local` and set:
 
 ```bash
 # Development
-NEXT_PUBLIC_API_HOST=http://localhost:19091
+NEXT_PUBLIC_API_HOST=https://localhost:19091
 
 # Production - ALWAYS use HTTPS
 NEXT_PUBLIC_API_HOST=https://api.example.com
