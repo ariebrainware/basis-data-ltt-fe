@@ -285,6 +285,14 @@ test.describe('Patient Registration', () => {
 
     await ensureTermsAccepted(page)
 
+    // Re-assert full name after toggling terms (WebKit can drop input state)
+    if (fullName) {
+      const fullNameLocator = page.locator('#fullName')
+      if ((await fullNameLocator.inputValue()) !== fullName) {
+        await reliableFill(page, '#fullName', fullName)
+      }
+    }
+
     // Click register button
     // Trigger register action; use page.$eval to invoke click in page context
     await page.$eval('#registerBtn', (el: Element) => {

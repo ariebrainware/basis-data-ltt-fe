@@ -87,7 +87,7 @@ Two main component patterns:
 
 ### API Integration
 
-- **Host**: Configurable via `process.env.NEXT_PUBLIC_API_HOST` (defaults to `http://localhost:19091`)
+- **Host**: Configurable via `process.env.NEXT_PUBLIC_API_HOST` (defaults to `https://localhost:19091`)
 - **Date Handling**: Format dates as `YYYY-MM-DD` (see dashboard treatment filtering)
 - **Response Shape**: Backend returns `{ data: { [resourceName]: [...] }, total: number }`
 - **Error Handling**: Check response.ok; 401 errors trigger re-login flow
@@ -143,7 +143,7 @@ pnpm run lint
 
 **Environment Setup**: Copy `sample.env` to `.env.local` and set:
 
-- `NEXT_PUBLIC_API_HOST`: Backend URL (e.g., `http://localhost:19091`)
+- `NEXT_PUBLIC_API_HOST`: Backend URL (e.g., `https://localhost:19091`)
 
 **⚠️ Security Note**: 
 - Any environment variables prefixed with `NEXT_PUBLIC_*` are exposed to the browser and embedded in the client-side JavaScript bundle

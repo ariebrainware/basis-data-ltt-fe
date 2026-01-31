@@ -54,14 +54,23 @@ pnpm install
 Copy `sample.env` to `.env.local` and set:
 
 ```bash
-# Development
-NEXT_PUBLIC_API_HOST=http://localhost:19091
+# Development - you can use HTTPS if your backend supports it
+NEXT_PUBLIC_API_HOST=https://localhost:19091
+
+# Or omit the scheme for convenience (localhost defaults to HTTP)
+NEXT_PUBLIC_API_HOST=localhost:19091
 
 # Production - ALWAYS use HTTPS
 NEXT_PUBLIC_API_HOST=https://api.example.com
 ```
 
 The `NEXT_PUBLIC_API_HOST` variable configures your backend API endpoint.
+
+**Smart Scheme Handling:**
+- If you provide a full URL with scheme (http:// or https://), it's used as-is
+- If you omit the scheme:
+  - `localhost` or `127.0.0.1` → defaults to `http://` (easier local development)
+  - Other domains → defaults to `https://` (secure by default)
 
 ⚠️ **Security Note**: See [SECURITY.md](./SECURITY.md) for important security guidelines before deploying to production.
 

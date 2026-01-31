@@ -127,7 +127,7 @@ try {
 }
 
 // Mock environment variables
-process.env.NEXT_PUBLIC_API_HOST = 'http://localhost:19091'
+process.env.NEXT_PUBLIC_API_HOST = 'https://localhost:19091'
 process.env.NEXT_PUBLIC_API_TOKEN = 'test-token'
 
 // Provide a basic `fetch` mock for tests that call browser APIs
