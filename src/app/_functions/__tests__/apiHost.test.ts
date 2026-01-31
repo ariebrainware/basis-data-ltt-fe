@@ -79,7 +79,7 @@ describe('getApiHost', () => {
   })
 
   describe('edge cases', () => {
-    test('handles empty string as undefined', () => {
+    test('returns default when NEXT_PUBLIC_API_HOST is empty string', () => {
       process.env.NEXT_PUBLIC_API_HOST = ''
       expect(getApiHost()).toBe('https://localhost:19091')
     })
