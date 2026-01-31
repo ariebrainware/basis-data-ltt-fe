@@ -14,6 +14,17 @@ export function getApiHost(): string {
     return raw
   }
 
-  // Default to HTTPS when scheme is missing, consistent with the default value
+  // For localhost/127.0.0.1, default to HTTP for easier local development
+  // (most developers don't have self-signed certificates set up)
+  const isLocalhost =
+    raw.toLowerCase().startsWith('localhost') ||
+    raw.startsWith('127.0.0.1') ||
+    raw.startsWith('[::1]')
+
+  if (isLocalhost) {
+    return `http://${raw}`
+  }
+
+  // For all other domains, default to HTTPS for security
   return `https://${raw}`
 }
