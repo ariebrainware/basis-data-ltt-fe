@@ -33,10 +33,11 @@ User Input → Frontend → Backend API (via HTTP POST)
    - Vulnerable to interception if HTTPS not enforced
    - **Impact**: Credentials can be stolen during transmission
 
-2. **No HTTPS Enforcement**
-   - Default configuration uses `https://localhost:19091`
-   - No validation to reject HTTP URLs in production
-   - **Impact**: Development practices may leak into production
+2. **No HTTPS Validation**
+   - Default configuration uses `https://localhost:19091` for secure local development
+   - However, HTTPS is not enforced or validated - HTTP URLs are still accepted
+   - No runtime validation to reject HTTP URLs in production configurations
+   - **Impact**: Developers can override to HTTP, and insecure practices may leak into production
 
 3. **Public API Token Exposure**
    - `NEXT_PUBLIC_API_TOKEN` embedded in browser bundle

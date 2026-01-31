@@ -14,5 +14,6 @@ export function getApiHost(): string {
     return raw
   }
 
-  return `http://${raw}`
+  // Default to HTTPS when scheme is missing, consistent with the default value
+  return `https://${raw}`
 }
