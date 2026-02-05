@@ -85,12 +85,15 @@ export function extractDiseaseList(data: any): DiseaseType[] {
   // Direct array case
   if (looksLikeDiseaseArray(data)) return data
 
-  // Try common candidate locations
-  const candidates = [data?.data, data?.Data, data]
+  // Try common nested candidate locations first
+  const candidates = [data?.data, data?.Data]
   for (const cand of candidates) {
     const arr = searchForDiseaseArray(cand)
     if (arr) return arr
   }
 
+  // Fallback: search on the top-level data object
+  const topLevelArr = searchForDiseaseArray(data)
+  if (topLevelArr) return topLevelArr
   return []
 }
