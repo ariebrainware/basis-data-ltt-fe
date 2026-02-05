@@ -38,12 +38,8 @@ function looksLikeDiseaseArray(arr: unknown): arr is DiseaseType[] {
   if (arr.length === 0) return true
   const first = arr[0]
   if (!first || typeof first !== 'object') return false
-  return (
-    'ID' in (first as any) ||
-    'id' in (first as any) ||
-    'Name' in (first as any) ||
-    'name' in (first as any)
-  )
+  // Ensure the structure matches DiseaseType: requires 'ID' and 'name'
+  return 'ID' in (first as any) && 'name' in (first as any)
 }
 
 /**
