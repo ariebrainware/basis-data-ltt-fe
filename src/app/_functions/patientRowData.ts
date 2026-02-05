@@ -62,8 +62,23 @@ function findFirstArrayValue(obj: Record<string, any> | null | undefined) {
  */
 function searchForDiseaseArray(cand: any): DiseaseType[] | undefined {
   if (!cand || typeof cand !== 'object') return undefined
+
+  // Check for direct disease keys
   const arr = cand.disease ?? cand.diseases
-  return looksLikeDiseaseArray(arr) ? arr : undefined
+  if (looksLikeDiseaseArray(arr)) return arr
+
+  // Check for nested Data key (handles cases like data.data.Data)
+  if (cand.Data) {
+    // If Data is an array, check if it's a disease array
+    if (looksLikeDiseaseArray(cand.Data)) return cand.Data
+    // If Data is an object, recursively search within it
+    if (typeof cand.Data === 'object') {
+      const nestedArr = searchForDiseaseArray(cand.Data)
+      if (nestedArr) return nestedArr
+    }
+  }
+
+  return undefined
 }
 
 /**
@@ -84,6 +99,9 @@ export function extractDiseaseList(data: any): DiseaseType[] {
   // Try common nested candidate locations first
   const candidates = [data?.data, data?.Data]
   for (const cand of candidates) {
+    // Check if the candidate itself is a disease array
+    if (looksLikeDiseaseArray(cand)) return cand
+    // Otherwise search for disease keys within the candidate
     const arr = searchForDiseaseArray(cand)
     if (arr) return arr
   }

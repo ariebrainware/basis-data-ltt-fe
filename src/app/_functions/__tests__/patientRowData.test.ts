@@ -91,5 +91,141 @@ describe('patientRowData helpers', () => {
       const result = extractDiseaseList(data)
       expect(result).toEqual([])
     })
+
+    test('extracts diseases from data.Data (capital D) structure', () => {
+      const mockDiseases: DiseaseType[] = [
+        { ID: 1, name: 'Diabetes' } as DiseaseType,
+        { ID: 2, name: 'Hypertension' } as DiseaseType,
+      ]
+      const data = {
+        data: {
+          Data: mockDiseases,
+        },
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual(mockDiseases)
+    })
+
+    test('extracts diseases from data.diseases (plural) structure', () => {
+      const mockDiseases: DiseaseType[] = [
+        { ID: 1, name: 'Diabetes' } as DiseaseType,
+        { ID: 2, name: 'Hypertension' } as DiseaseType,
+      ]
+      const data = {
+        data: {
+          diseases: mockDiseases,
+        },
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual(mockDiseases)
+    })
+
+    test('extracts diseases from nested data.Data.disease structure', () => {
+      const mockDiseases: DiseaseType[] = [
+        { ID: 1, name: 'Diabetes' } as DiseaseType,
+        { ID: 2, name: 'Hypertension' } as DiseaseType,
+      ]
+      const data = {
+        data: {
+          Data: {
+            disease: mockDiseases,
+          },
+        },
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual(mockDiseases)
+    })
+
+    test('extracts diseases from top-level diseases (plural) structure', () => {
+      const mockDiseases: DiseaseType[] = [
+        { ID: 1, name: 'Diabetes' } as DiseaseType,
+        { ID: 2, name: 'Hypertension' } as DiseaseType,
+      ]
+      const data = {
+        diseases: mockDiseases,
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual(mockDiseases)
+    })
+
+    test('extracts diseases from top-level disease (singular) structure', () => {
+      const mockDiseases: DiseaseType[] = [
+        { ID: 1, name: 'Diabetes' } as DiseaseType,
+        { ID: 2, name: 'Hypertension' } as DiseaseType,
+      ]
+      const data = {
+        disease: mockDiseases,
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual(mockDiseases)
+    })
+
+    test('prefers data.disease over data.diseases when both exist', () => {
+      const correctDiseases: DiseaseType[] = [
+        { ID: 1, name: 'Diabetes' } as DiseaseType,
+      ]
+      const wrongDiseases: DiseaseType[] = [
+        { ID: 99, name: 'Wrong' } as DiseaseType,
+      ]
+      const data = {
+        data: {
+          disease: correctDiseases,
+          diseases: wrongDiseases,
+        },
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual(correctDiseases)
+    })
+
+    test('prefers disease over diseases at top level when both exist', () => {
+      const correctDiseases: DiseaseType[] = [
+        { ID: 1, name: 'Diabetes' } as DiseaseType,
+      ]
+      const wrongDiseases: DiseaseType[] = [
+        { ID: 99, name: 'Wrong' } as DiseaseType,
+      ]
+      const data = {
+        disease: correctDiseases,
+        diseases: wrongDiseases,
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual(correctDiseases)
+    })
+
+    test('returns empty array when objects have no disease-like keys', () => {
+      const data = {
+        data: {
+          patients: [{ id: 1, name: 'John' }],
+          therapists: [{ id: 2, name: 'Jane' }],
+        },
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual([])
+    })
+
+    test('validates array items have correct DiseaseType structure', () => {
+      const data = {
+        data: {
+          disease: [
+            { id: 1, label: 'Wrong structure' }, // lowercase id, wrong field names
+          ],
+        },
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual([])
+    })
+
+    test('accepts array with correct ID and name properties', () => {
+      const mockDiseases: DiseaseType[] = [
+        { ID: 1, name: 'Diabetes' } as DiseaseType,
+      ]
+      const data = {
+        data: {
+          disease: mockDiseases,
+        },
+      }
+      const result = extractDiseaseList(data)
+      expect(result).toEqual(mockDiseases)
+    })
   })
 })
