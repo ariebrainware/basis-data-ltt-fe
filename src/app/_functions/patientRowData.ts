@@ -66,7 +66,7 @@ function findFirstArrayValue(obj: Record<string, any> | null | undefined) {
  */
 function searchForDiseaseArray(cand: any): DiseaseType[] | undefined {
   if (!cand || typeof cand !== 'object') return undefined
-  const arr = cand.disease ?? cand.diseases ?? findFirstArrayValue(cand)
+  const arr = cand.disease ?? cand.diseases
   return looksLikeDiseaseArray(arr) ? arr : undefined
 }
 
