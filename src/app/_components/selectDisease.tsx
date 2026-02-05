@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import { DiseaseType } from '../_types/disease'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
+import { extractDiseaseList } from '../_functions/patientRowData'
 
 /**
  * Props for {@link DiseaseMultiSelect}.
@@ -98,9 +99,8 @@ export function DiseaseMultiSelect({
           return
         }
         const data = await res.json()
-        // backend shape: { data: { disease: [...] } } or just []
-        const list: DiseaseType[] =
-          data?.data?.disease ?? data?.data ?? data ?? []
+        // backend may return several shapes; normalize to DiseaseType[]
+        const list: DiseaseType[] = extractDiseaseList(data)
         if (mounted) {
           setFetchedOptions(list)
           setIsLoading(false)

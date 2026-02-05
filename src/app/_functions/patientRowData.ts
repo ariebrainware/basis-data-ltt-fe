@@ -40,8 +40,37 @@ export async function fetchDiseaseList(router: AppRouterInstance) {
  * ```
  */
 export function extractDiseaseList(data: any): DiseaseType[] {
-  const nested = data?.data?.disease
-  if (Array.isArray(nested)) return nested as DiseaseType[]
-  if (Array.isArray(data)) return data as DiseaseType[]
+  const isLikelyDiseaseArray = (arr: any): boolean => {
+    if (!Array.isArray(arr)) return false
+    if (arr.length === 0) return true
+    const first = arr[0]
+    if (first && typeof first === 'object') {
+      return (
+        'ID' in first || 'id' in first || 'Name' in first || 'name' in first
+      )
+    }
+    return false
+  }
+
+  // Direct array
+  if (isLikelyDiseaseArray(data)) return data as DiseaseType[]
+
+  // Common nested shapes: { data: { disease: [...] } } or { data: { diseases: [...] } }
+  const candidates = [data?.data, data?.Data, data]
+  for (const cand of candidates) {
+    if (!cand || typeof cand !== 'object') continue
+    // direct disease or diseases property
+    if (isLikelyDiseaseArray(cand.disease)) {
+      return cand.disease as DiseaseType[]
+    }
+    if (isLikelyDiseaseArray(cand.diseases)) {
+      return cand.diseases as DiseaseType[]
+    }
+    // scan values for the first matching array
+    for (const v of Object.values(cand)) {
+      if (isLikelyDiseaseArray(v)) return v as DiseaseType[]
+    }
+  }
+
   return [] as DiseaseType[]
 }
