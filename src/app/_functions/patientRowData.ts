@@ -29,6 +29,48 @@ export async function fetchDiseaseList(router: AppRouterInstance) {
 }
 
 /**
+ * Type guard to check if a value looks like a DiseaseType array
+ * @param arr - Unknown value to check
+ * @returns True if arr is an array of DiseaseType objects
+ */
+function looksLikeDiseaseArray(arr: unknown): arr is DiseaseType[] {
+  if (!Array.isArray(arr)) return false
+  if (arr.length === 0) return true
+  const first = arr[0]
+  if (!first || typeof first !== 'object') return false
+  return (
+    'ID' in (first as any) ||
+    'id' in (first as any) ||
+    'Name' in (first as any) ||
+    'name' in (first as any)
+  )
+}
+
+/**
+ * Finds the first array value in an object
+ * @param obj - Object to search
+ * @returns First array found, or undefined
+ */
+function findFirstArrayValue(obj: Record<string, any> | null | undefined) {
+  if (!obj || typeof obj !== 'object') return undefined
+  for (const v of Object.values(obj)) {
+    if (Array.isArray(v)) return v
+  }
+  return undefined
+}
+
+/**
+ * Searches for a disease array in common response locations
+ * @param cand - Candidate object to search
+ * @returns DiseaseType array if found, or undefined
+ */
+function searchForDiseaseArray(cand: any): DiseaseType[] | undefined {
+  if (!cand || typeof cand !== 'object') return undefined
+  const arr = cand.disease ?? cand.diseases ?? findFirstArrayValue(cand)
+  return looksLikeDiseaseArray(arr) ? arr : undefined
+}
+
+/**
  * Extracts disease list from various API response formats
  * @param data - API response data that may contain diseases in different structures
  * @returns Array of DiseaseType objects, or empty array if not found
@@ -40,37 +82,15 @@ export async function fetchDiseaseList(router: AppRouterInstance) {
  * ```
  */
 export function extractDiseaseList(data: any): DiseaseType[] {
-  const isLikelyDiseaseArray = (arr: any): boolean => {
-    if (!Array.isArray(arr)) return false
-    if (arr.length === 0) return true
-    const first = arr[0]
-    if (first && typeof first === 'object') {
-      return (
-        'ID' in first || 'id' in first || 'Name' in first || 'name' in first
-      )
-    }
-    return false
-  }
+  // Direct array case
+  if (looksLikeDiseaseArray(data)) return data
 
-  // Direct array
-  if (isLikelyDiseaseArray(data)) return data as DiseaseType[]
-
-  // Common nested shapes: { data: { disease: [...] } } or { data: { diseases: [...] } }
+  // Try common candidate locations
   const candidates = [data?.data, data?.Data, data]
   for (const cand of candidates) {
-    if (!cand || typeof cand !== 'object') continue
-    // direct disease or diseases property
-    if (isLikelyDiseaseArray(cand.disease)) {
-      return cand.disease as DiseaseType[]
-    }
-    if (isLikelyDiseaseArray(cand.diseases)) {
-      return cand.diseases as DiseaseType[]
-    }
-    // scan values for the first matching array
-    for (const v of Object.values(cand)) {
-      if (isLikelyDiseaseArray(v)) return v as DiseaseType[]
-    }
+    const arr = searchForDiseaseArray(cand)
+    if (arr) return arr
   }
 
-  return [] as DiseaseType[]
+  return []
 }
