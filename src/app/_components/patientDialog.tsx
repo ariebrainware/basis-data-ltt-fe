@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import { PatientForm } from './patientForm'
 import { DiseaseType } from '../_types/disease'
+import { extractDiseaseList } from '../_functions/patientRowData'
 import {
   Button,
   Dialog,
@@ -66,12 +67,7 @@ export default function PatientDialog({
       }
       if (res.ok) {
         const data = await res.json()
-        const list: DiseaseType[] =
-          data && data.data && Array.isArray(data.data.disease)
-            ? (data.data.disease as DiseaseType[])
-            : Array.isArray(data)
-              ? (data as DiseaseType[])
-              : []
+        const list: DiseaseType[] = extractDiseaseList(data)
         setDiseases(list)
       }
     } catch (e) {
@@ -302,7 +298,7 @@ export default function PatientDialog({
             gender={genderValue}
             last_visit={''}
             onGenderChange={setGenderValue}
-            diseases={diseases}
+            diseases={diseasesFetched ? diseases : undefined}
           />
         </DialogBody>
         <DialogFooter
