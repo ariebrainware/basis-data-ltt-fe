@@ -60,22 +60,70 @@ function findFirstArrayValue(obj: Record<string, any> | null | undefined) {
  * @param cand - Candidate object to search
  * @returns DiseaseType array if found, or undefined
  */
+function isPlainObject(v: unknown): v is Record<string, any> {
+  return !!v && typeof v === 'object' && !Array.isArray(v)
+}
+
+/**
+ * Checks known disease keys in a node and queues nested objects
+ * @param node - Object to check
+ * @param keysToCheck - Keys to search for
+ * @param visited - WeakSet of already visited objects
+ * @param queue - Queue of objects to process
+ * @returns DiseaseType array if found in known keys, undefined otherwise
+ */
+function checkKnownKeys(
+  node: Record<string, any>,
+  keysToCheck: string[],
+  visited: WeakSet<Record<string, any>>,
+  queue: Record<string, any>[]
+): DiseaseType[] | undefined {
+  for (const key of keysToCheck) {
+    const val = node[key]
+    if (looksLikeDiseaseArray(val)) return val
+    if (isPlainObject(val) && !visited.has(val)) queue.push(val)
+  }
+  return undefined
+}
+
+/**
+ * Inspects all values in a node for disease arrays
+ * @param node - Object to inspect
+ * @param visited - WeakSet of already visited objects
+ * @param queue - Queue of objects to process
+ * @returns DiseaseType array if found, undefined otherwise
+ */
+function inspectNodeValues(
+  node: Record<string, any>,
+  visited: WeakSet<Record<string, any>>,
+  queue: Record<string, any>[]
+): DiseaseType[] | undefined {
+  for (const val of Object.values(node)) {
+    if (looksLikeDiseaseArray(val)) return val
+    if (isPlainObject(val) && !visited.has(val)) queue.push(val)
+  }
+  return undefined
+}
+
 function searchForDiseaseArray(cand: any): DiseaseType[] | undefined {
-  if (!cand || typeof cand !== 'object') return undefined
+  if (!isPlainObject(cand)) return undefined
 
-  // Check for direct disease keys
-  const arr = cand.disease ?? cand.diseases
-  if (looksLikeDiseaseArray(arr)) return arr
+  const keysToCheck = ['disease', 'diseases', 'Data']
+  const visited = new WeakSet<Record<string, any>>()
+  const queue: Record<string, any>[] = [cand]
 
-  // Check for nested Data key (handles cases like data.data.Data)
-  if (cand.Data) {
-    // If Data is an array, check if it's a disease array
-    if (looksLikeDiseaseArray(cand.Data)) return cand.Data
-    // If Data is a non-array object, recursively search within it
-    if (cand.Data && typeof cand.Data === 'object' && !Array.isArray(cand.Data)) {
-      const nestedArr = searchForDiseaseArray(cand.Data)
-      if (nestedArr) return nestedArr
-    }
+  while (queue.length) {
+    const node = queue.shift()!
+    if (!isPlainObject(node) || visited.has(node)) continue
+    visited.add(node)
+
+    // Check known keys first
+    const knownKeysResult = checkKnownKeys(node, keysToCheck, visited, queue)
+    if (knownKeysResult) return knownKeysResult
+
+    // Also inspect any array or object values in the node
+    const nodeValuesResult = inspectNodeValues(node, visited, queue)
+    if (nodeValuesResult) return nodeValuesResult
   }
 
   return undefined
