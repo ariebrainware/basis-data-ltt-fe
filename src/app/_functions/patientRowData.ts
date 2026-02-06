@@ -71,8 +71,8 @@ function searchForDiseaseArray(cand: any): DiseaseType[] | undefined {
   if (cand.Data) {
     // If Data is an array, check if it's a disease array
     if (looksLikeDiseaseArray(cand.Data)) return cand.Data
-    // If Data is an object, recursively search within it
-    if (typeof cand.Data === 'object') {
+    // If Data is a non-array object, recursively search within it
+    if (cand.Data && typeof cand.Data === 'object' && !Array.isArray(cand.Data)) {
       const nestedArr = searchForDiseaseArray(cand.Data)
       if (nestedArr) return nestedArr
     }
