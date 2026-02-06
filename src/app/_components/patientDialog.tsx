@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import { PatientForm } from './patientForm'
 import { DiseaseType } from '../_types/disease'
+import { extractDiseaseList } from '../_functions/patientRowData'
 import {
   Button,
   Dialog,
@@ -66,21 +67,6 @@ export default function PatientDialog({
       }
       if (res.ok) {
         const data = await res.json()
-        // normalize various backend shapes to DiseaseType[]
-        // reuse shared helper for consistency with other components
-        // (patientRowData.extractDiseaseList)
-        // import locally to avoid circular imports at top-level
-        // but reuse existing helper from _functions
-        // (already exported in src/app/_functions/patientRowData.ts)
-        // Note: dynamic import avoided to keep synchronous flow
-        // so import at top of file would be ideal; since file already
-        // imports DiseaseType, we'll just call the helper here.
-        // (See top of file for import adjustments if needed.)
-        // For simplicity, call extractDiseaseList after importing.
-        // We'll import at top—see apply_patch edits.
-        const { extractDiseaseList } = await Promise.resolve(
-          await import('../_functions/patientRowData')
-        )
         const list: DiseaseType[] = extractDiseaseList(data)
         setDiseases(list)
       }
