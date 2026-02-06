@@ -1,6 +1,6 @@
 {
   "name": "basis-data-ltt-fe",
-  "version": "v1.6.0",
+  "version": "v1.6.1",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
