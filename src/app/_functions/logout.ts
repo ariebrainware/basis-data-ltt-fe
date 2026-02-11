@@ -20,7 +20,6 @@ export async function logout(): Promise<void> {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
         'session-token': getSessionToken(),
       },
     })

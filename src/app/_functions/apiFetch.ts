@@ -22,7 +22,6 @@ export async function apiFetch(
 
   const defaultHeaders: Record<string, string> = {
     Accept: 'application/json',
-    Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
     'session-token': getSessionToken(),
   }
 

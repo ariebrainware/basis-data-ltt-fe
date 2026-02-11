@@ -42,7 +42,6 @@ export async function fetchCurrentUserId(): Promise<string | null> {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
         'session-token': sessionToken,
       },
     })

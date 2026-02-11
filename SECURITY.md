@@ -60,33 +60,40 @@ User Input → Frontend → Backend API → Database
 ### 🔴 CRITICAL Vulnerabilities
 
 #### 1. Plain Text Password Transmission
+
 **Issue**: Passwords are sent in plain text JSON to the backend.
 
 **Files Affected**:
+
 - `src/app/login/page.tsx` (lines 29-38)
 - `src/app/therapist/register/page.tsx` (lines 43-64)
 
 **Current Code**:
+
 ```typescript
-body: JSON.stringify({ email, password })  // ← Password in plain text
+body: JSON.stringify({ email, password }) // ← Password in plain text
 ```
 
 **Risk**: If HTTPS is not enforced, passwords can be intercepted by man-in-the-middle attacks.
 
-**Mitigation**: 
+**Mitigation**:
+
 - ✅ **REQUIRED**: Deploy backend with HTTPS/TLS enabled
 - ✅ **REQUIRED**: Configure frontend to use `https://` API endpoint in production
 - ✅ Implement HSTS (HTTP Strict Transport Security) on backend
 - ✅ Use strong TLS/SSL certificates (TLS 1.2 or higher)
 
 #### 2. No HTTPS Enforcement in Configuration
+
 **Issue**: Default configuration uses HTTP protocol.
 
 **Files Affected**:
+
 - `.env.sample` (line 2)
 - README.md configuration examples
 
 **Current Default**:
+
 ```bash
 NEXT_PUBLIC_API_HOST=https://localhost:19091
 ```
@@ -94,19 +101,23 @@ NEXT_PUBLIC_API_HOST=https://localhost:19091
 **Risk**: Development habits may carry over to production, exposing credentials.
 
 **Mitigation**:
+
 - ✅ Always use HTTPS in production
 - ✅ Update `.env.production` to enforce HTTPS URLs
 - ✅ Add validation to reject HTTP URLs in production builds
 
 #### 3. Public API Token Exposure
+
 **Issue**: `NEXT_PUBLIC_API_TOKEN` is exposed to the browser.
 
 **Files Affected**:
+
 - All API calls using `Authorization: Bearer ${NEXT_PUBLIC_API_TOKEN}`
 
 **Risk**: Any user can inspect the browser console/network tab and extract this token.
 
 **Current Usage**:
+
 ```typescript
 headers: {
   'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_TOKEN,
@@ -115,41 +126,49 @@ headers: {
 ```
 
 **Mitigation**:
+
 - ✅ Backend should ONLY rely on `session-token` for authentication
 - ✅ `NEXT_PUBLIC_API_TOKEN` should be removed or used only for non-sensitive operations
-- ⚠️ **NEVER use NEXT_PUBLIC_* variables for secrets**
+- ⚠️ **NEVER use NEXT*PUBLIC*\* variables for secrets**
 
 ### 🟠 HIGH Severity Issues
 
 #### 4. Session Token in localStorage
+
 **Issue**: Session tokens stored in localStorage are vulnerable to XSS attacks.
 
 **Risk**: If an attacker injects JavaScript (via XSS), they can steal session tokens.
 
 **Mitigation**:
+
 - ✅ Implement Content Security Policy (CSP) headers
 - ✅ Sanitize all user inputs to prevent XSS
 - ✅ Consider using httpOnly cookies for session management (requires backend changes)
 - ✅ Implement short session timeouts and token rotation
 
 #### 5. Client-Side Only Password Validation
+
 **Issue**: Password strength requirements only checked in browser.
 
 **Files Affected**:
+
 - `src/app/therapist/register/page.tsx` (therapist registration form password validation logic)
 
 **Risk**: Attackers can bypass frontend validation by sending direct API requests.
 
 **Mitigation**:
+
 - ✅ Backend MUST validate password strength server-side
 - ✅ Frontend validation is for UX only, not security
 
 ### 🟡 MEDIUM Severity Issues
 
 #### 6. Password Confirmation Only Client-Side
+
 **Issue**: Password confirmation check happens only in the browser.
 
 **Mitigation**:
+
 - ✅ Keep client-side check for UX
 - ✅ Backend should receive and validate both password fields
 
@@ -170,18 +189,20 @@ The backend API MUST implement the following security measures:
 - ❌ **NEVER USE**: MD5, SHA1, SHA256, SHA512 without salt/iterations
 
 **Example (Node.js with bcrypt)**:
+
 ```javascript
-const bcrypt = require('bcrypt');
-const saltRounds = 12;
+const bcrypt = require('bcrypt')
+const saltRounds = 12
 
 // Registration
-const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
+const hashedPassword = await bcrypt.hash(plainPassword, saltRounds)
 
 // Login
-const match = await bcrypt.compare(plainPassword, hashedPassword);
+const match = await bcrypt.compare(plainPassword, hashedPassword)
 ```
 
 **Example (Go with bcrypt)**:
+
 ```go
 import "golang.org/x/crypto/bcrypt"
 
@@ -195,6 +216,7 @@ err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(plainPassword))
 #### 2. Password Policy Enforcement
 
 Backend MUST enforce:
+
 - ✅ Minimum 8 characters
 - ✅ At least one uppercase letter
 - ✅ At least one lowercase letter
@@ -271,6 +293,7 @@ async headers() {
 ```
 
 **For Next.js with inline scripts/styles**, you may need to use nonces:
+
 ```typescript
 // In middleware or server component
 const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
@@ -291,6 +314,7 @@ See [Next.js CSP documentation](https://nextjs.org/docs/app/building-your-applic
 #### 3. Input Sanitization
 
 All user inputs should be sanitized to prevent XSS:
+
 - Use React's built-in escaping (default for JSX)
 - Avoid `dangerouslySetInnerHTML` unless absolutely necessary
 - Validate and sanitize on backend as well
@@ -301,18 +325,20 @@ All user inputs should be sanitized to prevent XSS:
 
 ### Security Guidelines for Environment Variables
 
-#### NEXT_PUBLIC_* Variables
+#### NEXT*PUBLIC*\* Variables
 
 ⚠️ **WARNING**: Variables prefixed with `NEXT_PUBLIC_` are **embedded in the browser bundle** and are **publicly accessible**.
 
-**NEVER store in NEXT_PUBLIC_* variables**:
+**NEVER store in NEXT*PUBLIC*\* variables**:
+
 - ❌ API secrets or keys
 - ❌ Database credentials
 - ❌ Private tokens
 - ❌ Encryption keys
 - ❌ Any sensitive information
 
-**Safe to store in NEXT_PUBLIC_* variables**:
+**Safe to store in NEXT*PUBLIC*\* variables**:
+
 - ✅ Public API endpoints (e.g., `NEXT_PUBLIC_API_HOST`)
 - ✅ Public feature flags
 - ✅ Analytics IDs (for public services)
@@ -321,6 +347,7 @@ All user inputs should be sanitized to prevent XSS:
 #### Current Variable Usage
 
 **`.env.sample`**:
+
 ```bash
 # Backend API host URL
 NEXT_PUBLIC_API_HOST=https://api.example.com  # ← Must be HTTPS in production
@@ -330,7 +357,8 @@ NEXT_PUBLIC_API_HOST=https://api.example.com  # ← Must be HTTPS in production
 NEXT_PUBLIC_API_TOKEN=your-token-here  # ← Remove or move to backend
 ```
 
-**Recommendation**: 
+**Recommendation**:
+
 1. Backend should remove dependency on `NEXT_PUBLIC_API_TOKEN` for authentication
 2. Use `session-token` header exclusively for user authentication
 3. If API-level authentication is needed, handle it server-side only
@@ -344,6 +372,7 @@ NEXT_PUBLIC_API_TOKEN=your-token-here  # ← Remove or move to backend
 Before deploying to production, ensure:
 
 #### Backend Checklist
+
 - [ ] HTTPS/TLS enabled with valid certificate
 - [ ] Password hashing with Argon2id or bcrypt (cost ≥ 12)
 - [ ] Unique salts per user password
@@ -357,6 +386,7 @@ Before deploying to production, ensure:
 - [ ] Input validation on all endpoints
 
 #### Frontend Checklist
+
 - [ ] `NEXT_PUBLIC_API_HOST` uses HTTPS URL
 - [ ] CSP headers configured
 - [ ] No sensitive data in localStorage
@@ -366,6 +396,7 @@ Before deploying to production, ensure:
 - [ ] Security audit completed
 
 #### Infrastructure Checklist
+
 - [ ] Firewall rules configured
 - [ ] Database access restricted
 - [ ] Regular security patches applied
@@ -380,6 +411,7 @@ Before deploying to production, ensure:
 ### For Developers
 
 **Before Committing Code**:
+
 - [ ] No hardcoded passwords or secrets
 - [ ] All user inputs are validated
 - [ ] No SQL injection vulnerabilities
@@ -388,6 +420,7 @@ Before deploying to production, ensure:
 - [ ] Error handling doesn't leak info
 
 **Before Deploying**:
+
 - [ ] Environment variables properly set
 - [ ] HTTPS enforced
 - [ ] Security headers configured
@@ -397,6 +430,7 @@ Before deploying to production, ensure:
 ### For DevOps/Infrastructure
 
 **Production Environment**:
+
 - [ ] TLS/SSL certificates valid and up to date
 - [ ] Firewall rules reviewed
 - [ ] Database encrypted at rest
