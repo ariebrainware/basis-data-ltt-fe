@@ -22,11 +22,11 @@ This document outlines the security architecture, known vulnerabilities, and bes
 
 **This is a FRONTEND application only.** All password hashing and authentication logic MUST be implemented on the backend.
 
-#### Current Flow:
+#### Current Flow
 
-```
+```md
 User Input → Frontend → Backend API → Database
-              (plain)    (must hash)
+(plain) (must hash)
 ```
 
 1. **User Registration** (`/therapist/register`):
