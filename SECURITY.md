@@ -325,11 +325,11 @@ All user inputs should be sanitized to prevent XSS:
 
 ### Security Guidelines for Environment Variables
 
-#### NEXT*PUBLIC*\* Variables
+#### `NEXT_PUBLIC_*` Variables
 
 ⚠️ **WARNING**: Variables prefixed with `NEXT_PUBLIC_` are **embedded in the browser bundle** and are **publicly accessible**.
 
-**NEVER store in NEXT*PUBLIC*\* variables**:
+**NEVER store in `NEXT_PUBLIC_*` variables**:
 
 - ❌ API secrets or keys
 - ❌ Database credentials
@@ -337,7 +337,7 @@ All user inputs should be sanitized to prevent XSS:
 - ❌ Encryption keys
 - ❌ Any sensitive information
 
-**Safe to store in NEXT*PUBLIC*\* variables**:
+**Safe to store in `NEXT_PUBLIC_*` variables**:
 
 - ✅ Public API endpoints (e.g., `NEXT_PUBLIC_API_HOST`)
 - ✅ Public feature flags
@@ -351,17 +351,12 @@ All user inputs should be sanitized to prevent XSS:
 ```bash
 # Backend API host URL
 NEXT_PUBLIC_API_HOST=https://api.example.com  # ← Must be HTTPS in production
-
-# ⚠️ Security Issue: This should NOT be a NEXT_PUBLIC_* variable
-# Backend should validate session-token only, not this public token
-NEXT_PUBLIC_API_TOKEN=your-token-here  # ← Remove or move to backend
 ```
 
 **Recommendation**:
 
-1. Backend should remove dependency on `NEXT_PUBLIC_API_TOKEN` for authentication
-2. Use `session-token` header exclusively for user authentication
-3. If API-level authentication is needed, handle it server-side only
+1. Use `session-token` header exclusively for user authentication
+2. If API-level authentication is needed, handle it server-side only
 
 ---
 
