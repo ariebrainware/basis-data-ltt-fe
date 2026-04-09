@@ -1,6 +1,17 @@
 import { getApiHost } from './apiHost'
 import { getSessionToken } from './sessionToken'
 
+const PUBLIC_AUTH_PATHS = new Set(['/login', '/register'])
+
+function isPublicAuthPath(path: string): boolean {
+  // Only inspect relative app API paths; absolute URLs may be third-party.
+  if (path.startsWith('http://') || path.startsWith('https://')) return false
+
+  const normalized = path.startsWith('/') ? path : `/${path}`
+  const pathOnly = normalized.split('?')[0]
+  return PUBLIC_AUTH_PATHS.has(pathOnly)
+}
+
 function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
   const out: Record<string, string> = {}
   if (!headers) return out
@@ -19,10 +30,15 @@ export async function apiFetch(
   init: RequestInit = {}
 ): Promise<Response> {
   const url = path.startsWith('http') ? path : `${getApiHost()}${path}`
+  const sessionToken = getSessionToken()
+  const allowAuthHeaders = !isPublicAuthPath(path)
 
   const defaultHeaders: Record<string, string> = {
     Accept: 'application/json',
-    'session-token': getSessionToken(),
+  }
+
+  if (allowAuthHeaders && sessionToken) {
+    defaultHeaders['session-token'] = sessionToken
   }
 
   const incoming = normalizeHeaders(init.headers)
