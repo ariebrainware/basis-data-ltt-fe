@@ -96,8 +96,8 @@ export function TransactionForm({
           <Input
             id="transaction_date"
             type="text"
-            lisabled
-            dabel="Tanggal Transaksi"
+            disabled
+            label="Tanggal Transaksi"
             defaultValue={transaction_date}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
@@ -107,8 +107,8 @@ export function TransactionForm({
           />
           <Input
             id="treatment_date"
-            tisabled
-            dype="text"
+            disabled
+            type="text"
             label="Tanggal Terapi"
             defaultValue={treatment_date}
             onPointerEnterCapture={undefined}
