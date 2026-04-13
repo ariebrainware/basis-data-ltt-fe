@@ -5,7 +5,7 @@ import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 export interface DeleteResourceConfig {
-  resourceType: 'patient' | 'therapist' | 'treatment' | 'disease'
+  resourceType: 'patient' | 'therapist' | 'treatment' | 'disease' | 'pricing'
   resourceId: number
   resourceName: string
 }
@@ -41,6 +41,12 @@ export function useDeleteResource(config: DeleteResourceConfig) {
         successText: 'Data penyakit berhasil dihapus.',
         errorText: 'Gagal menghapus data penyakit',
         consoleError: 'Error deleting disease record:',
+      },
+      pricing: {
+        confirmTitle: 'Hapus Data Harga?',
+        successText: 'Data harga berhasil dihapus.',
+        errorText: 'Gagal menghapus data harga',
+        consoleError: 'Error deleting pricing record:',
       },
     }[resourceType]
   }

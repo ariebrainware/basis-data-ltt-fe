@@ -18,6 +18,8 @@ import {
   Bars3Icon,
   XMarkIcon,
   DocumentTextIcon,
+  CurrencyDollarIcon,
+  ReceiptPercentIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
@@ -57,6 +59,20 @@ const navListMenuItems = [
     description: 'Halaman untuk penanganan pasien',
     icon: HeartIcon,
     url: '/treatment',
+    roles: ['super_admin'],
+  },
+  {
+    title: 'Harga',
+    description: 'Halaman manajemen harga layanan',
+    icon: CurrencyDollarIcon,
+    url: '/pricing',
+    roles: ['super_admin'],
+  },
+  {
+    title: 'Transaksi',
+    description: 'Halaman transaksi (hanya ubah data)',
+    icon: ReceiptPercentIcon,
+    url: '/transaction',
     roles: ['super_admin'],
   },
   {
