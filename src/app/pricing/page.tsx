@@ -38,7 +38,7 @@ function toNumber(value: unknown): number {
 function normalizePricing(item: any): PricingType {
   return {
     ID: toNumber(item?.ID ?? item?.id),
-    name: String(item?.name ?? item?.pricing_name ?? ''),
+    therapist_name: String(item?.name ?? item?.therapist_name ?? ''),
     amount: toNumber(item?.amount ?? item?.price),
     description: String(item?.description ?? item?.notes ?? ''),
   }
@@ -217,7 +217,7 @@ export default function PricingPage() {
             <Input
               id="add_name"
               type="text"
-              label="Nama Harga"
+              label="Nama"
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}

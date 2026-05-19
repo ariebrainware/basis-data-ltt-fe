@@ -16,7 +16,7 @@ import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function PricingRow({
   ID,
-  name,
+  therapist_name,
   amount,
   description,
   onDataChange,
@@ -33,8 +33,9 @@ export default function PricingRow({
   })
 
   const handleUpdatePricing = () => {
-    const nameInput =
-      document.querySelector<HTMLInputElement>('#name')?.value || name
+    const therapistNameInput =
+      document.querySelector<HTMLInputElement>('#therapist_name')?.value ||
+      therapist_name
     const amountInput =
       document.querySelector<HTMLInputElement>('#amount')?.value ||
       String(amount)
@@ -42,9 +43,9 @@ export default function PricingRow({
       document.querySelector<HTMLTextAreaElement>('#description')?.value ||
       description
 
-    if (!nameInput.trim()) {
+    if (!therapistNameInput.trim()) {
       Swal.fire({
-        text: 'Nama harga tidak boleh kosong.',
+        text: 'Nama terapis tidak boleh kosong.',
         icon: 'warning',
         confirmButtonText: 'OK',
       })
@@ -54,7 +55,7 @@ export default function PricingRow({
     apiFetch(`/pricing/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        name: nameInput.trim(),
+        therapist_name: therapistNameInput.trim(),
         amount: Number(amountInput),
         description: descriptionInput.trim(),
       }),
@@ -124,7 +125,7 @@ export default function PricingRow({
         >
           <PricingForm
             ID={ID}
-            name={name}
+            therapist_name={therapist_name}
             amount={amount}
             description={description}
           />
@@ -147,7 +148,7 @@ export default function PricingRow({
             onResize={undefined}
             onResizeCapture={undefined}
           >
-            <span>Cancel</span>
+            <span>Batal</span>
           </Button>
           <Button
             variant="gradient"
@@ -159,7 +160,7 @@ export default function PricingRow({
             onResize={undefined}
             onResizeCapture={undefined}
           >
-            <span>Confirm</span>
+            <span>Konfirmasi</span>
           </Button>
         </DialogFooter>
       </Dialog>
@@ -172,12 +173,12 @@ export default function PricingRow({
         </td>
         <td className="p-3">
           <small className="font-sans text-sm font-medium text-current antialiased">
-            {name}
+            {therapist_name}
           </small>
         </td>
         <td className="p-3">
           <small className="font-sans text-sm text-current antialiased">
-            Rp {Number(amount || 0).toLocaleString('id-ID')}
+            Rp. {Number(amount || 0).toLocaleString('id-ID')}
           </small>
         </td>
         <td className="p-3">

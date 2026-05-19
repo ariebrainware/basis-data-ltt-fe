@@ -198,7 +198,7 @@ export default function TransactionRow({
         </td>
         <td className="p-3">
           <small className="font-sans text-sm text-current antialiased">
-            Rp {Number(amount || 0).toLocaleString('id-ID')}
+            Rp. {Number(amount || 0).toLocaleString('id-ID')}
           </small>
         </td>
         <td className="p-3">
