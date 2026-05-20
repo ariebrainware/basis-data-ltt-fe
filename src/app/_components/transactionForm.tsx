@@ -82,17 +82,22 @@ export function TransactionForm({
             onResize={undefined}
             onResizeCapture={undefined}
           />
-          <Input
-            id="payment_status"
-            type="text"
-            label="Status Pembayaran"
-            defaultValue={payment_status}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            crossOrigin={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          />
+          <div className="w-full">
+            <label className="mb-1 block text-sm text-gray-600">
+              Status Pembayaran
+            </label>
+            <select
+              id="payment_status"
+              defaultValue={payment_status ?? ''}
+              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+            >
+              <option value="">Pilih status</option>
+              <option value="cash">cash</option>
+              <option value="transfer">transfer</option>
+              <option value="partial">Partial</option>
+              <option value="unpaid">Unpaid</option>
+            </select>
+          </div>
           <Input
             id="transaction_date"
             type="text"

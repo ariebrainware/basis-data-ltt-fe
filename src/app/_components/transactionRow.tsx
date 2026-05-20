@@ -41,7 +41,7 @@ export default function TransactionRow({
       document.querySelector<HTMLInputElement>('#amount')?.value ||
       String(amount)
     const paymentStatusInput =
-      document.querySelector<HTMLInputElement>('#payment_status')?.value ||
+      document.querySelector<HTMLSelectElement>('#payment_status')?.value ||
       payment_status
     const transactionDateInput =
       document.querySelector<HTMLInputElement>('#transaction_date')?.value ||
