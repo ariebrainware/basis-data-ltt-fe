@@ -26,6 +26,17 @@ export default function TransactionRow({
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
 
+  const formatPaymentStatus = (s?: string | null) => {
+    if (!s) return '-'
+    // replace underscores/hyphens with spaces, collapse spaces, then Title Case each word
+    return s
+      .replace(/[_\-]+/g, ' ')
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ')
+  }
+
   const handleOpen = () => setOpen((prev) => !prev)
 
   const handleUpdateTransaction = () => {
@@ -203,7 +214,7 @@ export default function TransactionRow({
         </td>
         <td className="p-3">
           <small className="font-sans text-sm text-current antialiased">
-            {payment_status || '-'}
+            {formatPaymentStatus(payment_status)}
           </small>
         </td>
         <td className="p-3">

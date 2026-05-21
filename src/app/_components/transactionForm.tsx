@@ -92,8 +92,8 @@ export function TransactionForm({
               className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
             >
               <option value="">Pilih status</option>
-              <option value="cash">cash</option>
-              <option value="transfer">transfer</option>
+              <option value="cash">Cash</option>
+              <option value="transfer">Transfer</option>
               <option value="partial">Partial</option>
               <option value="unpaid">Unpaid</option>
             </select>
