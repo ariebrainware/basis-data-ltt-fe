@@ -1,5 +1,8 @@
 {
   "chat.tools.terminal.autoApprove": {
     "pn": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
   }
 }
