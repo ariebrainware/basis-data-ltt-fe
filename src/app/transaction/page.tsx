@@ -28,6 +28,19 @@ function toNumber(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
+function formatDate(value: unknown): string {
+  if (value === null || value === undefined || value === '') return ''
+  const v = String(value)
+  const d = new Date(v)
+  if (Number.isNaN(d.getTime())) return v
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const min = String(d.getMinutes()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}`
+}
+
 function normalizeTransaction(item: any): TransactionType {
   return {
     ID: toNumber(item?.ID ?? item?.id),
@@ -37,8 +50,12 @@ function normalizeTransaction(item: any): TransactionType {
     amount: toNumber(item?.amount ?? item?.price),
     payment_status: String(item?.payment_status ?? item?.status ?? ''),
     notes: String(item?.notes ?? item?.remark ?? ''),
-    transaction_date: String(
-      item?.transaction_date ?? item?.created_at ?? item?.date ?? ''
+    transaction_date: formatDate(
+      item?.transaction_date ??
+        item?.CreatedAt ??
+        item?.created_at ??
+        item?.date ??
+        ''
     ),
     treatment_date: String(
       item?.treatment_date ?? item?.therapy_date ?? item?.service_date ?? ''
