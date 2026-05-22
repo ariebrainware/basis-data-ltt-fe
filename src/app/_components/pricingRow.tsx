@@ -55,7 +55,7 @@ export default function PricingRow({
     apiFetch(`/pricing/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        therapist_name: therapistNameInput.trim(),
+        name: therapistNameInput.trim(),
         amount: Number(amountInput),
         description: descriptionInput.trim(),
       }),
