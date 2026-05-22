@@ -33,8 +33,11 @@ export default function Therapist({
   const [approved, setApproved] = React.useState<boolean>(isApproved)
 
   React.useEffect(() => {
-    setRole(initialRole || '')
-    setApproved(isApproved)
+    const t = setTimeout(() => {
+      setRole(initialRole || '')
+      setApproved(isApproved)
+    }, 0)
+    return () => clearTimeout(t)
   }, [initialRole, isApproved])
 
   const handleRoleChange = (newRole: string) => {

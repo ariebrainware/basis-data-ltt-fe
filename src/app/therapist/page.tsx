@@ -41,7 +41,8 @@ export default function ListTherapist() {
   const router = useRouter()
   const { data, total } = useFetchTherapist(currentPage, keyword)
   useEffect(() => {
-    setTherapists(data.therapist)
+    const t = setTimeout(() => setTherapists(data.therapist), 0)
+    return () => clearTimeout(t)
   }, [data])
 
   const handleInputKeyDown = async (

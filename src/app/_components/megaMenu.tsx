@@ -93,7 +93,9 @@ function NavListMenu() {
   // Read user role only on the client after mount to avoid server/client
   // rendering differences that cause hydration mismatches.
   React.useEffect(() => {
-    setUserRole(getUserRole())
+    // Defer state update to avoid synchronous setState inside effect
+    const t = setTimeout(() => setUserRole(getUserRole()), 0)
+    return () => clearTimeout(t)
   }, [])
 
   const filteredMenuItems = navListMenuItems.filter((item) =>
@@ -304,10 +306,14 @@ export default function MegaMenuDefault() {
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
-    setMounted(true)
+    // Defer mounted flag to avoid synchronous setState inside effect
+    const t = setTimeout(() => setMounted(true), 0)
     const onResize = () => window.innerWidth >= 960 && setOpenNav(false)
     window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
+    return () => {
+      clearTimeout(t)
+      window.removeEventListener('resize', onResize)
+    }
   }, [])
 
   return (

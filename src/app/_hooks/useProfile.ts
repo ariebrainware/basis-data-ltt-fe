@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 
 import Swal from 'sweetalert2'
@@ -158,11 +158,10 @@ export function useProfile() {
   // Live password requirement booleans
   const { lengthOk, lowerOk, upperOk, digitOk, specialOk, strengthCount } =
     getPasswordStrength(newPassword)
-  const [strengthAnnounce, setStrengthAnnounce] = useState('')
-
-  useEffect(() => {
-    setStrengthAnnounce(`${strengthCount} of 5 password requirements met`)
-  }, [strengthCount])
+  const strengthAnnounce = useMemo(
+    () => `${strengthCount} of 5 password requirements met`,
+    [strengthCount]
+  )
 
   useEffect(() => {
     const load = async () => {

@@ -38,8 +38,8 @@ export function ControlledSelect({
   React.useEffect(() => {
     // In test or SSR environments `fetch` may be undefined — guard against that.
     if (typeof fetch === 'undefined') {
-      setTherapists([])
-      return
+      const t = setTimeout(() => setTherapists([]), 0)
+      return () => clearTimeout(t)
     }
     apiFetch('/therapist', { method: 'GET' })
       .then((res) => {
@@ -84,9 +84,12 @@ export function ControlledSelect({
   }, [router])
 
   React.useEffect(() => {
-    if ((propValue ?? '') !== '') {
-      setSelectedValue(String(propValue))
-    }
+    const t = setTimeout(() => {
+      if ((propValue ?? '') !== '') {
+        setSelectedValue(String(propValue))
+      }
+    }, 0)
+    return () => clearTimeout(t)
   }, [propValue])
 
   // If the library Select is unavailable (e.g., in lightweight tests),
