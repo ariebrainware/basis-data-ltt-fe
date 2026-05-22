@@ -27,6 +27,8 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    /* Allow self-signed/local HTTPS during tests */
+    ignoreHTTPSErrors: true,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     /* Use a pre-saved storage state that marks E2E tests to avoid automatic redirects */
@@ -78,6 +80,11 @@ export default defineConfig({
     command: 'pnpm run build && pnpm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    env: {
+      // Force API host to use HTTP for local E2E runs to avoid TLS issues with
+      // self-signed certificates on the backend during CI/dev testing.
+      NEXT_PUBLIC_API_HOST: process.env.NEXT_PUBLIC_API_HOST_OVERRIDE || 'http://localhost:19091',
+    },
     // Building can take longer locally; increase timeout to 3 minutes.
     timeout: 180000,
   },
