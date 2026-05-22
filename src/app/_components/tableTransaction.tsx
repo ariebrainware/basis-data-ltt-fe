@@ -62,7 +62,7 @@ const TableBody = ({ transaction }: { transaction: TransactionType[] }) => (
         notes={item.notes}
         transaction_date={item.transaction_date}
         treatment_date={item.treatment_date}
-        pricing_name={''}
+        pricing_name={item.pricing_name}
       />
     ))}
   </tbody>

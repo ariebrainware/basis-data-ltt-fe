@@ -69,7 +69,6 @@ function useFetchPricing(
 
         const rawArray =
           responseData?.data?.pricings ??
-          responseData?.data?.pricings ??
           responseData?.data?.pricing ??
           responseData?.data ??
           []

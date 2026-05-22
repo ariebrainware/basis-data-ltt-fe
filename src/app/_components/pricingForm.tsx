@@ -41,7 +41,6 @@ export function PricingForm({
             crossOrigin={undefined}
             onResize={undefined}
             onResizeCapture={undefined}
-            disabled={true}
           />
           <Input
             id="amount"
