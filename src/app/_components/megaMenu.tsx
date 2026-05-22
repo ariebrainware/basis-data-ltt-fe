@@ -93,9 +93,7 @@ function NavListMenu() {
   // Read user role only on the client after mount to avoid server/client
   // rendering differences that cause hydration mismatches.
   React.useEffect(() => {
-    // Defer state update to avoid synchronous setState inside effect
-    const t = setTimeout(() => setUserRole(getUserRole()), 0)
-    return () => clearTimeout(t)
+    setUserRole(getUserRole())
   }, [])
 
   const filteredMenuItems = navListMenuItems.filter((item) =>
