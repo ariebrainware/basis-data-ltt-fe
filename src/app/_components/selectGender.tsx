@@ -56,7 +56,8 @@ export function GenderSelect({
   }
 
   React.useEffect(() => {
-    setSelectedValue(normalizeGenderValue(value))
+    const t = setTimeout(() => setSelectedValue(normalizeGenderValue(value)), 0)
+    return () => clearTimeout(t)
   }, [value])
 
   return (

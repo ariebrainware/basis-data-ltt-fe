@@ -18,6 +18,8 @@ import {
   Bars3Icon,
   XMarkIcon,
   DocumentTextIcon,
+  CurrencyDollarIcon,
+  ReceiptPercentIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
@@ -60,6 +62,20 @@ const navListMenuItems = [
     roles: ['super_admin'],
   },
   {
+    title: 'Harga',
+    description: 'Halaman manajemen harga layanan',
+    icon: CurrencyDollarIcon,
+    url: '/pricing',
+    roles: ['super_admin'],
+  },
+  {
+    title: 'Transaksi',
+    description: 'Halaman transaksi (hanya ubah data)',
+    icon: ReceiptPercentIcon,
+    url: '/transaction',
+    roles: ['super_admin'],
+  },
+  {
     title: 'Penanganan Terapis',
     description: 'Lihat dan lengkapi penanganan pasien',
     icon: HeartIcon,
@@ -71,14 +87,19 @@ const navListMenuItems = [
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const [userRole, setUserRole] = React.useState<string | null>(null)
+  const userRole = React.useSyncExternalStore(
+    React.useCallback((onStoreChange: () => void) => {
+      window.addEventListener('storage', onStoreChange)
+      window.addEventListener('user-role-change', onStoreChange)
+      return () => {
+        window.removeEventListener('storage', onStoreChange)
+        window.removeEventListener('user-role-change', onStoreChange)
+      }
+    }, []),
+    getUserRole,
+    () => null
+  )
   const router = useRouter()
-
-  // Read user role only on the client after mount to avoid server/client
-  // rendering differences that cause hydration mismatches.
-  React.useEffect(() => {
-    setUserRole(getUserRole())
-  }, [])
 
   const filteredMenuItems = navListMenuItems.filter((item) =>
     userRole ? item.roles.includes(userRole) : false
@@ -288,10 +309,14 @@ export default function MegaMenuDefault() {
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
-    setMounted(true)
+    // Defer mounted flag to avoid synchronous setState inside effect
+    const t = setTimeout(() => setMounted(true), 0)
     const onResize = () => window.innerWidth >= 960 && setOpenNav(false)
     window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
+    return () => {
+      clearTimeout(t)
+      window.removeEventListener('resize', onResize)
+    }
   }, [])
 
   return (

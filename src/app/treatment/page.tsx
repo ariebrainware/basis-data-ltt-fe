@@ -71,7 +71,8 @@ export default function ListTreatment() {
   const [keyword, setKeyword] = useState('')
   const { data, total } = useFetchTreatment(currentPage, keyword)
   useEffect(() => {
-    setTreatment(data.treatment)
+    const t = setTimeout(() => setTreatment(data.treatment), 0)
+    return () => clearTimeout(t)
   }, [data])
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

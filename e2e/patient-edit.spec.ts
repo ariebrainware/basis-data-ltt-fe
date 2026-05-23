@@ -275,7 +275,7 @@ test.describe('Patient Edit Functionality', () => {
       })
 
       // Reload page to apply role
-      await page.goto('/patient')
+      await page.reload()
       await page.waitForLoadState('networkidle')
 
       // Find and click the first edit button
@@ -318,7 +318,7 @@ test.describe('Patient Edit Functionality', () => {
       })
 
       // Reload page to apply role
-      await page.goto('/patient')
+      await page.reload()
       await page.waitForLoadState('networkidle')
 
       // Find and click the first edit button
@@ -371,7 +371,7 @@ test.describe('Patient Edit Functionality', () => {
         localStorage.setItem('session-token', 'mock-admin-token')
       })
 
-      await page.goto('/patient')
+      await page.reload()
       await page.waitForLoadState('networkidle')
 
       const editButton = page.locator('button[data-open]').first()
