@@ -106,7 +106,7 @@ importers:
         specifier: ^30.3.0
         version: 30.4.1
       postcss:
-        specifier: ^8.5.10
+        specifier: ^8.5.15
         version: 8.5.15
       prettier:
         specifier: ^3.8.1
