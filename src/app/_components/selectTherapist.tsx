@@ -38,7 +38,6 @@ export function ControlledSelect({
   React.useEffect(() => {
     // In test or SSR environments `fetch` may be undefined — guard against that.
     if (typeof fetch === 'undefined') {
-      setTherapists([])
       return
     }
     apiFetch('/therapist', { method: 'GET' })

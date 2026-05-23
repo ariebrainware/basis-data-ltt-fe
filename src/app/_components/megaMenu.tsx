@@ -87,14 +87,19 @@ const navListMenuItems = [
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const [userRole, setUserRole] = React.useState<string | null>(null)
+  const userRole = React.useSyncExternalStore(
+    React.useCallback((onStoreChange: () => void) => {
+      window.addEventListener('storage', onStoreChange)
+      window.addEventListener('user-role-change', onStoreChange)
+      return () => {
+        window.removeEventListener('storage', onStoreChange)
+        window.removeEventListener('user-role-change', onStoreChange)
+      }
+    }, []),
+    getUserRole,
+    () => null
+  )
   const router = useRouter()
-
-  // Read user role only on the client after mount to avoid server/client
-  // rendering differences that cause hydration mismatches.
-  React.useEffect(() => {
-    setUserRole(getUserRole())
-  }, [])
 
   const filteredMenuItems = navListMenuItems.filter((item) =>
     userRole ? item.roles.includes(userRole) : false
