@@ -10,7 +10,7 @@ interface TablePricingProps {
   onDataChange?: () => void
 }
 
-const TABLE_HEAD = ['ID Harga', 'Nama Terapis', 'Nominal', 'Deskripsi', 'Aksi']
+const TABLE_HEAD = ['ID Harga', 'Nama Harga', 'Nominal', 'Deskripsi', 'Aksi']
 
 const TableHeader = () => (
   <thead>
@@ -53,7 +53,7 @@ const TableBody = ({
       <PricingRow
         key={item.ID}
         ID={item.ID}
-        therapist_name={item.therapist_name}
+        name={item.name}
         amount={item.amount}
         description={item.description}
         onDataChange={onDataChange}

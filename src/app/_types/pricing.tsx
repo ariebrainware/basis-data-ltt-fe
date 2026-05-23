@@ -1,6 +1,6 @@
 export interface PricingType {
   ID: number
-  therapist_name: string
+  name: string
   amount: number
   description: string
 }

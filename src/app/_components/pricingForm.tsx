@@ -1,12 +1,7 @@
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { PricingType } from '../_types/pricing'
 
-export function PricingForm({
-  ID,
-  therapist_name,
-  amount,
-  description,
-}: PricingType) {
+export function PricingForm({ ID, name, amount, description }: PricingType) {
   return (
     <Card
       color="transparent"
@@ -32,10 +27,10 @@ export function PricingForm({
             onResizeCapture={undefined}
           />
           <Input
-            id="therapist_name"
+            id="name"
             type="text"
-            label="Nama Terapis"
-            defaultValue={therapist_name}
+            label="Nama Harga"
+            defaultValue={name}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             crossOrigin={undefined}

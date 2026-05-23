@@ -16,7 +16,7 @@ import { useDeleteResource } from '../_hooks/useDeleteResource'
 
 export default function PricingRow({
   ID,
-  therapist_name,
+  name,
   amount,
   description,
   onDataChange,
@@ -33,9 +33,8 @@ export default function PricingRow({
   })
 
   const handleUpdatePricing = () => {
-    const therapistNameInput =
-      document.querySelector<HTMLInputElement>('#therapist_name')?.value ||
-      therapist_name
+    const nameInput =
+      document.querySelector<HTMLInputElement>('#name')?.value || name
     const amountInput =
       document.querySelector<HTMLInputElement>('#amount')?.value ||
       String(amount)
@@ -43,9 +42,9 @@ export default function PricingRow({
       document.querySelector<HTMLTextAreaElement>('#description')?.value ||
       description
 
-    if (!therapistNameInput.trim()) {
+    if (!nameInput.trim()) {
       Swal.fire({
-        text: 'Nama terapis tidak boleh kosong.',
+        text: 'Nama harga tidak boleh kosong.',
         icon: 'warning',
         confirmButtonText: 'OK',
       })
@@ -55,7 +54,7 @@ export default function PricingRow({
     apiFetch(`/pricing/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        name: therapistNameInput.trim(),
+        name: nameInput.trim(),
         amount: Number(amountInput),
         description: descriptionInput.trim(),
       }),
@@ -125,7 +124,7 @@ export default function PricingRow({
         >
           <PricingForm
             ID={ID}
-            therapist_name={therapist_name}
+            name={name}
             amount={amount}
             description={description}
           />
@@ -173,7 +172,7 @@ export default function PricingRow({
         </td>
         <td className="p-3">
           <small className="font-sans text-sm font-medium text-current antialiased">
-            {therapist_name}
+            {name}
           </small>
         </td>
         <td className="p-3">

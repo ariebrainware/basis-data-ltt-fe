@@ -38,7 +38,7 @@ function toNumber(value: unknown): number {
 function normalizePricing(item: any): PricingType {
   return {
     ID: toNumber(item?.ID ?? item?.id),
-    therapist_name: String(item?.name ?? item?.therapist_name ?? ''),
+    name: String(item?.name ?? item?.therapist_name ?? ''),
     amount: toNumber(item?.amount ?? item?.price),
     description: String(item?.description ?? item?.notes ?? ''),
   }

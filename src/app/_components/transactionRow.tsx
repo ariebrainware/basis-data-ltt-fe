@@ -17,6 +17,7 @@ export default function TransactionRow({
   ID,
   treatment_id,
   patient_name,
+  pricing_name,
   amount,
   payment_status,
   notes,
@@ -47,7 +48,8 @@ export default function TransactionRow({
       document.querySelector<HTMLInputElement>('#patient_name')?.value ||
       patient_name
     const pricingNameInput =
-      document.querySelector<HTMLInputElement>('#pricing_name')?.value || ''
+      document.querySelector<HTMLInputElement>('#pricing_name')?.value ||
+      pricing_name
     const amountInput =
       document.querySelector<HTMLInputElement>('#amount')?.value ||
       String(amount)
@@ -143,7 +145,7 @@ export default function TransactionRow({
             ID={ID}
             treatment_id={treatment_id}
             patient_name={patient_name}
-            pricing_name={''}
+            pricing_name={pricing_name}
             amount={amount}
             payment_status={payment_status}
             notes={notes}
