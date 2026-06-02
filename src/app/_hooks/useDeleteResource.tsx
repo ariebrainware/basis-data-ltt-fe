@@ -5,13 +5,20 @@ import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 export interface DeleteResourceConfig {
-  resourceType: 'patient' | 'therapist' | 'treatment' | 'disease' | 'pricing'
+  resourceType:
+    | 'patient'
+    | 'therapist'
+    | 'treatment'
+    | 'disease'
+    | 'pricing'
+    | 'item'
   resourceId: number
   resourceName: string
+  onSuccess?: () => void
 }
 
 export function useDeleteResource(config: DeleteResourceConfig) {
-  const { resourceType, resourceId } = config
+  const { resourceType, resourceId, onSuccess } = config
   const router = useRouter()
 
   const getEndpoint = (): string => `/${resourceType}/${resourceId}`
@@ -48,6 +55,12 @@ export function useDeleteResource(config: DeleteResourceConfig) {
         errorText: 'Gagal menghapus data harga',
         consoleError: 'Error deleting pricing record:',
       },
+      item: {
+        confirmTitle: 'Hapus Data Item?',
+        successText: 'Data item berhasil dihapus.',
+        errorText: 'Gagal menghapus data item',
+        consoleError: 'Error deleting item record:',
+      },
     }[resourceType]
   }
 
@@ -73,6 +86,7 @@ export function useDeleteResource(config: DeleteResourceConfig) {
       if (!response.ok) throw new Error('Failed to delete')
 
       await Swal.fire({ text: messages.successText, icon: 'success' })
+      if (onSuccess) onSuccess()
       router.refresh()
     } catch (err) {
       console.error(getMessages().consoleError, err)

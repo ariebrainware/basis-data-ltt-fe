@@ -20,6 +20,7 @@ import {
   DocumentTextIcon,
   CurrencyDollarIcon,
   ReceiptPercentIcon,
+  CubeIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
@@ -66,6 +67,13 @@ const navListMenuItems = [
     description: 'Halaman manajemen harga layanan',
     icon: CurrencyDollarIcon,
     url: '/pricing',
+    roles: ['super_admin'],
+  },
+  {
+    title: 'Item',
+    description: 'Halaman manajemen item',
+    icon: CubeIcon,
+    url: '/item',
     roles: ['super_admin'],
   },
   {
