@@ -87,7 +87,7 @@ export function useDeleteResource(config: DeleteResourceConfig) {
 
       await Swal.fire({ text: messages.successText, icon: 'success' })
       if (onSuccess) onSuccess()
-      router.refresh()
+      else router.refresh()
     } catch (err) {
       console.error(getMessages().consoleError, err)
       if (err instanceof Error && err.message === 'Unauthorized') return
