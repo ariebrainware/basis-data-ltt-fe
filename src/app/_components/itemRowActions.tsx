@@ -8,7 +8,7 @@ import {
   DialogHeader,
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
-import { ItemForm } from './itemForm'
+import ItemEditDialog from './itemEditDialog'
 import { ItemType } from '../_types/item'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { updateItem } from '@/app/_functions/itemUpdateService'
@@ -49,69 +49,15 @@ export default function ItemRowActions({
 
   return (
     <>
-      <Dialog
-        size={'md'}
-        handler={handleOpen}
-        placeholder={undefined}
-        onPointerEnterCapture={undefined}
-        onPointerLeaveCapture={undefined}
+      <ItemEditDialog
+        ID={ID}
+        name={name}
+        price={price}
+        quantity={quantity}
         open={open}
-        onResize={undefined}
-        onResizeCapture={undefined}
-      >
-        <DialogHeader
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-        >
-          Ubah Data Item
-        </DialogHeader>
-        <DialogBody
-          className="px-2 md:px-6"
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-        >
-          <ItemForm ID={ID} name={name} price={price} quantity={quantity} />
-        </DialogBody>
-        <DialogFooter
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-        >
-          <Button
-            variant="text"
-            color="red"
-            onClick={handleOpen}
-            className="mr-1"
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            <span>Batal</span>
-          </Button>
-          <Button
-            variant="gradient"
-            color="green"
-            onClick={handleConfirm}
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            <span>Konfirmasi</span>
-          </Button>
-        </DialogFooter>
-      </Dialog>
+        setOpen={setOpen}
+        onDataChange={onDataChange}
+      />
 
       <div className="flex items-center gap-2">
         <button
