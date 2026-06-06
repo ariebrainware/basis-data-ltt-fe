@@ -139,12 +139,24 @@ export default function ItemPage() {
       return
     }
 
+    const price = Number(priceInput)
+    const quantity = Number(quantityInput)
+
+    if (!Number.isFinite(price) || price < 0 || !Number.isFinite(quantity) || quantity < 0) {
+      Swal.fire({
+        text: 'Harga dan quantity harus berupa angka yang valid.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      })
+      return
+    }
+
     apiFetch('/item', {
       method: 'POST',
       body: JSON.stringify({
         name: nameInput.trim(),
-        price: Number(priceInput),
-        quantity: Number(quantityInput),
+        price,
+        quantity,
       }),
     })
       .then((response) => {
