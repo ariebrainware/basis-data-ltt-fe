@@ -51,12 +51,29 @@ export default function ItemRow({
       return
     }
 
+    const nextPrice = Number(priceInput)
+    const nextQuantity = Number(quantityInput)
+
+    if (
+      !Number.isFinite(nextPrice) ||
+      nextPrice < 0 ||
+      !Number.isFinite(nextQuantity) ||
+      nextQuantity < 0
+    ) {
+      Swal.fire({
+        text: 'Harga dan quantity harus berupa angka yang valid.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      })
+      return
+    }
+
     apiFetch(`/item/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify({
         name: nameInput.trim(),
-        price: Number(priceInput),
-        quantity: Number(quantityInput),
+        price: nextPrice,
+        quantity: nextQuantity,
       }),
     })
       .then((response) => {
