@@ -14,81 +14,20 @@ import {
   Input,
   Typography,
 } from '@material-tailwind/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
 import TableItem from '../_components/tableItem'
 import { apiFetch } from '../_functions/apiFetch'
+import {
+  readItemFormValues,
+  resetItemFormInputs,
+  validateItemForm,
+} from '../_functions/itemHelpers'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { ItemType } from '../_types/item'
 import { logout } from '../_functions/logout'
-
-interface ListItemResponse {
-  data: ItemType[]
-  total: number
-}
-
-function toNumber(value: unknown): number {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : 0
-}
-
-function normalizeItem(item: any): ItemType {
-  return {
-    ID: toNumber(item?.ID ?? item?.id),
-    name: String(item?.name ?? item?.item_name ?? item?.title ?? ''),
-    price: toNumber(item?.price ?? item?.amount ?? item?.nominal),
-    quantity: toNumber(item?.quantity ?? item?.qty ?? item?.stock),
-  }
-}
-
-function useFetchItem(
-  currentPage: number,
-  keyword: string,
-  refreshTrigger: number
-): ListItemResponse {
-  const [items, setItems] = useState<ItemType[]>([])
-  const [total, setTotal] = useState(0)
-  const router = useRouter()
-
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const limit = 100
-        const offset = (currentPage - 1) * limit
-        let params = `limit=${limit}&offset=${offset}`
-        if (keyword && keyword.trim() !== '') {
-          params += `&keyword=${encodeURIComponent(keyword)}`
-        }
-
-        const res = await apiFetch(`/item?${params}`, { method: 'GET' })
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const responseData = await res.json()
-
-        const rawArray =
-          responseData?.data?.items ??
-          responseData?.data?.item ??
-          responseData?.data ??
-          []
-
-        const itemArray = Array.isArray(rawArray)
-          ? rawArray.map(normalizeItem)
-          : []
-
-        setItems(itemArray)
-        setTotal(responseData?.data?.total ?? responseData?.total ?? 0)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess(router)
-        }
-        console.error('Error fetching items:', error)
-      }
-    })()
-  }, [currentPage, keyword, refreshTrigger, router])
-
-  return { data: items, total }
-}
+import { useFetchItem } from '../_hooks/useFetchItem'
 
 export default function ItemPage() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -111,90 +50,56 @@ export default function ItemPage() {
 
   const handleOpenAddDialog = () => {
     if (!openAddDialog) {
-      const nameInput = document.querySelector<HTMLInputElement>('#add_name')
-      const priceInput = document.querySelector<HTMLInputElement>('#add_price')
-      const quantityInput =
-        document.querySelector<HTMLInputElement>('#add_quantity')
-      if (nameInput) nameInput.value = ''
-      if (priceInput) priceInput.value = ''
-      if (quantityInput) quantityInput.value = ''
+      resetItemFormInputs()
     }
     setOpenAddDialog((prev) => !prev)
   }
 
-  const handleAddItem = () => {
-    const nameInput =
-      document.querySelector<HTMLInputElement>('#add_name')?.value || ''
-    const priceInput =
-      document.querySelector<HTMLInputElement>('#add_price')?.value || '0'
-    const quantityInput =
-      document.querySelector<HTMLInputElement>('#add_quantity')?.value || '0'
+  const handleAddItem = async () => {
+    const { name, price, quantity } = readItemFormValues()
+    const validation = validateItemForm(name, price, quantity)
 
-    if (!nameInput.trim()) {
+    if (!validation.ok) {
       Swal.fire({
-        text: 'Nama item tidak boleh kosong.',
+        text: validation.message,
         icon: 'warning',
         confirmButtonText: 'OK',
       })
       return
     }
 
-    const price = Number(priceInput)
-    const quantity = Number(quantityInput)
+    try {
+      const response = await apiFetch('/item', {
+        method: 'POST',
+        body: JSON.stringify(validation.payload),
+      })
 
-    if (
-      !Number.isFinite(price) ||
-      price < 0 ||
-      !Number.isFinite(quantity) ||
-      quantity < 0
-    ) {
-      Swal.fire({
-        text: 'Harga dan quantity harus berupa angka yang valid.',
-        icon: 'warning',
+      if (response.status === 401) {
+        UnauthorizedAccess(router)
+        return
+      }
+
+      if (!response.ok) {
+        throw new Error('Failed to add item')
+      }
+
+      const dataResponse = await response.json()
+      console.log('Item added successfully:', dataResponse)
+      setOpenAddDialog(false)
+      await Swal.fire({
+        text: 'Data item berhasil ditambahkan.',
+        icon: 'success',
         confirmButtonText: 'OK',
       })
-      return
+      handleRefresh()
+    } catch (error) {
+      console.error('Error adding item:', error)
+      Swal.fire({
+        text: 'Gagal menambahkan data item.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      })
     }
-
-    apiFetch('/item', {
-      method: 'POST',
-      body: JSON.stringify({
-        name: nameInput.trim(),
-        price,
-        quantity,
-      }),
-    })
-      .then((response) => {
-        if (response.status === 401) {
-          UnauthorizedAccess(router)
-          return Promise.reject(new Error('Unauthorized'))
-        }
-        if (!response.ok) {
-          throw new Error('Failed to add item')
-        }
-        return response.json()
-      })
-      .then((dataResponse) => {
-        console.log('Item added successfully:', dataResponse)
-        setOpenAddDialog(false)
-        Swal.fire({
-          text: 'Data item berhasil ditambahkan.',
-          icon: 'success',
-          confirmButtonText: 'OK',
-        }).then(() => {
-          handleRefresh()
-        })
-      })
-      .catch((error) => {
-        console.error('Error adding item:', error)
-        if (error.message !== 'Unauthorized') {
-          Swal.fire({
-            text: 'Gagal menambahkan data item.',
-            icon: 'error',
-            confirmButtonText: 'OK',
-          })
-        }
-      })
   }
 
   return (

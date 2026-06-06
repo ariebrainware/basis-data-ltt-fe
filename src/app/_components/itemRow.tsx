@@ -9,6 +9,7 @@ import {
 } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { apiFetch } from '../_functions/apiFetch'
+import { validateItemForm } from '../_functions/itemHelpers'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { ItemForm } from './itemForm'
 import { ItemType } from '../_types/item'
@@ -42,26 +43,11 @@ export default function ItemRow({
       document.querySelector<HTMLInputElement>('#quantity')?.value ||
       String(quantity)
 
-    if (!nameInput.trim()) {
-      Swal.fire({
-        text: 'Nama item tidak boleh kosong.',
-        icon: 'warning',
-        confirmButtonText: 'OK',
-      })
-      return
-    }
+    const validation = validateItemForm(nameInput, priceInput, quantityInput)
 
-    const nextPrice = Number(priceInput)
-    const nextQuantity = Number(quantityInput)
-
-    if (
-      !Number.isFinite(nextPrice) ||
-      nextPrice < 0 ||
-      !Number.isFinite(nextQuantity) ||
-      nextQuantity < 0
-    ) {
+    if (!validation.ok) {
       Swal.fire({
-        text: 'Harga dan quantity harus berupa angka yang valid.',
+        text: validation.message,
         icon: 'warning',
         confirmButtonText: 'OK',
       })
@@ -70,11 +56,7 @@ export default function ItemRow({
 
     apiFetch(`/item/${ID}`, {
       method: 'PATCH',
-      body: JSON.stringify({
-        name: nameInput.trim(),
-        price: nextPrice,
-        quantity: nextQuantity,
-      }),
+      body: JSON.stringify(validation.payload),
     })
       .then((response) => {
         if (response.status === 401) {
