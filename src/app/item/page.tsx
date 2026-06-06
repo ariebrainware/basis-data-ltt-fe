@@ -142,7 +142,12 @@ export default function ItemPage() {
     const price = Number(priceInput)
     const quantity = Number(quantityInput)
 
-    if (!Number.isFinite(price) || price < 0 || !Number.isFinite(quantity) || quantity < 0) {
+    if (
+      !Number.isFinite(price) ||
+      price < 0 ||
+      !Number.isFinite(quantity) ||
+      quantity < 0
+    ) {
       Swal.fire({
         text: 'Harga dan quantity harus berupa angka yang valid.',
         icon: 'warning',
