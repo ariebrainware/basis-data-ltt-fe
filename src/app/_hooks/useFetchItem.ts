@@ -6,7 +6,7 @@ import {
   buildItemQueryParams,
   extractItemList,
   getItemTotal,
-} from '../_functions/itemHelpers'
+} from '../_functions/itemDataHelpers'
 import { ItemType } from '../_types/item'
 
 interface ListItemResponse {

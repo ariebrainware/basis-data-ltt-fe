@@ -1,48 +1,5 @@
 import { ItemType } from '../_types/item'
 
-function toNumber(value: unknown): number {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : 0
-}
-
-export function normalizeItem(item: any): ItemType {
-  return {
-    ID: toNumber(item?.ID ?? item?.id),
-    name: String(item?.name ?? item?.item_name ?? item?.title ?? ''),
-    price: toNumber(item?.price ?? item?.amount ?? item?.nominal),
-    quantity: toNumber(item?.quantity ?? item?.qty ?? item?.stock),
-  }
-}
-
-export function buildItemQueryParams(
-  currentPage: number,
-  keyword: string
-): string {
-  const limit = 100
-  const offset = (currentPage - 1) * limit
-  let params = `limit=${limit}&offset=${offset}`
-
-  if (keyword.trim() !== '') {
-    params += `&keyword=${encodeURIComponent(keyword)}`
-  }
-
-  return params
-}
-
-export function extractItemList(responseData: any): ItemType[] {
-  const rawArray =
-    responseData?.data?.items ??
-    responseData?.data?.item ??
-    responseData?.data ??
-    []
-
-  return Array.isArray(rawArray) ? rawArray.map(normalizeItem) : []
-}
-
-export function getItemTotal(responseData: any): number {
-  return responseData?.data?.total ?? responseData?.total ?? 0
-}
-
 export function resetItemFormInputs(): void {
   const nameInput = document.querySelector<HTMLInputElement>('#add_name')
   const priceInput = document.querySelector<HTMLInputElement>('#add_price')
