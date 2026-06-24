@@ -7,6 +7,7 @@ interface TableTransactionProps {
   Data: {
     transaction: TransactionType[]
   }
+  onUpdateSuccess?: () => void
 }
 
 const TABLE_HEAD = [
@@ -49,7 +50,13 @@ const TableHeader = () => (
   </thead>
 )
 
-const TableBody = ({ transaction }: { transaction: TransactionType[] }) => (
+const TableBody = ({
+  transaction,
+  onUpdateSuccess,
+}: {
+  transaction: TransactionType[]
+  onUpdateSuccess?: () => void
+}) => (
   <tbody className="text-sm text-blue-gray-500">
     {transaction.map((item, index) => (
       <TransactionRow
@@ -63,18 +70,22 @@ const TableBody = ({ transaction }: { transaction: TransactionType[] }) => (
         transaction_date={item.transaction_date}
         treatment_date={item.treatment_date}
         pricing_name={item.pricing_name}
+        onUpdateSuccess={onUpdateSuccess}
       />
     ))}
   </tbody>
 )
 
-export default function TableTransaction({ Data }: TableTransactionProps) {
+export default function TableTransaction({
+  Data,
+  onUpdateSuccess,
+}: TableTransactionProps) {
   const { transaction } = Data
 
   return (
     <table className="w-full whitespace-nowrap">
       <TableHeader />
-      <TableBody transaction={transaction} />
+      <TableBody transaction={transaction} onUpdateSuccess={onUpdateSuccess} />
     </table>
   )
 }

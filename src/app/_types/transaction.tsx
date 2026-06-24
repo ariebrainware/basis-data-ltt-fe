@@ -1,3 +1,8 @@
+export interface TransactionItem {
+  item_id: number
+  quantity: number
+}
+
 export interface TransactionType {
   ID: number
   treatment_id: number
@@ -8,4 +13,5 @@ export interface TransactionType {
   notes: string
   transaction_date: string
   treatment_date: string
+  items?: TransactionItem[]
 }

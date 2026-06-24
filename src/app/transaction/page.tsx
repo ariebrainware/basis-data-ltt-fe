@@ -46,10 +46,12 @@ function normalizeTransaction(item: any): TransactionType {
     ID: toNumber(item?.ID ?? item?.id),
     treatment_id: toNumber(item?.treatment_id),
     patient_name: String(item?.patient_name ?? ''),
-    pricing_name: String(item?.pricing_name ?? item?.price_name ?? ''),
+    pricing_name: String(
+      item?.payment_method ?? item?.pricing_name ?? item?.price_name ?? ''
+    ),
     amount: toNumber(item?.amount ?? item?.price),
     payment_status: String(item?.payment_status ?? item?.status ?? ''),
-    notes: String(item?.notes ?? item?.remark ?? ''),
+    notes: String(item?.remarks ?? item?.notes ?? item?.remark ?? ''),
     transaction_date: formatDate(
       item?.transaction_date ??
         item?.CreatedAt ??
@@ -60,12 +62,19 @@ function normalizeTransaction(item: any): TransactionType {
     treatment_date: String(
       item?.treatment_date ?? item?.therapy_date ?? item?.service_date ?? ''
     ),
+    items: Array.isArray(item?.items)
+      ? item.items.map((i: any) => ({
+          item_id: toNumber(i?.item_id ?? i?.ItemID),
+          quantity: toNumber(i?.quantity ?? i?.Quantity),
+        }))
+      : [],
   }
 }
 
 function useFetchTransaction(
   currentPage: number,
-  keyword: string
+  keyword: string,
+  refreshTrigger: number
 ): ListTransactionResponse {
   const [transaction, setTransaction] = useState<TransactionType[]>([])
   const [total, setTotal] = useState(0)
@@ -104,7 +113,7 @@ function useFetchTransaction(
         console.error('Error fetching transaction:', error)
       }
     })()
-  }, [currentPage, keyword, router])
+  }, [currentPage, keyword, router, refreshTrigger])
 
   return { data: transaction, total }
 }
@@ -112,8 +121,17 @@ function useFetchTransaction(
 export default function TransactionPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [keyword, setKeyword] = useState('')
-  const { data, total } = useFetchTransaction(currentPage, keyword)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const { data, total } = useFetchTransaction(
+    currentPage,
+    keyword,
+    refreshTrigger
+  )
   const router = useRouter()
+
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1)
+  }
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -208,7 +226,10 @@ export default function TransactionPage() {
         onResize={undefined}
         onResizeCapture={undefined}
       >
-        <TableTransaction Data={{ transaction: data }} />
+        <TableTransaction
+          Data={{ transaction: data }}
+          onUpdateSuccess={handleRefresh}
+        />
       </CardBody>
       <CardFooter
         className="flex items-center justify-between border-t border-blue-gray-50 p-4"
