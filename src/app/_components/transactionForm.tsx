@@ -56,6 +56,8 @@ export function TransactionForm({
   const [selectedItems, setSelectedItems] = useState<
     { item_id: number; quantity: number }[]
   >(() => items ?? [])
+  const [dbAmount, setDbAmount] = useState<number | null>(null)
+  const [dbItems, setDbItems] = useState<{ item_id: number; quantity: number }[] | null>(null)
   const [manualAmount, setManualAmount] = useState<number | null>(null)
   const [isLoadingItems, setIsLoadingItems] = useState(false)
   const [itemsError, setItemsError] = useState<string | null>(null)
@@ -108,13 +110,19 @@ export function TransactionForm({
         if (res.ok) {
           const body = await res.json()
           const fetchedItems = body?.data?.items
-          if (Array.isArray(fetchedItems) && mounted) {
-            setSelectedItems(
-              fetchedItems.map((i: any) => ({
+          const fetchedAmount = body?.data?.amount
+          if (mounted) {
+            if (fetchedAmount !== undefined && fetchedAmount !== null) {
+              setDbAmount(Number(fetchedAmount))
+            }
+            if (Array.isArray(fetchedItems)) {
+              const mapped = fetchedItems.map((i: any) => ({
                 item_id: Number(i?.item_id ?? i?.ItemID ?? 0),
                 quantity: Number(i?.quantity ?? i?.Quantity ?? 0),
               }))
-            )
+              setDbItems(mapped)
+              setSelectedItems(mapped)
+            }
           }
         }
       } catch (e) {
@@ -127,17 +135,20 @@ export function TransactionForm({
     }
   }, [ID, router])
 
+  const currentBaseAmount = dbAmount !== null ? dbAmount : amount
+  const currentBaseItems = dbItems !== null ? dbItems : (items ?? [])
+
   // Calculate base price (amount of transaction minus the cost of the original items)
-  let calculatedBasePrice = amount
-  if (items && items.length > 0 && allItems.length > 0) {
+  let calculatedBasePrice = currentBaseAmount
+  if (currentBaseItems.length > 0 && allItems.length > 0) {
     let originalItemsCost = 0
-    for (const item of items) {
+    for (const item of currentBaseItems) {
       const detail = allItems.find((i) => i.ID === item.item_id)
       if (detail) {
         originalItemsCost += detail.price * item.quantity
       }
     }
-    calculatedBasePrice = Math.max(0, amount - originalItemsCost)
+    calculatedBasePrice = Math.max(0, currentBaseAmount - originalItemsCost)
   }
 
   // Calculate new total amount including the currently selected items
