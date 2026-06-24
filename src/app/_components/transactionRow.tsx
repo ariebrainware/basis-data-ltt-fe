@@ -58,8 +58,9 @@ export default function TransactionRow({
       document.querySelector<HTMLInputElement>('#patient_name')?.value ||
       patient_name
     const pricingNameInput =
-      document.querySelector<HTMLSelectElement | HTMLInputElement>('#pricing_name')?.value ||
-      pricing_name
+      document.querySelector<HTMLSelectElement | HTMLInputElement>(
+        '#pricing_name'
+      )?.value || pricing_name
     const amountInput =
       document.querySelector<HTMLInputElement>('#amount')?.value ||
       String(amount)

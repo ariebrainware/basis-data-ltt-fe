@@ -76,7 +76,10 @@ const TableBody = ({
   </tbody>
 )
 
-export default function TableTransaction({ Data, onUpdateSuccess }: TableTransactionProps) {
+export default function TableTransaction({
+  Data,
+  onUpdateSuccess,
+}: TableTransactionProps) {
   const { transaction } = Data
 
   return (

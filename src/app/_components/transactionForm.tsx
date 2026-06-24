@@ -57,7 +57,9 @@ export function TransactionForm({
     { item_id: number; quantity: number }[]
   >(() => items ?? [])
   const [dbAmount, setDbAmount] = useState<number | null>(null)
-  const [dbItems, setDbItems] = useState<{ item_id: number; quantity: number }[] | null>(null)
+  const [dbItems, setDbItems] = useState<
+    { item_id: number; quantity: number }[] | null
+  >(null)
   const [manualAmount, setManualAmount] = useState<number | null>(null)
   const [isLoadingItems, setIsLoadingItems] = useState(false)
   const [itemsError, setItemsError] = useState<string | null>(null)
@@ -253,13 +255,16 @@ export function TransactionForm({
               defaultValue={normalizePricingNameDefault(pricing_name)}
               className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
             >
-              <option value="" disabled>Pilih metode pembayaran</option>
+              <option value="" disabled>
+                Pilih metode pembayaran
+              </option>
               <option value="cash">Cash</option>
               <option value="transfer_or_qris">Transfer atau QRIS</option>
               <option value="debit">Debit</option>
-              {pricing_name && !['cash', 'transfer_or_qris', 'debit'].includes(pricing_name.toLowerCase()) && (
-                <option value={pricing_name}>{pricing_name}</option>
-              )}
+              {pricing_name &&
+                !['cash', 'transfer_or_qris', 'debit'].includes(
+                  pricing_name.toLowerCase()
+                ) && <option value={pricing_name}>{pricing_name}</option>}
             </select>
           </div>
           <Input
@@ -287,13 +292,20 @@ export function TransactionForm({
               defaultValue={normalizePaymentStatusDefault(payment_status)}
               className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
             >
-              <option value="" disabled>Pilih status pembayaran</option>
+              <option value="" disabled>
+                Pilih status pembayaran
+              </option>
               <option value="paid">Lunas</option>
               <option value="unpaid">Terhutang</option>
               <option value="partial">Parsial</option>
-              {payment_status && !['paid', 'unpaid', 'partial'].includes(payment_status.toLowerCase()) && (
-                <option value={payment_status}>{formatPaymentStatus(payment_status)}</option>
-              )}
+              {payment_status &&
+                !['paid', 'unpaid', 'partial'].includes(
+                  payment_status.toLowerCase()
+                ) && (
+                  <option value={payment_status}>
+                    {formatPaymentStatus(payment_status)}
+                  </option>
+                )}
             </select>
           </div>
 

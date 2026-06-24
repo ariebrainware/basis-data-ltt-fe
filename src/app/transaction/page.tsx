@@ -46,7 +46,9 @@ function normalizeTransaction(item: any): TransactionType {
     ID: toNumber(item?.ID ?? item?.id),
     treatment_id: toNumber(item?.treatment_id),
     patient_name: String(item?.patient_name ?? ''),
-    pricing_name: String(item?.payment_method ?? item?.pricing_name ?? item?.price_name ?? ''),
+    pricing_name: String(
+      item?.payment_method ?? item?.pricing_name ?? item?.price_name ?? ''
+    ),
     amount: toNumber(item?.amount ?? item?.price),
     payment_status: String(item?.payment_status ?? item?.status ?? ''),
     notes: String(item?.remarks ?? item?.notes ?? item?.remark ?? ''),
@@ -120,7 +122,11 @@ export default function TransactionPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [keyword, setKeyword] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
-  const { data, total } = useFetchTransaction(currentPage, keyword, refreshTrigger)
+  const { data, total } = useFetchTransaction(
+    currentPage,
+    keyword,
+    refreshTrigger
+  )
   const router = useRouter()
 
   const handleRefresh = () => {
@@ -220,7 +226,10 @@ export default function TransactionPage() {
         onResize={undefined}
         onResizeCapture={undefined}
       >
-        <TableTransaction Data={{ transaction: data }} onUpdateSuccess={handleRefresh} />
+        <TableTransaction
+          Data={{ transaction: data }}
+          onUpdateSuccess={handleRefresh}
+        />
       </CardBody>
       <CardFooter
         className="flex items-center justify-between border-t border-blue-gray-50 p-4"
