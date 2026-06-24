@@ -51,14 +51,14 @@ export async function updateItem({
     const data = await response.json()
     console.log('Item information updated successfully:', data)
 
+    if (onDataChange) onDataChange()
+    else router.refresh()
+
     await Swal.fire({
       text: 'Data item berhasil diperbarui.',
       icon: 'success',
       confirmButtonText: 'OK',
     })
-
-    if (onDataChange) onDataChange()
-    else router.refresh()
   } catch (error) {
     console.error('Error updating item information:', error)
     await Swal.fire({
