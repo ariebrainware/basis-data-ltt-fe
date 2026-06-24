@@ -8,6 +8,38 @@ import { ItemType } from '../_types/item'
 import { useRouter } from 'next/navigation'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
+const formatPaymentStatus = (s?: string | null) => {
+  if (!s) return '-'
+  const lower = s.trim().toLowerCase()
+  if (lower === 'unpaid') return 'Terhutang'
+  if (lower === 'partial') return 'Parsial'
+  if (lower === 'cash') return 'Cash'
+  return s
+    .replace(/[_\-]+/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ')
+}
+
+const normalizePricingNameDefault = (val?: string | null) => {
+  if (!val) return ''
+  const lower = val.toLowerCase()
+  if (['cash', 'transfer_or_qris', 'debit'].includes(lower)) {
+    return lower
+  }
+  return val
+}
+
+const normalizePaymentStatusDefault = (val?: string | null) => {
+  if (!val) return ''
+  const lower = val.toLowerCase()
+  if (['paid', 'unpaid', 'partial'].includes(lower)) {
+    return lower
+  }
+  return val
+}
+
 export function TransactionForm({
   ID,
   treatment_id,
@@ -198,17 +230,27 @@ export function TransactionForm({
             onResize={undefined}
             onResizeCapture={undefined}
           />
-          <Input
-            id="pricing_name"
-            type="text"
-            label="Jenis Harga"
-            defaultValue={pricing_name}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            crossOrigin={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          />
+          <div className="w-full">
+            <label
+              htmlFor="pricing_name"
+              className="mb-1 block text-sm text-gray-600"
+            >
+              Metode Pembayaran
+            </label>
+            <select
+              id="pricing_name"
+              defaultValue={normalizePricingNameDefault(pricing_name)}
+              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+            >
+              <option value="" disabled>Pilih metode pembayaran</option>
+              <option value="cash">Cash</option>
+              <option value="transfer_or_qris">Transfer atau QRIS</option>
+              <option value="debit">Debit</option>
+              {pricing_name && !['cash', 'transfer_or_qris', 'debit'].includes(pricing_name.toLowerCase()) && (
+                <option value={pricing_name}>{pricing_name}</option>
+              )}
+            </select>
+          </div>
           <Input
             id="amount"
             type="number"
@@ -231,14 +273,16 @@ export function TransactionForm({
             </label>
             <select
               id="payment_status"
-              defaultValue={payment_status ?? ''}
+              defaultValue={normalizePaymentStatusDefault(payment_status)}
               className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
             >
-              <option value="">Pilih status</option>
-              <option value="cash">Cash</option>
-              <option value="transfer">Transfer</option>
-              <option value="partial">Partial</option>
-              <option value="unpaid">Unpaid</option>
+              <option value="" disabled>Pilih status pembayaran</option>
+              <option value="paid">Lunas</option>
+              <option value="unpaid">Terhutang</option>
+              <option value="partial">Parsial</option>
+              {payment_status && !['paid', 'unpaid', 'partial'].includes(payment_status.toLowerCase()) && (
+                <option value={payment_status}>{formatPaymentStatus(payment_status)}</option>
+              )}
             </select>
           </div>
 

@@ -30,6 +30,10 @@ export default function TransactionRow({
 
   const formatPaymentStatus = (s?: string | null) => {
     if (!s) return '-'
+    const lower = s.trim().toLowerCase()
+    if (lower === 'unpaid') return 'Terhutang'
+    if (lower === 'partial') return 'Parsial'
+    if (lower === 'cash') return 'Cash'
     // replace underscores/hyphens with spaces, collapse spaces, then Title Case each word
     return s
       .replace(/[_\-]+/g, ' ')
@@ -49,7 +53,7 @@ export default function TransactionRow({
       document.querySelector<HTMLInputElement>('#patient_name')?.value ||
       patient_name
     const pricingNameInput =
-      document.querySelector<HTMLInputElement>('#pricing_name')?.value ||
+      document.querySelector<HTMLSelectElement | HTMLInputElement>('#pricing_name')?.value ||
       pricing_name
     const amountInput =
       document.querySelector<HTMLInputElement>('#amount')?.value ||
@@ -71,14 +75,10 @@ export default function TransactionRow({
     apiFetch(`/transaction/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        treatment_id: Number(treatmentIdInput),
-        patient_name: patientNameInput.trim(),
-        pricing_name: pricingNameInput.trim(),
         amount: Number(amountInput),
+        remarks: notesInput.trim(),
+        payment_method: pricingNameInput.trim(),
         payment_status: paymentStatusInput.trim(),
-        transaction_date: transactionDateInput.trim(),
-        treatment_date: treatmentDateInput.trim(),
-        notes: notesInput.trim(),
         items: itemsPayload,
       }),
     })

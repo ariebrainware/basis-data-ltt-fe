@@ -83,14 +83,10 @@ describe('TransactionRow', () => {
     const [, request] = (apiFetch as jest.Mock).mock.calls[0]
     expect(request.method).toBe('PATCH')
     expect(JSON.parse(request.body)).toEqual({
-      treatment_id: 30,
-      patient_name: 'Budi',
-      pricing_name: 'Paket Gold',
       amount: 250000,
+      remarks: 'catatan',
+      payment_method: 'Paket Gold',
       payment_status: 'cash',
-      transaction_date: '2026-05-20 10:00',
-      treatment_date: '2026-05-21',
-      notes: 'catatan',
       items: [],
     })
     await waitFor(() => expect(mockRefresh).toHaveBeenCalled())

@@ -46,10 +46,10 @@ function normalizeTransaction(item: any): TransactionType {
     ID: toNumber(item?.ID ?? item?.id),
     treatment_id: toNumber(item?.treatment_id),
     patient_name: String(item?.patient_name ?? ''),
-    pricing_name: String(item?.pricing_name ?? item?.price_name ?? ''),
+    pricing_name: String(item?.payment_method ?? item?.pricing_name ?? item?.price_name ?? ''),
     amount: toNumber(item?.amount ?? item?.price),
     payment_status: String(item?.payment_status ?? item?.status ?? ''),
-    notes: String(item?.notes ?? item?.remark ?? ''),
+    notes: String(item?.remarks ?? item?.notes ?? item?.remark ?? ''),
     transaction_date: formatDate(
       item?.transaction_date ??
         item?.CreatedAt ??
