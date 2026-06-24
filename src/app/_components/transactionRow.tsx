@@ -23,6 +23,7 @@ export default function TransactionRow({
   notes,
   transaction_date,
   treatment_date,
+  items,
 }: TransactionType) {
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
@@ -64,6 +65,9 @@ export default function TransactionRow({
       treatment_date
     const notesInput =
       document.querySelector<HTMLTextAreaElement>('#notes')?.value || notes
+    const itemsInput =
+      document.querySelector<HTMLInputElement>('#items')?.value
+    const itemsPayload = itemsInput ? JSON.parse(itemsInput) : []
 
     apiFetch(`/transaction/${ID}`, {
       method: 'PATCH',
@@ -76,6 +80,7 @@ export default function TransactionRow({
         transaction_date: transactionDateInput.trim(),
         treatment_date: treatmentDateInput.trim(),
         notes: notesInput.trim(),
+        items: itemsPayload,
       }),
     })
       .then((response) => {
@@ -151,6 +156,7 @@ export default function TransactionRow({
             notes={notes}
             transaction_date={transaction_date}
             treatment_date={treatment_date}
+            items={items}
           />
         </DialogBody>
         <DialogFooter

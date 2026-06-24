@@ -91,6 +91,7 @@ describe('TransactionRow', () => {
       transaction_date: '2026-05-20 10:00',
       treatment_date: '2026-05-21',
       notes: 'catatan',
+      items: [],
     })
     await waitFor(() => expect(mockRefresh).toHaveBeenCalled())
   })

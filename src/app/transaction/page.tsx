@@ -60,6 +60,12 @@ function normalizeTransaction(item: any): TransactionType {
     treatment_date: String(
       item?.treatment_date ?? item?.therapy_date ?? item?.service_date ?? ''
     ),
+    items: Array.isArray(item?.items)
+      ? item.items.map((i: any) => ({
+          item_id: toNumber(i?.item_id ?? i?.ItemID),
+          quantity: toNumber(i?.quantity ?? i?.Quantity),
+        }))
+      : [],
   }
 }
 
