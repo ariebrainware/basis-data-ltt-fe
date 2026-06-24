@@ -1,5 +1,4 @@
 import React from 'react'
-import { ItemForm } from './itemForm'
 import { ItemType } from '../_types/item'
 import ItemRowActions from './itemRowActions'
 

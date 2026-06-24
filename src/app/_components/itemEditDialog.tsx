@@ -24,20 +24,28 @@ export default function ItemEditDialog({
   quantity,
   open,
   setOpen,
-  onDataChange,
+  onDataChange: onParentDataChange,
 }: ItemEditDialogProps) {
   const router = useRouter()
 
   const handleConfirm = () => {
+    const nameInput =
+      document.querySelector<HTMLInputElement>('#name')?.value || name
+    const priceInput =
+      document.querySelector<HTMLInputElement>('#price')?.value || String(price)
+    const quantityInput =
+      document.querySelector<HTMLInputElement>('#quantity')?.value ||
+      String(quantity)
+
     void updateItem({
       id: ID,
-      name,
-      price,
-      quantity,
+      name: nameInput,
+      price: Number(priceInput),
+      quantity: Number(quantityInput),
       router,
       onDataChange: () => {
         setOpen(false)
-        if (onDataChange) onDataChange()
+        if (onParentDataChange) onParentDataChange()
         else router.refresh()
       },
     })

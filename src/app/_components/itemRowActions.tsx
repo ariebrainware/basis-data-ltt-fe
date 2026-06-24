@@ -11,7 +11,6 @@ import Swal from 'sweetalert2'
 import ItemEditDialog from './itemEditDialog'
 import { ItemType } from '../_types/item'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
-import { updateItem } from '@/app/_functions/itemUpdateService'
 
 export default function ItemRowActions({
   ID,
@@ -31,21 +30,6 @@ export default function ItemRowActions({
     resourceName: 'Data Item',
     onSuccess: onDataChange,
   })
-
-  const handleConfirm = () => {
-    void updateItem({
-      id: ID,
-      name,
-      price,
-      quantity,
-      router,
-      onDataChange: () => {
-        setOpen(false)
-        if (onDataChange) onDataChange()
-        else router.refresh()
-      },
-    })
-  }
 
   return (
     <>
