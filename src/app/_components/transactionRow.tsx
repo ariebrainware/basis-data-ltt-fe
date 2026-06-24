@@ -13,6 +13,10 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { TransactionType } from '../_types/transaction'
 import { TransactionForm } from './transactionForm'
 
+interface TransactionRowProps extends TransactionType {
+  onUpdateSuccess?: () => void
+}
+
 export default function TransactionRow({
   ID,
   treatment_id,
@@ -24,7 +28,8 @@ export default function TransactionRow({
   transaction_date,
   treatment_date,
   items,
-}: TransactionType) {
+  onUpdateSuccess,
+}: TransactionRowProps) {
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
 
@@ -100,7 +105,11 @@ export default function TransactionRow({
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
-          router.refresh()
+          if (onUpdateSuccess) {
+            onUpdateSuccess()
+          } else {
+            router.refresh()
+          }
         })
       })
       .catch((error) => {

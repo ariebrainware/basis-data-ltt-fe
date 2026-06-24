@@ -71,7 +71,8 @@ function normalizeTransaction(item: any): TransactionType {
 
 function useFetchTransaction(
   currentPage: number,
-  keyword: string
+  keyword: string,
+  refreshTrigger: number
 ): ListTransactionResponse {
   const [transaction, setTransaction] = useState<TransactionType[]>([])
   const [total, setTotal] = useState(0)
@@ -110,7 +111,7 @@ function useFetchTransaction(
         console.error('Error fetching transaction:', error)
       }
     })()
-  }, [currentPage, keyword, router])
+  }, [currentPage, keyword, router, refreshTrigger])
 
   return { data: transaction, total }
 }
@@ -118,8 +119,13 @@ function useFetchTransaction(
 export default function TransactionPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [keyword, setKeyword] = useState('')
-  const { data, total } = useFetchTransaction(currentPage, keyword)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const { data, total } = useFetchTransaction(currentPage, keyword, refreshTrigger)
   const router = useRouter()
+
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1)
+  }
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -214,7 +220,7 @@ export default function TransactionPage() {
         onResize={undefined}
         onResizeCapture={undefined}
       >
-        <TableTransaction Data={{ transaction: data }} />
+        <TableTransaction Data={{ transaction: data }} onUpdateSuccess={handleRefresh} />
       </CardBody>
       <CardFooter
         className="flex items-center justify-between border-t border-blue-gray-50 p-4"
