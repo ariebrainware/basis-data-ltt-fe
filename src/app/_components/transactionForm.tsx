@@ -241,16 +241,17 @@ export function TransactionForm({
                   ? 'Memuat data item...'
                   : 'Pilih item untuk ditambahkan...'}
               </option>
-              {allItems
-                .filter(
-                  (item) => !selectedItems.some((si) => si.item_id === item.ID)
+              {allItems.map((item) => {
+                const isSelected = selectedItems.some(
+                  (si) => si.item_id === item.ID
                 )
-                .map((item) => (
-                  <option key={item.ID} value={item.ID}>
+                return (
+                  <option key={item.ID} value={item.ID} disabled={isSelected}>
                     {item.name} - Rp. {item.price.toLocaleString('id-ID')}{' '}
-                    (Stok: {item.quantity})
+                    (Stok: {item.quantity}){isSelected ? ' (Terpilih)' : ''}
                   </option>
-                ))}
+                )
+              })}
             </select>
           </div>
 
