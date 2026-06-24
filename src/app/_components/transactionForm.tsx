@@ -21,10 +21,10 @@ export function TransactionForm({
   items,
 }: TransactionType) {
   const [allItems, setAllItems] = useState<ItemType[]>([])
-  const [selectedItems, setSelectedItems] = useState<{ item_id: number; quantity: number }[]>(
-    () => items ?? []
-  )
-  const [currentAmount, setCurrentAmount] = useState(amount)
+  const [selectedItems, setSelectedItems] = useState<
+    { item_id: number; quantity: number }[]
+  >(() => items ?? [])
+  const [manualAmount, setManualAmount] = useState<number | null>(null)
   const [isLoadingItems, setIsLoadingItems] = useState(false)
   const [itemsError, setItemsError] = useState<string | null>(null)
   const router = useRouter()
@@ -72,33 +72,29 @@ export function TransactionForm({
     }
   }, [router])
 
-  // Recalculate amount dynamically when items change
-  useEffect(() => {
-    if (allItems.length === 0) return
-
-    // Calculate base price (amount of transaction minus the cost of the original items)
-    let calculatedBasePrice = amount
-    if (items && items.length > 0) {
-      let originalItemsCost = 0
-      for (const item of items) {
-        const detail = allItems.find((i) => i.ID === item.item_id)
-        if (detail) {
-          originalItemsCost += detail.price * item.quantity
-        }
-      }
-      calculatedBasePrice = Math.max(0, amount - originalItemsCost)
-    }
-
-    // Calculate new total amount including the currently selected items
-    let newAmount = calculatedBasePrice
-    for (const item of selectedItems) {
+  // Calculate base price (amount of transaction minus the cost of the original items)
+  let calculatedBasePrice = amount
+  if (items && items.length > 0 && allItems.length > 0) {
+    let originalItemsCost = 0
+    for (const item of items) {
       const detail = allItems.find((i) => i.ID === item.item_id)
       if (detail) {
-        newAmount += detail.price * item.quantity
+        originalItemsCost += detail.price * item.quantity
       }
     }
-    setCurrentAmount(newAmount)
-  }, [selectedItems, allItems, amount, items])
+    calculatedBasePrice = Math.max(0, amount - originalItemsCost)
+  }
+
+  // Calculate new total amount including the currently selected items
+  let newAmount = calculatedBasePrice
+  for (const item of selectedItems) {
+    const detail = allItems.find((i) => i.ID === item.item_id)
+    if (detail) {
+      newAmount += detail.price * item.quantity
+    }
+  }
+
+  const currentAmount = manualAmount !== null ? manualAmount : newAmount
 
   const handleAddItemChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value
@@ -108,6 +104,7 @@ export function TransactionForm({
     if (selectedItems.some((i) => i.item_id === itemId)) return
 
     setSelectedItems((prev) => [...prev, { item_id: itemId, quantity: 1 }])
+    setManualAmount(null)
     e.target.value = '' // Reset selection
   }
 
@@ -122,10 +119,12 @@ export function TransactionForm({
         item.item_id === itemId ? { ...item, quantity: targetQty } : item
       )
     )
+    setManualAmount(null)
   }
 
   const handleRemoveItem = (itemId: number) => {
     setSelectedItems((prev) => prev.filter((item) => item.item_id !== itemId))
+    setManualAmount(null)
   }
 
   return (
@@ -192,7 +191,7 @@ export function TransactionForm({
             type="number"
             label="Nominal"
             value={currentAmount}
-            onChange={(e) => setCurrentAmount(Number(e.target.value))}
+            onChange={(e) => setManualAmount(Number(e.target.value))}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             crossOrigin={undefined}
@@ -201,7 +200,10 @@ export function TransactionForm({
           />
 
           <div className="w-full">
-            <label htmlFor="payment_status" className="mb-1 block text-sm text-gray-600">
+            <label
+              htmlFor="payment_status"
+              className="mb-1 block text-sm text-gray-600"
+            >
               Status Pembayaran
             </label>
             <select
@@ -218,7 +220,10 @@ export function TransactionForm({
           </div>
 
           <div className="w-full">
-            <label htmlFor="add_transaction_item" className="mb-1 block text-sm text-gray-600">
+            <label
+              htmlFor="add_transaction_item"
+              className="mb-1 block text-sm text-gray-600"
+            >
               Pilih Item Transaksi
             </label>
             {itemsError && (
@@ -232,13 +237,18 @@ export function TransactionForm({
               className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm disabled:bg-gray-100"
             >
               <option value="" disabled>
-                {isLoadingItems ? 'Memuat data item...' : 'Pilih item untuk ditambahkan...'}
+                {isLoadingItems
+                  ? 'Memuat data item...'
+                  : 'Pilih item untuk ditambahkan...'}
               </option>
               {allItems
-                .filter((item) => !selectedItems.some((si) => si.item_id === item.ID))
+                .filter(
+                  (item) => !selectedItems.some((si) => si.item_id === item.ID)
+                )
                 .map((item) => (
                   <option key={item.ID} value={item.ID}>
-                    {item.name} - Rp. {item.price.toLocaleString('id-ID')} (Stok: {item.quantity})
+                    {item.name} - Rp. {item.price.toLocaleString('id-ID')}{' '}
+                    (Stok: {item.quantity})
                   </option>
                 ))}
             </select>
@@ -246,13 +256,17 @@ export function TransactionForm({
 
           {selectedItems.length > 0 && (
             <div className="w-full rounded-md border border-gray-200 bg-gray-50 p-3">
-              <span className="mb-2 block text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-600">
                 Daftar Item Terpilih
               </span>
               <div className="flex flex-col gap-2">
                 {selectedItems.map((selectedItem) => {
-                  const detail = allItems.find((i) => i.ID === selectedItem.item_id)
-                  const name = detail ? detail.name : `Item #${selectedItem.item_id}`
+                  const detail = allItems.find(
+                    (i) => i.ID === selectedItem.item_id
+                  )
+                  const name = detail
+                    ? detail.name
+                    : `Item #${selectedItem.item_id}`
                   const price = detail ? detail.price : 0
                   const maxStock = detail ? detail.quantity : 999
 
@@ -262,14 +276,21 @@ export function TransactionForm({
                       className="flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-white p-2 text-sm shadow-sm transition-all hover:shadow"
                     >
                       <div className="flex-1">
-                        <span className="font-medium text-gray-800">{name}</span>
+                        <span className="font-medium text-gray-800">
+                          {name}
+                        </span>
                         <span className="ml-2 text-xs text-gray-500">
                           (Rp. {price.toLocaleString('id-ID')})
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <label htmlFor={`qty-${selectedItem.item_id}`} className="sr-only">Quantity</label>
+                        <label
+                          htmlFor={`qty-${selectedItem.item_id}`}
+                          className="sr-only"
+                        >
+                          Quantity
+                        </label>
                         <input
                           id={`qty-${selectedItem.item_id}`}
                           type="number"
@@ -277,18 +298,21 @@ export function TransactionForm({
                           max={maxStock}
                           value={selectedItem.quantity}
                           onChange={(e) =>
-                            handleQuantityChange(selectedItem.item_id, Number(e.target.value))
+                            handleQuantityChange(
+                              selectedItem.item_id,
+                              Number(e.target.value)
+                            )
                           }
                           className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(selectedItem.item_id)}
-                          className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-gray-100"
+                          className="rounded p-1 text-red-500 hover:bg-gray-100 hover:text-red-700"
                           aria-label={`Hapus ${name}`}
                         >
                           <svg
-                            className="w-4 h-4"
+                            className="h-4 w-4"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -310,7 +334,11 @@ export function TransactionForm({
             </div>
           )}
 
-          <input type="hidden" id="items" value={JSON.stringify(selectedItems)} />
+          <input
+            type="hidden"
+            id="items"
+            value={JSON.stringify(selectedItems)}
+          />
 
           <Input
             id="transaction_date"

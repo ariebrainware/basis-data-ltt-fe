@@ -65,8 +65,7 @@ export default function TransactionRow({
       treatment_date
     const notesInput =
       document.querySelector<HTMLTextAreaElement>('#notes')?.value || notes
-    const itemsInput =
-      document.querySelector<HTMLInputElement>('#items')?.value
+    const itemsInput = document.querySelector<HTMLInputElement>('#items')?.value
     const itemsPayload = itemsInput ? JSON.parse(itemsInput) : []
 
     apiFetch(`/transaction/${ID}`, {
