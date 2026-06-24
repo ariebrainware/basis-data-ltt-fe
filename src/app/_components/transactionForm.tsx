@@ -66,11 +66,34 @@ export function TransactionForm({
         }
       }
     })()
+    ;(async () => {
+      try {
+        const res = await apiFetch(`/transaction/${ID}`, { method: 'GET' })
+        if (res.status === 401) {
+          UnauthorizedAccess(router)
+          return
+        }
+        if (res.ok) {
+          const body = await res.json()
+          const fetchedItems = body?.data?.items
+          if (Array.isArray(fetchedItems) && mounted) {
+            setSelectedItems(
+              fetchedItems.map((i: any) => ({
+                item_id: Number(i?.item_id ?? i?.ItemID ?? 0),
+                quantity: Number(i?.quantity ?? i?.Quantity ?? 0),
+              }))
+            )
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load transaction details:', e)
+      }
+    })()
 
     return () => {
       mounted = false
     }
-  }, [router])
+  }, [ID, router])
 
   // Calculate base price (amount of transaction minus the cost of the original items)
   let calculatedBasePrice = amount
