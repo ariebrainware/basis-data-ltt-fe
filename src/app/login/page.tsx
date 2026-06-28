@@ -52,7 +52,7 @@ async function ensureAndStoreUserId(
     localStorage.setItem('user-id', userId.toString())
     if (process.env.NODE_ENV !== 'production')
       console.log('[Login] Stored user-id:', userId.toString())
-    router.push('/dashboard')
+    router.replace('/dashboard')
     return
   }
 
@@ -84,7 +84,7 @@ async function ensureAndStoreUserId(
       html: 'You are logged in, but we could not load your profile due to a network or server error. Some actions may not be available.',
     })
   } finally {
-    router.push('/dashboard')
+    router.replace('/dashboard')
   }
 }
 
@@ -146,7 +146,7 @@ export default function Login() {
 
   useEffect(() => {
     if (localStorage.getItem('session-token')) {
-      router.push('/dashboard')
+      router.replace('/dashboard')
       return
     }
     usernameInput = document.getElementById('email') as HTMLInputElement

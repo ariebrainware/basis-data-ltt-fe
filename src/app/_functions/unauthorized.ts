@@ -1,4 +1,7 @@
-export function UnauthorizedAccess(router?: { push?: (p: string) => void }) {
+export function UnauthorizedAccess(router?: {
+  replace?: (p: string) => void
+  push?: (p: string) => void
+}) {
   try {
     const isE2E =
       typeof window !== 'undefined' &&
@@ -12,19 +15,23 @@ export function UnauthorizedAccess(router?: { push?: (p: string) => void }) {
 
     // During E2E tests we skip the redirect to allow tests to control navigation
     if (!isE2E) {
-      if (router && typeof router.push === 'function') {
+      if (router && typeof router.replace === 'function') {
+        router.replace('/login')
+      } else if (router && typeof router.push === 'function') {
         router.push('/login')
       } else if (typeof window !== 'undefined') {
-        window.location.href = '/login'
+        window.location.replace('/login')
       }
     }
   } catch (err) {
     // If localStorage isn't available or other errors occur, attempt best-effort redirect
     try {
-      if (router && typeof router.push === 'function') {
+      if (router && typeof router.replace === 'function') {
+        router.replace('/login')
+      } else if (router && typeof router.push === 'function') {
         router.push('/login')
       } else if (typeof window !== 'undefined') {
-        window.location.href = '/login'
+        window.location.replace('/login')
       }
     } catch {
       // no-op
