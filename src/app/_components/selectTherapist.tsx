@@ -11,6 +11,7 @@ interface ControlledSelectProps {
   value?: string
   onChange: (value: string) => void
   disabled?: boolean
+  onlyApproved?: boolean
 }
 export function ControlledSelect({
   id,
@@ -18,6 +19,7 @@ export function ControlledSelect({
   value: propValue,
   onChange,
   disabled,
+  onlyApproved,
 }: ControlledSelectProps) {
   const router = useRouter()
   const [selectedValue, setSelectedValue] = React.useState<string | undefined>(
@@ -32,7 +34,7 @@ export function ControlledSelect({
     onChange(stringValue ?? '')
   }
   const [therapists, setTherapists] = React.useState<
-    { ID: string; full_name: string; role: string }[]
+    { ID: string; full_name: string; role: string; is_approved: boolean }[]
   >([])
 
   React.useEffect(() => {
@@ -60,7 +62,12 @@ export function ControlledSelect({
               t,
             ])
           ).values()
-        ) as { ID: string; full_name: string; role: string }[]
+        ) as {
+          ID: string
+          full_name: string
+          role: string
+          is_approved: boolean
+        }[]
 
         // Warn in development if duplicates were found
         if (process.env.NODE_ENV !== 'production') {
@@ -90,6 +97,10 @@ export function ControlledSelect({
     }, 0)
     return () => clearTimeout(t)
   }, [propValue])
+
+  const filteredTherapists = onlyApproved
+    ? therapists.filter((t) => t.is_approved)
+    : therapists
 
   // If the library Select is unavailable (e.g., in lightweight tests),
   // fall back to a native <select> so tests and non-browser envs work.
@@ -125,10 +136,12 @@ export function ControlledSelect({
         >
           <option value="">Pilih Terapis</option>
           {propValue &&
-          !therapists.find((t) => String(t.ID) === String(propValue)) ? (
+          !filteredTherapists.find(
+            (t) => String(t.ID) === String(propValue)
+          ) ? (
             <option value={String(propValue)}>{String(propValue)}</option>
           ) : null}
-          {therapists.map((therapist) => (
+          {filteredTherapists.map((therapist) => (
             <option key={therapist.ID} value={String(therapist.ID)}>
               {therapist.role} | {therapist.full_name}
             </option>
@@ -139,14 +152,15 @@ export function ControlledSelect({
   }
 
   const selectOptions: React.ReactNode[] = [
-    ...(propValue && !therapists.find((t) => String(t.ID) === String(propValue))
+    ...(propValue &&
+    !filteredTherapists.find((t) => String(t.ID) === String(propValue))
       ? [
           <LibraryOption key="__prefill" value={String(propValue)}>
             {String(propValue)}
           </LibraryOption>,
         ]
       : []),
-    ...therapists.map((therapist) => (
+    ...filteredTherapists.map((therapist) => (
       <LibraryOption key={therapist.ID} value={String(therapist.ID)}>
         {therapist.role} | {therapist.full_name}
       </LibraryOption>

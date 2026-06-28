@@ -30,6 +30,7 @@ export default function PricingRow({
     resourceType: 'pricing',
     resourceId: ID,
     resourceName: 'Data Harga',
+    onSuccess: onDataChange,
   })
 
   const handleUpdatePricing = () => {
