@@ -216,6 +216,7 @@ export default function PricingPage() {
               label="Nama"
               value={selectedTherapistId}
               onChange={setSelectedTherapistId}
+              onlyApproved={true}
             />
             <Input
               id="add_amount"
