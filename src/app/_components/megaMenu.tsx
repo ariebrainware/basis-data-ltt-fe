@@ -115,15 +115,19 @@ function NavListMenu() {
 
   const renderItems = filteredMenuItems.map(
     ({ icon, title, description, url }, key) => (
-      <a href="#" key={key}>
+      <a
+        href="#"
+        key={key}
+        onClick={(e) => {
+          e.preventDefault()
+          router.push(url)
+        }}
+      >
         <MenuItem
           className="flex items-center gap-3 rounded-lg"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
-          onClick={() => {
-            router.push(url)
-          }}
           onResize={undefined}
           onResizeCapture={undefined}
         >
@@ -244,6 +248,10 @@ function NavList() {
         onPointerLeaveCapture={undefined}
         onResize={undefined}
         onResizeCapture={undefined}
+        onClick={(e: React.MouseEvent) => {
+          e.preventDefault()
+          router.push('/dashboard')
+        }}
       >
         <ListItem
           className="flex items-center gap-2 py-2 pr-4"
@@ -267,6 +275,10 @@ function NavList() {
         onPointerLeaveCapture={undefined}
         onResize={undefined}
         onResizeCapture={undefined}
+        onClick={(e: React.MouseEvent) => {
+          e.preventDefault()
+          router.push('/profile')
+        }}
       >
         <ListItem
           className="flex cursor-pointer items-center gap-2 py-2 pr-4"
@@ -275,7 +287,6 @@ function NavList() {
           onPointerLeaveCapture={undefined}
           onResize={undefined}
           onResizeCapture={undefined}
-          onClick={() => router.push('/profile')}
         >
           Profile
         </ListItem>
@@ -292,16 +303,17 @@ function NavList() {
         onPointerLeaveCapture={undefined}
         onResize={undefined}
         onResizeCapture={undefined}
+        onClick={async (e: React.MouseEvent) => {
+          e.preventDefault()
+          await logout()
+          router.replace('/login')
+        }}
       >
         <ListItem
           className="flex items-center gap-2 py-2 pr-4"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
-          onClick={async () => {
-            await logout()
-            router.push('/login')
-          }}
           onResize={undefined}
           onResizeCapture={undefined}
         >

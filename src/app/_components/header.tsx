@@ -6,7 +6,7 @@ export default function Header() {
   const router = useRouter()
   const handleLogout = async () => {
     await logout()
-    router.push('/login')
+    router.replace('/login')
   }
 
   return (

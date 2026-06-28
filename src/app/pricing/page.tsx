@@ -338,7 +338,7 @@ export default function PricingPage() {
                 onPointerLeaveCapture={undefined}
                 onClick={async () => {
                   await logout()
-                  router.push('/login')
+                  router.replace('/login')
                 }}
                 onResize={undefined}
                 onResizeCapture={undefined}

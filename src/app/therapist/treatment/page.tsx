@@ -54,7 +54,7 @@ export default function TherapistTreatmentList() {
         <TherapistTreatmentHeader
           onLogout={async () => {
             await logout()
-            router.push('/login')
+            router.replace('/login')
           }}
           onSearchEnter={handleInputKeyDown}
         />

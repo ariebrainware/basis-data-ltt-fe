@@ -97,7 +97,7 @@ export default function ListTherapist() {
               onAddClick={() => window.open('/therapist/register', '_blank')}
               onLogoutClick={async () => {
                 await logout()
-                router.push('/login')
+                router.replace('/login')
               }}
               onSearchEnter={handleInputKeyDown}
             />
