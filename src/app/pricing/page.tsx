@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
 import TablePricing from '../_components/tablePricing'
+import { ControlledSelect } from '../_components/selectTherapist'
 import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { PricingType } from '../_types/pricing'
@@ -96,6 +97,7 @@ export default function PricingPage() {
   const [keyword, setKeyword] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [openAddDialog, setOpenAddDialog] = useState(false)
+  const [selectedTherapistId, setSelectedTherapistId] = useState<string>('')
   const { data, total } = useFetchPricing(currentPage, keyword, refreshTrigger)
   const router = useRouter()
 
@@ -112,12 +114,11 @@ export default function PricingPage() {
 
   const handleOpenAddDialog = () => {
     if (!openAddDialog) {
-      const nameInput = document.querySelector<HTMLInputElement>('#add_name')
+      setSelectedTherapistId('')
       const amountInput =
         document.querySelector<HTMLInputElement>('#add_amount')
       const descriptionInput =
         document.querySelector<HTMLTextAreaElement>('#add_description')
-      if (nameInput) nameInput.value = ''
       if (amountInput) amountInput.value = ''
       if (descriptionInput) descriptionInput.value = ''
     }
@@ -125,17 +126,15 @@ export default function PricingPage() {
   }
 
   const handleAddPricing = () => {
-    const nameInput =
-      document.querySelector<HTMLInputElement>('#add_name')?.value || ''
     const amountInput =
       document.querySelector<HTMLInputElement>('#add_amount')?.value || '0'
     const descriptionInput =
       document.querySelector<HTMLTextAreaElement>('#add_description')?.value ||
       ''
 
-    if (!nameInput.trim()) {
+    if (!selectedTherapistId) {
       Swal.fire({
-        text: 'Nama harga tidak boleh kosong.',
+        text: 'Nama terapis tidak boleh kosong.',
         icon: 'warning',
         confirmButtonText: 'OK',
       })
@@ -145,9 +144,8 @@ export default function PricingPage() {
     apiFetch('/pricing', {
       method: 'POST',
       body: JSON.stringify({
-        name: nameInput.trim(),
-        amount: Number(amountInput),
-        description: descriptionInput.trim(),
+        therapist_id: Number(selectedTherapistId),
+        price: Number(amountInput),
       }),
     })
       .then((response) => {
@@ -213,15 +211,11 @@ export default function PricingPage() {
           onResizeCapture={undefined}
         >
           <div className="flex flex-col gap-4">
-            <Input
+            <ControlledSelect
               id="add_name"
-              type="text"
               label="Nama"
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              crossOrigin={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
+              value={selectedTherapistId}
+              onChange={setSelectedTherapistId}
             />
             <Input
               id="add_amount"
