@@ -62,7 +62,12 @@ export function ControlledSelect({
               t,
             ])
           ).values()
-        ) as { ID: string; full_name: string; role: string; is_approved: boolean }[]
+        ) as {
+          ID: string
+          full_name: string
+          role: string
+          is_approved: boolean
+        }[]
 
         // Warn in development if duplicates were found
         if (process.env.NODE_ENV !== 'production') {
@@ -131,7 +136,9 @@ export function ControlledSelect({
         >
           <option value="">Pilih Terapis</option>
           {propValue &&
-          !filteredTherapists.find((t) => String(t.ID) === String(propValue)) ? (
+          !filteredTherapists.find(
+            (t) => String(t.ID) === String(propValue)
+          ) ? (
             <option value={String(propValue)}>{String(propValue)}</option>
           ) : null}
           {filteredTherapists.map((therapist) => (
@@ -145,7 +152,8 @@ export function ControlledSelect({
   }
 
   const selectOptions: React.ReactNode[] = [
-    ...(propValue && !filteredTherapists.find((t) => String(t.ID) === String(propValue))
+    ...(propValue &&
+    !filteredTherapists.find((t) => String(t.ID) === String(propValue))
       ? [
           <LibraryOption key="__prefill" value={String(propValue)}>
             {String(propValue)}
