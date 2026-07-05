@@ -21,7 +21,7 @@ import {
   startOfWeek,
   endOfWeek,
   startOfMonth,
-  endOfMonth
+  endOfMonth,
 } from 'date-fns'
 import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
@@ -139,10 +139,20 @@ const formatCurrency = (val: number) => {
   }).format(val)
 }
 
-const processTransactions = (rawTransactions: any[]): Omit<PeriodSummaryData, 'loading' | 'error'> => {
+const processTransactions = (
+  rawTransactions: any[]
+): Omit<PeriodSummaryData, 'loading' | 'error'> => {
   let totalGross = 0
   let totalNet = 0
-  const therapistMap: Record<number, { therapistName: string; visitCount: number; totalIncome: number; paidIncome: number }> = {}
+  const therapistMap: Record<
+    number,
+    {
+      therapistName: string
+      visitCount: number
+      totalIncome: number
+      paidIncome: number
+    }
+  > = {}
   let nextTempTherapistId = -1
   const tempTherapistIds: Record<string, number> = {}
 
@@ -154,16 +164,21 @@ const processTransactions = (rawTransactions: any[]): Omit<PeriodSummaryData, 'l
     if (isPaid || isPartial) totalNet += amount
 
     let therapistId = Number(tx.therapist_id || 0)
-    const therapistName = String(tx.therapist_name || (tx.therapist_id ? `Terapis ID: ${tx.therapist_id}` : 'Unknown'))
+    const therapistName = String(
+      tx.therapist_name ||
+        (tx.therapist_id ? `Terapis ID: ${tx.therapist_id}` : 'Unknown')
+    )
     if (!therapistId && therapistName && therapistName !== 'Unknown') {
-      therapistId = tempTherapistIds[therapistName] ?? (tempTherapistIds[therapistName] = nextTempTherapistId--)
+      therapistId =
+        tempTherapistIds[therapistName] ??
+        (tempTherapistIds[therapistName] = nextTempTherapistId--)
     }
     if (!therapistMap[therapistId]) {
       therapistMap[therapistId] = {
         therapistName,
         visitCount: 0,
         totalIncome: 0,
-        paidIncome: 0
+        paidIncome: 0,
       }
     }
 
@@ -174,23 +189,28 @@ const processTransactions = (rawTransactions: any[]): Omit<PeriodSummaryData, 'l
     }
   })
 
-  const therapists: TherapistSummary[] = Object.entries(therapistMap).map(([id, val]) => ({
-    therapistId: Number(id),
-    therapistName: val.therapistName,
-    visitCount: val.visitCount,
-    totalIncome: val.totalIncome,
-    paidIncome: val.paidIncome
-  })).sort((a, b) => b.totalIncome - a.totalIncome)
+  const therapists: TherapistSummary[] = Object.entries(therapistMap)
+    .map(([id, val]) => ({
+      therapistId: Number(id),
+      therapistName: val.therapistName,
+      visitCount: val.visitCount,
+      totalIncome: val.totalIncome,
+      paidIncome: val.paidIncome,
+    }))
+    .sort((a, b) => b.totalIncome - a.totalIncome)
 
   return {
     totalGross,
     totalNet,
     transactionCount: rawTransactions.length,
-    therapists
+    therapists,
   }
 }
 
-const fetchPeriodData = async (start: string, end: string): Promise<Omit<PeriodSummaryData, 'loading' | 'error'>> => {
+const fetchPeriodData = async (
+  start: string,
+  end: string
+): Promise<Omit<PeriodSummaryData, 'loading' | 'error'>> => {
   const url = `/transaction?start_date=${start}&end_date=${end}&limit=1000`
   const res = await apiFetch(url, { method: 'GET' })
   if (!res.ok) {
@@ -213,27 +233,35 @@ interface SummaryCardProps {
   customHeader?: React.ReactNode
 }
 
-function SummaryCard({ title, dateLabel, data, colorClass = "from-blue-600 to-indigo-700", customHeader }: SummaryCardProps) {
+function SummaryCard({
+  title,
+  dateLabel,
+  data,
+  colorClass = 'from-blue-600 to-indigo-700',
+  customHeader,
+}: SummaryCardProps) {
   return (
-    <Card 
-      className="flex flex-col shadow-lg border border-blue-gray-100 overflow-hidden min-h-[380px] bg-white rounded-xl"
+    <Card
+      className="flex min-h-[380px] flex-col overflow-hidden rounded-xl border border-blue-gray-100 bg-white shadow-lg"
       placeholder={undefined}
       onPointerEnterCapture={undefined}
       onPointerLeaveCapture={undefined}
       onResize={undefined}
       onResizeCapture={undefined}
     >
-      <div className={`p-4 bg-gradient-to-r ${colorClass} text-white`}>
-        <div className="flex justify-between items-center">
+      <div className={`bg-gradient-to-r p-4 ${colorClass} text-white`}>
+        <div className="flex items-center justify-between">
           <div>
-            <h6 className="font-bold text-white tracking-wide uppercase text-xs">{title}</h6>
-            <p className="text-white/80 font-normal text-xs">{dateLabel}</p>
+            <h6 className="text-xs font-bold uppercase tracking-wide text-white">
+              {title}
+            </h6>
+            <p className="text-xs font-normal text-white/80">{dateLabel}</p>
           </div>
           {customHeader}
         </div>
       </div>
       <CardBody
-        className="flex-1 p-4 flex flex-col justify-between"
+        className="flex flex-1 flex-col justify-between p-4"
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
@@ -241,31 +269,35 @@ function SummaryCard({ title, dateLabel, data, colorClass = "from-blue-600 to-in
         onResizeCapture={undefined}
       >
         {data.loading ? (
-          <div className="flex-1 flex flex-col justify-center items-center py-8 space-y-3">
-            <div className="w-8 h-8 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" />
-            <p className="text-xs text-gray-500 animate-pulse">Loading data...</p>
+          <div className="flex flex-1 flex-col items-center justify-center space-y-3 py-8">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
+            <p className="animate-pulse text-xs text-gray-500">
+              Loading data...
+            </p>
           </div>
         ) : data.error ? (
-          <div className="flex-1 flex flex-col justify-center items-center text-center p-4">
-            <p className="text-xs text-red-500 font-semibold">{data.error}</p>
+          <div className="flex flex-1 flex-col items-center justify-center p-4 text-center">
+            <p className="text-xs font-semibold text-red-500">{data.error}</p>
           </div>
         ) : (
-          <div className="space-y-4 flex-1 flex flex-col justify-between">
+          <div className="flex flex-1 flex-col justify-between space-y-4">
             {/* Income Display */}
             <div>
               <div className="mb-2">
-                <p className="text-blue-gray-400 font-medium text-xs">Total Pendapatan (Gross)</p>
-                <h4 className="font-extrabold text-blue-gray-800 text-2xl tracking-tight leading-none animate-fade-in">
+                <p className="text-xs font-medium text-blue-gray-400">
+                  Total Pendapatan (Gross)
+                </p>
+                <h4 className="animate-fade-in text-2xl font-extrabold leading-none tracking-tight text-blue-gray-800">
                   {formatCurrency(data.totalGross)}
                 </h4>
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500 animate-ping" />
-                <p className="text-green-700 font-semibold text-xs">
+                <span className="inline-block h-2.5 w-2.5 animate-ping rounded-full bg-green-500" />
+                <p className="text-xs font-semibold text-green-700">
                   Terbayar (Net): {formatCurrency(data.totalNet)}
                 </p>
               </div>
-              <p className="text-blue-gray-400 text-[10px] mt-0.5">
+              <p className="mt-0.5 text-[10px] text-blue-gray-400">
                 Total Transaksi: {data.transactionCount}
               </p>
             </div>
@@ -273,30 +305,42 @@ function SummaryCard({ title, dateLabel, data, colorClass = "from-blue-600 to-in
             <hr className="border-blue-gray-50" />
 
             {/* Therapist Breakdown */}
-            <div className="flex-1 flex flex-col">
-              <p className="text-blue-gray-600 font-semibold mb-2 text-xs">Kontribusi Terapis</p>
+            <div className="flex flex-1 flex-col">
+              <p className="mb-2 text-xs font-semibold text-blue-gray-600">
+                Kontribusi Terapis
+              </p>
               {data.therapists.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center py-4 bg-gray-50/50 rounded-lg">
-                  <p className="text-xs text-gray-500 italic">Tidak ada data transaksi</p>
+                <div className="flex flex-1 items-center justify-center rounded-lg bg-gray-50/50 py-4">
+                  <p className="text-xs italic text-gray-500">
+                    Tidak ada data transaksi
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-2.5 max-h-[160px] overflow-y-auto pr-1">
+                <div className="max-h-[160px] space-y-2.5 overflow-y-auto pr-1">
                   {data.therapists.map((therapist) => {
-                    const pct = data.totalGross > 0 ? Math.round((therapist.totalIncome / data.totalGross) * 100) : 0
+                    const pct =
+                      data.totalGross > 0
+                        ? Math.round(
+                            (therapist.totalIncome / data.totalGross) * 100
+                          )
+                        : 0
                     return (
                       <div key={therapist.therapistId} className="space-y-0.5">
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium text-blue-gray-800 truncate max-w-[130px] text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="max-w-[130px] truncate text-xs font-medium text-blue-gray-800">
                             {therapist.therapistName}
                           </span>
-                          <span className="font-semibold text-blue-gray-800 text-xs">
-                            {formatCurrency(therapist.totalIncome)} <span className="text-blue-gray-400 font-normal text-[10px]">({therapist.visitCount})</span>
+                          <span className="text-xs font-semibold text-blue-gray-800">
+                            {formatCurrency(therapist.totalIncome)}{' '}
+                            <span className="text-[10px] font-normal text-blue-gray-400">
+                              ({therapist.visitCount})
+                            </span>
                           </span>
                         </div>
                         {/* Progress bar */}
-                        <div className="w-full bg-blue-gray-50 h-1.5 rounded-full overflow-hidden">
-                          <div 
-                            className="bg-indigo-600 h-full rounded-full transition-all duration-500" 
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-blue-gray-50">
+                          <div
+                            className="h-full rounded-full bg-indigo-600 transition-all duration-500"
                             style={{ width: `${pct}%` }}
                           />
                         </div>
@@ -356,7 +400,9 @@ export default function Dashboard() {
     d.setDate(d.getDate() - 7) // default to last 7 days
     return format(d, 'yyyy-MM-dd')
   })
-  const [customEnd, setCustomEnd] = useState<string>(() => format(new Date(), 'yyyy-MM-dd'))
+  const [customEnd, setCustomEnd] = useState<string>(() =>
+    format(new Date(), 'yyyy-MM-dd')
+  )
 
   const [customData, setCustomData] = useState<PeriodSummaryData>({
     totalGross: 0,
@@ -380,7 +426,7 @@ export default function Dashboard() {
     const sunday = endOfWeek(now, { weekStartsOn: 1 })
     return {
       start: format(monday, 'yyyy-MM-dd'),
-      end: format(sunday, 'yyyy-MM-dd')
+      end: format(sunday, 'yyyy-MM-dd'),
     }
   }
 
@@ -390,7 +436,7 @@ export default function Dashboard() {
     const last = endOfMonth(now)
     return {
       start: format(first, 'yyyy-MM-dd'),
-      end: format(last, 'yyyy-MM-dd')
+      end: format(last, 'yyyy-MM-dd'),
     }
   }
 
@@ -407,7 +453,9 @@ export default function Dashboard() {
     // 1. Fetch Daily
     const dailyRange = getTodayRange()
     fetchPeriodData(dailyRange.start, dailyRange.end)
-      .then((resData) => setDailyData({ ...resData, loading: false, error: null }))
+      .then((resData) =>
+        setDailyData({ ...resData, loading: false, error: null })
+      )
       .catch((err) => {
         if (err instanceof Error && err.message.includes('401')) {
           UnauthorizedAccess(router)
@@ -423,7 +471,9 @@ export default function Dashboard() {
     // 2. Fetch Weekly
     const weeklyRange = getWeeklyRange()
     fetchPeriodData(weeklyRange.start, weeklyRange.end)
-      .then((resData) => setWeeklyData({ ...resData, loading: false, error: null }))
+      .then((resData) =>
+        setWeeklyData({ ...resData, loading: false, error: null })
+      )
       .catch((err) => {
         if (err instanceof Error && err.message.includes('401')) {
           UnauthorizedAccess(router)
@@ -439,7 +489,9 @@ export default function Dashboard() {
     // 3. Fetch Monthly
     const monthlyRange = getMonthlyRange()
     fetchPeriodData(monthlyRange.start, monthlyRange.end)
-      .then((resData) => setMonthlyData({ ...resData, loading: false, error: null }))
+      .then((resData) =>
+        setMonthlyData({ ...resData, loading: false, error: null })
+      )
       .catch((err) => {
         if (err instanceof Error && err.message.includes('401')) {
           UnauthorizedAccess(router)
@@ -451,21 +503,46 @@ export default function Dashboard() {
           error: err instanceof Error ? err.message : 'Unknown error',
         }))
       })
-  }, [])
+  }, [router])
+
+  const handleCustomStartChange = (val: string) => {
+    setCustomStart(val)
+    if (val && customEnd) {
+      if (val > customEnd) {
+        setCustomData((prev) => ({
+          ...prev,
+          loading: false,
+          error: 'Rentang tanggal tidak valid (mulai > akhir)',
+        }))
+      } else {
+        setCustomData((prev) => ({ ...prev, loading: true, error: null }))
+      }
+    }
+  }
+
+  const handleCustomEndChange = (val: string) => {
+    setCustomEnd(val)
+    if (customStart && val) {
+      if (customStart > val) {
+        setCustomData((prev) => ({
+          ...prev,
+          loading: false,
+          error: 'Rentang tanggal tidak valid (mulai > akhir)',
+        }))
+      } else {
+        setCustomData((prev) => ({ ...prev, loading: true, error: null }))
+      }
+    }
+  }
 
   useEffect(() => {
     if (!customStart || !customEnd) return
-    if (customStart > customEnd) {
-      setCustomData((prev) => ({
-        ...prev,
-        loading: false,
-        error: 'Rentang tanggal tidak valid (mulai > akhir)',
-      }))
-      return
-    }
-    setCustomData((prev) => ({ ...prev, loading: true, error: null }))
+    if (customStart > customEnd) return
+
     fetchPeriodData(customStart, customEnd)
-      .then((resData) => setCustomData({ ...resData, loading: false, error: null }))
+      .then((resData) =>
+        setCustomData({ ...resData, loading: false, error: null })
+      )
       .catch((err) => {
         if (err instanceof Error && err.message.includes('401')) {
           UnauthorizedAccess(router)
@@ -477,51 +554,51 @@ export default function Dashboard() {
           error: err instanceof Error ? err.message : 'Unknown error',
         }))
       })
-  }, [customStart, customEnd])
+  }, [customStart, customEnd, router])
 
   return (
-    <div className="space-y-6 p-4 md:p-6 bg-blue-gray-50/20 min-h-screen">
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
       <MegaMenuDefault />
 
       {/* Grid of Summaries */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <SummaryCard 
-          title="Ringkasan Harian" 
-          dateLabel={getTodayLabel()} 
-          data={dailyData} 
-          colorClass="from-teal-500 to-emerald-700" 
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard
+          title="Ringkasan Harian"
+          dateLabel={getTodayLabel()}
+          data={dailyData}
+          colorClass="from-teal-500 to-emerald-700"
         />
-        <SummaryCard 
-          title="Ringkasan Mingguan" 
-          dateLabel={getWeeklyLabel()} 
-          data={weeklyData} 
-          colorClass="from-blue-500 to-indigo-700" 
+        <SummaryCard
+          title="Ringkasan Mingguan"
+          dateLabel={getWeeklyLabel()}
+          data={weeklyData}
+          colorClass="from-blue-500 to-indigo-700"
         />
-        <SummaryCard 
-          title="Ringkasan Bulanan" 
-          dateLabel={getMonthlyLabel()} 
-          data={monthlyData} 
-          colorClass="from-purple-500 to-indigo-800" 
+        <SummaryCard
+          title="Ringkasan Bulanan"
+          dateLabel={getMonthlyLabel()}
+          data={monthlyData}
+          colorClass="from-purple-500 to-indigo-800"
         />
-        <SummaryCard 
-          title="Kustom Tanggal" 
-          dateLabel={`${customStart} s/d ${customEnd}`} 
-          data={customData} 
+        <SummaryCard
+          title="Kustom Tanggal"
+          dateLabel={`${customStart} s/d ${customEnd}`}
+          data={customData}
           colorClass="from-blue-gray-600 to-blue-gray-800"
           customHeader={
-            <div className="flex gap-2 text-black items-center">
+            <div className="flex items-center gap-2 text-black">
               <input
                 type="date"
                 value={customStart}
-                onChange={(e) => setCustomStart(e.target.value)}
-                className="text-[10px] px-1.5 py-0.5 rounded border border-gray-300 bg-white focus:outline-none max-w-[85px]"
+                onChange={(e) => handleCustomStartChange(e.target.value)}
+                className="max-w-[85px] rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] focus:outline-none"
               />
-              <span className="text-white text-xs self-center">s/d</span>
+              <span className="self-center text-xs text-white">s/d</span>
               <input
                 type="date"
                 value={customEnd}
-                onChange={(e) => setCustomEnd(e.target.value)}
-                className="text-[10px] px-1.5 py-0.5 rounded border border-gray-300 bg-white focus:outline-none max-w-[85px]"
+                onChange={(e) => handleCustomEndChange(e.target.value)}
+                className="max-w-[85px] rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] focus:outline-none"
               />
             </div>
           }
@@ -539,7 +616,7 @@ export default function Dashboard() {
         <CardHeader
           floated={false}
           shadow={false}
-          className="rounded-none m-0 p-4 pb-0"
+          className="m-0 rounded-none p-4 pb-0"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
@@ -574,7 +651,7 @@ export default function Dashboard() {
                 />
               </div>
               <Button
-                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="flex items-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700"
                 size="sm"
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
@@ -583,7 +660,8 @@ export default function Dashboard() {
                 onResizeCapture={undefined}
                 onClick={() => window.open('/treatment/register', '_blank')}
               >
-                <PlusCircleIcon strokeWidth={2} className="size-4 text-white" /> Tambah Penanganan
+                <PlusCircleIcon strokeWidth={2} className="size-4 text-white" />{' '}
+                Tambah Penanganan
               </Button>
             </div>
           </div>
@@ -641,7 +719,10 @@ export default function Dashboard() {
                     : 'p-4 border-b border-blue-gray-50'
 
                   return (
-                    <tr key={ID} className="hover:bg-blue-gray-50/20 transition-colors">
+                    <tr
+                      key={ID}
+                      className="transition-colors hover:bg-blue-gray-50/20"
+                    >
                       <td className={classes}>
                         <div className="flex items-center gap-3">
                           <Typography
