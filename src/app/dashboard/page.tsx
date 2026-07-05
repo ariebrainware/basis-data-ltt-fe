@@ -407,7 +407,17 @@ export default function Dashboard() {
     const dailyRange = getTodayRange()
     fetchPeriodData(dailyRange.start, dailyRange.end)
       .then((resData) => setDailyData({ ...resData, loading: false, error: null }))
-      .catch((err) => setDailyData((prev) => ({ ...prev, loading: false, error: err.message })))
+      .catch((err) => {
+        if (err instanceof Error && err.message.includes('401')) {
+          UnauthorizedAccess(router)
+          return
+        }
+        setDailyData((prev) => ({
+          ...prev,
+          loading: false,
+          error: err instanceof Error ? err.message : 'Unknown error',
+        }))
+      })
 
     // 2. Fetch Weekly
     const weeklyRange = getWeeklyRange()
