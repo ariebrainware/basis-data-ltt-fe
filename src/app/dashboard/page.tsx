@@ -423,7 +423,17 @@ export default function Dashboard() {
     const weeklyRange = getWeeklyRange()
     fetchPeriodData(weeklyRange.start, weeklyRange.end)
       .then((resData) => setWeeklyData({ ...resData, loading: false, error: null }))
-      .catch((err) => setWeeklyData((prev) => ({ ...prev, loading: false, error: err.message })))
+      .catch((err) => {
+        if (err instanceof Error && err.message.includes('401')) {
+          UnauthorizedAccess(router)
+          return
+        }
+        setWeeklyData((prev) => ({
+          ...prev,
+          loading: false,
+          error: err instanceof Error ? err.message : 'Unknown error',
+        }))
+      })
 
     // 3. Fetch Monthly
     const monthlyRange = getMonthlyRange()
