@@ -439,7 +439,17 @@ export default function Dashboard() {
     const monthlyRange = getMonthlyRange()
     fetchPeriodData(monthlyRange.start, monthlyRange.end)
       .then((resData) => setMonthlyData({ ...resData, loading: false, error: null }))
-      .catch((err) => setMonthlyData((prev) => ({ ...prev, loading: false, error: err.message })))
+      .catch((err) => {
+        if (err instanceof Error && err.message.includes('401')) {
+          UnauthorizedAccess(router)
+          return
+        }
+        setMonthlyData((prev) => ({
+          ...prev,
+          loading: false,
+          error: err instanceof Error ? err.message : 'Unknown error',
+        }))
+      })
   }, [])
 
   useEffect(() => {
