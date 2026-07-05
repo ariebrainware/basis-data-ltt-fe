@@ -454,10 +454,28 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!customStart || !customEnd) return
+    if (customStart > customEnd) {
+      setCustomData((prev) => ({
+        ...prev,
+        loading: false,
+        error: 'Rentang tanggal tidak valid (mulai > akhir)',
+      }))
+      return
+    }
     setCustomData((prev) => ({ ...prev, loading: true, error: null }))
     fetchPeriodData(customStart, customEnd)
       .then((resData) => setCustomData({ ...resData, loading: false, error: null }))
-      .catch((err) => setCustomData((prev) => ({ ...prev, loading: false, error: err.message })))
+      .catch((err) => {
+        if (err instanceof Error && err.message.includes('401')) {
+          UnauthorizedAccess(router)
+          return
+        }
+        setCustomData((prev) => ({
+          ...prev,
+          loading: false,
+          error: err instanceof Error ? err.message : 'Unknown error',
+        }))
+      })
   }, [customStart, customEnd])
 
   return (
