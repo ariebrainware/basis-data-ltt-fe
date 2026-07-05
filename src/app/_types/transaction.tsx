@@ -13,5 +13,6 @@ export interface TransactionType {
   notes: string
   transaction_date: string
   treatment_date: string
+  therapist_name?: string
   items?: TransactionItem[]
 }
