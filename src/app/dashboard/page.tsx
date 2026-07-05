@@ -143,20 +143,21 @@ const processTransactions = (rawTransactions: any[]): Omit<PeriodSummaryData, 'l
   let totalGross = 0
   let totalNet = 0
   const therapistMap: Record<number, { therapistName: string; visitCount: number; totalIncome: number; paidIncome: number }> = {}
+  let nextTempTherapistId = -1
+  const tempTherapistIds: Record<string, number> = {}
 
   rawTransactions.forEach((tx) => {
     const amount = Number(tx.amount || 0)
     totalGross += amount
-    
     const isPaid = tx.payment_status === 'paid'
     const isPartial = tx.payment_status === 'partial'
-    if (isPaid || isPartial) {
-      totalNet += amount
-    }
+    if (isPaid || isPartial) totalNet += amount
 
-    const therapistId = Number(tx.therapist_id || 0)
+    let therapistId = Number(tx.therapist_id || 0)
     const therapistName = String(tx.therapist_name || (tx.therapist_id ? `Terapis ID: ${tx.therapist_id}` : 'Unknown'))
-
+    if (!therapistId && therapistName && therapistName !== 'Unknown') {
+      therapistId = tempTherapistIds[therapistName] ?? (tempTherapistIds[therapistName] = nextTempTherapistId--)
+    }
     if (!therapistMap[therapistId]) {
       therapistMap[therapistId] = {
         therapistName,
