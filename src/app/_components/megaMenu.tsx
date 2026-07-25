@@ -49,6 +49,13 @@ const navListMenuItems = [
     roles: ['super_admin'],
   },
   {
+    title: 'Karyawan',
+    description: 'Halaman manajemen karyawan',
+    icon: UserGroupIcon,
+    url: '/employee',
+    roles: ['super_admin'],
+  },
+  {
     title: 'Penyakit',
     description: 'Halaman manajemen penyakit',
     icon: DocumentTextIcon,
