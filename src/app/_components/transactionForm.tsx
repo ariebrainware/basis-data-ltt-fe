@@ -54,11 +54,11 @@ export function TransactionForm({
 }: TransactionType) {
   const [allItems, setAllItems] = useState<ItemType[]>([])
   const [selectedItems, setSelectedItems] = useState<
-    { item_id: number; quantity: number }[]
+    { item_id: number; quantity: number; price?: number }[]
   >(() => items ?? [])
   const [dbAmount, setDbAmount] = useState<number | null>(null)
   const [dbItems, setDbItems] = useState<
-    { item_id: number; quantity: number }[] | null
+    { item_id: number; quantity: number; price?: number }[] | null
   >(null)
   const [manualAmount, setManualAmount] = useState<number | null>(null)
   const [isLoadingItems, setIsLoadingItems] = useState(false)
@@ -121,6 +121,7 @@ export function TransactionForm({
               const mapped = fetchedItems.map((i: any) => ({
                 item_id: Number(i?.item_id ?? i?.ItemID ?? 0),
                 quantity: Number(i?.quantity ?? i?.Quantity ?? 0),
+                price: i?.price !== undefined ? Number(i.price) : undefined,
               }))
               setDbItems(mapped)
               setSelectedItems(mapped)
@@ -147,7 +148,8 @@ export function TransactionForm({
     for (const item of currentBaseItems) {
       const detail = allItems.find((i) => i.ID === item.item_id)
       if (detail) {
-        originalItemsCost += detail.price * item.quantity
+        const itemPrice = item.price !== undefined ? item.price : detail.price
+        originalItemsCost += itemPrice * item.quantity
       }
     }
     calculatedBasePrice = Math.max(0, currentBaseAmount - originalItemsCost)
@@ -158,7 +160,8 @@ export function TransactionForm({
   for (const item of selectedItems) {
     const detail = allItems.find((i) => i.ID === item.item_id)
     if (detail) {
-      newAmount += detail.price * item.quantity
+      const itemPrice = item.price !== undefined ? item.price : detail.price
+      newAmount += itemPrice * item.quantity
     }
   }
 
@@ -171,7 +174,13 @@ export function TransactionForm({
     const itemId = Number(val)
     if (selectedItems.some((i) => i.item_id === itemId)) return
 
-    setSelectedItems((prev) => [...prev, { item_id: itemId, quantity: 1 }])
+    const detail = allItems.find((i) => i.ID === itemId)
+    const price = detail ? detail.price : 0
+
+    setSelectedItems((prev) => [
+      ...prev,
+      { item_id: itemId, quantity: 1, price },
+    ])
     setManualAmount(null)
     e.target.value = '' // Reset selection
   }
@@ -186,6 +195,14 @@ export function TransactionForm({
       prev.map((item) =>
         item.item_id === itemId ? { ...item, quantity: targetQty } : item
       )
+    )
+    setManualAmount(null)
+  }
+
+  const handlePriceChange = (itemId: number, price: number) => {
+    if (price < 0) return
+    setSelectedItems((prev) =>
+      prev.map((item) => (item.item_id === itemId ? { ...item, price } : item))
     )
     setManualAmount(null)
   }
@@ -358,7 +375,11 @@ export function TransactionForm({
                   const name = detail
                     ? detail.name
                     : `Item #${selectedItem.item_id}`
-                  const price = detail ? detail.price : 0
+                  const defaultPrice = detail ? detail.price : 0
+                  const price =
+                    selectedItem.price !== undefined
+                      ? selectedItem.price
+                      : defaultPrice
                   const maxStock = detail ? detail.quantity : 999
 
                   return (
@@ -366,13 +387,28 @@ export function TransactionForm({
                       key={selectedItem.item_id}
                       className="flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-white p-2 text-sm shadow-sm transition-all hover:shadow"
                     >
-                      <div className="flex-1">
+                      <div className="flex-1 flex flex-wrap items-center justify-between gap-2">
                         <span className="font-medium text-gray-800">
                           {name}
                         </span>
-                        <span className="ml-2 text-xs text-gray-500">
-                          (Rp. {price.toLocaleString('id-ID')})
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-gray-500">
+                            Harga: Rp
+                          </span>
+                          <input
+                            id={`price-${selectedItem.item_id}`}
+                            type="number"
+                            min="0"
+                            value={price}
+                            onChange={(e) =>
+                              handlePriceChange(
+                                selectedItem.item_id,
+                                Number(e.target.value)
+                              )
+                            }
+                            className="w-24 rounded border border-gray-300 px-2 py-1 text-right text-sm"
+                          />
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2">
