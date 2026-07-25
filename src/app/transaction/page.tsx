@@ -67,6 +67,7 @@ function normalizeTransaction(item: any): TransactionType {
       ? item.items.map((i: any) => ({
           item_id: toNumber(i?.item_id ?? i?.ItemID),
           quantity: toNumber(i?.quantity ?? i?.Quantity),
+          price: i?.price !== undefined ? toNumber(i.price) : undefined,
         }))
       : [],
   }
