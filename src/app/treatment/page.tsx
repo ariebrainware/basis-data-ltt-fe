@@ -71,11 +71,7 @@ export default function ListTreatment() {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [keyword, setKeyword] = useState('')
   const { data, total } = useFetchTreatment(currentPage, keyword)
-  const [userRole, setUserRole] = useState<string | null>(null)
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUserRole(getUserRole())
-  }, [])
+  const [userRole] = useState<string | null>(() => getUserRole())
   useEffect(() => {
     const t = setTimeout(() => setTreatment(data.treatment), 0)
     return () => clearTimeout(t)
