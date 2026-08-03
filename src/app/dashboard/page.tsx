@@ -672,7 +672,7 @@ export default function Dashboard() {
                   onResizeCapture={undefined}
                 />
               </div>
-              {(userRole === 'super_admin' || userRole === 'therapist') && (
+              {userRole === 'super_admin' && (
                 <Button
                   className="flex items-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700"
                   size="sm"

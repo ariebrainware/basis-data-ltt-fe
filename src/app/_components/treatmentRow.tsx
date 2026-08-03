@@ -14,7 +14,7 @@ import Swal from 'sweetalert2'
 import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
-import { isTherapist } from '../_functions/userRole'
+import { isTherapist, isAdmin, getUserRole } from '../_functions/userRole'
 import { getUserId } from '../_functions/userId'
 
 export default function Treatment({
@@ -47,16 +47,18 @@ export default function Treatment({
       : null
 
   // Check if current user can edit this treatment
+  // Admins can edit all treatments
   // Therapists can only edit treatments assigned to them
-  // Non-therapists (admins) can edit all treatments
-  const canEdit =
-    !isTherapistRole ||
-    (normalizedTherapistId !== null &&
-      normalizedCurrentUserId !== null &&
-      normalizedTherapistId === normalizedCurrentUserId)
+  // Normal users cannot edit treatments at all
+  const isAdminRole = isAdmin()
+  const canEdit = isAdminRole
 
   // Helper function to determine why edit is denied
   const getEditDenialReason = React.useCallback((): string => {
+    const role = getUserRole()
+    if (role === 'user') {
+      return 'Normal users do not have permissions to edit treatments'
+    }
     if (normalizedCurrentUserId === null) {
       return 'User ID not found in localStorage'
     }
@@ -327,12 +329,16 @@ export default function Treatment({
             aria-disabled={!canEdit}
             aria-label={
               !canEdit
-                ? 'Edit treatment (disabled - you can only edit treatments assigned to you)'
+                ? getUserRole() === 'user'
+                  ? 'Edit treatment (disabled - normal users cannot edit treatments)'
+                  : 'Edit treatment (disabled - you can only edit treatments assigned to you)'
                 : 'Edit treatment'
             }
             title={
               !canEdit
-                ? 'You can only edit treatments assigned to you'
+                ? getUserRole() === 'user'
+                  ? 'Normal users cannot edit treatments'
+                  : 'You can only edit treatments assigned to you'
                 : 'Edit treatment'
             }
           >
@@ -354,11 +360,11 @@ export default function Treatment({
               ></path>
             </svg>
           </button>
-          {/* Delete button is only available to admins (not therapists)
+          {/* Delete button is only available to admins (not therapists or normal users)
               This is intentionally different from edit permissions where therapists
               can edit their own treatments. Deletion requires admin privileges to
               prevent accidental data loss and maintain data integrity. */}
-          {!isTherapistRole && (
+          {isAdminRole && (
             <button
               className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
               data-shape="default"

@@ -18,6 +18,7 @@ import TableTreatment from '../_components/tableTreatment'
 import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { logout } from '../_functions/logout'
+import { getUserRole } from '../_functions/userRole'
 
 interface ListTreatmentResponse {
   data: {
@@ -70,6 +71,10 @@ export default function ListTreatment() {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [keyword, setKeyword] = useState('')
   const { data, total } = useFetchTreatment(currentPage, keyword)
+  const [userRole, setUserRole] = useState<string | null>(null)
+  useEffect(() => {
+    setUserRole(getUserRole())
+  }, [])
   useEffect(() => {
     const t = setTimeout(() => setTreatment(data.treatment), 0)
     return () => clearTimeout(t)
@@ -129,19 +134,21 @@ export default function ListTreatment() {
               </Typography>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                className="flex items-center gap-3"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={() => window.open('/treatment/register', '_blank')}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                <UserPlusIcon strokeWidth={2} className="size-4" /> Tambah
-                Penanganan
-              </Button>
+              {userRole === 'super_admin' && (
+                <Button
+                  className="flex items-center gap-3"
+                  size="sm"
+                  placeholder={undefined}
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
+                  onClick={() => window.open('/treatment/register', '_blank')}
+                  onResize={undefined}
+                  onResizeCapture={undefined}
+                >
+                  <UserPlusIcon strokeWidth={2} className="size-4" /> Tambah
+                  Penanganan
+                </Button>
+              )}
               <Button
                 variant="outlined"
                 size="sm"
