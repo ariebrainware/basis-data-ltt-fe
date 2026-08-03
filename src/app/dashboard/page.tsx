@@ -27,6 +27,7 @@ import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { apiFetch } from '../_functions/apiFetch'
 import { useRouter } from 'next/navigation'
+import { getUserRole } from '../_functions/userRole'
 import Pagination from '../_components/pagination'
 import { getApiHost } from '../_functions/apiHost'
 
@@ -363,6 +364,11 @@ export default function Dashboard() {
   const [keyword] = useState('')
   const { data, total } = useFetchTreatment(currentPage, keyword)
   const router = useRouter()
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    setUserRole(getUserRole())
+  }, [])
 
   useEffect(() => {
     const t = setTimeout(() => setTreatment(data.treatment), 0)
@@ -450,6 +456,14 @@ export default function Dashboard() {
   const getMonthlyLabel = () => format(new Date(), 'MMMM yyyy')
 
   useEffect(() => {
+    const role = getUserRole()
+    if (role !== 'super_admin') {
+      setDailyData((prev) => ({ ...prev, loading: false }))
+      setWeeklyData((prev) => ({ ...prev, loading: false }))
+      setMonthlyData((prev) => ({ ...prev, loading: false }))
+      return
+    }
+
     // 1. Fetch Daily
     const dailyRange = getTodayRange()
     fetchPeriodData(dailyRange.start, dailyRange.end)
@@ -539,6 +553,12 @@ export default function Dashboard() {
     if (!customStart || !customEnd) return
     if (customStart > customEnd) return
 
+    const role = getUserRole()
+    if (role !== 'super_admin') {
+      setCustomData((prev) => ({ ...prev, loading: false }))
+      return
+    }
+
     fetchPeriodData(customStart, customEnd)
       .then((resData) =>
         setCustomData({ ...resData, loading: false, error: null })
@@ -561,49 +581,51 @@ export default function Dashboard() {
       <MegaMenuDefault />
 
       {/* Grid of Summaries */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard
-          title="Ringkasan Harian"
-          dateLabel={getTodayLabel()}
-          data={dailyData}
-          colorClass="from-teal-500 to-emerald-700"
-        />
-        <SummaryCard
-          title="Ringkasan Mingguan"
-          dateLabel={getWeeklyLabel()}
-          data={weeklyData}
-          colorClass="from-blue-500 to-indigo-700"
-        />
-        <SummaryCard
-          title="Ringkasan Bulanan"
-          dateLabel={getMonthlyLabel()}
-          data={monthlyData}
-          colorClass="from-purple-500 to-indigo-800"
-        />
-        <SummaryCard
-          title="Kustom Tanggal"
-          dateLabel={`${customStart} s/d ${customEnd}`}
-          data={customData}
-          colorClass="from-blue-gray-600 to-blue-gray-800"
-          customHeader={
-            <div className="flex items-center gap-2 text-black">
-              <input
-                type="date"
-                value={customStart}
-                onChange={(e) => handleCustomStartChange(e.target.value)}
-                className="max-w-[85px] rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] focus:outline-none"
-              />
-              <span className="self-center text-xs text-white">s/d</span>
-              <input
-                type="date"
-                value={customEnd}
-                onChange={(e) => handleCustomEndChange(e.target.value)}
-                className="max-w-[85px] rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] focus:outline-none"
-              />
-            </div>
-          }
-        />
-      </div>
+      {userRole === 'super_admin' && (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <SummaryCard
+            title="Ringkasan Harian"
+            dateLabel={getTodayLabel()}
+            data={dailyData}
+            colorClass="from-teal-500 to-emerald-700"
+          />
+          <SummaryCard
+            title="Ringkasan Mingguan"
+            dateLabel={getWeeklyLabel()}
+            data={weeklyData}
+            colorClass="from-blue-500 to-indigo-700"
+          />
+          <SummaryCard
+            title="Ringkasan Bulanan"
+            dateLabel={getMonthlyLabel()}
+            data={monthlyData}
+            colorClass="from-purple-500 to-indigo-800"
+          />
+          <SummaryCard
+            title="Kustom Tanggal"
+            dateLabel={`${customStart} s/d ${customEnd}`}
+            data={customData}
+            colorClass="from-blue-gray-600 to-blue-gray-800"
+            customHeader={
+              <div className="flex items-center gap-2 text-black">
+                <input
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => handleCustomStartChange(e.target.value)}
+                  className="max-w-[85px] rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] focus:outline-none"
+                />
+                <span className="self-center text-xs text-white">s/d</span>
+                <input
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => handleCustomEndChange(e.target.value)}
+                  className="max-w-[85px] rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] focus:outline-none"
+                />
+              </div>
+            }
+          />
+        </div>
+      )}
 
       <Card
         placeholder={undefined}
@@ -650,19 +672,21 @@ export default function Dashboard() {
                   onResizeCapture={undefined}
                 />
               </div>
-              <Button
-                className="flex items-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
-                onClick={() => window.open('/treatment/register', '_blank')}
-              >
-                <PlusCircleIcon strokeWidth={2} className="size-4 text-white" />{' '}
-                Tambah Penanganan
-              </Button>
+              {(userRole === 'super_admin' || userRole === 'therapist') && (
+                <Button
+                  className="flex items-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700"
+                  size="sm"
+                  placeholder={undefined}
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
+                  onResize={undefined}
+                  onResizeCapture={undefined}
+                  onClick={() => window.open('/treatment/register', '_blank')}
+                >
+                  <PlusCircleIcon strokeWidth={2} className="size-4 text-white" />{' '}
+                  Tambah Penanganan
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>

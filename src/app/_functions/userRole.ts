@@ -11,7 +11,11 @@
  */
 export function getUserRole(): string | null {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('user-role')
+    const role = localStorage.getItem('user-role')
+    if (!role) return null
+    const lower = role.toLowerCase().trim()
+    if (lower === 'admin') return 'super_admin'
+    return lower
   }
   return null
 }
