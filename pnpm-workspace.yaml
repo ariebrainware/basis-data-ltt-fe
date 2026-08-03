@@ -2,7 +2,7 @@ packages:
   - '.'
 
 overrides:
-  postcss: "^8.5.15"
+  postcss: "^8.5.25"
   ws: "^8.21.0"
   js-yaml: "^4.2.0"
   "@babel/core": "^7.29.6"
