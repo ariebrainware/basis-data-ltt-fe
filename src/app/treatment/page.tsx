@@ -29,7 +29,8 @@ interface ListTreatmentResponse {
 
 function useFetchTreatment(
   currentPage: number,
-  keyword: string
+  keyword: string,
+  refreshTrigger: number
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
@@ -60,7 +61,7 @@ function useFetchTreatment(
         console.error('Error fetching treatment:', error)
       }
     })()
-  }, [currentPage, keyword, router])
+  }, [currentPage, keyword, refreshTrigger, router])
 
   return { data: { treatment: treatment }, total }
 }
@@ -70,8 +71,17 @@ export default function ListTreatment() {
   const [currentPage, setCurrentPage] = useState(1)
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [keyword, setKeyword] = useState('')
-  const { data, total } = useFetchTreatment(currentPage, keyword)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const { data, total } = useFetchTreatment(
+    currentPage,
+    keyword,
+    refreshTrigger
+  )
   const [userRole] = useState<string | null>(() => getUserRole())
+
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1)
+  }
   useEffect(() => {
     const t = setTimeout(() => setTreatment(data.treatment), 0)
     return () => clearTimeout(t)
@@ -186,7 +196,10 @@ export default function ListTreatment() {
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <TableTreatment Data={{ treatment: treatment }} />
+          <TableTreatment
+            Data={{ treatment: treatment }}
+            onDataChange={handleRefresh}
+          />
         </CardBody>
         <CardFooter
           className="flex items-center justify-between border-t border-blue-gray-50 p-4"

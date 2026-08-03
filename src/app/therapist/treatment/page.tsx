@@ -26,7 +26,16 @@ export default function TherapistTreatmentList() {
   const [currentPage, setCurrentPage] = useState(1)
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [keyword, setKeyword] = useState('')
-  const { data, total } = useFetchTreatment(currentPage, keyword)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const { data, total } = useFetchTreatment(
+    currentPage,
+    keyword,
+    undefined,
+    refreshTrigger
+  )
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1)
+  }
   useEffect(() => {
     const t = setTimeout(() => setTreatment(data.treatment), 0)
     return () => clearTimeout(t)
@@ -66,7 +75,10 @@ export default function TherapistTreatmentList() {
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <TableTreatment Data={{ treatment: treatment }} />
+          <TableTreatment
+            Data={{ treatment: treatment }}
+            onDataChange={handleRefresh}
+          />
         </CardBody>
         <CardFooter
           className="flex items-center justify-between border-t border-blue-gray-50 p-4"

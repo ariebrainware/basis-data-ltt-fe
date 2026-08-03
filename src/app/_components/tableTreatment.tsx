@@ -7,6 +7,7 @@ interface TableTreatmentProps {
   Data: {
     treatment: TreatmentType[]
   }
+  onDataChange?: () => void
 }
 const TABLE_HEAD = [
   'Waktu & Tanggal',
@@ -48,7 +49,13 @@ const TableHeader = () => (
   </thead>
 )
 
-const TableBody = ({ treatment }: { treatment: TreatmentType[] }) => (
+const TableBody = ({
+  treatment,
+  onDataChange,
+}: {
+  treatment: TreatmentType[]
+  onDataChange?: () => void
+}) => (
   <tbody className="text-sm text-blue-gray-500">
     {treatment?.map((treatment: TreatmentType) => (
       <Treatment
@@ -64,17 +71,21 @@ const TableBody = ({ treatment }: { treatment: TreatmentType[] }) => (
         therapist_name={treatment.therapist_name}
         therapist_id={treatment.therapist_id}
         next_visit={treatment.next_visit}
+        onDataChange={onDataChange}
       />
     ))}
   </tbody>
 )
 
-export default function TableTreatment({ Data }: TableTreatmentProps) {
+export default function TableTreatment({
+  Data,
+  onDataChange,
+}: TableTreatmentProps) {
   const { treatment } = Data
   return (
     <table className="w-full whitespace-nowrap">
       <TableHeader />
-      <TableBody treatment={treatment} />
+      <TableBody treatment={treatment} onDataChange={onDataChange} />
     </table>
   )
 }

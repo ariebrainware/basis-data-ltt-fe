@@ -29,7 +29,8 @@ export default function Treatment({
   treatment,
   remarks,
   next_visit: nextVisit,
-}: TreatmentType) {
+  onDataChange,
+}: TreatmentType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
   const [therapistIDState, setTherapistIDState] = React.useState<string>(
     therapistId?.toString() ?? ''
@@ -66,7 +67,8 @@ export default function Treatment({
           if (!resp.ok) return
 
           const json = await resp.json()
-          const fetchedId = json.data?.therapist_id || json.data?.user?.therapist_id
+          const fetchedId =
+            json.data?.therapist_id || json.data?.user?.therapist_id
           if (fetchedId) {
             const strId = String(fetchedId)
             localStorage.setItem('therapist-id', strId)
@@ -167,11 +169,7 @@ export default function Treatment({
     resourceType: 'treatment',
     resourceId: Number(ID),
     resourceName: 'Data Penanganan',
-    onSuccess: () => {
-      if (typeof window !== 'undefined') {
-        window.location.reload()
-      }
-    },
+    onSuccess: onDataChange,
   })
 
   const handleUpdateTreatment = () => {
@@ -227,11 +225,7 @@ export default function Treatment({
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
-          if (typeof window !== 'undefined') {
-            window.location.reload()
-          } else {
-            router.refresh()
-          }
+          if (onDataChange) onDataChange()
         })
       })
       .catch((error) => {

@@ -14,7 +14,8 @@ interface ListTreatmentResponse {
 export function useFetchTreatment(
   currentPage: number,
   keyword: string,
-  filterByTherapist?: boolean
+  filterByTherapist?: boolean,
+  refreshTrigger?: number
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
@@ -56,7 +57,7 @@ export function useFetchTreatment(
     return () => {
       cancelled = true
     }
-  }, [currentPage, keyword, filterByTherapist, router])
+  }, [currentPage, keyword, filterByTherapist, refreshTrigger, router])
 
   return { data: { treatment }, total }
 }
