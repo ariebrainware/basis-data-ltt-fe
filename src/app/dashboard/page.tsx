@@ -364,12 +364,7 @@ export default function Dashboard() {
   const [keyword] = useState('')
   const { data, total } = useFetchTreatment(currentPage, keyword)
   const router = useRouter()
-  const [userRole, setUserRole] = useState<string | null>(null)
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUserRole(getUserRole())
-  }, [])
+  const [userRole] = useState<string | null>(() => getUserRole())
 
   useEffect(() => {
     const t = setTimeout(() => setTreatment(data.treatment), 0)
