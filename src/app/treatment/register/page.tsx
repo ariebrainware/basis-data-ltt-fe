@@ -1,6 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
+import { useRouter } from 'next/navigation'
+import { getUserRole } from '../../_functions/userRole'
 
 import DatePicker from '../../_components/datePicker'
 import styles from '../../page.module.css'
@@ -20,6 +22,15 @@ let remarksInput: HTMLInputElement | null = null
 let nextVisitInput: HTMLInputElement | null = null
 
 export default function RegisterTreatment() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const role = getUserRole()
+    if (role !== 'super_admin') {
+      router.replace('/dashboard')
+    }
+  }, [router])
+
   const [therapistID, setTherapistID] = useState<string>('')
   const [selectedTreatmentConditions, setSelectedTreatmentConditions] =
     useState<string[]>([])

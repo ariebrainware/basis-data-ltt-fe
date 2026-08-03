@@ -14,8 +14,8 @@ import Swal from 'sweetalert2'
 import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
-import { isTherapist } from '../_functions/userRole'
-import { getUserId } from '../_functions/userId'
+import { isTherapist, isAdmin, getUserRole } from '../_functions/userRole'
+import { getUserId, getTherapistId } from '../_functions/userId'
 
 export default function Treatment({
   ID,
@@ -29,13 +29,17 @@ export default function Treatment({
   treatment,
   remarks,
   next_visit: nextVisit,
-}: TreatmentType) {
+  onDataChange,
+}: TreatmentType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
   const [therapistIDState, setTherapistIDState] = React.useState<string>(
     therapistId?.toString() ?? ''
   )
   const isTherapistRole = isTherapist()
   const currentUserId = getUserId()
+  const [currentTherapistIdState, setCurrentTherapistIdState] = React.useState<
+    string | null
+  >(() => getTherapistId())
   const router = useRouter()
   const normalizedTherapistId =
     therapistId !== null && therapistId !== undefined
@@ -45,29 +49,81 @@ export default function Treatment({
     currentUserId !== null && currentUserId !== undefined
       ? String(currentUserId)
       : null
+  const normalizedCurrentTherapistId =
+    currentTherapistIdState !== null && currentTherapistIdState !== undefined
+      ? String(currentTherapistIdState)
+      : null
+
+  // Dynamically fetch and set therapist-id in localStorage and component state if missing
+  React.useEffect(() => {
+    const fetchTherapistIdFallback = async () => {
+      if (isTherapistRole && currentUserId && !currentTherapistIdState) {
+        try {
+          const resp = await apiFetch(`/user/${currentUserId}`)
+          if (resp.status === 401) {
+            UnauthorizedAccess(router)
+            return
+          }
+          if (!resp.ok) return
+
+          const json = await resp.json()
+          const fetchedId =
+            json.data?.therapist_id || json.data?.user?.therapist_id
+          if (fetchedId) {
+            const strId = String(fetchedId)
+            localStorage.setItem('therapist-id', strId)
+            setCurrentTherapistIdState(strId)
+          }
+        } catch (err) {
+          console.error(
+            '[TreatmentRow] Failed to fetch therapist ID fallback:',
+            err
+          )
+        }
+      }
+    }
+    fetchTherapistIdFallback()
+  }, [isTherapistRole, currentUserId, currentTherapistIdState])
 
   // Check if current user can edit this treatment
+  // Admins can edit all treatments
   // Therapists can only edit treatments assigned to them
-  // Non-therapists (admins) can edit all treatments
+  // Normal users cannot edit treatments at all
+  const isAdminRole = isAdmin()
   const canEdit =
-    !isTherapistRole ||
-    (normalizedTherapistId !== null &&
-      normalizedCurrentUserId !== null &&
-      normalizedTherapistId === normalizedCurrentUserId)
+    isAdminRole ||
+    (isTherapistRole &&
+      normalizedTherapistId !== null &&
+      normalizedTherapistId === normalizedCurrentTherapistId)
 
   // Helper function to determine why edit is denied
   const getEditDenialReason = React.useCallback((): string => {
-    if (normalizedCurrentUserId === null) {
-      return 'User ID not found in localStorage'
+    const role = getUserRole()
+    if (role === 'user') {
+      return 'Normal users do not have permissions to edit treatments'
+    }
+    if (isTherapistRole && normalizedCurrentTherapistId === null) {
+      return 'Therapist ID not found in localStorage'
     }
     if (normalizedTherapistId === null) {
       return 'Treatment has no therapist assigned'
     }
-    if (normalizedTherapistId !== normalizedCurrentUserId) {
+    if (
+      isTherapistRole &&
+      normalizedTherapistId !== normalizedCurrentTherapistId
+    ) {
       return 'Treatment is assigned to a different therapist'
     }
+    if (!isAdminRole && !isTherapistRole) {
+      return 'Insufficient permissions'
+    }
     return 'Unknown reason'
-  }, [normalizedCurrentUserId, normalizedTherapistId])
+  }, [
+    isAdminRole,
+    isTherapistRole,
+    normalizedCurrentTherapistId,
+    normalizedTherapistId,
+  ])
 
   // Debug logging to help diagnose edit permission issues
   // Only log when there's a potential issue (therapist can't edit their own treatment)
@@ -82,6 +138,8 @@ export default function Treatment({
           normalizedTherapistId,
           currentUserId,
           normalizedCurrentUserId,
+          currentTherapistIdState,
+          normalizedCurrentTherapistId,
           reason: getEditDenialReason(),
         })
       }
@@ -94,6 +152,8 @@ export default function Treatment({
     normalizedTherapistId,
     currentUserId,
     normalizedCurrentUserId,
+    currentTherapistIdState,
+    normalizedCurrentTherapistId,
     getEditDenialReason,
   ])
 
@@ -109,6 +169,7 @@ export default function Treatment({
     resourceType: 'treatment',
     resourceId: Number(ID),
     resourceName: 'Data Penanganan',
+    onSuccess: onDataChange,
   })
 
   const handleUpdateTreatment = () => {
@@ -164,8 +225,7 @@ export default function Treatment({
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
-          // refresh the current route
-          router.refresh()
+          if (onDataChange) onDataChange()
         })
       })
       .catch((error) => {
@@ -327,12 +387,16 @@ export default function Treatment({
             aria-disabled={!canEdit}
             aria-label={
               !canEdit
-                ? 'Edit treatment (disabled - you can only edit treatments assigned to you)'
+                ? getUserRole() === 'user'
+                  ? 'Edit treatment (disabled - normal users cannot edit treatments)'
+                  : 'Edit treatment (disabled - you can only edit treatments assigned to you)'
                 : 'Edit treatment'
             }
             title={
               !canEdit
-                ? 'You can only edit treatments assigned to you'
+                ? getUserRole() === 'user'
+                  ? 'Normal users cannot edit treatments'
+                  : 'You can only edit treatments assigned to you'
                 : 'Edit treatment'
             }
           >
@@ -354,11 +418,11 @@ export default function Treatment({
               ></path>
             </svg>
           </button>
-          {/* Delete button is only available to admins (not therapists)
+          {/* Delete button is only available to admins (not therapists or normal users)
               This is intentionally different from edit permissions where therapists
               can edit their own treatments. Deletion requires admin privileges to
               prevent accidental data loss and maintain data integrity. */}
-          {!isTherapistRole && (
+          {isAdminRole && (
             <button
               className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
               data-shape="default"

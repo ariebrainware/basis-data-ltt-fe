@@ -26,7 +26,8 @@ export default function Therapist({
   height,
   is_approved: isApproved,
   role: initialRole,
-}: TherapistType) {
+  onDataChange,
+}: TherapistType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
   const [role, setRole] = React.useState<string>(initialRole || '')
@@ -48,6 +49,7 @@ export default function Therapist({
     resourceType: 'therapist',
     resourceId: ID,
     resourceName: 'Data Terapis',
+    onSuccess: onDataChange,
   })
 
   const handleOpen = () => setOpen(!open)
@@ -107,7 +109,7 @@ export default function Therapist({
             icon: 'success',
             confirmButtonText: 'OK',
           }).then(() => {
-            router.refresh()
+            if (onDataChange) onDataChange()
           })
         }
 
@@ -283,7 +285,7 @@ export default function Therapist({
                     .then((data) => {
                       console.log('Approval status updated:', data)
                       setApproved(true)
-                      router.refresh()
+                      if (onDataChange) onDataChange()
                     })
                     .catch((error) => {
                       console.error('Error:', error)

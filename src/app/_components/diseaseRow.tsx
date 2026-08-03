@@ -88,6 +88,7 @@ export default function DiseaseRow({
     resourceType: 'disease',
     resourceId: ID,
     resourceName: 'Data Penyakit',
+    onSuccess: onDataChange,
   })
 
   return (

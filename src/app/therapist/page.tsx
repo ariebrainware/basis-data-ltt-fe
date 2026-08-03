@@ -38,8 +38,16 @@ export default function ListTherapist() {
   const [therapists, setTherapists] = useState<TherapistType[]>([])
   const [, setTotal] = useState(0)
   const [keyword, setKeyword] = useState('')
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
   const router = useRouter()
-  const { data, total } = useFetchTherapist(currentPage, keyword)
+  const { data, total } = useFetchTherapist(
+    currentPage,
+    keyword,
+    refreshTrigger
+  )
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1)
+  }
   useEffect(() => {
     const t = setTimeout(() => setTherapists(data.therapist), 0)
     return () => clearTimeout(t)
@@ -111,7 +119,10 @@ export default function ListTherapist() {
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <TableTherapist Data={{ therapist: therapists }} />
+          <TableTherapist
+            Data={{ therapist: therapists }}
+            onDataChange={handleRefresh}
+          />
         </CardBody>
         <CardFooter
           className="flex items-center justify-between border-t border-blue-gray-50 p-4"
