@@ -387,7 +387,7 @@ export function TransactionForm({
                       key={selectedItem.item_id}
                       className="flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-white p-2 text-sm shadow-sm transition-all hover:shadow"
                     >
-                      <div className="flex-1 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-1 flex-wrap items-center justify-between gap-2">
                         <span className="font-medium text-gray-800">
                           {name}
                         </span>
