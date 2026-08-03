@@ -7,6 +7,7 @@ interface TableTherapistProps {
   Data: {
     therapist: TherapistType[]
   }
+  onDataChange?: () => void
 }
 const TABLE_HEAD = [
   'Terapis / No HP',
@@ -47,7 +48,13 @@ const TableHeader = () => (
   </thead>
 )
 
-const TableBody = ({ therapist }: { therapist: TherapistType[] }) => (
+const TableBody = ({
+  therapist,
+  onDataChange,
+}: {
+  therapist: TherapistType[]
+  onDataChange?: () => void
+}) => (
   <tbody className="text-sm text-blue-gray-500">
     {therapist?.map((therapist: TherapistType) => (
       <Therapist
@@ -63,18 +70,22 @@ const TableBody = ({ therapist }: { therapist: TherapistType[] }) => (
         weight={therapist.weight}
         height={therapist.height}
         address={therapist.address}
+        onDataChange={onDataChange}
       />
     ))}
   </tbody>
 )
 
-export default function TableTherapist({ Data }: TableTherapistProps) {
+export default function TableTherapist({
+  Data,
+  onDataChange,
+}: TableTherapistProps) {
   const { therapist } = Data
   //   console.log(`therapist`, therapist)
   return (
     <table className="w-full whitespace-nowrap">
       <TableHeader />
-      <TableBody therapist={therapist} />
+      <TableBody therapist={therapist} onDataChange={onDataChange} />
     </table>
   )
 }

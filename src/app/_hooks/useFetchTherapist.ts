@@ -13,7 +13,8 @@ interface ListTherapistResponse {
 
 export function useFetchTherapist(
   currentPage: number,
-  keyword: string
+  keyword: string,
+  refreshTrigger?: number
 ): ListTherapistResponse {
   const [therapist, setTherapist] = useState<TherapistType[]>([])
   const [total, setTotal] = useState(0)
@@ -37,7 +38,7 @@ export function useFetchTherapist(
         console.error('Error fetching therapist:', error)
       }
     })()
-  }, [currentPage, keyword, router])
+  }, [currentPage, keyword, refreshTrigger, router])
 
   return { data: { therapist: therapist }, total }
 }

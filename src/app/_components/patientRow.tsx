@@ -113,6 +113,7 @@ export default function Patient({
     resourceType: 'patient',
     resourceId: ID,
     resourceName: 'Data Pasien',
+    onSuccess: onDataChange,
   })
   const getGenderLabel = (gVal?: string) => {
     const g = (gVal || '').toString().trim().toLowerCase()
