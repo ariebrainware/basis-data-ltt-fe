@@ -51,7 +51,10 @@ async function ensureAndStoreUserId(
   if (userId) {
     localStorage.setItem('user-id', userId.toString())
     if (responseData.data?.therapist_id) {
-      localStorage.setItem('therapist-id', responseData.data.therapist_id.toString())
+      localStorage.setItem(
+        'therapist-id',
+        responseData.data.therapist_id.toString()
+      )
     }
     if (process.env.NODE_ENV !== 'production')
       console.log('[Login] Stored user-id:', userId.toString())

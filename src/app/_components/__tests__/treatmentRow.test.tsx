@@ -20,7 +20,8 @@ jest.mock('@material-tailwind/react', () => ({
       {children}
     </button>
   ),
-  Dialog: ({ children, open }: any) => open ? <div data-testid="dialog">{children}</div> : null,
+  Dialog: ({ children, open }: any) =>
+    open ? <div data-testid="dialog">{children}</div> : null,
   DialogHeader: ({ children }: any) => <div>{children}</div>,
   DialogBody: ({ children }: any) => <div>{children}</div>,
   DialogFooter: ({ children }: any) => <div>{children}</div>,

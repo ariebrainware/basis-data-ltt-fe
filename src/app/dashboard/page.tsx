@@ -367,6 +367,7 @@ export default function Dashboard() {
   const [userRole, setUserRole] = useState<string | null>(null)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUserRole(getUserRole())
   }, [])
 
@@ -458,6 +459,7 @@ export default function Dashboard() {
   useEffect(() => {
     const role = getUserRole()
     if (role !== 'super_admin') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDailyData((prev) => ({ ...prev, loading: false }))
       setWeeklyData((prev) => ({ ...prev, loading: false }))
       setMonthlyData((prev) => ({ ...prev, loading: false }))
@@ -555,6 +557,7 @@ export default function Dashboard() {
 
     const role = getUserRole()
     if (role !== 'super_admin') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCustomData((prev) => ({ ...prev, loading: false }))
       return
     }
@@ -683,7 +686,10 @@ export default function Dashboard() {
                   onResizeCapture={undefined}
                   onClick={() => window.open('/treatment/register', '_blank')}
                 >
-                  <PlusCircleIcon strokeWidth={2} className="size-4 text-white" />{' '}
+                  <PlusCircleIcon
+                    strokeWidth={2}
+                    className="size-4 text-white"
+                  />{' '}
                   Tambah Penanganan
                 </Button>
               )}

@@ -33,7 +33,11 @@ export function useFetchTreatment(
 
     const fetchData = async () => {
       try {
-        const baseParams = buildTreatmentQuery(keyword, currentPage, filterByTherapist)
+        const baseParams = buildTreatmentQuery(
+          keyword,
+          currentPage,
+          filterByTherapist
+        )
         const payload = await fetchTreatments(baseParams)
         if (!cancelled) {
           updateState(payload)
@@ -59,7 +63,11 @@ export function useFetchTreatment(
 
 class UnauthorizedFetchError extends Error {}
 
-function buildTreatmentQuery(keyword: string, currentPage: number, filterByTherapist?: boolean): string {
+function buildTreatmentQuery(
+  keyword: string,
+  currentPage: number,
+  filterByTherapist?: boolean
+): string {
   const params: string[] = []
   if (keyword) {
     params.push(`keyword=${encodeURIComponent(keyword)}`)

@@ -73,6 +73,7 @@ export default function ListTreatment() {
   const { data, total } = useFetchTreatment(currentPage, keyword)
   const [userRole, setUserRole] = useState<string | null>(null)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUserRole(getUserRole())
   }, [])
   useEffect(() => {

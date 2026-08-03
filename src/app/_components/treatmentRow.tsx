@@ -36,9 +36,9 @@ export default function Treatment({
   )
   const isTherapistRole = isTherapist()
   const currentUserId = getUserId()
-  const [currentTherapistIdState, setCurrentTherapistIdState] = React.useState<string | null>(
-    () => getTherapistId()
-  )
+  const [currentTherapistIdState, setCurrentTherapistIdState] = React.useState<
+    string | null
+  >(() => getTherapistId())
   const router = useRouter()
   const normalizedTherapistId =
     therapistId !== null && therapistId !== undefined
@@ -61,7 +61,8 @@ export default function Treatment({
           const resp = await apiFetch(`/user/${currentUserId}`)
           if (resp.ok) {
             const json = await resp.json()
-            const fetchedId = json.data?.therapist_id || json.data?.user?.therapist_id
+            const fetchedId =
+              json.data?.therapist_id || json.data?.user?.therapist_id
             if (fetchedId) {
               const strId = String(fetchedId)
               localStorage.setItem('therapist-id', strId)
@@ -69,7 +70,10 @@ export default function Treatment({
             }
           }
         } catch (err) {
-          console.error('[TreatmentRow] Failed to fetch therapist ID fallback:', err)
+          console.error(
+            '[TreatmentRow] Failed to fetch therapist ID fallback:',
+            err
+          )
         }
       }
     }
@@ -99,14 +103,22 @@ export default function Treatment({
     if (normalizedTherapistId === null) {
       return 'Treatment has no therapist assigned'
     }
-    if (isTherapistRole && normalizedTherapistId !== normalizedCurrentTherapistId) {
+    if (
+      isTherapistRole &&
+      normalizedTherapistId !== normalizedCurrentTherapistId
+    ) {
       return 'Treatment is assigned to a different therapist'
     }
     if (!isAdminRole && !isTherapistRole) {
       return 'Insufficient permissions'
     }
     return 'Unknown reason'
-  }, [isAdminRole, isTherapistRole, normalizedCurrentTherapistId, normalizedTherapistId])
+  }, [
+    isAdminRole,
+    isTherapistRole,
+    normalizedCurrentTherapistId,
+    normalizedTherapistId,
+  ])
 
   // Debug logging to help diagnose edit permission issues
   // Only log when there's a potential issue (therapist can't edit their own treatment)
