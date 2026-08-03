@@ -59,15 +59,18 @@ export default function Treatment({
       if (isTherapistRole && currentUserId && !currentTherapistIdState) {
         try {
           const resp = await apiFetch(`/user/${currentUserId}`)
-          if (resp.ok) {
-            const json = await resp.json()
-            const fetchedId =
-              json.data?.therapist_id || json.data?.user?.therapist_id
-            if (fetchedId) {
-              const strId = String(fetchedId)
-              localStorage.setItem('therapist-id', strId)
-              setCurrentTherapistIdState(strId)
-            }
+          if (resp.status === 401) {
+            UnauthorizedAccess(router)
+            return
+          }
+          if (!resp.ok) return
+
+          const json = await resp.json()
+          const fetchedId = json.data?.therapist_id || json.data?.user?.therapist_id
+          if (fetchedId) {
+            const strId = String(fetchedId)
+            localStorage.setItem('therapist-id', strId)
+            setCurrentTherapistIdState(strId)
           }
         } catch (err) {
           console.error(
