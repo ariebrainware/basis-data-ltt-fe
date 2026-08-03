@@ -78,6 +78,9 @@ export async function fetchCurrentUserId(): Promise<string | null> {
       data.therapist_id
 
     if (userId) {
+      if (data.data?.therapist_id && typeof window !== 'undefined') {
+        localStorage.setItem('therapist-id', String(data.data.therapist_id))
+      }
       if (process.env.NODE_ENV !== 'production') {
         console.log('[fetchCurrentUserId] Extracted user ID:', userId)
       }

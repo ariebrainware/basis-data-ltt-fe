@@ -34,3 +34,16 @@ export function getUserId(): string | null {
 
   return userId
 }
+
+/**
+ * Get the current therapist's ID from localStorage
+ * @returns The therapist ID as a string or null if not found
+ */
+export function getTherapistId(): string | null {
+  // Guard against SSR / non-browser environments
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  return localStorage.getItem('therapist-id')
+}

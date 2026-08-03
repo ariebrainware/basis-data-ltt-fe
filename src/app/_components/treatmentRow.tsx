@@ -15,7 +15,7 @@ import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isTherapist, isAdmin, getUserRole } from '../_functions/userRole'
-import { getUserId } from '../_functions/userId'
+import { getUserId, getTherapistId } from '../_functions/userId'
 
 export default function Treatment({
   ID,
@@ -36,6 +36,9 @@ export default function Treatment({
   )
   const isTherapistRole = isTherapist()
   const currentUserId = getUserId()
+  const [currentTherapistIdState, setCurrentTherapistIdState] = React.useState<string | null>(
+    () => getTherapistId()
+  )
   const router = useRouter()
   const normalizedTherapistId =
     therapistId !== null && therapistId !== undefined
@@ -45,13 +48,44 @@ export default function Treatment({
     currentUserId !== null && currentUserId !== undefined
       ? String(currentUserId)
       : null
+  const normalizedCurrentTherapistId =
+    currentTherapistIdState !== null && currentTherapistIdState !== undefined
+      ? String(currentTherapistIdState)
+      : null
+
+  // Dynamically fetch and set therapist-id in localStorage and component state if missing
+  React.useEffect(() => {
+    const fetchTherapistIdFallback = async () => {
+      if (isTherapistRole && currentUserId && !currentTherapistIdState) {
+        try {
+          const resp = await apiFetch(`/user/${currentUserId}`)
+          if (resp.ok) {
+            const json = await resp.json()
+            const fetchedId = json.data?.therapist_id || json.data?.user?.therapist_id
+            if (fetchedId) {
+              const strId = String(fetchedId)
+              localStorage.setItem('therapist-id', strId)
+              setCurrentTherapistIdState(strId)
+            }
+          }
+        } catch (err) {
+          console.error('[TreatmentRow] Failed to fetch therapist ID fallback:', err)
+        }
+      }
+    }
+    fetchTherapistIdFallback()
+  }, [isTherapistRole, currentUserId, currentTherapistIdState])
 
   // Check if current user can edit this treatment
   // Admins can edit all treatments
   // Therapists can only edit treatments assigned to them
   // Normal users cannot edit treatments at all
   const isAdminRole = isAdmin()
-  const canEdit = isAdminRole
+  const canEdit =
+    isAdminRole ||
+    (isTherapistRole &&
+      normalizedTherapistId !== null &&
+      normalizedTherapistId === normalizedCurrentTherapistId)
 
   // Helper function to determine why edit is denied
   const getEditDenialReason = React.useCallback((): string => {
@@ -59,17 +93,20 @@ export default function Treatment({
     if (role === 'user') {
       return 'Normal users do not have permissions to edit treatments'
     }
-    if (normalizedCurrentUserId === null) {
-      return 'User ID not found in localStorage'
+    if (isTherapistRole && normalizedCurrentTherapistId === null) {
+      return 'Therapist ID not found in localStorage'
     }
     if (normalizedTherapistId === null) {
       return 'Treatment has no therapist assigned'
     }
-    if (normalizedTherapistId !== normalizedCurrentUserId) {
+    if (isTherapistRole && normalizedTherapistId !== normalizedCurrentTherapistId) {
       return 'Treatment is assigned to a different therapist'
     }
+    if (!isAdminRole && !isTherapistRole) {
+      return 'Insufficient permissions'
+    }
     return 'Unknown reason'
-  }, [normalizedCurrentUserId, normalizedTherapistId])
+  }, [isAdminRole, isTherapistRole, normalizedCurrentTherapistId, normalizedTherapistId])
 
   // Debug logging to help diagnose edit permission issues
   // Only log when there's a potential issue (therapist can't edit their own treatment)
@@ -84,6 +121,8 @@ export default function Treatment({
           normalizedTherapistId,
           currentUserId,
           normalizedCurrentUserId,
+          currentTherapistIdState,
+          normalizedCurrentTherapistId,
           reason: getEditDenialReason(),
         })
       }
@@ -96,6 +135,8 @@ export default function Treatment({
     normalizedTherapistId,
     currentUserId,
     normalizedCurrentUserId,
+    currentTherapistIdState,
+    normalizedCurrentTherapistId,
     getEditDenialReason,
   ])
 
@@ -111,6 +152,11 @@ export default function Treatment({
     resourceType: 'treatment',
     resourceId: Number(ID),
     resourceName: 'Data Penanganan',
+    onSuccess: () => {
+      if (typeof window !== 'undefined') {
+        window.location.reload()
+      }
+    },
   })
 
   const handleUpdateTreatment = () => {
@@ -166,8 +212,11 @@ export default function Treatment({
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
-          // refresh the current route
-          router.refresh()
+          if (typeof window !== 'undefined') {
+            window.location.reload()
+          } else {
+            router.refresh()
+          }
         })
       })
       .catch((error) => {

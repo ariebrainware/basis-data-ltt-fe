@@ -13,7 +13,8 @@ interface ListTreatmentResponse {
 
 export function useFetchTreatment(
   currentPage: number,
-  keyword: string
+  keyword: string,
+  filterByTherapist?: boolean
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
@@ -32,7 +33,7 @@ export function useFetchTreatment(
 
     const fetchData = async () => {
       try {
-        const baseParams = buildTreatmentQuery(keyword, currentPage)
+        const baseParams = buildTreatmentQuery(keyword, currentPage, filterByTherapist)
         const payload = await fetchTreatments(baseParams)
         if (!cancelled) {
           updateState(payload)
@@ -51,17 +52,24 @@ export function useFetchTreatment(
     return () => {
       cancelled = true
     }
-  }, [currentPage, keyword, router])
+  }, [currentPage, keyword, filterByTherapist, router])
 
   return { data: { treatment }, total }
 }
 
 class UnauthorizedFetchError extends Error {}
 
-function buildTreatmentQuery(keyword: string, currentPage: number): string {
-  return keyword
-    ? `keyword=${encodeURIComponent(keyword)}`
-    : `limit=20&offset=${(currentPage - 1) * 20}`
+function buildTreatmentQuery(keyword: string, currentPage: number, filterByTherapist?: boolean): string {
+  const params: string[] = []
+  if (keyword) {
+    params.push(`keyword=${encodeURIComponent(keyword)}`)
+  } else {
+    params.push(`limit=20&offset=${(currentPage - 1) * 20}`)
+  }
+  if (filterByTherapist) {
+    params.push('filter_by_therapist=true')
+  }
+  return params.join('&')
 }
 
 function parseTreatmentData(data: any): {
