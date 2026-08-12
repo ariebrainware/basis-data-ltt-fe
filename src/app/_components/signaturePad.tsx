@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from 'react'
 
 export interface SignaturePadRef {
   clear: () => void
@@ -83,7 +89,7 @@ export const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(
       if (!canvas) return
       const ctx = canvas.getContext('2d')
       if (!ctx) return
-      
+
       // Clear scaled coordinates correctly
       ctx.save()
       ctx.setTransform(1, 0, 0, 1, 0, 0)
@@ -106,11 +112,11 @@ export const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(
       if (canvas) {
         const rect = canvas.getBoundingClientRect()
         const dpr = window.devicePixelRatio || 1
-        
+
         // Scale internal backing store width/height by DPR
         canvas.width = (rect.width || 400) * dpr
         canvas.height = (rect.height || 220) * dpr
-        
+
         const ctx = canvas.getContext('2d')
         if (ctx) {
           // Scale context drawing matching backing store scaling
@@ -125,23 +131,25 @@ export const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(
 
     return (
       <div className="w-full">
-        <label className="mb-1 block text-sm font-medium text-slate-600 dark:text-slate-300">
+        <label className="text-slate-600 dark:text-slate-300 mb-1 block text-sm font-medium">
           Tanda Tangan Pasien
         </label>
-        <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white/50 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50">
-          <canvas aria-label="Tanda Tangan Pasien"
+        <div className="border-slate-200 dark:border-slate-800 dark:bg-slate-900/50 relative overflow-hidden rounded-lg border bg-white/50 backdrop-blur-sm">
+          <canvas
+            aria-label="Tanda Tangan Pasien"
             ref={canvasRef}
             onPointerDown={startDrawing}
             onPointerMove={draw}
             onPointerUp={stopDrawing}
             onPointerLeave={stopDrawing}
             onPointerCancel={stopDrawing}
-            className="block h-[220px] w-full cursor-crosshair touch-none bg-slate-50 dark:bg-slate-950"
+            className="bg-slate-50 dark:bg-slate-950 block h-[220px] w-full cursor-crosshair touch-none"
             style={{ touchAction: 'none' }}
           />
           {isEmpty && (
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm italic text-slate-400">
-              Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini
+            <div className="text-slate-400 pointer-events-none absolute inset-0 flex items-center justify-center text-sm italic">
+              Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di
+              sini
             </div>
           )}
         </div>
@@ -149,7 +157,7 @@ export const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(
           <button
             type="button"
             onClick={handleClear}
-            className="rounded border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 hover:text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40"
+            className="dark:bg-red-950/20 dark:hover:bg-red-950/40 rounded border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 hover:text-red-700 dark:border-red-900/50 dark:text-red-400"
           >
             Hapus Tanda Tangan
           </button>

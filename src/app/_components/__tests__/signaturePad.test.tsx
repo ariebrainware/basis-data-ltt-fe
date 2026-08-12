@@ -35,7 +35,9 @@ describe('SignaturePad Component', () => {
   }
 
   const mockGetContext = jest.fn().mockReturnValue(mockContext)
-  const mockToDataURL = jest.fn().mockReturnValue('data:image/png;base64,mockImage')
+  const mockToDataURL = jest
+    .fn()
+    .mockReturnValue('data:image/png;base64,mockImage')
   const mockSetPointerCapture = jest.fn()
   const mockReleasePointerCapture = jest.fn()
   const mockGetBoundingClientRect = jest.fn().mockReturnValue({
@@ -56,8 +58,10 @@ describe('SignaturePad Component', () => {
     HTMLCanvasElement.prototype.getContext = mockGetContext as any
     HTMLCanvasElement.prototype.toDataURL = mockToDataURL
     HTMLCanvasElement.prototype.setPointerCapture = mockSetPointerCapture
-    HTMLCanvasElement.prototype.releasePointerCapture = mockReleasePointerCapture
-    HTMLCanvasElement.prototype.getBoundingClientRect = mockGetBoundingClientRect
+    HTMLCanvasElement.prototype.releasePointerCapture =
+      mockReleasePointerCapture
+    HTMLCanvasElement.prototype.getBoundingClientRect =
+      mockGetBoundingClientRect
   })
 
   beforeEach(() => {
@@ -70,9 +74,13 @@ describe('SignaturePad Component', () => {
 
     expect(screen.getByText('Tanda Tangan Pasien')).toBeInTheDocument()
     expect(
-      screen.getByText('Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini')
+      screen.getByText(
+        'Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini'
+      )
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /hapus tanda tangan/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /hapus tanda tangan/i })
+    ).toBeInTheDocument()
   })
 
   test('simulates drawing flow and triggers onChange', () => {
@@ -98,14 +106,18 @@ describe('SignaturePad Component', () => {
 
     // Placeholder should be hidden
     expect(
-      screen.queryByText('Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini')
+      screen.queryByText(
+        'Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini'
+      )
     ).not.toBeInTheDocument()
   })
 
   test('clears the signature and triggers callbacks', () => {
     const mockOnChange = jest.fn()
     const mockOnClear = jest.fn()
-    const { container } = render(<SignaturePad onChange={mockOnChange} onClear={mockOnClear} />)
+    const { container } = render(
+      <SignaturePad onChange={mockOnChange} onClear={mockOnClear} />
+    )
     const canvas = container.querySelector('canvas')
     if (!canvas) throw new Error('Canvas not found')
 
@@ -113,7 +125,9 @@ describe('SignaturePad Component', () => {
     fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 50, clientY: 50 })
     fireEvent.pointerUp(canvas, { pointerId: 1 })
     expect(
-      screen.queryByText('Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini')
+      screen.queryByText(
+        'Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini'
+      )
     ).not.toBeInTheDocument()
 
     // Click clear button
@@ -126,14 +140,18 @@ describe('SignaturePad Component', () => {
 
     // Placeholder should be visible again
     expect(
-      screen.getByText('Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini')
+      screen.getByText(
+        'Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini'
+      )
     ).toBeInTheDocument()
   })
 
   test('supports imperative clear ref method', () => {
     const mockOnChange = jest.fn()
     const ref = createRef<SignaturePadRef>()
-    const { container } = render(<SignaturePad ref={ref} onChange={mockOnChange} />)
+    const { container } = render(
+      <SignaturePad ref={ref} onChange={mockOnChange} />
+    )
     const canvas = container.querySelector('canvas')
     if (!canvas) throw new Error('Canvas not found')
 
@@ -141,7 +159,9 @@ describe('SignaturePad Component', () => {
     fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 50, clientY: 50 })
     fireEvent.pointerUp(canvas, { pointerId: 1 })
     expect(
-      screen.queryByText('Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini')
+      screen.queryByText(
+        'Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini'
+      )
     ).not.toBeInTheDocument()
 
     // Call clear imperatively
@@ -152,7 +172,9 @@ describe('SignaturePad Component', () => {
     expect(mockContext.clearRect).toHaveBeenCalled()
     expect(mockOnChange).toHaveBeenLastCalledWith('')
     expect(
-      screen.getByText('Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini')
+      screen.getByText(
+        'Gunakan mouse, sentuhan, atau Apple Pencil untuk tanda tangan di sini'
+      )
     ).toBeInTheDocument()
   })
 
