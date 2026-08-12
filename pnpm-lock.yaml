@@ -9,7 +9,7 @@ overrides:
   ws: ^8.21.0
   js-yaml: ^4.2.0
   '@babel/core': ^7.29.6
-  sharp: ^0.35.0
+  sharp: '>=0.35.0'
 
 importers:
 
