@@ -91,7 +91,7 @@ export default defineConfig({
       ? 'pnpm run build && pnpm run start:https'
       : 'pnpm run build && pnpm run start',
     url: process.env.WEBSERVER_URL || defaultWebServerUrl,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     env: {
       // API host to use when the app calls the backend. Defaults to HTTPS for
       // production-like local runs; can be overridden via NEXT_PUBLIC_API_HOST.
