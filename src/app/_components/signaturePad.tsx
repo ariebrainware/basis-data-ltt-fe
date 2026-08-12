@@ -1,11 +1,11 @@
-import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
+import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
 
 export interface SignaturePadRef {
   clear: () => void
 }
 
 interface SignaturePadProps {
-  onChange: (base64Image: string) => void
+  onChange: (dataUrl: string) => void
   onClear?: () => void
 }
 
@@ -129,7 +129,7 @@ export const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(
           Tanda Tangan Pasien
         </label>
         <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white/50 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50">
-          <canvas
+          <canvas aria-label="Tanda Tangan Pasien"
             ref={canvasRef}
             onPointerDown={startDrawing}
             onPointerMove={draw}
