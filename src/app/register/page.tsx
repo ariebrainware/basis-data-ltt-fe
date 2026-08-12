@@ -8,6 +8,7 @@ import { apiFetch } from '../_functions/apiFetch'
 import { DiseaseMultiSelect } from '../_components/selectDisease'
 import { extractErrorMessage } from '../_functions/errorMessage'
 import Swal from 'sweetalert2'
+import { SignaturePad, type SignaturePadRef } from '../_components/signaturePad'
 
 type GenderValue = 'male' | 'female' | ''
 
@@ -36,6 +37,8 @@ export default function Register() {
   const [showPatientCode, setShowPatientCode] = useState(false)
   const patientCodeRef = useRef<HTMLInputElement | null>(null)
   const [termsAccepted, setTermsAccepted] = useState(false)
+  const [signature, setSignature] = useState('')
+  const signaturePadRef = useRef<SignaturePadRef | null>(null)
 
   async function sendRegisterRequest() {
     const validationError = validateRegistration(
@@ -58,7 +61,8 @@ export default function Register() {
       healthHistory,
       surgeryHistory,
       phoneNumbers,
-      patientCodeRef.current?.value || ''
+      patientCodeRef.current?.value || '',
+      signature
     )
 
     const result = await submitRegistration(payload)
@@ -80,6 +84,8 @@ export default function Register() {
       setHealthHistory([])
       setShowPatientCode(false)
       setTermsAccepted(false)
+      setSignature('')
+      signaturePadRef.current?.clear()
 
       // Clear phone inputs: remove extras and leave a single empty input
       try {
@@ -193,6 +199,8 @@ export default function Register() {
           inputRef={patientCodeRef}
         />
 
+        <SignaturePad ref={signaturePadRef} onChange={setSignature} />
+
         <div className={styles.ctas}>
           <a
             className={
@@ -245,7 +253,8 @@ function buildRegistrationPayload(
   healthHistory: string[],
   surgeryHistory: string,
   phoneNumbers: string[],
-  patientCode: string
+  patientCode: string,
+  signature: string
 ) {
   const validPhones = phoneNumbers.filter((p) => p && p.trim())
   return {
@@ -258,6 +267,7 @@ function buildRegistrationPayload(
     surgery_history: surgeryHistory,
     phone_number: validPhones,
     patient_code: patientCode,
+    signature: signature,
   }
 }
 

@@ -83,7 +83,7 @@ export default function Treatment({
       }
     }
     fetchTherapistIdFallback()
-  }, [isTherapistRole, currentUserId, currentTherapistIdState])
+  }, [isTherapistRole, currentUserId, currentTherapistIdState, router])
 
   // Check if current user can edit this treatment
   // Admins can edit all treatments
