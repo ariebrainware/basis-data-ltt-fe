@@ -5,7 +5,7 @@ export interface SignaturePadRef {
 }
 
 interface SignaturePadProps {
-  onChange: (base64Image: string) => void
+  onChange: (dataUrl: string) => void
   onClear?: () => void
 }
 
