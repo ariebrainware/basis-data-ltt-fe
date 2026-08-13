@@ -177,56 +177,76 @@ function NavListMenu() {
 
   return (
     <React.Fragment>
-      <Menu
-        open={isMenuOpen}
-        handler={setIsMenuOpen}
-        offset={{ mainAxis: 20 }}
-        placement="bottom"
-      >
-        {(userRole === 'super_admin' || userRole === 'therapist') && (
-          <MenuHandler>
-            <Typography as="div" variant="small" className="font-medium">
-              <ListItem
-                className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
-                selected={isMenuOpen || isMobileMenuOpen}
-                onClick={() => setIsMobileMenuOpen((cur) => !cur)}
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Menu
-                <ChevronDownIcon
-                  strokeWidth={2.5}
-                  className={`hidden size-3 transition-transform lg:block ${
-                    isMenuOpen ? 'rotate-180' : ''
-                  }`}
-                />
-                <ChevronDownIcon
-                  strokeWidth={2.5}
-                  className={`block size-3 transition-transform lg:hidden ${
-                    isMobileMenuOpen ? 'rotate-180' : ''
-                  }`}
-                />
-              </ListItem>
-            </Typography>
-          </MenuHandler>
-        )}
-        <MenuList
-          className="hidden max-w-screen-xl rounded-xl lg:block"
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
+      {/* Desktop Menu */}
+      <div className="hidden lg:block">
+        <Menu
+          open={isMenuOpen}
+          handler={setIsMenuOpen}
+          offset={{ mainAxis: 20 }}
+          placement="bottom"
         >
-          <ul className="grid grid-cols-3 gap-y-2 outline-none outline-0">
-            {renderItems}
-          </ul>
-        </MenuList>
-      </Menu>
+          {(userRole === 'super_admin' || userRole === 'therapist') && (
+            <MenuHandler>
+              <Typography as="div" variant="small" className="font-medium">
+                <ListItem
+                  className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
+                  selected={isMenuOpen}
+                  placeholder={undefined}
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
+                  onResize={undefined}
+                  onResizeCapture={undefined}
+                >
+                  Menu
+                  <ChevronDownIcon
+                    strokeWidth={2.5}
+                    className={`hidden size-3 transition-transform lg:block ${
+                      isMenuOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </ListItem>
+              </Typography>
+            </MenuHandler>
+          )}
+          <MenuList
+            className="hidden max-w-screen-xl rounded-xl lg:block"
+            placeholder={undefined}
+            onPointerEnterCapture={undefined}
+            onPointerLeaveCapture={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
+          >
+            <ul className="grid grid-cols-3 gap-y-2 outline-none outline-0">
+              {renderItems}
+            </ul>
+          </MenuList>
+        </Menu>
+      </div>
+
+      {/* Mobile Menu */}
       <div className="block lg:hidden">
+        {(userRole === 'super_admin' || userRole === 'therapist') && (
+          <Typography as="div" variant="small" className="font-medium">
+            <ListItem
+              className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
+              selected={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen((cur) => !cur)}
+              placeholder={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            >
+              Menu
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`block size-3 transition-transform lg:hidden ${
+                  isMobileMenuOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </ListItem>
+          </Typography>
+        )}
         <Collapse open={isMobileMenuOpen}>{renderItems}</Collapse>
       </div>
     </React.Fragment>
