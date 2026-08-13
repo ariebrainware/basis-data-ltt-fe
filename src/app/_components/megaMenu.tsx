@@ -247,7 +247,9 @@ function NavListMenu() {
             </ListItem>
           </Typography>
         )}
-        <Collapse open={isMobileMenuOpen}>{renderItems}</Collapse>
+        {isMobileMenuOpen && (
+          <div className="flex flex-col gap-1 pl-4">{renderItems}</div>
+        )}
       </div>
     </React.Fragment>
   )
