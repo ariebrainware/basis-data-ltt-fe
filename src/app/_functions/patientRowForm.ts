@@ -144,6 +144,7 @@ type PatientUpdatePayloadArgs = {
   genderValue: string
   gender?: string
   patientCode?: string
+  signature?: string
   diseases: DiseaseType[]
 }
 
@@ -183,6 +184,7 @@ export function buildPatientUpdatePayload(
     genderValue,
     gender,
     patientCode,
+    signature,
     diseases,
   } = args
 
@@ -207,6 +209,7 @@ export function buildPatientUpdatePayload(
   )
   const gender_new_input = genderValue || gender || ''
   const patient_code_new_input = getInputValue('#patient_code', patientCode)
+  const signature_new_input = getInputValue('#signature', signature)
 
   const payload: PatientUpdatePayload = {
     full_name: full_name_new_input,
@@ -221,6 +224,7 @@ export function buildPatientUpdatePayload(
       diseases
     ),
     surgery_history: surgery_history_new_input,
+    signature: signature_new_input,
   }
 
   if (isAdmin()) {

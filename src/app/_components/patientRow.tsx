@@ -33,6 +33,8 @@ export default function Patient({
   health_history,
   surgery_history,
   patient_code: patientCode,
+  signature,
+  signature_path,
   onDataChange,
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
@@ -167,6 +169,8 @@ export default function Patient({
             surgery_history={surgery_history}
             gender={genderValue}
             last_visit={''}
+            signature={signature}
+            signature_path={signature_path}
             onGenderChange={setGenderValue}
             diseases={diseases}
           />
@@ -256,6 +260,8 @@ export default function Patient({
             health_history={health_history}
             surgery_history={surgery_history}
             gender={gender}
+            signature={signature}
+            signature_path={signature_path}
             onDataChange={onDataChange}
           />
           <button

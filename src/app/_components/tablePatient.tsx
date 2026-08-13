@@ -160,6 +160,8 @@ const TableBody = ({
         health_history={patient.health_history}
         surgery_history={patient.surgery_history}
         address={patient.address}
+        signature={patient.signature}
+        signature_path={patient.signature_path}
         onDataChange={onDataChange}
       />
     ))}

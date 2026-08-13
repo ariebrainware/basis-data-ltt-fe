@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { PatientForm } from '../patientForm'
 import { PatientType } from '@/app/_types/patient'
 import { DiseaseType } from '@/app/_types/disease'
@@ -25,6 +25,21 @@ jest.mock('@material-tailwind/react', () => ({
       data-testid={String(props.id)}
       aria-label={props.label}
     />
+  ),
+}))
+
+// Mock SignaturePad component
+jest.mock('../signaturePad', () => ({
+  SignaturePad: ({ onChange }: { onChange: (dataUrl: string) => void }) => (
+    <div data-testid="signature-pad">
+      <button
+        type="button"
+        data-testid="mock-sign-btn"
+        onClick={() => onChange('data:image/png;base64,newMockSignature')}
+      >
+        Sign
+      </button>
+    </div>
   ),
 }))
 
@@ -113,6 +128,7 @@ describe('PatientForm Component', () => {
     surgery_history: 'None',
     patient_code: 'PAT001',
     last_visit: '',
+    signature: 'data:image/png;base64,oldMockSignature',
   }
 
   test('renders patient form with all fields', () => {
@@ -179,5 +195,62 @@ describe('PatientForm Component', () => {
 
     expect(screen.getByTestId('full_name')).toHaveValue('')
     expect(screen.getByTestId('email')).toHaveValue('')
+  })
+
+  test('displays registered signature preview when signature is present', () => {
+    render(
+      <PatientForm
+        {...mockPatient}
+        signature="data:image/png;base64,oldMockSignature"
+      />
+    )
+
+    // Check if the registered signature text is present
+    expect(screen.getByText('Tanda Tangan Terdaftar')).toBeInTheDocument()
+
+    // Check if the image displays the signature
+    const img = screen.getByRole('img', { name: 'Tanda Tangan Pasien' })
+    expect(img).toBeInTheDocument()
+    expect(img).toHaveAttribute('src', 'data:image/png;base64,oldMockSignature')
+
+    // Check that the hidden input has the value
+    const hiddenInput = screen.getByTestId('signature')
+    expect(hiddenInput).toHaveValue('data:image/png;base64,oldMockSignature')
+  })
+
+  test('displays signature pad when signature is not present or when user clicks edit', () => {
+    const { rerender } = render(
+      <PatientForm {...mockPatient} signature="" />
+    )
+
+    // Check if the empty signature message/status is present
+    expect(screen.getByText('Belum Ada Tanda Tangan')).toBeInTheDocument()
+
+    // Signature pad should be rendered
+    expect(screen.getByTestId('signature-pad')).toBeInTheDocument()
+
+    // Rerender with signature to test transition
+    rerender(
+      <PatientForm
+        {...mockPatient}
+        signature="data:image/png;base64,oldMockSignature"
+      />
+    )
+    expect(screen.queryByTestId('signature-pad')).not.toBeInTheDocument()
+
+    // Click "Ubah Tanda Tangan"
+    const editBtn = screen.getByRole('button', { name: 'Ubah Tanda Tangan' })
+    fireEvent.click(editBtn)
+
+    // Signature pad should now show up
+    expect(screen.getByTestId('signature-pad')).toBeInTheDocument()
+
+    // Clicking mock sign button should update value
+    const signBtn = screen.getByTestId('mock-sign-btn')
+    fireEvent.click(signBtn)
+
+    // Hidden input should be updated
+    const hiddenInput = screen.getByTestId('signature')
+    expect(hiddenInput).toHaveValue('data:image/png;base64,newMockSignature')
   })
 })
