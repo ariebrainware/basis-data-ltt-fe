@@ -219,9 +219,7 @@ describe('PatientForm Component', () => {
   })
 
   test('displays signature pad when signature is not present or when user clicks edit', () => {
-    const { rerender } = render(
-      <PatientForm {...mockPatient} signature="" />
-    )
+    const { rerender } = render(<PatientForm {...mockPatient} signature="" />)
 
     // Check if the empty signature message/status is present
     expect(screen.getByText('Belum Ada Tanda Tangan')).toBeInTheDocument()

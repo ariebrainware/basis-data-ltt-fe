@@ -60,9 +60,12 @@ export default function PatientDialog({
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
   const [diseases, setDiseases] = React.useState<DiseaseType[]>([])
   const [diseasesFetched, setDiseasesFetched] = React.useState(false)
-  const [currentSignature, setCurrentSignature] = React.useState<string>(signature_path || signature || '')
+  const [currentSignature, setCurrentSignature] = React.useState<string>(
+    signature_path || signature || ''
+  )
 
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentSignature(signature_path || signature || '')
   }, [signature, signature_path])
 
@@ -91,7 +94,7 @@ export default function PatientDialog({
       setGenderValue(gender || '')
       await fetchDiseasesIfNeeded()
       setOpen(true)
-      
+
       try {
         const res = await apiFetch(`/patient/${ID}`, { method: 'GET' })
         if (res.status === 401) {
@@ -100,8 +103,13 @@ export default function PatientDialog({
         }
         if (res.ok) {
           const resData = await res.json()
-          if (resData.data && (resData.data.signature_path || resData.data.signature)) {
-            setCurrentSignature(resData.data.signature_path || resData.data.signature)
+          if (
+            resData.data &&
+            (resData.data.signature_path || resData.data.signature)
+          ) {
+            setCurrentSignature(
+              resData.data.signature_path || resData.data.signature
+            )
           }
         }
       } catch (err) {

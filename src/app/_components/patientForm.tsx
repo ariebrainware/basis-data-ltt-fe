@@ -53,9 +53,12 @@ export function PatientForm({
           .filter(Boolean)
       : []
   })
-  const [signatureVal, setSignatureVal] = useState(signature_path || signature || '')
+  const [signatureVal, setSignatureVal] = useState(
+    signature_path || signature || ''
+  )
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSignatureVal(signature_path || signature || '')
   }, [signature, signature_path])
 
@@ -238,21 +241,22 @@ export function PatientForm({
             />
             <div className="mt-2 w-full">
               {signatureVal ? (
-                <div className="relative overflow-hidden rounded-xl border border-slate-200/80 bg-white/50 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-emerald-100 dark:border-emerald-900/30">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="border-slate-200/80 dark:border-slate-800 dark:bg-slate-900/50 relative overflow-hidden rounded-xl border bg-white/50 p-4 shadow-sm backdrop-blur-sm">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/30 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold">
+                      <span className="bg-emerald-500 h-1.5 w-1.5 animate-pulse rounded-full" />
                       Tanda Tangan Terdaftar
                     </span>
                     <button
                       type="button"
                       onClick={() => setSignatureVal('')}
-                      className="text-xs font-semibold text-red-600 hover:text-red-700 dark:text-red-400 hover:underline transition-all"
+                      className="text-xs font-semibold text-red-600 transition-all hover:text-red-700 hover:underline dark:text-red-400"
                     >
                       Ubah Tanda Tangan
                     </button>
                   </div>
-                  <div className="flex justify-center bg-slate-50 dark:bg-slate-950 rounded-lg p-4 border border-slate-100 dark:border-slate-800">
+                  <div className="bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 flex justify-center rounded-lg border p-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={getSignatureUrl(signatureVal)}
                       alt="Tanda Tangan Pasien"
@@ -261,10 +265,10 @@ export function PatientForm({
                   </div>
                 </div>
               ) : (
-                <div className="rounded-xl border border-slate-200/80 bg-white/50 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50">
+                <div className="border-slate-200/80 dark:border-slate-800 dark:bg-slate-900/50 rounded-xl border bg-white/50 p-4 shadow-sm backdrop-blur-sm">
                   <div className="mb-2">
-                    <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit border border-amber-100 dark:border-amber-900/30">
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="dark:bg-amber-950/30 flex w-fit items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600 dark:border-amber-900/30 dark:text-amber-400">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
                       Belum Ada Tanda Tangan
                     </span>
                   </div>
