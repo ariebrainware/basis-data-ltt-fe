@@ -27,6 +27,8 @@ type PatientProps = {
   health_history?: string
   surgery_history?: string
   gender?: string
+  signature?: string
+  signature_path?: string
   onDataChange?: () => void
 }
 
@@ -49,6 +51,8 @@ export default function PatientDialog({
   health_history,
   surgery_history,
   gender,
+  signature,
+  signature_path,
   onDataChange,
 }: PatientProps) {
   const [open, setOpen] = React.useState(false)
@@ -56,6 +60,14 @@ export default function PatientDialog({
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
   const [diseases, setDiseases] = React.useState<DiseaseType[]>([])
   const [diseasesFetched, setDiseasesFetched] = React.useState(false)
+  const [currentSignature, setCurrentSignature] = React.useState<string>(
+    signature_path || signature || ''
+  )
+
+  React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentSignature(signature_path || signature || '')
+  }, [signature, signature_path])
 
   const fetchDiseasesIfNeeded = async () => {
     if (diseasesFetched) return
@@ -82,6 +94,27 @@ export default function PatientDialog({
       setGenderValue(gender || '')
       await fetchDiseasesIfNeeded()
       setOpen(true)
+
+      try {
+        const res = await apiFetch(`/patient/${ID}`, { method: 'GET' })
+        if (res.status === 401) {
+          UnauthorizedAccess(router)
+          return
+        }
+        if (res.ok) {
+          const resData = await res.json()
+          if (
+            resData.data &&
+            (resData.data.signature_path || resData.data.signature)
+          ) {
+            setCurrentSignature(
+              resData.data.signature_path || resData.data.signature
+            )
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching patient details:', err)
+      }
     } else {
       setOpen(false)
     }
@@ -161,6 +194,7 @@ export default function PatientDialog({
     )
     const gender_new_input = genderValue || gender
     const patient_code_new_input = getInputValue('#patient_code', patientCode)
+    const signature_new_input = getInputValue('#signature', currentSignature)
 
     const payload: PatientUpdatePayload = {
       full_name: full_name_new_input,
@@ -174,6 +208,7 @@ export default function PatientDialog({
         health_history_new_input || ''
       ),
       surgery_history: surgery_history_new_input,
+      signature: signature_new_input,
     }
 
     if (isAdmin()) {
@@ -297,6 +332,8 @@ export default function PatientDialog({
             surgery_history={surgery_history ?? ''}
             gender={genderValue}
             last_visit={''}
+            signature={currentSignature}
+            signature_path={signature_path}
             onGenderChange={setGenderValue}
             diseases={diseasesFetched ? diseases : undefined}
           />
