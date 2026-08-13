@@ -399,7 +399,7 @@ export default function MegaMenuDefault() {
         </IconButton>
       </div>
       <Collapse open={openNav}>
-        <NavList />
+        {mounted && <NavList />}
       </Collapse>
     </Navbar>
   )
