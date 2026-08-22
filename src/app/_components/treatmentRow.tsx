@@ -261,9 +261,11 @@ export default function Treatment({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          {isTherapistRole
-            ? 'Lengkapi Data Penanganan Pasien'
-            : 'Ubah Data Penanganan Pasien'}
+          {canEdit
+            ? isTherapistRole
+              ? 'Lengkapi Data Penanganan Pasien'
+              : 'Ubah Data Penanganan Pasien'
+            : 'Detail Data Penanganan Pasien'}
         </DialogHeader>
         <DialogBody
           className="px-2 md:px-6"
@@ -287,6 +289,7 @@ export default function Treatment({
             next_visit={nextVisit}
             therapistIDState={therapistIDState}
             setTherapistIDState={setTherapistIDState}
+            disabled={!canEdit}
           />
         </DialogBody>
         <DialogFooter
@@ -296,35 +299,55 @@ export default function Treatment({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <Button
-            variant="text"
-            color="red"
-            onClick={() => handleOpen()}
-            className="mr-1"
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            <span>Cancel</span>
-          </Button>
-          <Button
-            variant="gradient"
-            color="green"
-            onClick={() => handleUpdateTreatment()}
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            <span>Confirm</span>
-          </Button>
+          {canEdit ? (
+            <>
+              <Button
+                variant="text"
+                color="red"
+                onClick={() => handleOpen()}
+                className="mr-1"
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <span>Cancel</span>
+              </Button>
+              <Button
+                variant="gradient"
+                color="green"
+                onClick={() => handleUpdateTreatment()}
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <span>Confirm</span>
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="gradient"
+              color="blue"
+              onClick={() => handleOpen()}
+              placeholder={undefined}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            >
+              <span>Close</span>
+            </Button>
+          )}
         </DialogFooter>
       </Dialog>
 
-      <tr className="border-slate-200 border-b last:border-0">
+      <tr
+        className="border-slate-200 border-b last:border-0 hover:bg-blue-gray-50/50 cursor-pointer"
+        onClick={() => handleOpen()}
+      >
         <td className="p-3">
           <div className="flex items-center gap-3">
             <div className="flex flex-col">
@@ -377,46 +400,58 @@ export default function Treatment({
             </small>
           </div>
         </td>
-        <td className="p-3">
+        <td className="p-3" onClick={(e) => e.stopPropagation()}>
           <button
             data-open={open}
             className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
             data-shape="default"
             onClick={() => handleOpen()}
-            disabled={!canEdit}
-            aria-disabled={!canEdit}
-            aria-label={
-              !canEdit
-                ? getUserRole() === 'user'
-                  ? 'Edit treatment (disabled - normal users cannot edit treatments)'
-                  : 'Edit treatment (disabled - you can only edit treatments assigned to you)'
-                : 'Edit treatment'
-            }
-            title={
-              !canEdit
-                ? getUserRole() === 'user'
-                  ? 'Normal users cannot edit treatments'
-                  : 'You can only edit treatments assigned to you'
-                : 'Edit treatment'
-            }
+            aria-label={canEdit ? 'Edit treatment' : 'View treatment'}
+            title={canEdit ? 'Edit treatment' : 'View treatment'}
           >
-            <svg
-              width="1.5em"
-              height="1.5em"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              color="currentColor"
-              className="text-slate-800 size-4 dark:text-white"
-            >
-              <path
-                d="M14.3632 5.65156L15.8431 4.17157C16.6242 3.39052 17.8905 3.39052 18.6716 4.17157L20.0858 5.58579C20.8668 6.36683 20.8668 7.63316 20.0858 8.41421L18.6058 9.8942M14.3632 5.65156L4.74749 15.2672C4.41542 15.5993 4.21079 16.0376 4.16947 16.5054L3.92738 19.2459C3.87261 19.8659 4.39148 20.3848 5.0115 20.33L7.75191 20.0879C8.21972 20.0466 8.65806 19.8419 8.99013 19.5099L18.6058 9.8942M14.3632 5.65156L18.6058 9.8942"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></path>
-            </svg>
+            {canEdit ? (
+              <svg
+                width="1.5em"
+                height="1.5em"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                color="currentColor"
+                className="text-slate-800 size-4 dark:text-white"
+              >
+                <path
+                  d="M14.3632 5.65156L15.8431 4.17157C16.6242 3.39052 17.8905 3.39052 18.6716 4.17157L20.0858 5.58579C20.8668 6.36683 20.8668 7.63316 20.0858 8.41421L18.6058 9.8942M14.3632 5.65156L4.74749 15.2672C4.41542 15.5993 4.21079 16.0376 4.16947 16.5054L3.92738 19.2459C3.87261 19.8659 4.39148 20.3848 5.0115 20.33L7.75191 20.0879C8.21972 20.0466 8.65806 19.8419 8.99013 19.5099L18.6058 9.8942M14.3632 5.65156L18.6058 9.8942"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></path>
+              </svg>
+            ) : (
+              <svg
+                width="1.5em"
+                height="1.5em"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                color="currentColor"
+                className="text-slate-800 size-4 dark:text-white"
+              >
+                <path
+                  d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            )}
           </button>
           {/* Delete button is only available to admins (not therapists or normal users)
               This is intentionally different from edit permissions where therapists
