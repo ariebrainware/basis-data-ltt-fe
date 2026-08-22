@@ -80,7 +80,7 @@ describe('Treatment Row Component', () => {
     expect(screen.getByText('Dr. Jane Smith (10)')).toBeInTheDocument()
   })
 
-  test('disables edit button for normal users', () => {
+  test('shows view button (enabled) for normal users', () => {
     ;(isAdmin as jest.Mock).mockReturnValue(false)
     ;(isTherapist as jest.Mock).mockReturnValue(false)
 
@@ -92,8 +92,8 @@ describe('Treatment Row Component', () => {
       </table>
     )
 
-    const editBtn = screen.getByRole('button', { name: /edit treatment/i })
-    expect(editBtn).toBeDisabled()
+    const viewBtn = screen.getByRole('button', { name: /view treatment/i })
+    expect(viewBtn).not.toBeDisabled()
   })
 
   test('enables edit button for super admins', () => {
@@ -129,7 +129,7 @@ describe('Treatment Row Component', () => {
     expect(editBtn).not.toBeDisabled()
   })
 
-  test('disables edit button for therapist non-owner', () => {
+  test('shows view button (enabled) for therapist non-owner', () => {
     ;(isAdmin as jest.Mock).mockReturnValue(false)
     ;(isTherapist as jest.Mock).mockReturnValue(true)
     ;(getTherapistId as jest.Mock).mockReturnValue('20') // different from therapist_id 10
@@ -142,7 +142,7 @@ describe('Treatment Row Component', () => {
       </table>
     )
 
-    const editBtn = screen.getByRole('button', { name: /edit treatment/i })
-    expect(editBtn).toBeDisabled()
+    const viewBtn = screen.getByRole('button', { name: /view treatment/i })
+    expect(viewBtn).not.toBeDisabled()
   })
 })

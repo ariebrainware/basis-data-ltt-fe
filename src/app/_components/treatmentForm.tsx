@@ -9,6 +9,7 @@ import { TreatmentConditionMultiSelect } from './selectTreatmentCondition'
 interface TreatmentFormProps extends TreatmentType {
   therapistIDState?: string
   setTherapistIDState?: (value: string) => void
+  disabled?: boolean
 }
 
 export function TreatmentForm({
@@ -24,6 +25,7 @@ export function TreatmentForm({
   next_visit: nextVisit,
   therapistIDState,
   setTherapistIDState,
+  disabled = false,
 }: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
   // The backend may return treatment data in either JSON array format or comma-separated string format.
@@ -88,7 +90,7 @@ export function TreatmentForm({
               type="text"
               label="Waktu & Tanggal"
               defaultValue={treatmentDate}
-              disabled={isTherapistRole}
+              disabled={disabled || isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -100,7 +102,7 @@ export function TreatmentForm({
               type="text"
               label="Kode Pasien"
               defaultValue={patientCode}
-              disabled={isTherapistRole}
+              disabled={disabled || isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
@@ -135,7 +137,7 @@ export function TreatmentForm({
               id="therapist_id"
               label="Pilih Terapis"
               value={therapistID}
-              disabled={isTherapistRole}
+              disabled={disabled || isTherapistRole}
               onChange={(value: string) => {
                 if (process.env.NODE_ENV !== 'production') {
                   console.log('Therapist selected:', value)
@@ -149,7 +151,7 @@ export function TreatmentForm({
               id="issues"
               label="Keluhan"
               defaultValue={issues}
-              disabled={isTherapistRole}
+              disabled={disabled || isTherapistRole}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               onResize={undefined}
@@ -159,6 +161,7 @@ export function TreatmentForm({
               id="treatment"
               label="Penanganan"
               defaultValue={treatment}
+              disabled={disabled}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               onResize={undefined}
@@ -174,13 +177,14 @@ export function TreatmentForm({
                 onChange={(items: string[]) =>
                   setSelectedTreatmentConditions(items)
                 }
-                disabled={false}
+                disabled={disabled}
               />
             </div>
             <Textarea
               id="remarks"
               label="Keterangan"
               defaultValue={remarks}
+              disabled={disabled}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               onResize={undefined}
@@ -190,6 +194,7 @@ export function TreatmentForm({
               id="next_visit"
               label="Kunjungan Selanjutnya"
               defaultValue={nextVisit}
+              disabled={disabled}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               onResize={undefined}

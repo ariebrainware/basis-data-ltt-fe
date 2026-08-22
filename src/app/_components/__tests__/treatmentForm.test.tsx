@@ -213,6 +213,20 @@ describe('TreatmentForm Component', () => {
     expect(screen.getByTestId('next_visit')).not.toBeDisabled()
   })
 
+  test('disables all fields when disabled prop is true', () => {
+    render(<TreatmentForm {...mockTreatment} disabled={true} />)
+
+    expect(screen.getByTestId('treatment_date')).toBeDisabled()
+    expect(screen.getByTestId('patient_code')).toBeDisabled()
+    expect(screen.getByTestId('patient_name')).toBeDisabled()
+    expect(screen.getByTestId('therapist_name')).toBeDisabled()
+    expect(screen.getByTestId('therapist_id')).toBeDisabled()
+    expect(screen.getByTestId('issues')).toBeDisabled()
+    expect(screen.getByTestId('treatment')).toBeDisabled()
+    expect(screen.getByTestId('remarks')).toBeDisabled()
+    expect(screen.getByTestId('next_visit')).toBeDisabled()
+  })
+
   test('renders with empty data', () => {
     const emptyTreatment: TreatmentType = {
       ID: '0',
