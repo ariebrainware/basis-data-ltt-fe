@@ -36,6 +36,19 @@ jest.mock('../selectTreatmentCondition', () => ({
   ),
 }))
 
+jest.mock('../selectDisease', () => ({
+  DiseaseMultiSelect: ({ id, label, value, onChange, disabled }: any) => (
+    <input
+      id={id}
+      data-testid={id}
+      aria-label={label}
+      defaultValue={Array.isArray(value) ? value.join(',') : value}
+      disabled={disabled}
+      onChange={(e) => onChange && onChange(e.target.value.split(','))}
+    />
+  ),
+}))
+
 import { TreatmentForm } from '../treatmentForm'
 
 const _origConsoleError = console.error.bind(console)
@@ -145,6 +158,8 @@ describe('TreatmentForm Component', () => {
     remarks: 'Patient responding well',
     next_visit: '2024-01-22',
     age: 42,
+    health_history: 'Diabetes',
+    surgery_history: 'Appendectomy',
   }
 
   test('renders treatment form with all fields', () => {
@@ -164,6 +179,8 @@ describe('TreatmentForm Component', () => {
     expect(screen.getByTestId('treatment')).toBeInTheDocument()
     expect(screen.getByTestId('remarks')).toBeInTheDocument()
     expect(screen.getByTestId('next_visit')).toBeInTheDocument()
+    expect(screen.getByTestId('health_history')).toBeInTheDocument()
+    expect(screen.getByTestId('surgery_history')).toBeInTheDocument()
   })
 
   test('displays correct treatment data', () => {
@@ -180,6 +197,8 @@ describe('TreatmentForm Component', () => {
     expect(screen.getByTestId('treatment')).toHaveValue('Massage therapy')
     expect(screen.getByTestId('remarks')).toHaveValue('Patient responding well')
     expect(screen.getByTestId('next_visit')).toHaveValue('2024-01-22')
+    expect(screen.getByTestId('health_history')).toHaveValue('Diabetes')
+    expect(screen.getByTestId('surgery_history')).toHaveValue('Appendectomy')
   })
 
   test('ID field is always disabled', () => {
@@ -225,6 +244,8 @@ describe('TreatmentForm Component', () => {
     expect(screen.getByTestId('treatment')).toBeDisabled()
     expect(screen.getByTestId('remarks')).toBeDisabled()
     expect(screen.getByTestId('next_visit')).toBeDisabled()
+    expect(screen.getByTestId('health_history')).toBeDisabled()
+    expect(screen.getByTestId('surgery_history')).toBeDisabled()
   })
 
   test('renders with empty data', () => {

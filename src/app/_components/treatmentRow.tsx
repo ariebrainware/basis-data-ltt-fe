@@ -30,6 +30,8 @@ export default function Treatment({
   remarks,
   next_visit: nextVisit,
   onDataChange,
+  health_history: healthHistory,
+  surgery_history: surgeryHistory,
 }: TreatmentType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
   const [therapistIDState, setTherapistIDState] = React.useState<string>(
@@ -193,6 +195,13 @@ export default function Treatment({
     const next_visit_new_input =
       document.querySelector<HTMLTextAreaElement>('#next_visit')?.value ||
       nextVisit
+    const health_history_new_input =
+      document.querySelector<HTMLInputElement>('#health_history')?.value ??
+      (healthHistory || '')
+    const surgery_history_new_input =
+      document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ??
+      (surgeryHistory || '')
+
     apiFetch(`/treatment/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify({
@@ -204,6 +213,8 @@ export default function Treatment({
         treatment: treatment_new_input,
         remarks: remarks_new_input,
         next_visit: next_visit_new_input,
+        health_history: health_history_new_input,
+        surgery_history: surgery_history_new_input,
       }),
     })
       .then((response) => {
@@ -290,6 +301,8 @@ export default function Treatment({
             therapistIDState={therapistIDState}
             setTherapistIDState={setTherapistIDState}
             disabled={!canEdit}
+            health_history={healthHistory}
+            surgery_history={surgeryHistory}
           />
         </DialogBody>
         <DialogFooter
