@@ -267,6 +267,7 @@ export default function Patient({
             gender={gender}
             signature={signature}
             signature_path={signature_path}
+            attachment_path={attachment_path}
             onDataChange={onDataChange}
           />
           <button

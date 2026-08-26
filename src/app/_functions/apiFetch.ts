@@ -53,6 +53,5 @@ export async function apiFetch(
     headers['Content-Type'] = 'application/json'
   }
 
-
   return fetch(url, { ...init, headers })
 }

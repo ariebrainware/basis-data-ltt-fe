@@ -60,12 +60,19 @@ export function PatientForm({
   )
   console.log('PatientForm attachment_path prop:', attachment_path)
   const [attachmentPaths, setAttachmentPaths] = useState<string[]>(() => {
-    return attachment_path ? attachment_path.split(',').filter(Boolean) : []
+    return attachment_path
+      ? attachment_path.split(/,(?=\/?uploads\/|https?:\/\/)/).filter(Boolean)
+      : []
   })
   const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
-    setAttachmentPaths(attachment_path ? attachment_path.split(',').filter(Boolean) : [])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAttachmentPaths(
+      attachment_path
+        ? attachment_path.split(/,(?=\/?uploads\/|https?:\/\/)/).filter(Boolean)
+        : []
+    )
   }, [attachment_path])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +86,8 @@ export function PatientForm({
 
     setIsUploading(true)
     const formData = new FormData()
-    formData.append('file', file)
+    const sanitizedName = file.name.replace(/,/g, '_')
+    formData.append('file', file, sanitizedName)
 
     try {
       const res = await apiFetch('/patient/upload', {
@@ -280,14 +288,17 @@ export function PatientForm({
               value={attachmentPaths.join(',')}
             />
             <div className="mt-2 w-full">
-              <label className="text-slate-800 font-sans text-sm font-semibold antialiased dark:text-white block mb-1">
+              <label className="text-slate-800 mb-1 block font-sans text-sm font-semibold antialiased dark:text-white">
                 Lampiran
               </label>
               <div className="space-y-2">
                 {attachmentPaths.map((path, index) => (
-                  <div key={index} className="flex items-center justify-between gap-4 border border-slate-200 rounded-md p-2 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+                  <div
+                    key={index}
+                    className="border-slate-200 dark:bg-slate-900/50 flex items-center justify-between gap-4 rounded-md border bg-white/50 p-2 backdrop-blur-sm"
+                  >
                     <div className="flex items-center gap-2.5 overflow-hidden">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                      <span className="dark:bg-blue-950/40 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:text-blue-400">
                         <svg
                           width="16"
                           height="16"
@@ -306,7 +317,7 @@ export function PatientForm({
                         </svg>
                       </span>
                       <div className="flex flex-col overflow-hidden text-xs">
-                        <span className="truncate font-semibold text-slate-800 dark:text-slate-200">
+                        <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
                           {path.split('/').pop()}
                         </span>
                         <a
@@ -322,8 +333,12 @@ export function PatientForm({
                     </div>
                     <button
                       type="button"
-                      onClick={() => setAttachmentPaths(prev => prev.filter((_, i) => i !== index))}
-                      className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-red-500 dark:hover:bg-slate-800"
+                      onClick={() =>
+                        setAttachmentPaths((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        )
+                      }
+                      className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1 hover:text-red-500"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -344,7 +359,7 @@ export function PatientForm({
                 ))}
 
                 <div>
-                  <label className="flex cursor-pointer items-center justify-center gap-2 border border-dashed border-slate-350 rounded-md p-3 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-900/80 transition-all">
+                  <label className="border-slate-350 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-900/80 flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed p-3 transition-all">
                     {isUploading ? (
                       <svg
                         className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400"
@@ -383,8 +398,10 @@ export function PatientForm({
                         <line x1="12" y1="3" x2="12" y2="15" />
                       </svg>
                     )}
-                    <span className="text-xs font-sans text-slate-600 dark:text-slate-400 font-medium">
-                      {isUploading ? 'Mengunggah...' : 'Pilih File (PDF, DOC, Gambar, dsb.)'}
+                    <span className="text-slate-600 dark:text-slate-400 font-sans text-xs font-medium">
+                      {isUploading
+                        ? 'Mengunggah...'
+                        : 'Pilih File (PDF, DOC, Gambar, dsb.)'}
                     </span>
                     <input
                       type="file"

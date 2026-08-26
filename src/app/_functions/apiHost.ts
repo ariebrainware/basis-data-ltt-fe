@@ -47,4 +47,3 @@ export function getAttachmentUrl(path?: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`
   return `${host}${cleanPath}`
 }
-

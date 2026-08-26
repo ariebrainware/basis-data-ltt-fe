@@ -29,14 +29,16 @@ type PatientProps = {
   gender?: string
   signature?: string
   signature_path?: string
+  attachment_path?: string
   onDataChange?: () => void
 }
 
 type PatientUpdatePayload = Omit<
   PatientProps & { ID: number },
-  'ID' | 'patient_code'
+  'ID' | 'patient_code' | 'attachment_path'
 > & {
   patient_code?: string
+  attachment_path?: string[]
 }
 
 export default function PatientDialog({
@@ -53,6 +55,7 @@ export default function PatientDialog({
   gender,
   signature,
   signature_path,
+  attachment_path,
   onDataChange,
 }: PatientProps) {
   const [open, setOpen] = React.useState(false)
@@ -63,11 +66,18 @@ export default function PatientDialog({
   const [currentSignature, setCurrentSignature] = React.useState<string>(
     signature_path || signature || ''
   )
+  const [currentAttachmentPath, setCurrentAttachmentPath] =
+    React.useState<string>(attachment_path || '')
 
   React.useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentSignature(signature_path || signature || '')
   }, [signature, signature_path])
+
+  React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentAttachmentPath(attachment_path || '')
+  }, [attachment_path])
 
   const fetchDiseasesIfNeeded = async () => {
     if (diseasesFetched) return
@@ -103,13 +113,15 @@ export default function PatientDialog({
         }
         if (res.ok) {
           const resData = await res.json()
-          if (
-            resData.data &&
-            (resData.data.signature_path || resData.data.signature)
-          ) {
-            setCurrentSignature(
-              resData.data.signature_path || resData.data.signature
-            )
+          if (resData.data) {
+            if (resData.data.signature_path || resData.data.signature) {
+              setCurrentSignature(
+                resData.data.signature_path || resData.data.signature
+              )
+            }
+            if (resData.data.attachment_path) {
+              setCurrentAttachmentPath(resData.data.attachment_path)
+            }
           }
         }
       } catch (err) {
@@ -157,8 +169,8 @@ export default function PatientDialog({
     selector: string,
     fallback?: string | number | null
   ): string => {
-    const val = document.querySelector<HTMLInputElement>(selector)?.value
-    if (typeof val === 'string' && val !== '') return val
+    const el = document.querySelector<HTMLInputElement>(selector)
+    if (el) return el.value
     if (fallback === undefined || fallback === null) return ''
     return String(fallback)
   }
@@ -167,8 +179,8 @@ export default function PatientDialog({
     selector: string,
     fallback?: string | undefined
   ): string => {
-    const val = document.querySelector<HTMLTextAreaElement>(selector)?.value
-    if (typeof val === 'string' && val !== '') return val
+    const el = document.querySelector<HTMLTextAreaElement>(selector)
+    if (el) return el.value
     return fallback ?? ''
   }
 
@@ -195,6 +207,10 @@ export default function PatientDialog({
     const gender_new_input = genderValue || gender
     const patient_code_new_input = getInputValue('#patient_code', patientCode)
     const signature_new_input = getInputValue('#signature', currentSignature)
+    const attachment_path_new_input = getInputValue(
+      '#attachment_path',
+      currentAttachmentPath
+    )
 
     const payload: PatientUpdatePayload = {
       full_name: full_name_new_input,
@@ -209,6 +225,12 @@ export default function PatientDialog({
       ),
       surgery_history: surgery_history_new_input,
       signature: signature_new_input,
+      attachment_path: attachment_path_new_input
+        ? attachment_path_new_input
+            .split(/,(?=\/?uploads\/|https?:\/\/)/)
+            .map((p) => p.trim())
+            .filter(Boolean)
+        : [],
     }
 
     if (isAdmin()) {
@@ -334,6 +356,7 @@ export default function PatientDialog({
             last_visit={''}
             signature={currentSignature}
             signature_path={signature_path}
+            attachment_path={currentAttachmentPath}
             onGenderChange={setGenderValue}
             diseases={diseasesFetched ? diseases : undefined}
           />
