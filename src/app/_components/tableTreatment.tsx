@@ -71,6 +71,8 @@ const TableBody = ({
         therapist_name={treatment.therapist_name}
         therapist_id={treatment.therapist_id}
         next_visit={treatment.next_visit}
+        health_history={treatment.health_history}
+        surgery_history={treatment.surgery_history}
         onDataChange={onDataChange}
       />
     ))}

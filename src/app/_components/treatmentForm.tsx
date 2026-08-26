@@ -5,6 +5,7 @@ import { TreatmentType } from '../_types/treatment'
 import { isTherapist } from '../_functions/userRole'
 import { ControlledSelect } from './selectTherapist'
 import { TreatmentConditionMultiSelect } from './selectTreatmentCondition'
+import { DiseaseMultiSelect } from './selectDisease'
 
 interface TreatmentFormProps extends TreatmentType {
   therapistIDState?: string
@@ -26,6 +27,8 @@ export function TreatmentForm({
   therapistIDState,
   setTherapistIDState,
   disabled = false,
+  health_history,
+  surgery_history,
 }: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
   // The backend may return treatment data in either JSON array format or comma-separated string format.
@@ -60,6 +63,45 @@ export function TreatmentForm({
   // Use either the passed state or local state
   const therapistID = therapistIDState ?? localTherapistID
   const setTherapistID = setTherapistIDState ?? setLocalTherapistID
+
+  const [selectedHealthHistory, setSelectedHealthHistory] = React.useState<
+    string[]
+  >(() => {
+    return health_history
+      ? health_history
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : []
+  })
+
+  React.useEffect(() => {
+    const initial = health_history
+      ? health_history
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : []
+    const t = setTimeout(() => {
+      setSelectedHealthHistory((prev) => {
+        if (prev.length !== initial.length) return initial
+
+        const prevSet = new Set(prev)
+        const equal = initial.every((id) => prevSet.has(id))
+
+        return equal ? prev : initial
+      })
+    }, 0)
+
+    return () => clearTimeout(t)
+  }, [health_history])
+
+  React.useEffect(() => {
+    const el = document.getElementById(
+      'health_history'
+    ) as HTMLInputElement | null
+    if (el) el.value = selectedHealthHistory.join(',')
+  }, [selectedHealthHistory])
   return (
     <Card
       color="transparent"
@@ -144,6 +186,33 @@ export function TreatmentForm({
                 }
                 setTherapistID(value)
               }}
+            />
+            <input
+              id="health_history"
+              name="health_history"
+              type="hidden"
+              data-testid="health_history"
+              defaultValue={health_history ?? ''}
+              disabled={disabled}
+            />
+            <div>
+              <DiseaseMultiSelect
+                id="health_history_select"
+                label="Riwayat Penyakit"
+                value={selectedHealthHistory}
+                onChange={setSelectedHealthHistory}
+                disabled={disabled}
+              />
+            </div>
+            <Textarea
+              id="surgery_history"
+              label="Riwayat Operasi/Penyakit Tambahan (Jika Ada)"
+              defaultValue={surgery_history ?? ''}
+              disabled={disabled}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
             />
           </div>
           <div className="flex w-full flex-col gap-4 md:w-1/2">
