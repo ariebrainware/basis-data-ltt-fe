@@ -358,7 +358,7 @@ export default function Treatment({
       </Dialog>
 
       <tr
-        className="border-slate-200 border-b last:border-0 hover:bg-blue-gray-50/50 cursor-pointer"
+        className="border-slate-200 cursor-pointer border-b last:border-0 hover:bg-blue-gray-50/50"
         onClick={() => handleOpen()}
       >
         <td className="p-3">

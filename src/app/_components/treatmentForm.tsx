@@ -64,7 +64,9 @@ export function TreatmentForm({
   const therapistID = therapistIDState ?? localTherapistID
   const setTherapistID = setTherapistIDState ?? setLocalTherapistID
 
-  const [selectedHealthHistory, setSelectedHealthHistory] = React.useState<string[]>(() => {
+  const [selectedHealthHistory, setSelectedHealthHistory] = React.useState<
+    string[]
+  >(() => {
     return health_history
       ? health_history
           .split(',')
