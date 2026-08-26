@@ -28,3 +28,22 @@ export function getApiHost(): string {
   // For all other domains, default to HTTPS for security
   return `https://${raw}`
 }
+
+/**
+ * Resolves the full URL for an attachment path.
+ * @param path The relative attachment path (e.g. 'uploads/attachments/xyz.pdf')
+ * @returns The resolved URL or empty string.
+ */
+export function getAttachmentUrl(path?: string): string {
+  if (!path) return ''
+  if (
+    path.startsWith('data:') ||
+    path.startsWith('http://') ||
+    path.startsWith('https://')
+  ) {
+    return path
+  }
+  const host = getApiHost()
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return `${host}${cleanPath}`
+}

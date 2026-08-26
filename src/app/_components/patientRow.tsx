@@ -35,6 +35,7 @@ export default function Patient({
   patient_code: patientCode,
   signature,
   signature_path,
+  attachment_path,
   onDataChange,
 }: PatientType) {
   const [open, setOpen] = React.useState(false)
@@ -74,6 +75,7 @@ export default function Patient({
       genderValue,
       gender,
       patientCode,
+      attachmentPath: attachment_path,
       diseases,
     })
     apiFetch(`/patient/${ID}`, {
@@ -156,24 +158,27 @@ export default function Patient({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <PatientForm
-            ID={ID}
-            patient_code={patientCode}
-            full_name={name}
-            job={job}
-            age={age}
-            phone_number={phoneNumber}
-            email={email}
-            address={address}
-            health_history={health_history}
-            surgery_history={surgery_history}
-            gender={genderValue}
-            last_visit={''}
-            signature={signature}
-            signature_path={signature_path}
-            onGenderChange={setGenderValue}
-            diseases={diseases}
-          />
+          {open && (
+            <PatientForm
+              ID={ID}
+              patient_code={patientCode}
+              full_name={name}
+              job={job}
+              age={age}
+              phone_number={phoneNumber}
+              email={email}
+              address={address}
+              health_history={health_history}
+              surgery_history={surgery_history}
+              gender={genderValue}
+              last_visit={''}
+              signature={signature}
+              signature_path={signature_path}
+              attachment_path={attachment_path}
+              onGenderChange={setGenderValue}
+              diseases={diseases}
+            />
+          )}
         </DialogBody>
         <DialogFooter
           placeholder={undefined}
@@ -262,6 +267,7 @@ export default function Patient({
             gender={gender}
             signature={signature}
             signature_path={signature_path}
+            attachment_path={attachment_path}
             onDataChange={onDataChange}
           />
           <button

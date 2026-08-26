@@ -162,6 +162,7 @@ const TableBody = ({
         address={patient.address}
         signature={patient.signature}
         signature_path={patient.signature_path}
+        attachment_path={patient.attachment_path}
         onDataChange={onDataChange}
       />
     ))}

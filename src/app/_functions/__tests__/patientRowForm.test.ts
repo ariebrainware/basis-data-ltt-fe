@@ -137,10 +137,10 @@ describe('patientRowForm helpers', () => {
       expect(result).toBe('test value')
     })
 
-    test('returns fallback for empty value', () => {
+    test('returns empty string for empty value', () => {
       document.body.innerHTML = '<input id="test" value="" />'
       const result = getInputValue('#test', 'fallback')
-      expect(result).toBe('fallback')
+      expect(result).toBe('')
     })
 
     test('returns empty string for non-existent selector without fallback', () => {
@@ -192,10 +192,10 @@ describe('patientRowForm helpers', () => {
       expect(result).toBe('test content')
     })
 
-    test('returns fallback for empty value', () => {
+    test('returns empty string for empty value', () => {
       document.body.innerHTML = '<textarea id="test"></textarea>'
       const result = getTextAreaValue('#test', 'fallback')
-      expect(result).toBe('fallback')
+      expect(result).toBe('')
     })
 
     test('returns empty string for non-existent selector without fallback', () => {
