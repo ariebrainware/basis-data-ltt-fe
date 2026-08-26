@@ -4,9 +4,10 @@ import { isAdmin } from './userRole'
 
 export type PatientUpdatePayload = Omit<
   PatientType,
-  'ID' | 'last_visit' | 'onDataChange' | 'patient_code'
+  'ID' | 'last_visit' | 'onDataChange' | 'patient_code' | 'attachment_path'
 > & {
   patient_code?: string
+  attachment_path?: string[]
 }
 
 const LOCKED_HEALTH_INPUT = '-'
@@ -145,6 +146,7 @@ type PatientUpdatePayloadArgs = {
   gender?: string
   patientCode?: string
   signature?: string
+  attachmentPath?: string
   diseases: DiseaseType[]
 }
 
@@ -185,6 +187,7 @@ export function buildPatientUpdatePayload(
     gender,
     patientCode,
     signature,
+    attachmentPath,
     diseases,
   } = args
 
@@ -210,6 +213,7 @@ export function buildPatientUpdatePayload(
   const gender_new_input = genderValue || gender || ''
   const patient_code_new_input = getInputValue('#patient_code', patientCode)
   const signature_new_input = getInputValue('#signature', signature)
+  const attachment_path_new_input = getInputValue('#attachment_path', attachmentPath)
 
   const payload: PatientUpdatePayload = {
     full_name: full_name_new_input,
@@ -225,6 +229,12 @@ export function buildPatientUpdatePayload(
     ),
     surgery_history: surgery_history_new_input,
     signature: signature_new_input,
+    attachment_path: attachment_path_new_input
+      ? attachment_path_new_input
+          .split(',')
+          .map((p) => p.trim())
+          .filter(Boolean)
+      : [],
   }
 
   if (isAdmin()) {

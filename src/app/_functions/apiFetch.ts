@@ -44,13 +44,15 @@ export async function apiFetch(
   const incoming = normalizeHeaders(init.headers)
   const headers: Record<string, string> = { ...defaultHeaders, ...incoming }
 
-  // If body exists and no content-type set, assume JSON
+  // If body exists, is not FormData, and no content-type set, assume JSON
   if (
     init.body &&
+    !(init.body instanceof FormData) &&
     !Object.keys(headers).some((k) => k.toLowerCase() === 'content-type')
   ) {
     headers['Content-Type'] = 'application/json'
   }
+
 
   return fetch(url, { ...init, headers })
 }

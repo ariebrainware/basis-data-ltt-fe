@@ -13,5 +13,6 @@ export interface PatientType {
   patient_code: string
   signature?: string
   signature_path?: string
+  attachment_path?: string
   onDataChange?: () => void
 }

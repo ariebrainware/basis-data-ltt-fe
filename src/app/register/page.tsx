@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
 import { apiFetch } from '../_functions/apiFetch'
+import { getAttachmentUrl } from '../_functions/apiHost'
 import { DiseaseMultiSelect } from '../_components/selectDisease'
 import { extractErrorMessage } from '../_functions/errorMessage'
 import Swal from 'sweetalert2'
@@ -39,6 +40,39 @@ export default function Register() {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [signature, setSignature] = useState('')
   const signaturePadRef = useRef<SignaturePadRef | null>(null)
+  const [attachmentPaths, setAttachmentPaths] = useState<string[]>([])
+  const [isUploading, setIsUploading] = useState(false)
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 10 * 1024 * 1024) {
+      await Swal.fire('Gagal', 'Ukuran file maksimal adalah 10MB', 'error')
+      return
+    }
+
+    setIsUploading(true)
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const res = await apiFetch('/patient/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (!res.ok) {
+        throw new Error('Upload failed')
+      }
+      const data = await res.json()
+      setAttachmentPaths((prev) => [...prev, data.data.file_path])
+    } catch (err) {
+      console.error(err)
+      await Swal.fire('Gagal', 'Gagal mengunggah file', 'error')
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   async function sendRegisterRequest() {
     const validationError = validateRegistration(
@@ -62,7 +96,8 @@ export default function Register() {
       surgeryHistory,
       phoneNumbers,
       patientCodeRef.current?.value || '',
-      signature
+      signature,
+      attachmentPaths
     )
 
     const result = await submitRegistration(payload)
@@ -85,6 +120,7 @@ export default function Register() {
       setShowPatientCode(false)
       setTermsAccepted(false)
       setSignature('')
+      setAttachmentPaths([])
       signaturePadRef.current?.clear()
 
       // Clear phone inputs: remove extras and leave a single empty input
@@ -201,6 +237,131 @@ export default function Register() {
 
         <SignaturePad ref={signaturePadRef} onChange={setSignature} />
 
+        <input
+          id="attachment_path"
+          name="attachment_path"
+          type="hidden"
+          value={attachmentPaths.join(',')}
+        />
+        <div className="mt-4 w-full">
+          <label className="text-slate-650 mb-1.5 block text-sm font-medium dark:text-slate-400">
+            Lampiran
+          </label>
+          <div className="space-y-2">
+            {attachmentPaths.map((path, index) => (
+              <div key={index} className="flex items-center justify-between gap-4 border border-slate-200 rounded-md p-2 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+                <div className="flex items-center gap-2.5 overflow-hidden">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                      <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                  </span>
+                  <div className="flex flex-col overflow-hidden text-xs">
+                    <span className="truncate font-semibold text-slate-800 dark:text-slate-200">
+                      {path.split('/').pop()}
+                    </span>
+                    <a
+                      href={getAttachmentUrl(path)}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                    >
+                      Lihat Lampiran
+                    </a>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAttachmentPaths(prev => prev.filter((_, i) => i !== index))}
+                  className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-red-500 dark:hover:bg-slate-800"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="h-4 w-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18 18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))}
+
+            <div>
+              <label className="flex cursor-pointer items-center justify-center gap-2 border border-dashed border-slate-350 rounded-md p-3 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-900/80 transition-all">
+                {isUploading ? (
+                  <svg
+                    className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-slate-500"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                )}
+                <span className="text-xs font-sans text-slate-600 dark:text-slate-400 font-medium">
+                  {isUploading ? 'Mengunggah...' : 'Pilih File (PDF, DOC, Gambar, dsb.)'}
+                </span>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div className={styles.ctas}>
           <a
             className={
@@ -254,7 +415,8 @@ function buildRegistrationPayload(
   surgeryHistory: string,
   phoneNumbers: string[],
   patientCode: string,
-  signature: string
+  signature: string,
+  attachmentPaths: string[]
 ) {
   const validPhones = phoneNumbers.filter((p) => p && p.trim())
   return {
@@ -268,6 +430,7 @@ function buildRegistrationPayload(
     phone_number: validPhones,
     patient_code: patientCode,
     signature: signature,
+    attachment_path: attachmentPaths,
   }
 }
 
