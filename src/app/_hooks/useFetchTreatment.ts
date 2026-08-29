@@ -15,7 +15,8 @@ export function useFetchTreatment(
   currentPage: number,
   keyword: string,
   filterByTherapist?: boolean,
-  refreshTrigger?: number
+  refreshTrigger?: number,
+  groupByDate?: string
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
@@ -37,7 +38,8 @@ export function useFetchTreatment(
         const baseParams = buildTreatmentQuery(
           keyword,
           currentPage,
-          filterByTherapist
+          filterByTherapist,
+          groupByDate
         )
         const payload = await fetchTreatments(baseParams)
         if (!cancelled) {
@@ -57,7 +59,14 @@ export function useFetchTreatment(
     return () => {
       cancelled = true
     }
-  }, [currentPage, keyword, filterByTherapist, refreshTrigger, router])
+  }, [
+    currentPage,
+    keyword,
+    filterByTherapist,
+    refreshTrigger,
+    groupByDate,
+    router,
+  ])
 
   return { data: { treatment }, total }
 }
@@ -67,9 +76,13 @@ class UnauthorizedFetchError extends Error {}
 function buildTreatmentQuery(
   keyword: string,
   currentPage: number,
-  filterByTherapist?: boolean
+  filterByTherapist?: boolean,
+  groupByDate?: string
 ): string {
   const params: string[] = []
+  if (groupByDate) {
+    params.push(`group_by_date=${encodeURIComponent(groupByDate)}`)
+  }
   if (keyword) {
     params.push(`keyword=${encodeURIComponent(keyword)}`)
   } else {
@@ -85,10 +98,23 @@ function parseTreatmentData(data: any): {
   treatments: TreatmentType[]
   total: number
 } {
-  const treatments = Array.isArray(data?.data?.treatments)
-    ? data.data.treatments
-    : []
-  const total = typeof data?.data?.total === 'number' ? data.data.total : 0
+  const raw = Array.isArray(data?.data?.treatments) ? data.data.treatments : []
+  const seenIds = new Set<string>()
+  const treatments: TreatmentType[] = []
+
+  for (const item of raw) {
+    if (item && item.ID) {
+      const idKey = String(item.ID)
+      if (seenIds.has(idKey)) {
+        continue
+      }
+      seenIds.add(idKey)
+    }
+    treatments.push(item)
+  }
+
+  const total =
+    typeof data?.data?.total === 'number' ? data.data.total : treatments.length
   return { treatments, total }
 }
 

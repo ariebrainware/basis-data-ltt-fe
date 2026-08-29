@@ -30,17 +30,7 @@ import { useRouter } from 'next/navigation'
 import { getUserRole } from '../_functions/userRole'
 import Pagination from '../_components/pagination'
 import { getApiHost } from '../_functions/apiHost'
-
-// Simple in-module cache to deduplicate concurrent identical fetches
-// API response interface (what the backend returns)
-interface TreatmentApiResponse {
-  data: {
-    treatments: TreatmentType[]
-    total: number
-  }
-}
-
-const treatmentFetchCache = new Map<string, Promise<TreatmentApiResponse>>()
+import { useFetchTreatment } from '../_hooks/useFetchTreatment'
 
 const TABLE_HEAD = [
   'Nama Pasien (K. Pasien)',
@@ -49,72 +39,6 @@ const TABLE_HEAD = [
   'Terapis (ID)',
   'Keluhan',
 ]
-
-// Hook return type interface (what useFetchTreatment returns)
-interface ListTreatmentResponse {
-  data: {
-    treatment: TreatmentType[]
-  }
-  total: number
-}
-
-function useFetchTreatment(
-  currentPage: number,
-  keyword: string
-): ListTreatmentResponse {
-  const [treatment, setTreatment] = useState<TreatmentType[]>([])
-  const [total, setTotal] = useState(0)
-  const router = useRouter()
-
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const today = new Date()
-        const yyyy = today.getFullYear()
-        const mm = String(today.getMonth() + 1).padStart(2, '0')
-        const dd = String(today.getDate()).padStart(2, '0')
-        const groupByDate = `${yyyy}-${mm}-${dd}`
-        const url = `${getApiHost()}/treatment?group_by_date=${groupByDate}`
-
-        // Use cache to prevent duplicate concurrent fetches for same URL
-        let jsonData
-        if (treatmentFetchCache.has(url)) {
-          jsonData = await treatmentFetchCache.get(url)
-        } else {
-          const p = apiFetch(url, { method: 'GET' })
-            .then((r) => {
-              if (!r.ok) throw new Error(`HTTP error! Status: ${r.status}`)
-              return r.json()
-            })
-            .finally(() => {
-              // remove cache entry after completion so subsequent requests refetch
-              treatmentFetchCache.delete(url)
-            })
-
-          treatmentFetchCache.set(url, p)
-          jsonData = await p
-        }
-        const data = jsonData
-        const treatmentArray: TreatmentType[] = Array.isArray(
-          data.data.treatments
-        )
-          ? data.data.treatments
-          : []
-        setTreatment(treatmentArray)
-        console.log(`data: `, data.data.treatments)
-        console.log(`treatmentArray: `, treatmentArray)
-        setTotal(data.data.total)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess(router)
-        }
-        console.error('Error fetching treatment:', error)
-      }
-    })()
-  }, [currentPage, keyword, router])
-
-  return { data: { treatment: treatment }, total }
-}
 interface TherapistSummary {
   therapistId: number
   therapistName: string
@@ -360,16 +284,18 @@ function SummaryCard({
 
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [treatment, setTreatment] = useState<TreatmentType[]>([])
-  const [keyword] = useState('')
-  const { data, total } = useFetchTreatment(currentPage, keyword)
+  const [keyword, setKeyword] = useState('')
+  const todayStr = format(new Date(), 'yyyy-MM-dd')
+  const { data, total } = useFetchTreatment(
+    currentPage,
+    keyword,
+    undefined,
+    undefined,
+    todayStr
+  )
+  const treatment = data.treatment
   const router = useRouter()
   const [userRole] = useState<string | null>(() => getUserRole())
-
-  useEffect(() => {
-    const t = setTimeout(() => setTreatment(data.treatment), 0)
-    return () => clearTimeout(t)
-  }, [data])
 
   // Summaries states
   const [dailyData, setDailyData] = useState<PeriodSummaryData>({
@@ -666,6 +592,13 @@ export default function Dashboard() {
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
                   crossOrigin={undefined}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key === 'Enter') {
+                      const newKeyword = (e.target as HTMLInputElement).value
+                      setKeyword(newKeyword)
+                      setCurrentPage(1)
+                    }
+                  }}
                   onResize={undefined}
                   onResizeCapture={undefined}
                 />
@@ -745,7 +678,7 @@ export default function Dashboard() {
 
                   return (
                     <tr
-                      key={ID}
+                      key={ID || `${patient_code}-${index}`}
                       className="transition-colors hover:bg-blue-gray-50/20"
                     >
                       <td className={classes}>
