@@ -24,7 +24,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
-import { getUserRole } from '../_functions/userRole'
+import { getUserRole, useUserRole } from '../_functions/userRole'
 import { logout } from '../_functions/logout'
 
 // Workaround: Material Tailwind's `Typography` props typing requires many
@@ -102,18 +102,7 @@ const navListMenuItems = [
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const userRole = React.useSyncExternalStore(
-    React.useCallback((onStoreChange: () => void) => {
-      window.addEventListener('storage', onStoreChange)
-      window.addEventListener('user-role-change', onStoreChange)
-      return () => {
-        window.removeEventListener('storage', onStoreChange)
-        window.removeEventListener('user-role-change', onStoreChange)
-      }
-    }, []),
-    getUserRole,
-    () => null
-  )
+  const userRole = useUserRole()
   const router = useRouter()
 
   const filteredMenuItems = navListMenuItems.filter((item) =>

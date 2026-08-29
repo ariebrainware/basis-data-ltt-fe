@@ -27,7 +27,7 @@ import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { apiFetch } from '../_functions/apiFetch'
 import { useRouter } from 'next/navigation'
-import { getUserRole } from '../_functions/userRole'
+import { getUserRole, useUserRole } from '../_functions/userRole'
 import Pagination from '../_components/pagination'
 import { getApiHost } from '../_functions/apiHost'
 import { useFetchTreatment } from '../_hooks/useFetchTreatment'
@@ -295,7 +295,7 @@ export default function Dashboard() {
   )
   const treatment = data.treatment
   const router = useRouter()
-  const [userRole] = useState<string | null>(() => getUserRole())
+  const userRole = useUserRole()
 
   // Summaries states
   const [dailyData, setDailyData] = useState<PeriodSummaryData>({
@@ -378,8 +378,8 @@ export default function Dashboard() {
   const getMonthlyLabel = () => format(new Date(), 'MMMM yyyy')
 
   useEffect(() => {
-    const role = getUserRole()
-    if (role !== 'super_admin') {
+    if (userRole === null) return
+    if (userRole !== 'super_admin') {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setDailyData((prev) => ({ ...prev, loading: false }))
       setWeeklyData((prev) => ({ ...prev, loading: false }))
@@ -440,7 +440,7 @@ export default function Dashboard() {
           error: err instanceof Error ? err.message : 'Unknown error',
         }))
       })
-  }, [router])
+  }, [userRole, router])
 
   const handleCustomStartChange = (val: string) => {
     setCustomStart(val)
@@ -475,9 +475,8 @@ export default function Dashboard() {
   useEffect(() => {
     if (!customStart || !customEnd) return
     if (customStart > customEnd) return
-
-    const role = getUserRole()
-    if (role !== 'super_admin') {
+    if (userRole === null) return
+    if (userRole !== 'super_admin') {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCustomData((prev) => ({ ...prev, loading: false }))
       return
@@ -498,7 +497,7 @@ export default function Dashboard() {
           error: err instanceof Error ? err.message : 'Unknown error',
         }))
       })
-  }, [customStart, customEnd, router])
+  }, [customStart, customEnd, userRole, router])
 
   return (
     <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">

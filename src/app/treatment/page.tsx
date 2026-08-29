@@ -18,7 +18,7 @@ import TableTreatment from '../_components/tableTreatment'
 import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { logout } from '../_functions/logout'
-import { getUserRole } from '../_functions/userRole'
+import { getUserRole, useUserRole } from '../_functions/userRole'
 
 interface ListTreatmentResponse {
   data: {
@@ -77,7 +77,7 @@ export default function ListTreatment() {
     keyword,
     refreshTrigger
   )
-  const [userRole] = useState<string | null>(() => getUserRole())
+  const userRole = useUserRole()
 
   const handleRefresh = () => {
     setRefreshTrigger((prev) => prev + 1)
