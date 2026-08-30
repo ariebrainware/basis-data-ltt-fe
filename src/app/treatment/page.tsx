@@ -12,59 +12,12 @@ import {
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { apiFetch } from '../_functions/apiFetch'
 import Pagination from '../_components/pagination'
 import TableTreatment from '../_components/tableTreatment'
 import { TreatmentType } from '../_types/treatment'
-import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { logout } from '../_functions/logout'
-import { getUserRole } from '../_functions/userRole'
-
-interface ListTreatmentResponse {
-  data: {
-    treatment: TreatmentType[]
-  }
-  total: number
-}
-
-function useFetchTreatment(
-  currentPage: number,
-  keyword: string,
-  refreshTrigger: number
-): ListTreatmentResponse {
-  const [treatment, setTreatment] = useState<TreatmentType[]>([])
-  const [total, setTotal] = useState(0)
-  const router = useRouter()
-
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const res = await apiFetch(
-          `/treatment?${keyword ? `keyword=${keyword}` : `limit=20&offset=${(currentPage - 1) * 20}`}`,
-          { method: 'GET' }
-        )
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-        const data = await res.json()
-        const treatmentArray: TreatmentType[] = Array.isArray(
-          data.data.treatments
-        )
-          ? data.data.treatments
-          : []
-        setTreatment(treatmentArray)
-        console.log(`data: `, data.data.treatments)
-        console.log(`treatmentArray: `, treatmentArray)
-        setTotal(data.data.total)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess(router)
-        }
-        console.error('Error fetching treatment:', error)
-      }
-    })()
-  }, [currentPage, keyword, refreshTrigger, router])
-
-  return { data: { treatment: treatment }, total }
-}
+import { useUserRole } from '../_functions/userRole'
+import { useFetchTreatment } from '../_hooks/useFetchTreatment'
 
 export default function ListTreatment() {
   const router = useRouter()
@@ -75,9 +28,10 @@ export default function ListTreatment() {
   const { data, total } = useFetchTreatment(
     currentPage,
     keyword,
+    undefined,
     refreshTrigger
   )
-  const [userRole] = useState<string | null>(() => getUserRole())
+  const userRole = useUserRole()
 
   const handleRefresh = () => {
     setRefreshTrigger((prev) => prev + 1)

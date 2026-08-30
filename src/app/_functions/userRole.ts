@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from 'react'
+
 /**
  * Get the current user's role from localStorage
  * @returns The user role ('super_admin', 'therapist', etc.) or null if not found
@@ -18,6 +20,27 @@ export function getUserRole(): string | null {
     return lower
   }
   return null
+}
+
+const subscribeUserRole = (callback: () => void) => {
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', callback)
+    window.addEventListener('user-role-change', callback)
+    return () => {
+      window.removeEventListener('storage', callback)
+      window.removeEventListener('user-role-change', callback)
+    }
+  }
+  return () => {}
+}
+
+const getServerSnapshot = () => null
+
+/**
+ * Hook to safely access the current user's role without SSR hydration mismatches.
+ */
+export function useUserRole(): string | null {
+  return useSyncExternalStore(subscribeUserRole, getUserRole, getServerSnapshot)
 }
 
 /**
