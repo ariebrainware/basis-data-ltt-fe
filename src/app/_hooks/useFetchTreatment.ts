@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
@@ -9,6 +9,9 @@ interface ListTreatmentResponse {
     treatment: TreatmentType[]
   }
   total: number
+  loading: boolean
+  error: string | null
+  refetch: () => void
 }
 
 export function useFetchTreatment(
@@ -20,7 +23,14 @@ export function useFetchTreatment(
 ): ListTreatmentResponse {
   const [treatment, setTreatment] = useState<TreatmentType[]>([])
   const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [internalRefresh, setInternalRefresh] = useState(0)
   const router = useRouter()
+
+  const refetch = useCallback(() => {
+    setInternalRefresh((prev) => prev + 1)
+  }, [])
 
   const updateState = (payload: {
     treatments: TreatmentType[]
@@ -28,10 +38,14 @@ export function useFetchTreatment(
   }) => {
     setTreatment(payload.treatments)
     setTotal(payload.total)
+    setError(null)
+    setLoading(false)
   }
 
   useEffect(() => {
     let cancelled = false
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(true)
 
     const fetchData = async () => {
       try {
@@ -45,12 +59,20 @@ export function useFetchTreatment(
         if (!cancelled) {
           updateState(payload)
         }
-      } catch (error) {
-        if (error instanceof UnauthorizedFetchError) {
+      } catch (err: any) {
+        if (err instanceof UnauthorizedFetchError) {
           UnauthorizedAccess(router)
           return
         }
-        console.error('Error fetching treatment:', error)
+        if (!cancelled) {
+          const errMsg =
+            err instanceof Error
+              ? err.message
+              : 'Gagal mengambil data penanganan'
+          setError(errMsg)
+          setLoading(false)
+        }
+        console.error('Error fetching treatment:', err)
       }
     }
 
@@ -64,11 +86,12 @@ export function useFetchTreatment(
     keyword,
     filterByTherapist,
     refreshTrigger,
+    internalRefresh,
     groupByDate,
     router,
   ])
 
-  return { data: { treatment }, total }
+  return { data: { treatment }, total, loading, error, refetch }
 }
 
 class UnauthorizedFetchError extends Error {}
@@ -118,20 +141,55 @@ function parseTreatmentData(data: any): {
   return { treatments, total }
 }
 
-async function fetchTreatments(query: string): Promise<{
+async function fetchTreatments(
+  query: string,
+  maxRetries = 2
+): Promise<{
   treatments: TreatmentType[]
   total: number
 }> {
-  const res = await apiFetch(`/treatment?${query}`, { method: 'GET' })
+  let lastError: any = null
 
-  if (res.status === 401) {
-    throw new UnauthorizedFetchError('unauthorized')
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await apiFetch(`/treatment?${query}`, { method: 'GET' })
+
+      if (res.status === 401) {
+        throw new UnauthorizedFetchError('unauthorized')
+      }
+
+      if (!res.ok) {
+        if ([502, 503, 504].includes(res.status) && attempt < maxRetries) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, 800 * Math.pow(1.5, attempt))
+          )
+          continue
+        }
+        if (res.status === 502) {
+          throw new Error('Server upstream tidak merespons (502 Bad Gateway)')
+        }
+        if (res.status === 503) {
+          throw new Error('Layanan sedang tidak tersedia (503)')
+        }
+        throw new Error(`HTTP error! Status: ${res.status}`)
+      }
+
+      const data = await res.json()
+      return parseTreatmentData(data)
+    } catch (err: any) {
+      lastError = err
+      if (err instanceof UnauthorizedFetchError) {
+        throw err
+      }
+      if (attempt < maxRetries) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, 800 * Math.pow(1.5, attempt))
+        )
+      } else {
+        break
+      }
+    }
   }
 
-  if (!res.ok) {
-    throw new Error(`HTTP error! Status: ${res.status}`)
-  }
-
-  const data = await res.json()
-  return parseTreatmentData(data)
+  throw lastError || new Error('Gagal mengambil data penanganan')
 }
