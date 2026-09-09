@@ -21,6 +21,7 @@ import {
   CurrencyDollarIcon,
   ReceiptPercentIcon,
   CubeIcon,
+  BanknotesIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
@@ -88,6 +89,13 @@ const navListMenuItems = [
     description: 'Halaman transaksi (hanya ubah data)',
     icon: ReceiptPercentIcon,
     url: '/transaction',
+    roles: ['super_admin'],
+  },
+  {
+    title: 'Pengeluaran',
+    description: 'Halaman manajemen pengeluaran',
+    icon: BanknotesIcon,
+    url: '/expense',
     roles: ['super_admin'],
   },
   {
