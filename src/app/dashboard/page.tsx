@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import MegaMenuDefault from '../_components/megaMenu'
 import {
   MagnifyingGlassIcon,
@@ -27,20 +27,10 @@ import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { apiFetch } from '../_functions/apiFetch'
 import { useRouter } from 'next/navigation'
-import { getUserRole } from '../_functions/userRole'
+import { getUserRole, useUserRole } from '../_functions/userRole'
 import Pagination from '../_components/pagination'
 import { getApiHost } from '../_functions/apiHost'
-
-// Simple in-module cache to deduplicate concurrent identical fetches
-// API response interface (what the backend returns)
-interface TreatmentApiResponse {
-  data: {
-    treatments: TreatmentType[]
-    total: number
-  }
-}
-
-const treatmentFetchCache = new Map<string, Promise<TreatmentApiResponse>>()
+import { useFetchTreatment } from '../_hooks/useFetchTreatment'
 
 const TABLE_HEAD = [
   'Nama Pasien (K. Pasien)',
@@ -49,72 +39,6 @@ const TABLE_HEAD = [
   'Terapis (ID)',
   'Keluhan',
 ]
-
-// Hook return type interface (what useFetchTreatment returns)
-interface ListTreatmentResponse {
-  data: {
-    treatment: TreatmentType[]
-  }
-  total: number
-}
-
-function useFetchTreatment(
-  currentPage: number,
-  keyword: string
-): ListTreatmentResponse {
-  const [treatment, setTreatment] = useState<TreatmentType[]>([])
-  const [total, setTotal] = useState(0)
-  const router = useRouter()
-
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const today = new Date()
-        const yyyy = today.getFullYear()
-        const mm = String(today.getMonth() + 1).padStart(2, '0')
-        const dd = String(today.getDate()).padStart(2, '0')
-        const groupByDate = `${yyyy}-${mm}-${dd}`
-        const url = `${getApiHost()}/treatment?group_by_date=${groupByDate}`
-
-        // Use cache to prevent duplicate concurrent fetches for same URL
-        let jsonData
-        if (treatmentFetchCache.has(url)) {
-          jsonData = await treatmentFetchCache.get(url)
-        } else {
-          const p = apiFetch(url, { method: 'GET' })
-            .then((r) => {
-              if (!r.ok) throw new Error(`HTTP error! Status: ${r.status}`)
-              return r.json()
-            })
-            .finally(() => {
-              // remove cache entry after completion so subsequent requests refetch
-              treatmentFetchCache.delete(url)
-            })
-
-          treatmentFetchCache.set(url, p)
-          jsonData = await p
-        }
-        const data = jsonData
-        const treatmentArray: TreatmentType[] = Array.isArray(
-          data.data.treatments
-        )
-          ? data.data.treatments
-          : []
-        setTreatment(treatmentArray)
-        console.log(`data: `, data.data.treatments)
-        console.log(`treatmentArray: `, treatmentArray)
-        setTotal(data.data.total)
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
-          UnauthorizedAccess(router)
-        }
-        console.error('Error fetching treatment:', error)
-      }
-    })()
-  }, [currentPage, keyword, router])
-
-  return { data: { treatment: treatment }, total }
-}
 interface TherapistSummary {
   therapistId: number
   therapistName: string
@@ -210,20 +134,52 @@ const processTransactions = (
 
 const fetchPeriodData = async (
   start: string,
-  end: string
+  end: string,
+  maxRetries = 2
 ): Promise<Omit<PeriodSummaryData, 'loading' | 'error'>> => {
   const url = `/transaction?start_date=${start}&end_date=${end}&limit=1000`
-  const res = await apiFetch(url, { method: 'GET' })
-  if (!res.ok) {
-    throw new Error(`HTTP error! Status: ${res.status}`)
+  let lastError: any = null
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await apiFetch(url, { method: 'GET' })
+      if (!res.ok) {
+        if ([502, 503, 504].includes(res.status) && attempt < maxRetries) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, 800 * Math.pow(1.5, attempt))
+          )
+          continue
+        }
+        if (res.status === 502) {
+          throw new Error('Server upstream tidak merespons (502 Bad Gateway)')
+        }
+        if (res.status === 503) {
+          throw new Error('Layanan sedang tidak tersedia (503)')
+        }
+        throw new Error(`HTTP error! Status: ${res.status}`)
+      }
+      const jsonData = await res.json()
+      const rawArray =
+        jsonData?.data?.transactions ??
+        jsonData?.data?.transaction ??
+        jsonData?.data ??
+        []
+      return processTransactions(Array.isArray(rawArray) ? rawArray : [])
+    } catch (err: any) {
+      lastError = err
+      if (
+        attempt < maxRetries &&
+        (!err?.message || !err.message.includes('401'))
+      ) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, 800 * Math.pow(1.5, attempt))
+        )
+      } else {
+        break
+      }
+    }
   }
-  const jsonData = await res.json()
-  const rawArray =
-    jsonData?.data?.transactions ??
-    jsonData?.data?.transaction ??
-    jsonData?.data ??
-    []
-  return processTransactions(Array.isArray(rawArray) ? rawArray : [])
+  throw lastError || new Error('Gagal mengambil data transaksi')
 }
 
 interface SummaryCardProps {
@@ -232,6 +188,7 @@ interface SummaryCardProps {
   data: PeriodSummaryData
   colorClass?: string
   customHeader?: React.ReactNode
+  onRetry?: () => void
 }
 
 function SummaryCard({
@@ -240,6 +197,7 @@ function SummaryCard({
   data,
   colorClass = 'from-blue-600 to-indigo-700',
   customHeader,
+  onRetry,
 }: SummaryCardProps) {
   return (
     <Card
@@ -277,8 +235,17 @@ function SummaryCard({
             </p>
           </div>
         ) : data.error ? (
-          <div className="flex flex-1 flex-col items-center justify-center p-4 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center space-y-2 p-4 text-center">
             <p className="text-xs font-semibold text-red-500">{data.error}</p>
+            {onRetry && (
+              <button
+                type="button"
+                onClick={onRetry}
+                className="mt-1 rounded bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-100"
+              >
+                Coba Lagi
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex flex-1 flex-col justify-between space-y-4">
@@ -360,16 +327,18 @@ function SummaryCard({
 
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [treatment, setTreatment] = useState<TreatmentType[]>([])
-  const [keyword] = useState('')
-  const { data, total } = useFetchTreatment(currentPage, keyword)
+  const [keyword, setKeyword] = useState('')
+  const todayStr = format(new Date(), 'yyyy-MM-dd')
+  const {
+    data,
+    total,
+    loading: treatmentLoading,
+    error: treatmentError,
+    refetch: refetchTreatment,
+  } = useFetchTreatment(currentPage, keyword, undefined, undefined, todayStr)
+  const treatment = data.treatment
   const router = useRouter()
-  const [userRole] = useState<string | null>(() => getUserRole())
-
-  useEffect(() => {
-    const t = setTimeout(() => setTreatment(data.treatment), 0)
-    return () => clearTimeout(t)
-  }, [data])
+  const userRole = useUserRole()
 
   // Summaries states
   const [dailyData, setDailyData] = useState<PeriodSummaryData>({
@@ -451,17 +420,8 @@ export default function Dashboard() {
   }
   const getMonthlyLabel = () => format(new Date(), 'MMMM yyyy')
 
-  useEffect(() => {
-    const role = getUserRole()
-    if (role !== 'super_admin') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDailyData((prev) => ({ ...prev, loading: false }))
-      setWeeklyData((prev) => ({ ...prev, loading: false }))
-      setMonthlyData((prev) => ({ ...prev, loading: false }))
-      return
-    }
-
-    // 1. Fetch Daily
+  const fetchDaily = useCallback(() => {
+    setDailyData((prev) => ({ ...prev, loading: true, error: null }))
     const dailyRange = getTodayRange()
     fetchPeriodData(dailyRange.start, dailyRange.end)
       .then((resData) =>
@@ -478,8 +438,10 @@ export default function Dashboard() {
           error: err instanceof Error ? err.message : 'Unknown error',
         }))
       })
+  }, [router])
 
-    // 2. Fetch Weekly
+  const fetchWeekly = useCallback(() => {
+    setWeeklyData((prev) => ({ ...prev, loading: true, error: null }))
     const weeklyRange = getWeeklyRange()
     fetchPeriodData(weeklyRange.start, weeklyRange.end)
       .then((resData) =>
@@ -496,8 +458,10 @@ export default function Dashboard() {
           error: err instanceof Error ? err.message : 'Unknown error',
         }))
       })
+  }, [router])
 
-    // 3. Fetch Monthly
+  const fetchMonthly = useCallback(() => {
+    setMonthlyData((prev) => ({ ...prev, loading: true, error: null }))
     const monthlyRange = getMonthlyRange()
     fetchPeriodData(monthlyRange.start, monthlyRange.end)
       .then((resData) =>
@@ -515,6 +479,41 @@ export default function Dashboard() {
         }))
       })
   }, [router])
+
+  const fetchCustom = useCallback(() => {
+    if (!customStart || !customEnd || customStart > customEnd) return
+    setCustomData((prev) => ({ ...prev, loading: true, error: null }))
+    fetchPeriodData(customStart, customEnd)
+      .then((resData) =>
+        setCustomData({ ...resData, loading: false, error: null })
+      )
+      .catch((err) => {
+        if (err instanceof Error && err.message.includes('401')) {
+          UnauthorizedAccess(router)
+          return
+        }
+        setCustomData((prev) => ({
+          ...prev,
+          loading: false,
+          error: err instanceof Error ? err.message : 'Unknown error',
+        }))
+      })
+  }, [customStart, customEnd, router])
+
+  useEffect(() => {
+    if (userRole === null) return
+    if (userRole !== 'super_admin') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDailyData((prev) => ({ ...prev, loading: false }))
+      setWeeklyData((prev) => ({ ...prev, loading: false }))
+      setMonthlyData((prev) => ({ ...prev, loading: false }))
+      return
+    }
+
+    fetchDaily()
+    fetchWeekly()
+    fetchMonthly()
+  }, [userRole, fetchDaily, fetchWeekly, fetchMonthly])
 
   const handleCustomStartChange = (val: string) => {
     setCustomStart(val)
@@ -549,30 +548,15 @@ export default function Dashboard() {
   useEffect(() => {
     if (!customStart || !customEnd) return
     if (customStart > customEnd) return
-
-    const role = getUserRole()
-    if (role !== 'super_admin') {
+    if (userRole === null) return
+    if (userRole !== 'super_admin') {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCustomData((prev) => ({ ...prev, loading: false }))
       return
     }
 
-    fetchPeriodData(customStart, customEnd)
-      .then((resData) =>
-        setCustomData({ ...resData, loading: false, error: null })
-      )
-      .catch((err) => {
-        if (err instanceof Error && err.message.includes('401')) {
-          UnauthorizedAccess(router)
-          return
-        }
-        setCustomData((prev) => ({
-          ...prev,
-          loading: false,
-          error: err instanceof Error ? err.message : 'Unknown error',
-        }))
-      })
-  }, [customStart, customEnd, router])
+    fetchCustom()
+  }, [customStart, customEnd, userRole, fetchCustom])
 
   return (
     <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
@@ -586,24 +570,28 @@ export default function Dashboard() {
             dateLabel={getTodayLabel()}
             data={dailyData}
             colorClass="from-teal-500 to-emerald-700"
+            onRetry={fetchDaily}
           />
           <SummaryCard
             title="Ringkasan Mingguan"
             dateLabel={getWeeklyLabel()}
             data={weeklyData}
             colorClass="from-blue-500 to-indigo-700"
+            onRetry={fetchWeekly}
           />
           <SummaryCard
             title="Ringkasan Bulanan"
             dateLabel={getMonthlyLabel()}
             data={monthlyData}
             colorClass="from-purple-500 to-indigo-800"
+            onRetry={fetchMonthly}
           />
           <SummaryCard
             title="Kustom Tanggal"
             dateLabel={`${customStart} s/d ${customEnd}`}
             data={customData}
             colorClass="from-blue-gray-600 to-blue-gray-800"
+            onRetry={fetchCustom}
             customHeader={
               <div className="flex items-center gap-2 text-black">
                 <input
@@ -666,6 +654,13 @@ export default function Dashboard() {
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
                   crossOrigin={undefined}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key === 'Enter') {
+                      const newKeyword = (e.target as HTMLInputElement).value
+                      setKeyword(newKeyword)
+                      setCurrentPage(1)
+                    }
+                  }}
                   onResize={undefined}
                   onResizeCapture={undefined}
                 />
@@ -724,109 +719,148 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {treatment.map(
-                (
-                  {
-                    ID,
-                    patient_name,
-                    patient_code,
-                    age,
-                    treatment_date,
-                    therapist_name,
-                    therapist_id,
-                    issues,
-                  },
-                  index
-                ) => {
-                  const isLast = index === treatment.length - 1
-                  const classes = isLast
-                    ? 'p-4'
-                    : 'p-4 border-b border-blue-gray-50'
+              {treatmentLoading ? (
+                <tr>
+                  <td colSpan={TABLE_HEAD.length} className="p-8 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <div className="size-6 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
+                      <p className="text-xs text-gray-500">
+                        Memuat jadwal penanganan...
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : treatmentError ? (
+                <tr>
+                  <td colSpan={TABLE_HEAD.length} className="p-8 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <p className="text-xs font-semibold text-red-500">
+                        {treatmentError}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={refetchTreatment}
+                        className="rounded bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-100"
+                      >
+                        Coba Lagi
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ) : treatment.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={TABLE_HEAD.length}
+                    className="p-8 text-center text-xs italic text-gray-500"
+                  >
+                    Tidak ada jadwal penanganan hari ini
+                  </td>
+                </tr>
+              ) : (
+                treatment.map(
+                  (
+                    {
+                      ID,
+                      patient_name,
+                      patient_code,
+                      age,
+                      treatment_date,
+                      therapist_name,
+                      therapist_id,
+                      issues,
+                    },
+                    index
+                  ) => {
+                    const isLast = index === treatment.length - 1
+                    const classes = isLast
+                      ? 'p-4'
+                      : 'p-4 border-b border-blue-gray-50'
 
-                  return (
-                    <tr
-                      key={ID}
-                      className="transition-colors hover:bg-blue-gray-50/20"
-                    >
-                      <td className={classes}>
-                        <div className="flex items-center gap-3">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-bold"
-                            placeholder={undefined}
-                            onPointerEnterCapture={undefined}
-                            onPointerLeaveCapture={undefined}
-                            onResize={undefined}
-                            onResizeCapture={undefined}
-                          >
-                            {patient_name} ({patient_code})
-                          </Typography>
-                        </div>
-                      </td>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                          placeholder={undefined}
-                          onPointerEnterCapture={undefined}
-                          onPointerLeaveCapture={undefined}
-                          onResize={undefined}
-                          onResizeCapture={undefined}
-                        >
-                          {age} Tahun
-                        </Typography>
-                      </td>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                          placeholder={undefined}
-                          onPointerEnterCapture={undefined}
-                          onPointerLeaveCapture={undefined}
-                          onResize={undefined}
-                          onResizeCapture={undefined}
-                        >
-                          {treatment_date}
-                        </Typography>
-                      </td>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                          placeholder={undefined}
-                          onPointerEnterCapture={undefined}
-                          onPointerLeaveCapture={undefined}
-                          onResize={undefined}
-                          onResizeCapture={undefined}
-                        >
-                          {therapist_name} ({therapist_id})
-                        </Typography>
-                      </td>
-                      <td className={classes}>
-                        <div className="flex items-center gap-3">
-                          <div className="flex flex-col">
+                    return (
+                      <tr
+                        key={ID || `${patient_code}-${index}`}
+                        className="transition-colors hover:bg-blue-gray-50/20"
+                      >
+                        <td className={classes}>
+                          <div className="flex items-center gap-3">
                             <Typography
                               variant="small"
                               color="blue-gray"
-                              className="font-normal opacity-70"
+                              className="font-bold"
                               placeholder={undefined}
                               onPointerEnterCapture={undefined}
                               onPointerLeaveCapture={undefined}
                               onResize={undefined}
                               onResizeCapture={undefined}
                             >
-                              {issues}
+                              {patient_name} ({patient_code})
                             </Typography>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                }
+                        </td>
+                        <td className={classes}>
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                            placeholder={undefined}
+                            onPointerEnterCapture={undefined}
+                            onPointerLeaveCapture={undefined}
+                            onResize={undefined}
+                            onResizeCapture={undefined}
+                          >
+                            {age} Tahun
+                          </Typography>
+                        </td>
+                        <td className={classes}>
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                            placeholder={undefined}
+                            onPointerEnterCapture={undefined}
+                            onPointerLeaveCapture={undefined}
+                            onResize={undefined}
+                            onResizeCapture={undefined}
+                          >
+                            {treatment_date}
+                          </Typography>
+                        </td>
+                        <td className={classes}>
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                            placeholder={undefined}
+                            onPointerEnterCapture={undefined}
+                            onPointerLeaveCapture={undefined}
+                            onResize={undefined}
+                            onResizeCapture={undefined}
+                          >
+                            {therapist_name} ({therapist_id})
+                          </Typography>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center gap-3">
+                            <div className="flex flex-col">
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="font-normal opacity-70"
+                                placeholder={undefined}
+                                onPointerEnterCapture={undefined}
+                                onPointerLeaveCapture={undefined}
+                                onResize={undefined}
+                                onResizeCapture={undefined}
+                              >
+                                {issues}
+                              </Typography>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  }
+                )
               )}
             </tbody>
           </table>
