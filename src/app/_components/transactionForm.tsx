@@ -193,6 +193,10 @@ export function TransactionForm({
         method: 'POST',
         body: formData,
       })
+      if (res.status === 401) {
+        UnauthorizedAccess(router)
+        return
+      }
       if (!res.ok) {
         throw new Error('Upload failed')
       }
