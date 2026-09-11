@@ -54,7 +54,7 @@ export default function ExpenseRow({
         </small>
       </td>
       <td className="max-w-[150px] truncate p-3">
-        {receipt_url ? (
+        {receipt_url && /^https?:\/\//i.test(receipt_url) ? (
           <a
             href={receipt_url}
             target="_blank"
