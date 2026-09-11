@@ -42,6 +42,11 @@ const normalizePaymentStatusDefault = (val?: string | null) => {
   return val
 }
 
+export interface TransactionFormProps extends TransactionType {
+  onUploadingChange?: (isUploading: boolean) => void
+  onUploadStateChange?: (isUploading: boolean) => void
+}
+
 export function TransactionForm({
   ID,
   treatment_id,
@@ -54,7 +59,9 @@ export function TransactionForm({
   treatment_date,
   items,
   attachment_path,
-}: TransactionType) {
+  onUploadingChange,
+  onUploadStateChange,
+}: TransactionFormProps) {
   const [allItems, setAllItems] = useState<ItemType[]>([])
   const [selectedItems, setSelectedItems] = useState<
     { item_id: number; quantity: number; price?: number }[]
@@ -75,6 +82,11 @@ export function TransactionForm({
   })
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    onUploadingChange?.(isUploading)
+    onUploadStateChange?.(isUploading)
+  }, [isUploading, onUploadingChange, onUploadStateChange])
 
   useEffect(() => {
     if (prevIdRef.current !== ID) {

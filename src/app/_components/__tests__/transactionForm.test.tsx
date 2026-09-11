@@ -347,4 +347,61 @@ describe('TransactionForm', () => {
       process.env.NODE_ENV = originalEnv
     }
   })
+
+  test('calls onUploadingChange when upload starts and completes', async () => {
+    let resolveUpload: (value: any) => void
+    const uploadPromise = new Promise((resolve) => {
+      resolveUpload = resolve
+    })
+
+    ;(apiFetch as jest.Mock).mockReturnValueOnce(uploadPromise)
+
+    const onUploadingChange = jest.fn()
+
+    const { container } = render(
+      <TransactionForm
+        ID={1}
+        treatment_id={100}
+        patient_name="John Doe"
+        pricing_name="cash"
+        amount={150000}
+        payment_status="paid"
+        notes="Pembayaran lunas"
+        transaction_date="2026-05-20 10:00"
+        treatment_date="2026-05-20"
+        onUploadingChange={onUploadingChange}
+      />
+    )
+
+    // Initial state is false
+    expect(onUploadingChange).toHaveBeenLastCalledWith(false)
+
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    const file = new File(['upload content'], 'new_receipt.pdf', {
+      type: 'application/pdf',
+    })
+    fireEvent.change(fileInput, { target: { files: [file] } })
+
+    // When upload starts
+    await waitFor(() => {
+      expect(onUploadingChange).toHaveBeenLastCalledWith(true)
+    })
+
+    // Resolve upload
+    resolveUpload!({
+      ok: true,
+      json: async () => ({
+        data: {
+          attachment_path: 'uploads/attachments/new_receipt.pdf',
+        },
+      }),
+    })
+
+    // When upload finishes
+    await waitFor(() => {
+      expect(onUploadingChange).toHaveBeenLastCalledWith(false)
+    })
+  })
 })

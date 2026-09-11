@@ -32,6 +32,7 @@ export default function TransactionRow({
   onUpdateSuccess,
 }: TransactionRowProps) {
   const [open, setOpen] = React.useState(false)
+  const [isUploading, setIsUploading] = React.useState(false)
   const router = useRouter()
 
   const formatPaymentStatus = (s?: string | null) => {
@@ -52,6 +53,9 @@ export default function TransactionRow({
   const handleOpen = () => setOpen((prev) => !prev)
 
   const handleUpdateTransaction = () => {
+    if (isUploading) {
+      return
+    }
     const treatmentIdInput =
       document.querySelector<HTMLInputElement>('#treatment_id')?.value ||
       String(treatment_id)
@@ -174,6 +178,7 @@ export default function TransactionRow({
             treatment_date={treatment_date}
             items={items}
             attachment_path={attachment_path}
+            onUploadingChange={setIsUploading}
           />
         </DialogBody>
         <DialogFooter
@@ -200,6 +205,7 @@ export default function TransactionRow({
             variant="gradient"
             color="green"
             onClick={handleUpdateTransaction}
+            disabled={isUploading}
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
