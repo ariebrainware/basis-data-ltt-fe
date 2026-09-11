@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { TransactionType } from '../_types/transaction'
 import { apiFetch } from '../_functions/apiFetch'
@@ -66,6 +66,8 @@ export function TransactionForm({
   const [manualAmount, setManualAmount] = useState<number | null>(null)
   const [isLoadingItems, setIsLoadingItems] = useState(false)
   const [itemsError, setItemsError] = useState<string | null>(null)
+  const isAttachmentDirtyRef = useRef(false)
+  const prevIdRef = useRef(ID)
   const [attachmentPaths, setAttachmentPaths] = useState<string[]>(() => {
     return attachment_path
       ? attachment_path.split(/,(?=\/?uploads\/|https?:\/\/)/).filter(Boolean)
@@ -75,8 +77,14 @@ export function TransactionForm({
   const router = useRouter()
 
   useEffect(() => {
-    if (attachment_path !== undefined) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (prevIdRef.current !== ID) {
+      prevIdRef.current = ID
+      isAttachmentDirtyRef.current = false
+    }
+  }, [ID])
+
+  useEffect(() => {
+    if (attachment_path !== undefined && !isAttachmentDirtyRef.current) {
       setAttachmentPaths(
         attachment_path
           ? attachment_path
@@ -150,7 +158,7 @@ export function TransactionForm({
               setDbItems(mapped)
               setSelectedItems(mapped)
             }
-            if (fetchedAttachment) {
+            if (fetchedAttachment && !isAttachmentDirtyRef.current) {
               setAttachmentPaths(
                 typeof fetchedAttachment === 'string'
                   ? fetchedAttachment
@@ -183,6 +191,7 @@ export function TransactionForm({
       return
     }
 
+    isAttachmentDirtyRef.current = true
     setIsUploading(true)
     const formData = new FormData()
     const sanitizedName = file.name.replace(/,/g, '_')
@@ -203,6 +212,7 @@ export function TransactionForm({
         data?.attachment_path ||
         data?.file_path
       if (uploadedPath) {
+        isAttachmentDirtyRef.current = true
         setAttachmentPaths((prev) => [...prev, uploadedPath])
       }
     } catch (err) {
@@ -630,11 +640,12 @@ export function TransactionForm({
                   </div>
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
+                      isAttachmentDirtyRef.current = true
                       setAttachmentPaths((prev) =>
                         prev.filter((_, i) => i !== index)
                       )
-                    }
+                    }}
                     className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1 hover:text-red-500"
                     aria-label={`Hapus lampiran ${index + 1}`}
                   >

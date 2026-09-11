@@ -187,4 +187,164 @@ describe('TransactionForm', () => {
     expect(window.alert).toHaveBeenCalledWith('Ukuran file maksimal adalah 5MB')
     expect(apiFetch).not.toHaveBeenCalled()
   })
+
+  test('does not overwrite local attachment deletion when transaction details request resolves', async () => {
+    const originalEnv = process.env.NODE_ENV
+    process.env.NODE_ENV = 'development'
+    try {
+      let resolveTransactionDetails: (value: any) => void
+      const transactionDetailsPromise = new Promise((resolve) => {
+        resolveTransactionDetails = resolve
+      })
+
+      ;(apiFetch as jest.Mock).mockImplementation((url: string) => {
+        if (url === '/item?limit=1000') {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ data: [] }),
+          })
+        }
+        if (url === '/transaction/1') {
+          return transactionDetailsPromise
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) })
+      })
+
+      render(
+        <TransactionForm
+          ID={1}
+          treatment_id={100}
+          patient_name="John Doe"
+          pricing_name="cash"
+          amount={150000}
+          payment_status="paid"
+          notes="Pembayaran lunas"
+          transaction_date="2026-05-20 10:00"
+          treatment_date="2026-05-20"
+          attachment_path="uploads/attachments/old_receipt.pdf"
+        />
+      )
+
+      expect(screen.getByText('old_receipt.pdf')).toBeInTheDocument()
+
+      // User deletes the old receipt while request is in flight
+      const deleteBtn = screen.getByRole('button', { name: /hapus lampiran/i })
+      fireEvent.click(deleteBtn)
+      expect(screen.queryByText('old_receipt.pdf')).not.toBeInTheDocument()
+
+      // Transaction details request resolves with server attachment
+      resolveTransactionDetails!({
+        ok: true,
+        json: async () => ({
+          data: {
+            attachment_path: 'uploads/attachments/server_receipt.pdf',
+          },
+        }),
+      })
+
+      await waitFor(() => {
+        expect(apiFetch).toHaveBeenCalledWith('/transaction/1', {
+          method: 'GET',
+        })
+      })
+
+      // Ensure server response did not restore attachment list
+      expect(screen.queryByText('server_receipt.pdf')).not.toBeInTheDocument()
+      expect(screen.queryByText('old_receipt.pdf')).not.toBeInTheDocument()
+      const hiddenAttachmentInput =
+        document.querySelector<HTMLInputElement>('#attachment_path')
+      expect(hiddenAttachmentInput?.value).toBe('')
+    } finally {
+      process.env.NODE_ENV = originalEnv
+    }
+  })
+
+  test('does not overwrite locally uploaded attachment when transaction details request resolves', async () => {
+    const originalEnv = process.env.NODE_ENV
+    process.env.NODE_ENV = 'development'
+    try {
+      let resolveTransactionDetails: (value: any) => void
+      const transactionDetailsPromise = new Promise((resolve) => {
+        resolveTransactionDetails = resolve
+      })
+
+      ;(apiFetch as jest.Mock).mockImplementation((url: string) => {
+        if (url === '/item?limit=1000') {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ data: [] }),
+          })
+        }
+        if (url === '/transaction/1') {
+          return transactionDetailsPromise
+        }
+        if (url === '/transaction/upload') {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              data: {
+                attachment_path: 'uploads/attachments/new_upload.pdf',
+              },
+            }),
+          })
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) })
+      })
+
+      const { container } = render(
+        <TransactionForm
+          ID={1}
+          treatment_id={100}
+          patient_name="John Doe"
+          pricing_name="cash"
+          amount={150000}
+          payment_status="paid"
+          notes="Pembayaran lunas"
+          transaction_date="2026-05-20 10:00"
+          treatment_date="2026-05-20"
+        />
+      )
+
+      const fileInput = container.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement
+      const file = new File(['upload content'], 'new_upload.pdf', {
+        type: 'application/pdf',
+      })
+      fireEvent.change(fileInput, { target: { files: [file] } })
+
+      await waitFor(() => {
+        expect(screen.getByText('new_upload.pdf')).toBeInTheDocument()
+      })
+
+      // Transaction details request resolves with old server attachment
+      resolveTransactionDetails!({
+        ok: true,
+        json: async () => ({
+          data: {
+            attachment_path: 'uploads/attachments/old_server_receipt.pdf',
+          },
+        }),
+      })
+
+      await waitFor(() => {
+        expect(apiFetch).toHaveBeenCalledWith('/transaction/1', {
+          method: 'GET',
+        })
+      })
+
+      // Server response should not overwrite the new upload
+      expect(screen.getByText('new_upload.pdf')).toBeInTheDocument()
+      expect(
+        screen.queryByText('old_server_receipt.pdf')
+      ).not.toBeInTheDocument()
+      const hiddenAttachmentInput =
+        document.querySelector<HTMLInputElement>('#attachment_path')
+      expect(hiddenAttachmentInput?.value).toBe(
+        'uploads/attachments/new_upload.pdf'
+      )
+    } finally {
+      process.env.NODE_ENV = originalEnv
+    }
+  })
 })
