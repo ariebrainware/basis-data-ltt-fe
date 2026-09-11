@@ -76,6 +76,7 @@ export function TransactionForm({
 
   useEffect(() => {
     if (attachment_path !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAttachmentPaths(
         attachment_path
           ? attachment_path

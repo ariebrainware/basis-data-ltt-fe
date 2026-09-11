@@ -59,13 +59,14 @@ describe('TransactionForm', () => {
 
     expect(screen.getByTestId('patient_name')).toHaveValue('John Doe')
     expect(screen.getByText('receipt1.pdf')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /lihat lampiran/i })).toHaveAttribute(
+    expect(
+      screen.getByRole('link', { name: /lihat lampiran/i })
+    ).toHaveAttribute(
       'href',
       expect.stringContaining('uploads/attachments/receipt1.pdf')
     )
-    const hiddenAttachmentInput = document.querySelector<HTMLInputElement>(
-      '#attachment_path'
-    )
+    const hiddenAttachmentInput =
+      document.querySelector<HTMLInputElement>('#attachment_path')
     expect(hiddenAttachmentInput?.value).toBe(
       'uploads/attachments/receipt1.pdf'
     )
@@ -101,9 +102,8 @@ describe('TransactionForm', () => {
     expect(screen.queryByText('receipt1.pdf')).not.toBeInTheDocument()
     expect(screen.getByText('receipt2.png')).toBeInTheDocument()
 
-    const hiddenAttachmentInput = document.querySelector<HTMLInputElement>(
-      '#attachment_path'
-    )
+    const hiddenAttachmentInput =
+      document.querySelector<HTMLInputElement>('#attachment_path')
     expect(hiddenAttachmentInput?.value).toBe(
       'uploads/attachments/receipt2.png'
     )
@@ -152,9 +152,8 @@ describe('TransactionForm', () => {
       expect(screen.getByText('new_invoice.pdf')).toBeInTheDocument()
     })
 
-    const hiddenAttachmentInput = document.querySelector<HTMLInputElement>(
-      '#attachment_path'
-    )
+    const hiddenAttachmentInput =
+      document.querySelector<HTMLInputElement>('#attachment_path')
     expect(hiddenAttachmentInput?.value).toBe(
       'uploads/attachments/new_invoice.pdf'
     )
@@ -185,9 +184,7 @@ describe('TransactionForm', () => {
 
     fireEvent.change(fileInput, { target: { files: [largeFile] } })
 
-    expect(window.alert).toHaveBeenCalledWith(
-      'Ukuran file maksimal adalah 5MB'
-    )
+    expect(window.alert).toHaveBeenCalledWith('Ukuran file maksimal adalah 5MB')
     expect(apiFetch).not.toHaveBeenCalled()
   })
 })
