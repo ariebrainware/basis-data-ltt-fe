@@ -13,6 +13,7 @@ export interface DeleteResourceConfig {
     | 'pricing'
     | 'item'
     | 'employee'
+    | 'expense'
   resourceId: number
   resourceName: string
   onSuccess?: () => void
@@ -67,6 +68,12 @@ export function useDeleteResource(config: DeleteResourceConfig) {
         successText: 'Data karyawan berhasil dihapus.',
         errorText: 'Gagal menghapus data karyawan',
         consoleError: 'Error deleting employee record:',
+      },
+      expense: {
+        confirmTitle: 'Hapus Data Pengeluaran?',
+        successText: 'Data pengeluaran berhasil dihapus.',
+        errorText: 'Gagal menghapus data pengeluaran',
+        consoleError: 'Error deleting expense record:',
       },
     }[resourceType]
   }
