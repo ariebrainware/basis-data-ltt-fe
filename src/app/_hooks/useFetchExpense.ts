@@ -76,18 +76,17 @@ export function useFetchExpense(
           setExpenses(fetchedExpenses)
           setSummary(fetchedSummary)
 
-          // Calculate total pagination items
-          let calculatedTotal =
-            (currentPage - 1) * limit + fetchedExpenses.length
-          if (fetchedExpenses.length === limit) {
-            calculatedTotal = currentPage * limit + 1
-          }
-          if (
-            fetchedSummary &&
-            typeof fetchedSummary.total_count === 'number'
-          ) {
-            calculatedTotal = fetchedSummary.total_count
-          }
+          // Calculate total pagination items (prefer API-provided totals when available)
+          const apiTotal =
+            fetchedSummary && typeof fetchedSummary.total_count === 'number'
+              ? fetchedSummary.total_count
+              : typeof responseData?.total === 'number'
+                ? responseData.total
+                : typeof payload?.total === 'number'
+                  ? payload.total
+                  : null
+
+          const calculatedTotal = apiTotal ?? offset + fetchedExpenses.length
           setTotal(calculatedTotal)
         }
       } catch (error) {
