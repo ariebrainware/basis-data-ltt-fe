@@ -28,6 +28,7 @@ export default function TransactionRow({
   transaction_date,
   treatment_date,
   items,
+  attachment_path,
   onUpdateSuccess,
 }: TransactionRowProps) {
   const [open, setOpen] = React.useState(false)
@@ -77,6 +78,8 @@ export default function TransactionRow({
       document.querySelector<HTMLTextAreaElement>('#notes')?.value || notes
     const itemsInput = document.querySelector<HTMLInputElement>('#items')?.value
     const itemsPayload = itemsInput ? JSON.parse(itemsInput) : []
+    const attachmentPathInput =
+      document.querySelector<HTMLInputElement>('#attachment_path')?.value
 
     apiFetch(`/transaction/${ID}`, {
       method: 'PATCH',
@@ -86,6 +89,10 @@ export default function TransactionRow({
         payment_method: pricingNameInput.trim(),
         payment_status: paymentStatusInput.trim(),
         items: itemsPayload,
+        attachment_path:
+          attachmentPathInput !== undefined
+            ? attachmentPathInput
+            : attachment_path || '',
       }),
     })
       .then((response) => {
@@ -166,6 +173,7 @@ export default function TransactionRow({
             transaction_date={transaction_date}
             treatment_date={treatment_date}
             items={items}
+            attachment_path={attachment_path}
           />
         </DialogBody>
         <DialogFooter

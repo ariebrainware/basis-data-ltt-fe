@@ -81,6 +81,42 @@ describe('TransactionRow', () => {
 
     await waitFor(() => expect(apiFetch).toHaveBeenCalled())
     const [, request] = (apiFetch as jest.Mock).mock.calls[0]
+    expect(JSON.parse(request.body)).toEqual({
+      amount: 250000,
+      remarks: 'catatan',
+      payment_method: 'Paket Gold',
+      payment_status: 'cash',
+      items: [],
+      attachment_path: '',
+    })
+    await waitFor(() => expect(mockRefresh).toHaveBeenCalled())
+  })
+
+  test('submits PATCH payload with multiple attachment paths', async () => {
+    render(
+      <table>
+        <tbody>
+          <TransactionRow
+            ID={10}
+            treatment_id={30}
+            patient_name="Budi"
+            pricing_name="Paket Gold"
+            amount={250000}
+            payment_status="cash"
+            notes="catatan"
+            transaction_date="2026-05-20 10:00"
+            treatment_date="2026-05-21"
+            attachment_path="uploads/attachments/receipt1.pdf,uploads/attachments/receipt2.png"
+          />
+        </tbody>
+      </table>
+    )
+
+    fireEvent.click(screen.getByLabelText('Edit transaction'))
+    fireEvent.click(screen.getByText('Confirm'))
+
+    await waitFor(() => expect(apiFetch).toHaveBeenCalled())
+    const [, request] = (apiFetch as jest.Mock).mock.calls[0]
     expect(request.method).toBe('PATCH')
     expect(JSON.parse(request.body)).toEqual({
       amount: 250000,
@@ -88,6 +124,8 @@ describe('TransactionRow', () => {
       payment_method: 'Paket Gold',
       payment_status: 'cash',
       items: [],
+      attachment_path:
+        'uploads/attachments/receipt1.pdf,uploads/attachments/receipt2.png',
     })
     await waitFor(() => expect(mockRefresh).toHaveBeenCalled())
   })

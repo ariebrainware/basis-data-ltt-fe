@@ -70,6 +70,8 @@ const TableBody = ({
         transaction_date={item.transaction_date}
         treatment_date={item.treatment_date}
         pricing_name={item.pricing_name}
+        items={item.items}
+        attachment_path={item.attachment_path}
         onUpdateSuccess={onUpdateSuccess}
       />
     ))}

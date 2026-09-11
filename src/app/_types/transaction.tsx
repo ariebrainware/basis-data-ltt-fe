@@ -16,4 +16,5 @@ export interface TransactionType {
   treatment_date: string
   therapist_name?: string
   items?: TransactionItem[]
+  attachment_path?: string
 }

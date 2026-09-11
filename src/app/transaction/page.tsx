@@ -70,6 +70,7 @@ function normalizeTransaction(item: any): TransactionType {
           price: i?.price !== undefined ? toNumber(i.price) : undefined,
         }))
       : [],
+    attachment_path: String(item?.attachment_path ?? ''),
   }
 }
 
