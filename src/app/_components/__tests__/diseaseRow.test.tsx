@@ -2,6 +2,7 @@ import '@testing-library/jest-dom'
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import DiseaseRow from '../diseaseRow'
+import { apiFetch } from '../../_functions/apiFetch'
 
 // Mock Material Tailwind components used in DiseaseRow (and DiseaseForm)
 jest.mock('@material-tailwind/react', () => ({
@@ -47,12 +48,12 @@ jest.mock('@material-tailwind/react', () => ({
 }))
 
 // Mock helper modules used by the component
-jest.mock('../../_functions/sessionToken', () => ({
-  getSessionToken: () => 'mock-session-token',
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: jest.fn() }),
 }))
 
-jest.mock('../../_functions/apiHost', () => ({
-  getApiHost: () => 'https://localhost:19091',
+jest.mock('../../_functions/apiFetch', () => ({
+  apiFetch: jest.fn(),
 }))
 
 jest.mock('../../_functions/unauthorized', () => ({
@@ -73,12 +74,12 @@ describe('DiseaseRow Component', () => {
 
   beforeEach(() => {
     // Reset mocks
-    mockOnDataChange.mockReset()
-    // Mock fetch with a typed Jest mock
-    const globalAny = global as typeof globalThis & { fetch: jest.Mock }
-    globalAny.fetch = jest.fn(() =>
-      Promise.resolve({ ok: true, status: 200, json: async () => ({}) })
-    )
+    jest.clearAllMocks()
+    ;(apiFetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({}),
+    })
   })
 
   test('renders table row cells', () => {
@@ -122,7 +123,7 @@ describe('DiseaseRow Component', () => {
     const confirmButton = screen.getByText('Confirm')
     fireEvent.click(confirmButton)
 
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    await waitFor(() => expect(apiFetch).toHaveBeenCalled())
     await waitFor(() => expect(mockOnDataChange).toHaveBeenCalled())
   })
 })
