@@ -329,7 +329,7 @@ export function PatientForm({
                             e.preventDefault()
                             void viewAttachment(path, path.split('/').pop())
                           }}
-                          className="text-[10px] text-blue-600 hover:underline dark:text-blue-400 cursor-pointer"
+                          className="cursor-pointer text-[10px] text-blue-600 hover:underline dark:text-blue-400"
                         >
                           Lihat Lampiran
                         </a>
