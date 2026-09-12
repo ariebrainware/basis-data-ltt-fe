@@ -7,6 +7,7 @@ import { GenderSelect } from './selectGender'
 import { DiseaseMultiSelect } from './selectDisease'
 import { SignaturePad } from './signaturePad'
 import { getApiHost, getAttachmentUrl } from '../_functions/apiHost'
+import { viewAttachment } from '../_functions/viewAttachment'
 import { apiFetch } from '../_functions/apiFetch'
 
 function getSignatureUrl(path?: string): string {
@@ -322,10 +323,13 @@ export function PatientForm({
                         </span>
                         <a
                           href={getAttachmentUrl(path)}
-                          download
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            void viewAttachment(path, path.split('/').pop())
+                          }}
+                          className="text-[10px] text-blue-600 hover:underline dark:text-blue-400 cursor-pointer"
                         >
                           Lihat Lampiran
                         </a>

@@ -6,6 +6,7 @@ import Footer from '../_components/footer'
 import { Checkbox, Radio } from '@material-tailwind/react'
 import { apiFetch } from '../_functions/apiFetch'
 import { getAttachmentUrl } from '../_functions/apiHost'
+import { viewAttachment } from '../_functions/viewAttachment'
 import { DiseaseMultiSelect } from '../_components/selectDisease'
 import { extractErrorMessage } from '../_functions/errorMessage'
 import Swal from 'sweetalert2'
@@ -279,10 +280,13 @@ export default function Register() {
                     </span>
                     <a
                       href={getAttachmentUrl(path)}
-                      download
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        void viewAttachment(path, path.split('/').pop())
+                      }}
+                      className="text-[10px] text-blue-600 hover:underline dark:text-blue-400 cursor-pointer"
                     >
                       Lihat Lampiran
                     </a>

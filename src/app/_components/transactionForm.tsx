@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 import { getAttachmentUrl } from '../_functions/apiHost'
+import { viewAttachment } from '../_functions/viewAttachment'
 
 const formatPaymentStatus = (s?: string | null) => {
   if (!s) return '-'
@@ -645,10 +646,13 @@ export function TransactionForm({
                       </span>
                       <a
                         href={getAttachmentUrl(path)}
-                        download
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          void viewAttachment(path, path.split('/').pop())
+                        }}
+                        className="text-[10px] text-blue-600 hover:underline dark:text-blue-400 cursor-pointer"
                       >
                         Lihat Lampiran
                       </a>

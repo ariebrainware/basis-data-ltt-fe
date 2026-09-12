@@ -1,4 +1,4 @@
-import { getApiHost } from '../apiHost'
+import { getApiHost, getAttachmentUrl } from '../apiHost'
 
 describe('getApiHost', () => {
   const originalEnv = process.env.NEXT_PUBLIC_API_HOST
@@ -98,5 +98,37 @@ describe('getApiHost', () => {
       process.env.NEXT_PUBLIC_API_HOST = 'LOCALHOST:19091'
       expect(getApiHost()).toBe('http://LOCALHOST:19091')
     })
+  })
+})
+
+describe('getAttachmentUrl', () => {
+  beforeEach(() => {
+    delete process.env.NEXT_PUBLIC_API_HOST
+  })
+
+  test('returns empty string when path is empty or undefined', () => {
+    expect(getAttachmentUrl()).toBe('')
+    expect(getAttachmentUrl('')).toBe('')
+  })
+
+  test('returns data: URLs unchanged', () => {
+    const dataUri =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+    expect(getAttachmentUrl(dataUri)).toBe(dataUri)
+  })
+
+  test('constructs URL with API host for relative path', () => {
+    expect(getAttachmentUrl('uploads/attachments/receipt.pdf')).toBe(
+      'https://localhost:19091/uploads/attachments/receipt.pdf'
+    )
+  })
+
+  test('preserves absolute URLs unchanged', () => {
+    expect(
+      getAttachmentUrl('http://localhost:19091/uploads/attachments/receipt.pdf')
+    ).toBe('http://localhost:19091/uploads/attachments/receipt.pdf')
+    expect(
+      getAttachmentUrl('https://example.com/uploads/attachments/receipt.pdf')
+    ).toBe('https://example.com/uploads/attachments/receipt.pdf')
   })
 })

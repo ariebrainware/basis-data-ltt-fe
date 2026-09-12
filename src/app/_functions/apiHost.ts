@@ -31,7 +31,7 @@ export function getApiHost(): string {
 
 /**
  * Resolves the full URL for an attachment path.
- * @param path The relative attachment path (e.g. 'uploads/attachments/xyz.pdf')
+ * @param path The relative or absolute attachment path (e.g. 'uploads/attachments/xyz.pdf')
  * @returns The resolved URL or empty string.
  */
 export function getAttachmentUrl(path?: string): string {
@@ -43,6 +43,7 @@ export function getAttachmentUrl(path?: string): string {
   ) {
     return path
   }
+
   const host = getApiHost()
   const cleanPath = path.startsWith('/') ? path : `/${path}`
   return `${host}${cleanPath}`
