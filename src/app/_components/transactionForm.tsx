@@ -633,18 +633,15 @@ export function TransactionForm({
                       <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
                         {path.split('/').pop()}
                       </span>
-                      <a
-                        href={getAttachmentUrl(path)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => {
-                          e.preventDefault()
+                      <button
+                        type="button"
+                        onClick={() =>
                           void viewAttachment(path, path.split('/').pop())
-                        }}
-                        className="cursor-pointer text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                        }
+                        className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
                       >
                         Lihat Lampiran
-                      </a>
+                      </button>
                     </div>
                   </div>
                   <button

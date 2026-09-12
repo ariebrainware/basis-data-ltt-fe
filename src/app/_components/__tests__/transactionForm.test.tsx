@@ -60,11 +60,8 @@ describe('TransactionForm', () => {
     expect(screen.getByTestId('patient_name')).toHaveValue('John Doe')
     expect(screen.getByText('receipt1.pdf')).toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: /lihat lampiran/i })
-    ).toHaveAttribute(
-      'href',
-      expect.stringContaining('uploads/attachments/receipt1.pdf')
-    )
+      screen.getByRole('button', { name: /lihat lampiran/i })
+    ).toBeInTheDocument()
     const hiddenAttachmentInput =
       document.querySelector<HTMLInputElement>('#attachment_path')
     expect(hiddenAttachmentInput?.value).toBe(
@@ -443,16 +440,10 @@ describe('TransactionForm', () => {
       screen.getByText('1789201450665503000_IMG_2438.JPG')
     ).toBeInTheDocument()
 
-    const link = screen.getByRole('link', { name: /lihat lampiran/i })
-    expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute(
-      'href',
-      expect.stringContaining(
-        'storage/attachments/1789201450665503000_IMG_2438.JPG'
-      )
-    )
+    const button = screen.getByRole('button', { name: /lihat lampiran/i })
+    expect(button).toBeInTheDocument()
 
-    fireEvent.click(link)
+    fireEvent.click(button)
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
