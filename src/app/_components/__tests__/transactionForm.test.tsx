@@ -190,7 +190,8 @@ describe('TransactionForm', () => {
 
   test('does not overwrite local attachment deletion when transaction details request resolves', async () => {
     const originalEnv = process.env.NODE_ENV
-    process.env.NODE_ENV = 'development'
+    ;(process.env as Record<string, string | undefined>).NODE_ENV =
+      'development'
     try {
       let resolveTransactionDetails: (value: any) => void
       const transactionDetailsPromise = new Promise((resolve) => {
@@ -255,13 +256,15 @@ describe('TransactionForm', () => {
         document.querySelector<HTMLInputElement>('#attachment_path')
       expect(hiddenAttachmentInput?.value).toBe('')
     } finally {
-      process.env.NODE_ENV = originalEnv
+      ;(process.env as Record<string, string | undefined>).NODE_ENV =
+        originalEnv
     }
   })
 
   test('does not overwrite locally uploaded attachment when transaction details request resolves', async () => {
     const originalEnv = process.env.NODE_ENV
-    process.env.NODE_ENV = 'development'
+    ;(process.env as Record<string, string | undefined>).NODE_ENV =
+      'development'
     try {
       let resolveTransactionDetails: (value: any) => void
       const transactionDetailsPromise = new Promise((resolve) => {
@@ -344,7 +347,8 @@ describe('TransactionForm', () => {
         'uploads/attachments/new_upload.pdf'
       )
     } finally {
-      process.env.NODE_ENV = originalEnv
+      ;(process.env as Record<string, string | undefined>).NODE_ENV =
+        originalEnv
     }
   })
 
