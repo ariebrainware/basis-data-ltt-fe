@@ -15,5 +15,10 @@ export function getSessionToken(): string {
     return ''
   }
 
-  return window.localStorage.getItem('session-token') ?? ''
+  return (
+    window.localStorage.getItem('session-token') ||
+    window.localStorage.getItem('session_token') ||
+    window.localStorage.getItem('token') ||
+    ''
+  )
 }

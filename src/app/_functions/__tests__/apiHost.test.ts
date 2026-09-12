@@ -1,4 +1,4 @@
-import { getApiHost } from '../apiHost'
+import { getApiHost, getAttachmentUrl, parseAttachmentPaths } from '../apiHost'
 
 describe('getApiHost', () => {
   const originalEnv = process.env.NEXT_PUBLIC_API_HOST
@@ -98,5 +98,90 @@ describe('getApiHost', () => {
       process.env.NEXT_PUBLIC_API_HOST = 'LOCALHOST:19091'
       expect(getApiHost()).toBe('http://LOCALHOST:19091')
     })
+  })
+})
+
+describe('getAttachmentUrl', () => {
+  beforeEach(() => {
+    delete process.env.NEXT_PUBLIC_API_HOST
+  })
+
+  test('returns empty string when path is empty or undefined', () => {
+    expect(getAttachmentUrl()).toBe('')
+    expect(getAttachmentUrl('')).toBe('')
+  })
+
+  test('returns data: URLs unchanged', () => {
+    const dataUri =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+    expect(getAttachmentUrl(dataUri)).toBe(dataUri)
+  })
+
+  test('constructs URL with API host for relative path', () => {
+    expect(getAttachmentUrl('uploads/attachments/receipt.pdf')).toBe(
+      'https://localhost:19091/uploads/attachments/receipt.pdf'
+    )
+  })
+
+  test('preserves absolute URLs unchanged', () => {
+    expect(
+      getAttachmentUrl('http://localhost:19091/uploads/attachments/receipt.pdf')
+    ).toBe('http://localhost:19091/uploads/attachments/receipt.pdf')
+    expect(
+      getAttachmentUrl('https://example.com/uploads/attachments/receipt.pdf')
+    ).toBe('https://example.com/uploads/attachments/receipt.pdf')
+  })
+
+  test('normalizes leading ./ in relative paths', () => {
+    expect(getAttachmentUrl('./storage/attachments/receipt.pdf')).toBe(
+      'https://localhost:19091/storage/attachments/receipt.pdf'
+    )
+  })
+})
+
+describe('parseAttachmentPaths', () => {
+  test('returns empty array for empty, undefined, or null input', () => {
+    expect(parseAttachmentPaths()).toEqual([])
+    expect(parseAttachmentPaths('')).toEqual([])
+    expect(parseAttachmentPaths(null)).toEqual([])
+    expect(parseAttachmentPaths('   ')).toEqual([])
+  })
+
+  test('returns array input directly with trimmed non-empty strings', () => {
+    expect(
+      parseAttachmentPaths([
+        'uploads/attachments/a.pdf',
+        ' storage/attachments/b.jpg ',
+        '',
+      ])
+    ).toEqual(['uploads/attachments/a.pdf', 'storage/attachments/b.jpg'])
+  })
+
+  test('parses JSON string array format', () => {
+    expect(
+      parseAttachmentPaths(
+        '["uploads/attachments/a.pdf", "storage/attachments/b.jpg"]'
+      )
+    ).toEqual(['uploads/attachments/a.pdf', 'storage/attachments/b.jpg'])
+  })
+
+  test('parses single path', () => {
+    expect(
+      parseAttachmentPaths(
+        'storage/attachments/1789201450665503000_IMG_2438.JPG'
+      )
+    ).toEqual(['storage/attachments/1789201450665503000_IMG_2438.JPG'])
+  })
+
+  test('parses multiple comma-separated paths', () => {
+    expect(
+      parseAttachmentPaths(
+        'storage/attachments/a.jpg,storage/attachments/b.jpg,uploads/attachments/c.pdf'
+      )
+    ).toEqual([
+      'storage/attachments/a.jpg',
+      'storage/attachments/b.jpg',
+      'uploads/attachments/c.pdf',
+    ])
   })
 })

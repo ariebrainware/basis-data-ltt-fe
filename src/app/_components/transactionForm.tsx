@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { TransactionType } from '../_types/transaction'
 import { apiFetch } from '../_functions/apiFetch'
@@ -7,6 +7,9 @@ import { extractItemList } from '../_functions/itemDataHelpers'
 import { ItemType } from '../_types/item'
 import { useRouter } from 'next/navigation'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
+
+import { getAttachmentUrl, parseAttachmentPaths } from '../_functions/apiHost'
+import { viewAttachment } from '../_functions/viewAttachment'
 
 const formatPaymentStatus = (s?: string | null) => {
   if (!s) return '-'
@@ -40,6 +43,11 @@ const normalizePaymentStatusDefault = (val?: string | null) => {
   return val
 }
 
+export interface TransactionFormProps extends TransactionType {
+  onUploadingChange?: (isUploading: boolean) => void
+  onUploadStateChange?: (isUploading: boolean) => void
+}
+
 export function TransactionForm({
   ID,
   treatment_id,
@@ -51,7 +59,10 @@ export function TransactionForm({
   transaction_date,
   treatment_date,
   items,
-}: TransactionType) {
+  attachment_path,
+  onUploadingChange,
+  onUploadStateChange,
+}: TransactionFormProps) {
   const [allItems, setAllItems] = useState<ItemType[]>([])
   const [selectedItems, setSelectedItems] = useState<
     { item_id: number; quantity: number; price?: number }[]
@@ -63,7 +74,31 @@ export function TransactionForm({
   const [manualAmount, setManualAmount] = useState<number | null>(null)
   const [isLoadingItems, setIsLoadingItems] = useState(false)
   const [itemsError, setItemsError] = useState<string | null>(null)
+  const isAttachmentDirtyRef = useRef(false)
+  const prevIdRef = useRef(ID)
+  const [attachmentPaths, setAttachmentPaths] = useState<string[]>(() => {
+    return parseAttachmentPaths(attachment_path)
+  })
+  const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    onUploadingChange?.(isUploading)
+    onUploadStateChange?.(isUploading)
+  }, [isUploading, onUploadingChange, onUploadStateChange])
+
+  useEffect(() => {
+    if (prevIdRef.current !== ID) {
+      prevIdRef.current = ID
+      isAttachmentDirtyRef.current = false
+    }
+  }, [ID])
+
+  useEffect(() => {
+    if (attachment_path !== undefined && !isAttachmentDirtyRef.current) {
+      setAttachmentPaths(parseAttachmentPaths(attachment_path))
+    }
+  }, [attachment_path])
 
   useEffect(() => {
     let mounted = true
@@ -113,6 +148,8 @@ export function TransactionForm({
           const body = await res.json()
           const fetchedItems = body?.data?.items
           const fetchedAmount = body?.data?.amount
+          const fetchedAttachment =
+            body?.data?.attachment_path || body?.data?.file_path
           if (mounted) {
             if (fetchedAmount !== undefined && fetchedAmount !== null) {
               setDbAmount(Number(fetchedAmount))
@@ -126,6 +163,9 @@ export function TransactionForm({
               setDbItems(mapped)
               setSelectedItems(mapped)
             }
+            if (fetchedAttachment && !isAttachmentDirtyRef.current) {
+              setAttachmentPaths(parseAttachmentPaths(fetchedAttachment))
+            }
           }
         }
       } catch (e) {
@@ -137,6 +177,58 @@ export function TransactionForm({
       mounted = false
     }
   }, [ID, router])
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file maksimal adalah 5MB')
+      e.target.value = ''
+      return
+    }
+
+    isAttachmentDirtyRef.current = true
+    setIsUploading(true)
+    const formData = new FormData()
+    const sanitizedName = file.name.replace(/,/g, '_')
+    formData.append('file', file, sanitizedName)
+
+    try {
+      const res = await apiFetch('/transaction/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (res.status === 401) {
+        UnauthorizedAccess(router)
+        return
+      }
+      if (!res.ok) {
+        throw new Error('Upload failed')
+      }
+      const data = await res.json()
+      const uploadedPath =
+        data?.data?.attachment_path ||
+        data?.data?.file_path ||
+        data?.attachment_path ||
+        data?.file_path
+      if (uploadedPath) {
+        isAttachmentDirtyRef.current = true
+        const parsed = parseAttachmentPaths(uploadedPath)
+        if (parsed.length > 0) {
+          setAttachmentPaths((prev) => [...prev, ...parsed])
+        } else if (typeof uploadedPath === 'string') {
+          setAttachmentPaths((prev) => [...prev, uploadedPath])
+        }
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Gagal mengunggah file')
+    } finally {
+      setIsUploading(false)
+      e.target.value = ''
+    }
+  }
 
   const currentBaseAmount = dbAmount !== null ? dbAmount : amount
   const currentBaseItems = dbItems !== null ? dbItems : (items ?? [])
@@ -500,6 +592,143 @@ export function TransactionForm({
             onResize={undefined}
             onResizeCapture={undefined}
           />
+
+          <input
+            id="attachment_path"
+            name="attachment_path"
+            type="hidden"
+            value={attachmentPaths.join(',')}
+          />
+
+          <div className="mt-2 w-full">
+            <label className="text-slate-800 mb-1 block font-sans text-sm font-semibold antialiased dark:text-white">
+              Lampiran Transaksi
+            </label>
+            <div className="space-y-2">
+              {attachmentPaths.map((path, index) => (
+                <div
+                  key={index}
+                  className="border-slate-200 dark:bg-slate-900/50 flex items-center justify-between gap-4 rounded-md border bg-white/50 p-2 backdrop-blur-sm"
+                >
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    <span className="dark:bg-blue-950/40 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:text-blue-400">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                      </svg>
+                    </span>
+                    <div className="flex flex-col overflow-hidden text-xs">
+                      <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
+                        {path.split('/').pop()}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void viewAttachment(path, path.split('/').pop())
+                        }
+                        className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                      >
+                        Lihat Lampiran
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      isAttachmentDirtyRef.current = true
+                      setAttachmentPaths((prev) =>
+                        prev.filter((_, i) => i !== index)
+                      )
+                    }}
+                    className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1 hover:text-red-500"
+                    aria-label={`Hapus lampiran ${index + 1}`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="h-4 w-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18 18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+
+              <div>
+                <label className="border-slate-350 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-900/80 flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed p-3 transition-all">
+                  {isUploading ? (
+                    <svg
+                      className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-slate-500"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                  )}
+                  <span className="text-slate-600 dark:text-slate-400 text-xs font-medium">
+                    {isUploading
+                      ? 'Mengunggah lampiran...'
+                      : 'Unggah Lampiran Transaksi (PDF, JPEG, PNG, HEIC maks 5MB)'}
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                    disabled={isUploading}
+                    accept=".pdf,.jpeg,.jpg,.png,.heic,.heif,image/*,application/pdf"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
       </form>
     </Card>

@@ -6,7 +6,12 @@ import { DiseaseType } from '../_types/disease'
 import { GenderSelect } from './selectGender'
 import { DiseaseMultiSelect } from './selectDisease'
 import { SignaturePad } from './signaturePad'
-import { getApiHost, getAttachmentUrl } from '../_functions/apiHost'
+import {
+  getApiHost,
+  getAttachmentUrl,
+  parseAttachmentPaths,
+} from '../_functions/apiHost'
+import { viewAttachment } from '../_functions/viewAttachment'
 import { apiFetch } from '../_functions/apiFetch'
 
 function getSignatureUrl(path?: string): string {
@@ -60,19 +65,13 @@ export function PatientForm({
   )
   console.log('PatientForm attachment_path prop:', attachment_path)
   const [attachmentPaths, setAttachmentPaths] = useState<string[]>(() => {
-    return attachment_path
-      ? attachment_path.split(/,(?=\/?uploads\/|https?:\/\/)/).filter(Boolean)
-      : []
+    return parseAttachmentPaths(attachment_path)
   })
   const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAttachmentPaths(
-      attachment_path
-        ? attachment_path.split(/,(?=\/?uploads\/|https?:\/\/)/).filter(Boolean)
-        : []
-    )
+    setAttachmentPaths(parseAttachmentPaths(attachment_path))
   }, [attachment_path])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -320,15 +319,15 @@ export function PatientForm({
                         <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
                           {path.split('/').pop()}
                         </span>
-                        <a
-                          href={getAttachmentUrl(path)}
-                          download
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void viewAttachment(path, path.split('/').pop())
+                          }
+                          className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
                         >
                           Lihat Lampiran
-                        </a>
+                        </button>
                       </div>
                     </div>
                     <button
