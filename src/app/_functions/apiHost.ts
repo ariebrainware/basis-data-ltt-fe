@@ -79,6 +79,11 @@ export function getAttachmentUrl(path?: string): string {
   const trimmed = path.trim()
   if (!trimmed) return ''
 
+  // Data URLs: return directly
+  if (trimmed.startsWith('data:')) {
+    return trimmed
+  }
+
   // Absolute URL: only allow HTTP(S)
   if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(trimmed)) {
     try {
@@ -101,6 +106,6 @@ export function getAttachmentUrl(path?: string): string {
   try {
     return new URL(cleanPath, host).toString()
   } catch {
-    return ''
+    return `${host}${cleanPath}`
   }
 }
