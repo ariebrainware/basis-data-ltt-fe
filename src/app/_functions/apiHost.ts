@@ -77,18 +77,30 @@ export function parseAttachmentPaths(raw?: string | string[] | null): string[] {
 export function getAttachmentUrl(path?: string): string {
   if (!path) return ''
   const trimmed = path.trim()
-  if (
-    trimmed.startsWith('data:') ||
-    trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://')
-  ) {
-    return trimmed
+  if (!trimmed) return ''
+
+  // Absolute URL: only allow HTTP(S)
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed)
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        return parsed.toString()
+      }
+      return ''
+    } catch {
+      return ''
+    }
   }
 
+  // Relative path: resolve against API host
   const host = getApiHost()
   let cleanPath = trimmed.replace(/^\.\//, '')
   if (!cleanPath.startsWith('/')) {
     cleanPath = `/${cleanPath}`
   }
-  return `${host}${cleanPath}`
+  try {
+    return new URL(cleanPath, host).toString()
+  } catch {
+    return ''
+  }
 }
