@@ -28,12 +28,14 @@ export async function viewAttachment(
   const headers: Record<string, string> = {}
   if (token) {
     headers['session-token'] = token
+    headers['Authorization'] = `Bearer ${token}`
   }
 
   try {
     const response = await fetch(url, {
       method: 'GET',
       headers,
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -54,9 +56,6 @@ export async function viewAttachment(
         link.href = blobUrl
         link.target = '_blank'
         link.rel = 'noopener noreferrer'
-        if (filename) {
-          link.download = filename
-        }
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)

@@ -408,4 +408,67 @@ describe('TransactionForm', () => {
       expect(onUploadingChange).toHaveBeenLastCalledWith(false)
     })
   })
+
+  test('renders storage/attachments paths and allows clicking Lihat Lampiran', async () => {
+    const originalOpen = window.open
+    const originalCreateObjectURL = URL.createObjectURL
+    const originalRevokeObjectURL = URL.revokeObjectURL
+    window.open = jest.fn()
+    URL.createObjectURL = jest
+      .fn()
+      .mockReturnValue('blob:http://localhost/mock')
+    URL.revokeObjectURL = jest.fn()
+    window.localStorage.setItem('session-token', 'test-token')
+    ;(global.fetch as any) = jest.fn().mockResolvedValue({
+      ok: true,
+      blob: async () => new Blob(['pdf content']),
+    })
+
+    render(
+      <TransactionForm
+        ID={1}
+        treatment_id={100}
+        patient_name="John Doe"
+        pricing_name="cash"
+        amount={150000}
+        payment_status="paid"
+        notes="Pembayaran lunas"
+        transaction_date="2026-05-20 10:00"
+        treatment_date="2026-05-20"
+        attachment_path="storage/attachments/1789201450665503000_IMG_2438.JPG"
+      />
+    )
+
+    expect(
+      screen.getByText('1789201450665503000_IMG_2438.JPG')
+    ).toBeInTheDocument()
+
+    const link = screen.getByRole('link', { name: /lihat lampiran/i })
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute(
+      'href',
+      expect.stringContaining(
+        'storage/attachments/1789201450665503000_IMG_2438.JPG'
+      )
+    )
+
+    fireEvent.click(link)
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'storage/attachments/1789201450665503000_IMG_2438.JPG'
+        ),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'session-token': 'test-token',
+          }),
+        })
+      )
+    })
+
+    window.open = originalOpen
+    URL.createObjectURL = originalCreateObjectURL
+    URL.revokeObjectURL = originalRevokeObjectURL
+  })
 })

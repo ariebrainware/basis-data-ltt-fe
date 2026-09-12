@@ -66,7 +66,9 @@ describe('viewAttachment', () => {
         method: 'GET',
         headers: {
           'session-token': 'my-auth-token',
+          Authorization: 'Bearer my-auth-token',
         },
+        credentials: 'include',
       }
     )
 

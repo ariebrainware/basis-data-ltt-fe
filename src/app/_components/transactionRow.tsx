@@ -33,7 +33,15 @@ export default function TransactionRow({
 }: TransactionRowProps) {
   const [open, setOpen] = React.useState(false)
   const [isUploading, setIsUploading] = React.useState(false)
+  const [currentAttachmentPath, setCurrentAttachmentPath] = React.useState(
+    attachment_path || ''
+  )
   const router = useRouter()
+
+  React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentAttachmentPath(attachment_path || '')
+  }, [attachment_path])
 
   const formatPaymentStatus = (s?: string | null) => {
     if (!s) return '-'
@@ -96,7 +104,7 @@ export default function TransactionRow({
         attachment_path:
           attachmentPathInput !== undefined
             ? attachmentPathInput
-            : attachment_path || '',
+            : currentAttachmentPath || '',
       }),
     })
       .then((response) => {
@@ -111,6 +119,14 @@ export default function TransactionRow({
       })
       .then((data) => {
         console.log('Transaction information updated successfully:', data)
+        const updatedPath =
+          data?.data?.attachment_path ||
+          (attachmentPathInput !== undefined
+            ? attachmentPathInput
+            : currentAttachmentPath)
+        if (updatedPath !== undefined) {
+          setCurrentAttachmentPath(updatedPath)
+        }
         setOpen(false)
         Swal.fire({
           text: 'Data transaksi berhasil diperbarui.',
@@ -177,7 +193,7 @@ export default function TransactionRow({
             transaction_date={transaction_date}
             treatment_date={treatment_date}
             items={items}
-            attachment_path={attachment_path}
+            attachment_path={currentAttachmentPath}
             onUploadingChange={setIsUploading}
           />
         </DialogBody>

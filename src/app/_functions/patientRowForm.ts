@@ -1,6 +1,7 @@
 import { DiseaseType } from '../_types/disease'
 import { PatientType } from '../_types/patient'
 import { isAdmin } from './userRole'
+import { parseAttachmentPaths } from './apiHost'
 
 export type PatientUpdatePayload = Omit<
   PatientType,
@@ -232,12 +233,7 @@ export function buildPatientUpdatePayload(
     ),
     surgery_history: surgery_history_new_input,
     signature: signature_new_input,
-    attachment_path: attachment_path_new_input
-      ? attachment_path_new_input
-          .split(/,(?=\/?uploads\/|https?:\/\/)/)
-          .map((p) => p.trim())
-          .filter(Boolean)
-      : [],
+    attachment_path: parseAttachmentPaths(attachment_path_new_input),
   }
 
   if (isAdmin()) {

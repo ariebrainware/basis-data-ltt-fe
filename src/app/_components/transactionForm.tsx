@@ -8,7 +8,7 @@ import { ItemType } from '../_types/item'
 import { useRouter } from 'next/navigation'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
-import { getAttachmentUrl } from '../_functions/apiHost'
+import { getAttachmentUrl, parseAttachmentPaths } from '../_functions/apiHost'
 import { viewAttachment } from '../_functions/viewAttachment'
 
 const formatPaymentStatus = (s?: string | null) => {
@@ -77,9 +77,7 @@ export function TransactionForm({
   const isAttachmentDirtyRef = useRef(false)
   const prevIdRef = useRef(ID)
   const [attachmentPaths, setAttachmentPaths] = useState<string[]>(() => {
-    return attachment_path
-      ? attachment_path.split(/,(?=\/?uploads\/|https?:\/\/)/).filter(Boolean)
-      : []
+    return parseAttachmentPaths(attachment_path)
   })
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
@@ -98,13 +96,7 @@ export function TransactionForm({
 
   useEffect(() => {
     if (attachment_path !== undefined && !isAttachmentDirtyRef.current) {
-      setAttachmentPaths(
-        attachment_path
-          ? attachment_path
-              .split(/,(?=\/?uploads\/|https?:\/\/)/)
-              .filter(Boolean)
-          : []
-      )
+      setAttachmentPaths(parseAttachmentPaths(attachment_path))
     }
   }, [attachment_path])
 
@@ -172,15 +164,7 @@ export function TransactionForm({
               setSelectedItems(mapped)
             }
             if (fetchedAttachment && !isAttachmentDirtyRef.current) {
-              setAttachmentPaths(
-                typeof fetchedAttachment === 'string'
-                  ? fetchedAttachment
-                      .split(/,(?=\/?uploads\/|https?:\/\/)/)
-                      .filter(Boolean)
-                  : Array.isArray(fetchedAttachment)
-                    ? fetchedAttachment
-                    : []
-              )
+              setAttachmentPaths(parseAttachmentPaths(fetchedAttachment))
             }
           }
         }
@@ -230,7 +214,12 @@ export function TransactionForm({
         data?.file_path
       if (uploadedPath) {
         isAttachmentDirtyRef.current = true
-        setAttachmentPaths((prev) => [...prev, uploadedPath])
+        const parsed = parseAttachmentPaths(uploadedPath)
+        if (parsed.length > 0) {
+          setAttachmentPaths((prev) => [...prev, ...parsed])
+        } else if (typeof uploadedPath === 'string') {
+          setAttachmentPaths((prev) => [...prev, uploadedPath])
+        }
       }
     } catch (err) {
       console.error(err)
