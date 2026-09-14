@@ -156,6 +156,49 @@ describe('TransactionForm', () => {
     )
   })
 
+  test('handles upload failure and alerts backend error message', async () => {
+    const originalAlert = window.alert
+    window.alert = jest.fn()
+    ;(apiFetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      json: async () => ({
+        success: false,
+        msg: 'Failed to create upload directory',
+        error: 'mkdir storage: permission denied',
+      }),
+    })
+
+    const { container } = render(
+      <TransactionForm
+        ID={1}
+        treatment_id={100}
+        patient_name="John Doe"
+        pricing_name="cash"
+        amount={150000}
+        payment_status="paid"
+        notes="Pembayaran lunas"
+        transaction_date="2026-05-20 10:00"
+        treatment_date="2026-05-20"
+      />
+    )
+
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    const file = new File(['invoice content'], 'invoice.pdf', {
+      type: 'application/pdf',
+    })
+    fireEvent.change(fileInput, { target: { files: [file] } })
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith(
+        'Failed to create upload directory'
+      )
+    })
+    window.alert = originalAlert
+  })
+
   test('rejects files exceeding 5MB limit', async () => {
     const { container } = render(
       <TransactionForm
