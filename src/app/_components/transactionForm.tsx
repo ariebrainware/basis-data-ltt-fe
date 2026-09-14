@@ -203,10 +203,14 @@ export function TransactionForm({
         UnauthorizedAccess(router)
         return
       }
-      if (!res.ok) {
-        throw new Error('Upload failed')
+      const data = await res.json().catch(() => null)
+      if (!res.ok || data?.success === false) {
+        const errorMsg =
+          data?.msg ||
+          data?.error ||
+          (res.ok ? 'Gagal mengunggah file' : `Gagal mengunggah file (${res.status})`)
+        throw new Error(errorMsg)
       }
-      const data = await res.json()
       const uploadedPath =
         data?.data?.attachment_path ||
         data?.data?.file_path ||
@@ -221,9 +225,9 @@ export function TransactionForm({
           setAttachmentPaths((prev) => [...prev, uploadedPath])
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
-      alert('Gagal mengunggah file')
+      alert(err.message || 'Gagal mengunggah file')
     } finally {
       setIsUploading(false)
       e.target.value = ''
