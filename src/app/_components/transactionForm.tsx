@@ -208,7 +208,9 @@ export function TransactionForm({
         const errorMsg =
           data?.msg ||
           data?.error ||
-          (res.ok ? 'Gagal mengunggah file' : `Gagal mengunggah file (${res.status})`)
+          (res.ok
+            ? 'Gagal mengunggah file'
+            : `Gagal mengunggah file (${res.status})`)
         throw new Error(errorMsg)
       }
       const uploadedPath =
