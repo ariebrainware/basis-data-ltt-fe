@@ -243,12 +243,21 @@ describe('PatientForm Component', () => {
     // Signature pad should now show up
     expect(screen.getByTestId('signature-pad')).toBeInTheDocument()
 
-    // Clicking mock sign button should update value
+    // Clicking mock sign button should update value without unmounting the pad
     const signBtn = screen.getByTestId('mock-sign-btn')
     fireEvent.click(signBtn)
 
     // Hidden input should be updated
     const hiddenInput = screen.getByTestId('signature')
     expect(hiddenInput).toHaveValue('data:image/png;base64,newMockSignature')
+
+    // Signature pad must remain visible (not unmounted or finalized immediately)
+    expect(screen.getByTestId('signature-pad')).toBeInTheDocument()
+
+    // Clicking "Batal Ubah" reverts to initial registered signature
+    const cancelBtn = screen.getByRole('button', { name: 'Batal Ubah' })
+    fireEvent.click(cancelBtn)
+    expect(screen.getByText('Tanda Tangan Terdaftar')).toBeInTheDocument()
+    expect(hiddenInput).toHaveValue('data:image/png;base64,oldMockSignature')
   })
 })
