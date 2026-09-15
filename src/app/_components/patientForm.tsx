@@ -60,9 +60,9 @@ export function PatientForm({
           .filter(Boolean)
       : []
   })
-  const [signatureVal, setSignatureVal] = useState(
-    signature_path || signature || ''
-  )
+  const initialSignature = signature_path || signature || ''
+  const [signatureVal, setSignatureVal] = useState(initialSignature)
+  const [isEditingSignature, setIsEditingSignature] = useState(false)
   console.log('PatientForm attachment_path prop:', attachment_path)
   const [attachmentPaths, setAttachmentPaths] = useState<string[]>(() => {
     return parseAttachmentPaths(attachment_path)
@@ -109,6 +109,7 @@ export function PatientForm({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSignatureVal(signature_path || signature || '')
+    setIsEditingSignature(false)
   }, [signature, signature_path])
 
   useEffect(() => {
@@ -422,7 +423,7 @@ export function PatientForm({
               value={signatureVal}
             />
             <div className="mt-2 w-full">
-              {signatureVal ? (
+              {Boolean(initialSignature) && !isEditingSignature ? (
                 <div className="border-slate-200/80 dark:border-slate-800 dark:bg-slate-900/50 relative overflow-hidden rounded-xl border bg-white/50 p-4 shadow-sm backdrop-blur-sm">
                   <div className="mb-3 flex items-center justify-between">
                     <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/30 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold">
@@ -431,7 +432,10 @@ export function PatientForm({
                     </span>
                     <button
                       type="button"
-                      onClick={() => setSignatureVal('')}
+                      onClick={() => {
+                        setIsEditingSignature(true)
+                        setSignatureVal('')
+                      }}
                       className="text-xs font-semibold text-red-600 transition-all hover:text-red-700 hover:underline dark:text-red-400"
                     >
                       Ubah Tanda Tangan
@@ -440,7 +444,7 @@ export function PatientForm({
                   <div className="bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 flex justify-center rounded-lg border p-4">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={getSignatureUrl(signatureVal)}
+                      src={getSignatureUrl(initialSignature)}
                       alt="Tanda Tangan Pasien"
                       className="max-h-[100px] object-contain dark:invert"
                     />
@@ -448,11 +452,25 @@ export function PatientForm({
                 </div>
               ) : (
                 <div className="border-slate-200/80 dark:border-slate-800 dark:bg-slate-900/50 rounded-xl border bg-white/50 p-4 shadow-sm backdrop-blur-sm">
-                  <div className="mb-2">
+                  <div className="mb-2 flex items-center justify-between">
                     <span className="dark:bg-amber-950/30 flex w-fit items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600 dark:border-amber-900/30 dark:text-amber-400">
                       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
-                      Belum Ada Tanda Tangan
+                      {initialSignature
+                        ? 'Mengubah Tanda Tangan'
+                        : 'Belum Ada Tanda Tangan'}
                     </span>
+                    {Boolean(initialSignature) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsEditingSignature(false)
+                          setSignatureVal(initialSignature)
+                        }}
+                        className="text-xs font-semibold text-slate-500 transition-all hover:text-slate-700 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
+                      >
+                        Batal Ubah
+                      </button>
+                    )}
                   </div>
                   <SignaturePad onChange={(val) => setSignatureVal(val)} />
                 </div>
