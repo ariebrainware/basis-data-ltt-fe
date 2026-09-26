@@ -36,7 +36,15 @@ export default function Treatment({
   attachment_path: attachmentPath,
 }: TreatmentType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
-  const currentAttachmentPath = attachmentPath || ''
+  const [prevAttachmentPath, setPrevAttachmentPath] =
+    React.useState(attachmentPath)
+  const [currentAttachmentPath, setCurrentAttachmentPath] =
+    React.useState<string>(attachmentPath || '')
+
+  if (attachmentPath !== prevAttachmentPath) {
+    setPrevAttachmentPath(attachmentPath)
+    setCurrentAttachmentPath(attachmentPath || '')
+  }
   const [therapistIDState, setTherapistIDState] = React.useState<string>(
     therapistId?.toString() ?? ''
   )
