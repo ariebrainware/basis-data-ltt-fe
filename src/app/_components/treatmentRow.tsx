@@ -36,12 +36,7 @@ export default function Treatment({
   attachment_path: attachmentPath,
 }: TreatmentType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
-  const [currentAttachmentPath, setCurrentAttachmentPath] = React.useState(
-    attachmentPath || ''
-  )
-  React.useEffect(() => {
-    setCurrentAttachmentPath(attachmentPath || '')
-  }, [attachmentPath])
+  const currentAttachmentPath = attachmentPath || ''
   const [therapistIDState, setTherapistIDState] = React.useState<string>(
     therapistId?.toString() ?? ''
   )

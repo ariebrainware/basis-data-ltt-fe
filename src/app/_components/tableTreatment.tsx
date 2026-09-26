@@ -179,9 +179,7 @@ const TableBody = ({
           <td colSpan={TABLE_COLUMNS.length} className="p-8 text-center">
             <div className="flex flex-col items-center justify-center space-y-2">
               <div className="size-6 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
-              <p className="text-xs text-gray-500">
-                Memuat data penanganan...
-              </p>
+              <p className="text-xs text-gray-500">Memuat data penanganan...</p>
             </div>
           </td>
         </tr>

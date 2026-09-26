@@ -107,12 +107,15 @@ export function TreatmentForm({
     if (el) el.value = selectedHealthHistory.join(',')
   }, [selectedHealthHistory])
 
+  const [prevAttachmentPath, setPrevAttachmentPath] =
+    React.useState(attachment_path)
   const [attachmentPaths, setAttachmentPaths] = React.useState<string[]>(() => {
     return parseAttachmentPaths(attachment_path)
   })
   const [isUploading, setIsUploading] = React.useState(false)
 
-  React.useEffect(() => {
+  if (attachment_path !== prevAttachmentPath) {
+    setPrevAttachmentPath(attachment_path)
     if (attachment_path !== undefined) {
       const incoming = parseAttachmentPaths(attachment_path)
       setAttachmentPaths((prev) => {
@@ -120,7 +123,7 @@ export function TreatmentForm({
         return combined
       })
     }
-  }, [attachment_path])
+  }
 
   // Fetch patient attachments by patient_code to ensure patient attachments appear in treatment data
   React.useEffect(() => {
@@ -528,4 +531,3 @@ export function TreatmentForm({
     </Card>
   )
 }
-

@@ -282,7 +282,8 @@ describe('TreatmentForm Component', () => {
   test('renders attachments and allows viewing without delete button', () => {
     const treatmentWithAttachment: TreatmentType = {
       ...mockTreatment,
-      attachment_path: 'uploads/attachments/xray.pdf,uploads/attachments/report.png',
+      attachment_path:
+        'uploads/attachments/xray.pdf,uploads/attachments/report.png',
     }
 
     render(<TreatmentForm {...treatmentWithAttachment} />)
@@ -324,7 +325,9 @@ describe('TreatmentForm Component', () => {
 
     expect(screen.getByText('initial.pdf')).toBeInTheDocument()
 
-    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
     expect(fileInput).toBeInTheDocument()
 
     const file = new File(['dummy content'], 'new_scan.pdf', {
@@ -360,7 +363,9 @@ describe('TreatmentForm Component', () => {
     )
 
     expect(screen.getByText('initial.pdf')).toBeInTheDocument()
-    expect(container.querySelector('input[type="file"]')).not.toBeInTheDocument()
+    expect(
+      container.querySelector('input[type="file"]')
+    ).not.toBeInTheDocument()
     expect(screen.queryByText(/Tambah Lampiran/i)).not.toBeInTheDocument()
   })
 })

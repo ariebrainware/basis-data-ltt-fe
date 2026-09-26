@@ -187,10 +187,7 @@ describe('TableTreatment Sorting', () => {
     expect(screen.getByText('Memuat data penanganan...')).toBeInTheDocument()
 
     rerender(
-      <TableTreatment
-        Data={{ treatment: [] }}
-        error="Gagal mengambil data"
-      />
+      <TableTreatment Data={{ treatment: [] }} error="Gagal mengambil data" />
     )
     expect(screen.getByText('Gagal mengambil data')).toBeInTheDocument()
 
