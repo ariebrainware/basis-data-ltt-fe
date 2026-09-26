@@ -1,7 +1,20 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 import Footer from './_components/footer'
+import { getSessionToken } from './_functions/sessionToken'
 
 export default function Home() {
+  const router = useRouter()
+
+  useEffect(() => {
+    if (getSessionToken()) {
+      router.replace('/dashboard')
+    }
+  }, [router])
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>

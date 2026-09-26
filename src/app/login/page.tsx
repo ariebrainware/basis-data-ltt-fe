@@ -23,6 +23,7 @@ import {
 } from '../_functions/loginUi'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { LoginResponseData } from '../_types/login'
+import { getSessionToken } from '../_functions/sessionToken'
 
 let usernameInput: HTMLInputElement | null = null
 let passwordInput: HTMLInputElement | null = null
@@ -151,7 +152,7 @@ export default function Login() {
   }
 
   useEffect(() => {
-    if (localStorage.getItem('session-token')) {
+    if (getSessionToken()) {
       router.replace('/dashboard')
       return
     }
