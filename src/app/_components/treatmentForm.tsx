@@ -6,6 +6,9 @@ import { isTherapist } from '../_functions/userRole'
 import { ControlledSelect } from './selectTherapist'
 import { TreatmentConditionMultiSelect } from './selectTreatmentCondition'
 import { DiseaseMultiSelect } from './selectDisease'
+import { parseAttachmentPaths } from '../_functions/apiHost'
+import { viewAttachment } from '../_functions/viewAttachment'
+import { apiFetch } from '../_functions/apiFetch'
 
 interface TreatmentFormProps extends TreatmentType {
   therapistIDState?: string
@@ -29,6 +32,7 @@ export function TreatmentForm({
   disabled = false,
   health_history,
   surgery_history,
+  attachment_path,
 }: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
   // The backend may return treatment data in either JSON array format or comma-separated string format.
@@ -102,6 +106,134 @@ export function TreatmentForm({
     ) as HTMLInputElement | null
     if (el) el.value = selectedHealthHistory.join(',')
   }, [selectedHealthHistory])
+
+  const [attachmentPaths, setAttachmentPaths] = React.useState<string[]>(() => {
+    return parseAttachmentPaths(attachment_path)
+  })
+  const [isUploading, setIsUploading] = React.useState(false)
+
+  React.useEffect(() => {
+    if (attachment_path !== undefined) {
+      const incoming = parseAttachmentPaths(attachment_path)
+      setAttachmentPaths((prev) => {
+        const combined = Array.from(new Set([...prev, ...incoming]))
+        return combined
+      })
+    }
+  }, [attachment_path])
+
+  // Fetch patient attachments by patient_code to ensure patient attachments appear in treatment data
+  React.useEffect(() => {
+    let mounted = true
+    if (process.env.NODE_ENV === 'test' || !patientCode) return
+
+    const fetchPatientAttachments = async () => {
+      try {
+        const res = await apiFetch(
+          `/patient?keyword=${encodeURIComponent(patientCode)}`
+        )
+        if (res.ok) {
+          const resData = await res.json()
+          const patients = Array.isArray(resData?.data?.patients)
+            ? resData.data.patients
+            : Array.isArray(resData?.data)
+              ? resData.data
+              : []
+          const found =
+            patients.find(
+              (p: any) =>
+                String(p.patient_code) === String(patientCode) ||
+                String(p.ID) === String(patientCode)
+            ) || patients[0]
+
+          if (found?.attachment_path && mounted) {
+            const parsed = parseAttachmentPaths(found.attachment_path)
+            if (parsed.length > 0) {
+              setAttachmentPaths((prev) =>
+                Array.from(new Set([...prev, ...parsed]))
+              )
+            }
+          }
+        }
+      } catch (err) {
+        // ignore error fetching patient attachments
+      }
+    }
+
+    void fetchPatientAttachments()
+
+    return () => {
+      mounted = false
+    }
+  }, [patientCode])
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Ukuran file maksimal adalah 10MB')
+      e.target.value = ''
+      return
+    }
+
+    setIsUploading(true)
+    const formData = new FormData()
+    const sanitizedName = file.name.replace(/,/g, '_')
+    formData.append('file', file, sanitizedName)
+
+    try {
+      const res = await apiFetch('/patient/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (!res.ok) {
+        const fallbackRes = await apiFetch('/treatment/upload', {
+          method: 'POST',
+          body: formData,
+        }).catch(() => null)
+        if (!fallbackRes || !fallbackRes.ok) {
+          throw new Error('Gagal mengunggah file')
+        }
+        const fbData = await fallbackRes.json()
+        const uploadedPath =
+          fbData?.data?.file_path ||
+          fbData?.data?.attachment_path ||
+          fbData?.file_path ||
+          fbData?.attachment_path
+        if (uploadedPath) {
+          const parsed = parseAttachmentPaths(uploadedPath)
+          setAttachmentPaths((prev) =>
+            Array.from(
+              new Set([...prev, ...(parsed.length ? parsed : [uploadedPath])])
+            )
+          )
+        }
+        return
+      }
+      const data = await res.json()
+      const uploadedPath =
+        data?.data?.file_path ||
+        data?.data?.attachment_path ||
+        data?.file_path ||
+        data?.attachment_path
+      if (uploadedPath) {
+        const parsed = parseAttachmentPaths(uploadedPath)
+        setAttachmentPaths((prev) =>
+          Array.from(
+            new Set([...prev, ...(parsed.length ? parsed : [uploadedPath])])
+          )
+        )
+      }
+    } catch (err: any) {
+      console.error(err)
+      alert(err.message || 'Gagal mengunggah file')
+    } finally {
+      setIsUploading(false)
+      e.target.value = ''
+    }
+  }
+
   return (
     <Card
       color="transparent"
@@ -214,6 +346,127 @@ export function TreatmentForm({
               onResize={undefined}
               onResizeCapture={undefined}
             />
+            {/* Hidden input for attachment paths */}
+            <input
+              id="attachment_path"
+              name="attachment_path"
+              type="hidden"
+              data-testid="attachment_path"
+              value={attachmentPaths.join(',')}
+            />
+            {/* Lampiran UI */}
+            <div className="mt-2 w-full">
+              <label className="text-slate-800 mb-1 block font-sans text-sm font-semibold antialiased dark:text-white">
+                Lampiran
+              </label>
+              <div className="space-y-2">
+                {attachmentPaths.length === 0 ? (
+                  <p className="text-xs italic text-gray-500">
+                    Tidak ada lampiran
+                  </p>
+                ) : (
+                  attachmentPaths.map((path, index) => (
+                    <div
+                      key={index}
+                      className="border-slate-200 dark:bg-slate-900/50 flex items-center justify-between gap-4 rounded-md border bg-white/50 p-2 backdrop-blur-sm"
+                    >
+                      <div className="flex items-center gap-2.5 overflow-hidden">
+                        <span className="dark:bg-blue-950/40 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:text-blue-400">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                          </svg>
+                        </span>
+                        <div className="flex flex-col overflow-hidden text-xs">
+                          <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
+                            {path.split('/').pop()}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void viewAttachment(path, path.split('/').pop())
+                            }
+                            className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                          >
+                            Lihat Lampiran
+                          </button>
+                        </div>
+                      </div>
+                      {/* Note: No delete button rendered here to restrict to view and append-only access */}
+                    </div>
+                  ))
+                )}
+
+                {!disabled && (
+                  <div>
+                    <label className="border-slate-350 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-900/80 flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed p-3 transition-all">
+                      {isUploading ? (
+                        <svg
+                          className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="text-slate-500"
+                        >
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                      )}
+                      <span className="text-slate-600 dark:text-slate-400 font-sans text-xs font-medium">
+                        {isUploading
+                          ? 'Mengunggah...'
+                          : 'Tambah Lampiran (PDF, DOC, Gambar, dsb.)'}
+                      </span>
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                        onChange={handleFileChange}
+                        disabled={isUploading}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <div className="flex w-full flex-col gap-4 md:w-1/2">
             <Textarea
@@ -275,3 +528,4 @@ export function TreatmentForm({
     </Card>
   )
 }
+

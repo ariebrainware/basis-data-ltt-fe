@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { isTherapist, isAdmin } from '../../_functions/userRole'
 import { getUserId, getTherapistId } from '../../_functions/userId'
 import Treatment from '../treatmentRow'
@@ -29,7 +29,12 @@ jest.mock('@material-tailwind/react', () => ({
 
 // Mock Sub-components
 jest.mock('../treatmentForm', () => ({
-  TreatmentForm: () => <div data-testid="treatment-form" />,
+  TreatmentForm: (props: any) => (
+    <div
+      data-testid="treatment-form"
+      data-attachment-path={props.attachment_path}
+    />
+  ),
 }))
 
 // Mock role and ID helpers
@@ -144,5 +149,33 @@ describe('Treatment Row Component', () => {
 
     const viewBtn = screen.getByRole('button', { name: /view treatment/i })
     expect(viewBtn).not.toBeDisabled()
+  })
+
+  test('passes attachment_path to TreatmentForm when dialog opens', async () => {
+    ;(isAdmin as jest.Mock).mockReturnValue(true)
+
+    const treatmentWithAttachment: TreatmentType = {
+      ...mockTreatment,
+      attachment_path: 'uploads/attachments/history.pdf',
+    }
+
+    render(
+      <table>
+        <tbody>
+          <Treatment {...treatmentWithAttachment} />
+        </tbody>
+      </table>
+    )
+
+    const editBtn = screen.getByRole('button', { name: /edit treatment/i })
+    fireEvent.click(editBtn)
+
+    await waitFor(() => {
+      const form = screen.getByTestId('treatment-form')
+      expect(form).toHaveAttribute(
+        'data-attachment-path',
+        'uploads/attachments/history.pdf'
+      )
+    })
   })
 })

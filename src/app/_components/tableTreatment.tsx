@@ -141,6 +141,7 @@ const TableBody = ({
           next_visit={item.next_visit}
           health_history={item.health_history}
           surgery_history={item.surgery_history}
+          attachment_path={item.attachment_path}
           onDataChange={onDataChange}
         />
       ))}

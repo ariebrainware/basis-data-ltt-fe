@@ -16,6 +16,7 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isTherapist, isAdmin, getUserRole } from '../_functions/userRole'
 import { getUserId, getTherapistId } from '../_functions/userId'
+import { parseAttachmentPaths } from '../_functions/apiHost'
 
 export default function Treatment({
   ID,
@@ -32,8 +33,15 @@ export default function Treatment({
   onDataChange,
   health_history: healthHistory,
   surgery_history: surgeryHistory,
+  attachment_path: attachmentPath,
 }: TreatmentType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
+  const [currentAttachmentPath, setCurrentAttachmentPath] = React.useState(
+    attachmentPath || ''
+  )
+  React.useEffect(() => {
+    setCurrentAttachmentPath(attachmentPath || '')
+  }, [attachmentPath])
   const [therapistIDState, setTherapistIDState] = React.useState<string>(
     therapistId?.toString() ?? ''
   )
@@ -159,12 +167,48 @@ export default function Treatment({
     getEditDenialReason,
   ])
 
-  const handleOpen = () => {
+  const handleOpen = async () => {
     if (!open) {
       // When opening the dialog, ensure therapistIDState is synced with current therapistId
       setTherapistIDState(therapistId?.toString() ?? '')
+      setOpen(true)
+
+      // Fetch patient attachments & treatment details
+      try {
+        if (patientCode && process.env.NODE_ENV !== 'test') {
+          const res = await apiFetch(
+            `/patient?keyword=${encodeURIComponent(patientCode)}`
+          )
+          if (res.ok) {
+            const data = await res.json()
+            const patients = Array.isArray(data?.data?.patients)
+              ? data.data.patients
+              : Array.isArray(data?.data)
+                ? data.data
+                : []
+            const found =
+              patients.find(
+                (p: any) =>
+                  String(p.patient_code) === String(patientCode) ||
+                  String(p.ID) === String(patientCode)
+              ) || patients[0]
+            if (found?.attachment_path) {
+              const parsed = parseAttachmentPaths(found.attachment_path)
+              if (parsed.length > 0) {
+                setCurrentAttachmentPath((prev) => {
+                  const existing = parseAttachmentPaths(prev)
+                  return Array.from(new Set([...existing, ...parsed])).join(',')
+                })
+              }
+            }
+          }
+        }
+      } catch (err) {
+        // ignore error fetching patient attachment
+      }
+    } else {
+      setOpen(false)
     }
-    setOpen(!open)
   }
 
   const handleDeleteTreatment = useDeleteResource({
@@ -201,6 +245,9 @@ export default function Treatment({
     const surgery_history_new_input =
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ??
       (surgeryHistory || '')
+    const attachment_path_new_input =
+      document.querySelector<HTMLInputElement>('#attachment_path')?.value ??
+      (currentAttachmentPath || '')
 
     apiFetch(`/treatment/${ID}`, {
       method: 'PATCH',
@@ -215,6 +262,7 @@ export default function Treatment({
         next_visit: next_visit_new_input,
         health_history: health_history_new_input,
         surgery_history: surgery_history_new_input,
+        attachment_path: attachment_path_new_input,
       }),
     })
       .then((response) => {
@@ -229,6 +277,9 @@ export default function Treatment({
       })
       .then((data) => {
         console.log('Treatment information updated successfully:', data)
+        const updatedPath =
+          data?.data?.attachment_path || attachment_path_new_input
+        setCurrentAttachmentPath(updatedPath)
         // Close modal and show success message
         setOpen(false)
         Swal.fire({
@@ -303,6 +354,7 @@ export default function Treatment({
             disabled={!canEdit}
             health_history={healthHistory}
             surgery_history={surgeryHistory}
+            attachment_path={currentAttachmentPath}
           />
         </DialogBody>
         <DialogFooter
