@@ -466,7 +466,7 @@ export function PatientForm({
                           setIsEditingSignature(false)
                           setSignatureVal(initialSignature)
                         }}
-                        className="text-xs font-semibold text-slate-500 transition-all hover:text-slate-700 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
+                        className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-xs font-semibold transition-all hover:underline"
                       >
                         Batal Ubah
                       </button>

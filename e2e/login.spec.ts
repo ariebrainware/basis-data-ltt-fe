@@ -90,4 +90,16 @@ test.describe('Login Page', () => {
     await expect(emailInput).toHaveAttribute('placeholder', 'Email')
     await expect(passwordInput).toHaveAttribute('placeholder', 'Password')
   })
+
+  test('should redirect to dashboard if already logged in', async ({
+    page,
+  }) => {
+    await page.goto('/login')
+    await page.evaluate(() =>
+      localStorage.setItem('session-token', 'valid-mock-token')
+    )
+    await page.goto('/login')
+    await page.waitForURL('**/dashboard')
+    expect(page.url()).toContain('/dashboard')
+  })
 })

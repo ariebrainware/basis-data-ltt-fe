@@ -49,7 +49,17 @@ jest.mock('../selectDisease', () => ({
   ),
 }))
 
+jest.mock('@/app/_functions/viewAttachment', () => ({
+  viewAttachment: jest.fn(),
+}))
+
+jest.mock('@/app/_functions/apiFetch', () => ({
+  apiFetch: jest.fn(),
+}))
+
 import { TreatmentForm } from '../treatmentForm'
+import { viewAttachment } from '@/app/_functions/viewAttachment'
+import { apiFetch } from '@/app/_functions/apiFetch'
 
 const _origConsoleError = console.error.bind(console)
 jest.spyOn(console, 'error').mockImplementation((msg, ...args) => {
@@ -267,5 +277,95 @@ describe('TreatmentForm Component', () => {
 
     expect(screen.getByTestId('patient_name')).toHaveValue('')
     expect(screen.getByTestId('treatment')).toHaveValue('')
+  })
+
+  test('renders attachments and allows viewing without delete button', () => {
+    const treatmentWithAttachment: TreatmentType = {
+      ...mockTreatment,
+      attachment_path:
+        'uploads/attachments/xray.pdf,uploads/attachments/report.png',
+    }
+
+    render(<TreatmentForm {...treatmentWithAttachment} />)
+
+    expect(screen.getByText('xray.pdf')).toBeInTheDocument()
+    expect(screen.getByText('report.png')).toBeInTheDocument()
+
+    const viewButtons = screen.getAllByText('Lihat Lampiran')
+    expect(viewButtons).toHaveLength(2)
+
+    // Click the view button
+    viewButtons[0].click()
+    expect(viewAttachment).toHaveBeenCalledWith(
+      'uploads/attachments/xray.pdf',
+      'xray.pdf'
+    )
+
+    // Verify there are no delete buttons for attachments
+    expect(screen.queryByLabelText(/delete/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/hapus/i)).not.toBeInTheDocument()
+  })
+
+  test('allows uploading new attachments and appends to attachment_path', async () => {
+    ;(apiFetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        data: {
+          file_path: 'uploads/attachments/new_scan.pdf',
+        },
+      }),
+    })
+
+    const treatmentWithAttachment: TreatmentType = {
+      ...mockTreatment,
+      attachment_path: 'uploads/attachments/initial.pdf',
+    }
+
+    const { container } = render(<TreatmentForm {...treatmentWithAttachment} />)
+
+    expect(screen.getByText('initial.pdf')).toBeInTheDocument()
+
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    expect(fileInput).toBeInTheDocument()
+
+    const file = new File(['dummy content'], 'new_scan.pdf', {
+      type: 'application/pdf',
+    })
+
+    // Simulate file selection
+    const { fireEvent } = require('@testing-library/react')
+    fireEvent.change(fileInput, { target: { files: [file] } })
+
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/patient/upload',
+      expect.objectContaining({
+        method: 'POST',
+      })
+    )
+
+    // Wait for the new attachment to appear in the list
+    expect(await screen.findByText('new_scan.pdf')).toBeInTheDocument()
+    expect(screen.getByTestId('attachment_path')).toHaveValue(
+      'uploads/attachments/initial.pdf,uploads/attachments/new_scan.pdf'
+    )
+  })
+
+  test('hides upload button when disabled is true', () => {
+    const treatmentWithAttachment: TreatmentType = {
+      ...mockTreatment,
+      attachment_path: 'uploads/attachments/initial.pdf',
+    }
+
+    const { container } = render(
+      <TreatmentForm {...treatmentWithAttachment} disabled={true} />
+    )
+
+    expect(screen.getByText('initial.pdf')).toBeInTheDocument()
+    expect(
+      container.querySelector('input[type="file"]')
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText(/Tambah Lampiran/i)).not.toBeInTheDocument()
   })
 })

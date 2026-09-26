@@ -12,4 +12,5 @@ export interface TreatmentType {
   therapist_id: string
   health_history?: string
   surgery_history?: string
+  attachment_path?: string
 }
