@@ -34,9 +34,13 @@ export function useFetchExpense(
         const offset = (currentPage - 1) * limit
         let params = `limit=${limit}&offset=${offset}`
         if (keyword && keyword.trim() !== '') {
-          params += `&search=${encodeURIComponent(keyword.trim())}`
+          params += `&keyword=${encodeURIComponent(keyword.trim())}`
         }
-        if (category && category.trim() !== '') {
+        if (
+          category &&
+          category.trim() !== '' &&
+          category.trim().toLowerCase() !== 'all'
+        ) {
           params += `&category=${encodeURIComponent(category.trim())}`
         }
         if (startDate && startDate.trim() !== '') {
