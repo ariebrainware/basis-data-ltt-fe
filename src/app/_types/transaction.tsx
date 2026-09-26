@@ -18,3 +18,20 @@ export interface TransactionType {
   items?: TransactionItem[]
   attachment_path?: string
 }
+
+export interface PaymentStatusSummary {
+  paid: number
+  partial: number
+  unpaid: number
+}
+
+export interface TherapistPatientCount {
+  therapist_name: string
+  patient_count: number
+}
+
+export interface TransactionSummary {
+  total_amount: number
+  payment_status_counts: PaymentStatusSummary
+  therapist_patient_counts: TherapistPatientCount[]
+}
