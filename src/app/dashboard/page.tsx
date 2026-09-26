@@ -31,14 +31,8 @@ import { getUserRole, useUserRole } from '../_functions/userRole'
 import Pagination from '../_components/pagination'
 import { getApiHost } from '../_functions/apiHost'
 import { useFetchTreatment } from '../_hooks/useFetchTreatment'
+import TableTreatment from '../_components/tableTreatment'
 
-const TABLE_HEAD = [
-  'Nama Pasien (K. Pasien)',
-  'Umur',
-  'Tanggal/Waktu',
-  'Terapis (ID)',
-  'Keluhan',
-]
 interface TherapistSummary {
   therapistId: number
   therapistName: string
@@ -694,176 +688,14 @@ export default function Dashboard() {
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <table className="w-full min-w-max table-auto text-left">
-            <thead>
-              <tr>
-                {TABLE_HEAD.map((head) => (
-                  <th
-                    key={head}
-                    className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4"
-                  >
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-bold leading-none opacity-80"
-                      placeholder={undefined}
-                      onPointerEnterCapture={undefined}
-                      onPointerLeaveCapture={undefined}
-                      onResize={undefined}
-                      onResizeCapture={undefined}
-                    >
-                      {head}
-                    </Typography>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {treatmentLoading ? (
-                <tr>
-                  <td colSpan={TABLE_HEAD.length} className="p-8 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-2">
-                      <div className="size-6 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
-                      <p className="text-xs text-gray-500">
-                        Memuat jadwal penanganan...
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ) : treatmentError ? (
-                <tr>
-                  <td colSpan={TABLE_HEAD.length} className="p-8 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-2">
-                      <p className="text-xs font-semibold text-red-500">
-                        {treatmentError}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={refetchTreatment}
-                        className="rounded bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-100"
-                      >
-                        Coba Lagi
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ) : treatment.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={TABLE_HEAD.length}
-                    className="p-8 text-center text-xs italic text-gray-500"
-                  >
-                    Tidak ada jadwal penanganan hari ini
-                  </td>
-                </tr>
-              ) : (
-                treatment.map(
-                  (
-                    {
-                      ID,
-                      patient_name,
-                      patient_code,
-                      age,
-                      treatment_date,
-                      therapist_name,
-                      therapist_id,
-                      issues,
-                    },
-                    index
-                  ) => {
-                    const isLast = index === treatment.length - 1
-                    const classes = isLast
-                      ? 'p-4'
-                      : 'p-4 border-b border-blue-gray-50'
-
-                    return (
-                      <tr
-                        key={ID || `${patient_code}-${index}`}
-                        className="transition-colors hover:bg-blue-gray-50/20"
-                      >
-                        <td className={classes}>
-                          <div className="flex items-center gap-3">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold"
-                              placeholder={undefined}
-                              onPointerEnterCapture={undefined}
-                              onPointerLeaveCapture={undefined}
-                              onResize={undefined}
-                              onResizeCapture={undefined}
-                            >
-                              {patient_name} ({patient_code})
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal"
-                            placeholder={undefined}
-                            onPointerEnterCapture={undefined}
-                            onPointerLeaveCapture={undefined}
-                            onResize={undefined}
-                            onResizeCapture={undefined}
-                          >
-                            {age} Tahun
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal"
-                            placeholder={undefined}
-                            onPointerEnterCapture={undefined}
-                            onPointerLeaveCapture={undefined}
-                            onResize={undefined}
-                            onResizeCapture={undefined}
-                          >
-                            {treatment_date}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal"
-                            placeholder={undefined}
-                            onPointerEnterCapture={undefined}
-                            onPointerLeaveCapture={undefined}
-                            onResize={undefined}
-                            onResizeCapture={undefined}
-                          >
-                            {therapist_name} ({therapist_id})
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex items-center gap-3">
-                            <div className="flex flex-col">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-normal opacity-70"
-                                placeholder={undefined}
-                                onPointerEnterCapture={undefined}
-                                onPointerLeaveCapture={undefined}
-                                onResize={undefined}
-                                onResizeCapture={undefined}
-                              >
-                                {issues}
-                              </Typography>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  }
-                )
-              )}
-            </tbody>
-          </table>
+          <TableTreatment
+            Data={{ treatment }}
+            onDataChange={refetchTreatment}
+            loading={treatmentLoading}
+            error={treatmentError}
+            onRetry={refetchTreatment}
+            emptyMessage="Tidak ada jadwal penanganan hari ini"
+          />
         </CardBody>
         <CardFooter
           className="flex items-center justify-between border-t border-blue-gray-50 p-4"

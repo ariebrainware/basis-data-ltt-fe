@@ -8,6 +8,10 @@ interface TableTreatmentProps {
     treatment: TreatmentType[]
   }
   onDataChange?: () => void
+  loading?: boolean
+  error?: string | null
+  onRetry?: () => void
+  emptyMessage?: string
 }
 const TABLE_HEAD = [
   'Waktu & Tanggal',
@@ -52,42 +56,118 @@ const TableHeader = () => (
 const TableBody = ({
   treatment,
   onDataChange,
+  loading,
+  error,
+  onRetry,
+  emptyMessage = 'Tidak ada data penanganan',
 }: {
   treatment: TreatmentType[]
   onDataChange?: () => void
-}) => (
-  <tbody className="text-sm text-blue-gray-500">
-    {treatment?.map((treatment: TreatmentType) => (
-      <Treatment
-        key={treatment.ID}
-        ID={treatment.ID}
-        treatment_date={treatment.treatment_date}
-        patient_code={treatment.patient_code}
-        patient_name={treatment.patient_name}
-        age={treatment.age}
-        issues={treatment.issues}
-        treatment={treatment.treatment}
-        remarks={treatment.remarks}
-        therapist_name={treatment.therapist_name}
-        therapist_id={treatment.therapist_id}
-        next_visit={treatment.next_visit}
-        health_history={treatment.health_history}
-        surgery_history={treatment.surgery_history}
-        onDataChange={onDataChange}
-      />
-    ))}
-  </tbody>
-)
+  loading?: boolean
+  error?: string | null
+  onRetry?: () => void
+  emptyMessage?: string
+}) => {
+  if (loading) {
+    return (
+      <tbody>
+        <tr>
+          <td colSpan={TABLE_HEAD.length} className="p-8 text-center">
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <div className="size-6 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
+              <p className="text-xs text-gray-500">
+                Memuat data penanganan...
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    )
+  }
+
+  if (error) {
+    return (
+      <tbody>
+        <tr>
+          <td colSpan={TABLE_HEAD.length} className="p-8 text-center">
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <p className="text-xs font-semibold text-red-500">{error}</p>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="rounded bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-100"
+                >
+                  Coba Lagi
+                </button>
+              )}
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    )
+  }
+
+  if (!treatment || treatment.length === 0) {
+    return (
+      <tbody>
+        <tr>
+          <td
+            colSpan={TABLE_HEAD.length}
+            className="p-8 text-center text-xs italic text-gray-500"
+          >
+            {emptyMessage}
+          </td>
+        </tr>
+      </tbody>
+    )
+  }
+
+  return (
+    <tbody className="text-sm text-blue-gray-500">
+      {treatment.map((item: TreatmentType) => (
+        <Treatment
+          key={item.ID}
+          ID={item.ID}
+          treatment_date={item.treatment_date}
+          patient_code={item.patient_code}
+          patient_name={item.patient_name}
+          age={item.age}
+          issues={item.issues}
+          treatment={item.treatment}
+          remarks={item.remarks}
+          therapist_name={item.therapist_name}
+          therapist_id={item.therapist_id}
+          next_visit={item.next_visit}
+          health_history={item.health_history}
+          surgery_history={item.surgery_history}
+          onDataChange={onDataChange}
+        />
+      ))}
+    </tbody>
+  )
+}
 
 export default function TableTreatment({
   Data,
   onDataChange,
+  loading,
+  error,
+  onRetry,
+  emptyMessage,
 }: TableTreatmentProps) {
   const { treatment } = Data
   return (
     <table className="w-full whitespace-nowrap">
       <TableHeader />
-      <TableBody treatment={treatment} onDataChange={onDataChange} />
+      <TableBody
+        treatment={treatment}
+        onDataChange={onDataChange}
+        loading={loading}
+        error={error}
+        onRetry={onRetry}
+        emptyMessage={emptyMessage}
+      />
     </table>
   )
 }
