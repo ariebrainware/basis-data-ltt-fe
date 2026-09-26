@@ -19,7 +19,7 @@ describe('TransactionPage', () => {
     jest.clearAllMocks()
   })
 
-  it('renders transaction page header and metric summary cards', async () => {
+  it('renders transaction page header and metric summary cards including payment method', async () => {
     ;(apiFetch as jest.Mock).mockResolvedValue({
       ok: true,
       status: 200,
@@ -32,6 +32,7 @@ describe('TransactionPage', () => {
               patient_name: 'Budi Santoso',
               amount: 150000,
               payment_status: 'paid',
+              payment_method: 'cash',
               notes: 'Selesai',
               transaction_date: '2026-05-01 10:00',
               treatment_date: '2026-05-01',
@@ -61,10 +62,13 @@ describe('TransactionPage', () => {
     expect(screen.getByText('Daftar Transaksi')).toBeInTheDocument()
     expect(screen.getByText('Total Transaksi')).toBeInTheDocument()
     expect(screen.getByText('Status Pembayaran')).toBeInTheDocument()
+    expect(screen.getByText('Metode Pembayaran')).toBeInTheDocument()
     expect(screen.getByText('Pasien per Terapis')).toBeInTheDocument()
 
-    expect(await screen.findByText('Rp 150.000')).toBeInTheDocument()
+    const amounts = await screen.findAllByText('Rp 150.000')
+    expect(amounts.length).toBeGreaterThanOrEqual(1)
     expect(await screen.findByText('Lunas: 1')).toBeInTheDocument()
+    expect(await screen.findByText(/Cash \/ Tunai/)).toBeInTheDocument()
     expect(await screen.findByText('Dr. John: 1 Pasien')).toBeInTheDocument()
   })
 })

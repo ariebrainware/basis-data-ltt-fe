@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { TransactionSummary, TransactionType } from '../_types/transaction'
+import {
+  PaymentMethodBreakdown,
+  TransactionSummary,
+  TransactionType,
+} from '../_types/transaction'
 
 export interface ListTransactionResponse {
   data: TransactionType[]
@@ -62,6 +66,54 @@ export function normalizeTransaction(item: any): TransactionType {
   }
 }
 
+export function formatPaymentMethodLabel(method: string): string {
+  if (!method || method.trim() === '') return 'Lainnya / Belum Ditentukan'
+  const lower = method.trim().toLowerCase()
+  if (lower === 'cash') return 'Cash / Tunai'
+  if (
+    lower === 'transfer_or_qris' ||
+    lower === 'transfer' ||
+    lower === 'qris'
+  ) {
+    return 'Transfer / QRIS'
+  }
+  if (lower === 'debit') return 'Debit'
+  return method
+    .replace(/[_\-]+/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ')
+}
+
+export function calculatePaymentMethodBreakdown(
+  transactions: TransactionType[]
+): PaymentMethodBreakdown[] {
+  const methodMap = new Map<string, { count: number; total_amount: number }>()
+
+  for (const item of transactions) {
+    const rawMethod = item.pricing_name || 'other'
+    const normalizedKey = rawMethod.trim().toLowerCase() || 'other'
+    const existing = methodMap.get(normalizedKey) || {
+      count: 0,
+      total_amount: 0,
+    }
+    methodMap.set(normalizedKey, {
+      count: existing.count + 1,
+      total_amount: existing.total_amount + (Number(item.amount) || 0),
+    })
+  }
+
+  return Array.from(methodMap.entries())
+    .map(([method, stats]) => ({
+      method,
+      label: formatPaymentMethodLabel(method),
+      count: stats.count,
+      total_amount: stats.total_amount,
+    }))
+    .sort((a, b) => b.total_amount - a.total_amount)
+}
+
 export function normalizeSummary(rawSummary: any): TransactionSummary | null {
   if (!rawSummary || typeof rawSummary !== 'object') return null
   return {
@@ -77,6 +129,16 @@ export function normalizeSummary(rawSummary: any): TransactionSummary | null {
           patient_count: toNumber(t?.patient_count),
         }))
       : [],
+    payment_method_breakdown: Array.isArray(rawSummary.payment_method_breakdown)
+      ? rawSummary.payment_method_breakdown.map((pm: any) => ({
+          method: String(pm?.method ?? ''),
+          label: formatPaymentMethodLabel(
+            String(pm?.label ?? pm?.method ?? '')
+          ),
+          count: toNumber(pm?.count),
+          total_amount: toNumber(pm?.total_amount),
+        }))
+      : undefined,
   }
 }
 

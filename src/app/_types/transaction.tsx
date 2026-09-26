@@ -30,8 +30,16 @@ export interface TherapistPatientCount {
   patient_count: number
 }
 
+export interface PaymentMethodBreakdown {
+  method: string
+  label: string
+  count: number
+  total_amount: number
+}
+
 export interface TransactionSummary {
   total_amount: number
   payment_status_counts: PaymentStatusSummary
   therapist_patient_counts: TherapistPatientCount[]
+  payment_method_breakdown?: PaymentMethodBreakdown[]
 }

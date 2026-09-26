@@ -1,7 +1,7 @@
 'use client'
 import {
   BanknotesIcon,
-  CalendarDaysIcon,
+  CreditCardIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
   UserGroupIcon,
@@ -21,7 +21,10 @@ import Pagination from '../_components/pagination'
 import TableTransaction from '../_components/tableTransaction'
 import { formatRupiah } from '../_functions/expenseHelpers'
 import { logout } from '../_functions/logout'
-import { useFetchTransaction } from '../_hooks/useFetchTransaction'
+import {
+  calculatePaymentMethodBreakdown,
+  useFetchTransaction,
+} from '../_hooks/useFetchTransaction'
 
 export default function TransactionPage() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -70,6 +73,12 @@ export default function TransactionPage() {
   const totalTransactionsCount = summary
     ? paidCount + partialCount + unpaidCount
     : total || data.length
+
+  const paymentMethodBreakdown =
+    summary?.payment_method_breakdown &&
+    summary.payment_method_breakdown.length > 0
+      ? summary.payment_method_breakdown
+      : calculatePaymentMethodBreakdown(data)
 
   return (
     <Card
@@ -149,7 +158,7 @@ export default function TransactionPage() {
         </div>
 
         {/* Metric Summary Cards */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Card 1: Total Transaksi */}
           <div className="border-slate-200 from-emerald-50 rounded-xl border bg-gradient-to-br to-white p-4 shadow-sm">
             <div className="flex items-center justify-between">
@@ -199,8 +208,51 @@ export default function TransactionPage() {
             </div>
           </div>
 
-          {/* Card 3: Pasien per Terapis */}
-          <div className="border-slate-200 rounded-xl border bg-gradient-to-br from-purple-50 to-white p-4 shadow-sm sm:col-span-2 lg:col-span-1">
+          {/* Card 3: Metode Pembayaran */}
+          <div className="border-slate-200 rounded-xl border bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-amber-700">
+                Metode Pembayaran
+              </span>
+              <span className="rounded-full bg-amber-100 p-1.5 text-amber-700">
+                <CreditCardIcon className="size-4" />
+              </span>
+            </div>
+            {paymentMethodBreakdown.length > 0 ? (
+              <div className="mt-2 space-y-1">
+                <div className="max-h-20 space-y-1 overflow-y-auto pr-1">
+                  {paymentMethodBreakdown.map((pm, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between text-xs"
+                    >
+                      <span
+                        className="text-slate-700 max-w-[110px] truncate font-medium"
+                        title={pm.label}
+                      >
+                        {pm.label} ({pm.count})
+                      </span>
+                      <span className="text-slate-900 font-semibold">
+                        {formatRupiah(pm.total_amount)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-slate-700 mt-2 text-sm font-semibold">
+                  Belum ada data transaksi
+                </p>
+                <p className="text-slate-500 mt-0.5 text-xs">
+                  Berdasarkan metode pembayaran
+                </p>
+              </>
+            )}
+          </div>
+
+          {/* Card 4: Pasien per Terapis */}
+          <div className="border-slate-200 rounded-xl border bg-gradient-to-br from-purple-50 to-white p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-purple-600">
                 Pasien per Terapis
@@ -213,7 +265,7 @@ export default function TransactionPage() {
             summary.therapist_patient_counts &&
             summary.therapist_patient_counts.length > 0 ? (
               <div className="mt-2 space-y-1">
-                <div className="flex max-h-16 flex-wrap gap-1.5 overflow-y-auto">
+                <div className="max-h-20 flex-wrap gap-1.5 space-y-1 overflow-y-auto">
                   {summary.therapist_patient_counts.map((t, idx) => (
                     <span
                       key={idx}
