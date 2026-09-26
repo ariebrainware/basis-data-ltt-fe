@@ -14,5 +14,6 @@ export interface PatientType {
   signature?: string
   signature_path?: string
   attachment_path?: string
+  date_of_birth?: string
   onDataChange?: () => void
 }

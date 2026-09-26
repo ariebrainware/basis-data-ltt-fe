@@ -3,6 +3,8 @@ import styles from '../page.module.css'
 import { useState, useRef, type ComponentProps, type RefObject } from 'react'
 import { useRouter } from 'next/navigation'
 import Footer from '../_components/footer'
+import DatePicker from '../_components/datePicker'
+import type { DateValueType } from 'react-tailwindcss-datepicker'
 import { Checkbox, Radio } from '@material-tailwind/react'
 import { apiFetch } from '../_functions/apiFetch'
 import { getAttachmentUrl } from '../_functions/apiHost'
@@ -24,7 +26,7 @@ export default function Register() {
   const router = useRouter()
   const [fullName, setFullName] = useState('')
   const [gender, setGender] = useState<GenderValue>('')
-  const [age, setAge] = useState<number | ''>('')
+  const [dateOfBirth, setDateOfBirth] = useState<DateValueType | null>(null)
   const [job, setJob] = useState('')
   const [address, setAddress] = useState('')
   const [surgeryHistory, setSurgeryHistory] = useState('')
@@ -88,10 +90,17 @@ export default function Register() {
       return
     }
 
+    const dobString = dateOfBirth?.startDate
+      ? typeof dateOfBirth.startDate === 'string'
+        ? dateOfBirth.startDate
+        : `${dateOfBirth.startDate.getFullYear()}-${String(dateOfBirth.startDate.getMonth() + 1).padStart(2, '0')}-${String(dateOfBirth.startDate.getDate()).padStart(2, '0')}`
+      : (document.getElementById('date_of_birth') as HTMLInputElement)?.value ||
+        ''
+
     const payload = buildRegistrationPayload(
       fullName,
       gender,
-      age,
+      dobString,
       job,
       address,
       healthHistory,
@@ -114,7 +123,11 @@ export default function Register() {
       // Clear form fields instead of redirecting
       setFullName('')
       setGender('')
-      setAge('')
+      setDateOfBirth(null)
+      const dobInput = document.getElementById(
+        'date_of_birth'
+      ) as HTMLInputElement | null
+      if (dobInput) dobInput.value = ''
       setJob('')
       setAddress('')
       setSurgeryHistory('')
@@ -169,24 +182,19 @@ export default function Register() {
 
         <GenderSelector value={gender} onChange={setGender} />
 
-        <LabeledField
-          id="age"
-          name="age"
-          type="number"
-          placeholder="Umur"
-          value={age === '' ? '' : String(age)}
-          onValueChange={(value) => {
-            if (value === '') {
-              setAge('')
-              return
-            }
-
-            if (/^\d+$/.test(value)) {
-              setAge(Number(value))
-            }
-            // Ignore invalid numeric strings to avoid setting age to NaN
-          }}
-        />
+        <div className="w-full">
+          <label
+            htmlFor="date_of_birth"
+            className="text-slate-650 dark:text-slate-400 mb-1.5 block text-sm font-medium"
+          >
+            Tanggal Lahir
+          </label>
+          <DatePicker
+            id="date_of_birth"
+            value={dateOfBirth}
+            onChange={setDateOfBirth}
+          />
+        </div>
 
         <LabeledField
           id="job"
@@ -419,7 +427,7 @@ function validateRegistration(
 function buildRegistrationPayload(
   fullName: string,
   gender: GenderValue,
-  age: number | '',
+  dateOfBirth: string,
   job: string,
   address: string,
   healthHistory: string[],
@@ -433,7 +441,7 @@ function buildRegistrationPayload(
   return {
     full_name: fullName,
     gender,
-    age: normalizeAge(age),
+    date_of_birth: dateOfBirth,
     job,
     address,
     health_history: healthHistory,
@@ -457,10 +465,6 @@ async function submitRegistration(payload: any) {
   } catch (err) {
     return { ok: false, error: err }
   }
-}
-
-function normalizeAge(value: number | ''): number {
-  return typeof value === 'number' ? value : 0
 }
 
 function usePhoneFields(maxInputs = 3) {

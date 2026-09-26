@@ -72,7 +72,7 @@ test.describe('Patient Registration', () => {
 
     // Check required fields are present
     await expect(page.locator('#fullName')).toBeVisible()
-    await expect(page.locator('#age')).toBeVisible()
+    await expect(page.locator('#date_of_birth')).toBeVisible()
     await expect(page.locator('#job')).toBeVisible()
     await expect(page.locator('#address')).toBeVisible()
     await expect(page.locator('#surgeryHistory')).toBeVisible()
@@ -99,9 +99,9 @@ test.describe('Patient Registration', () => {
     await expect(maleRadio).not.toBeChecked()
   })
 
-  test('should allow filling age field', async ({ page }) => {
-    await reliableFill(page, '#age', '30')
-    await expect(page.locator('#age')).toHaveValue('30')
+  test('should have date of birth picker', async ({ page }) => {
+    const dateInput = page.locator('#date_of_birth')
+    await expect(dateInput).toBeVisible()
   })
 
   test('should allow filling job field', async ({ page }) => {
@@ -227,7 +227,7 @@ test.describe('Patient Registration', () => {
     const fullNameValue = 'John Doe'
     await reliableFill(page, '#fullName', fullNameValue)
     await page.locator('#gender_male').check()
-    await reliableFill(page, '#age', '30')
+    await reliableFill(page, '#date_of_birth', '1995-05-20')
     await reliableFill(page, '#job', 'Engineer')
     await reliableFill(page, '#address', 'Test Address')
     await reliableFill(page, '#phone-0', '+628123456789')
