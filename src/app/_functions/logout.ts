@@ -34,7 +34,11 @@ export async function logout(): Promise<void> {
   // Clear local storage
   localStorage.removeItem('session-token')
   localStorage.removeItem('user-role')
+  localStorage.removeItem('user-name')
   localStorage.removeItem('user-id')
   localStorage.removeItem('therapist-id')
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('user-name-change'))
+  }
   // Do not perform navigation here; caller should redirect using Next.js router.
 }

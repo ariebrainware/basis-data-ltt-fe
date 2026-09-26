@@ -10,6 +10,7 @@ export function UnauthorizedAccess(router?: {
     try {
       localStorage.removeItem('session-token')
       localStorage.removeItem('user-role')
+      localStorage.removeItem('user-name')
       localStorage.removeItem('user-id')
       localStorage.removeItem('therapist-id')
     } catch {}

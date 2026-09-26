@@ -13,6 +13,7 @@ import { format as formatDate } from 'date-fns'
 import {
   getLockedFieldFromResponse,
   getUserIdFromResponse,
+  getUserNameFromResponse,
 } from '../_functions/loginParsing'
 import {
   handleUserNotFound,
@@ -140,14 +141,24 @@ export default function Login() {
   ) {
     const token = responseData.data?.token
     const role = responseData.data?.role
+    const userName = getUserNameFromResponse(responseData)
     const userId = getUserIdFromResponse(responseData)
 
     if (process.env.NODE_ENV !== 'production')
-      console.log('token', token, 'userId', userId, 'role', role)
+      console.log(
+        'token',
+        token,
+        'userId',
+        userId,
+        'role',
+        role,
+        'userName',
+        userName
+      )
 
     if (!token) return
-    storeSession(token, role)
-    await showLoginSuccess()
+    storeSession(token, role, userName)
+    await showLoginSuccess(role, userName)
     await ensureAndStoreUserId(userId, responseData, router)
   }
 

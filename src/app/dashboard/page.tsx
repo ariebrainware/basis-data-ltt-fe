@@ -2,6 +2,7 @@
 import React from 'react'
 import { useState, useEffect, useCallback } from 'react'
 import MegaMenuDefault from '../_components/megaMenu'
+import GreetingBanner from '../_components/greetingBanner'
 import {
   MagnifyingGlassIcon,
   PlusCircleIcon,
@@ -555,6 +556,8 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
       <MegaMenuDefault />
+
+      <GreetingBanner />
 
       {/* Grid of Summaries */}
       {userRole === 'super_admin' && (

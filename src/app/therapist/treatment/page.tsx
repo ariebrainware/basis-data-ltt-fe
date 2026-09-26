@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation'
 import { apiFetch } from '../../_functions/apiFetch'
 import { UnauthorizedAccess } from '../../_functions/unauthorized'
 import TherapistTreatmentHeader from '../../_components/therapistTreatmentHeader'
+import MegaMenuDefault from '../../_components/megaMenu'
 import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
@@ -51,9 +52,11 @@ export default function TherapistTreatmentList() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
+
       <Card
-        className="size-full"
+        className="size-full border border-blue-gray-100 shadow-md"
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
@@ -95,6 +98,6 @@ export default function TherapistTreatmentList() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }

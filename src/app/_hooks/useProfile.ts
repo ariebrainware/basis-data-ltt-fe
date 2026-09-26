@@ -13,6 +13,7 @@ import {
   fetchUserProfile,
   submitProfileUpdate,
 } from '@/app/_functions/profileService'
+import { setUserName } from '@/app/_functions/userName'
 
 function isEmailValid(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -126,6 +127,10 @@ async function performProfileUpdateHelper(params: {
     return false
   }
 
+  if (typeof body.name === 'string' && body.name.trim()) {
+    setUserName(body.name.trim())
+  }
+
   await Swal.fire({
     text: 'Profile updated successfully',
     icon: 'success',
@@ -173,7 +178,10 @@ export function useProfile() {
           return
         }
 
-        if ((r as any).name) setName((r as any).name)
+        if ((r as any).name) {
+          setName((r as any).name)
+          setUserName((r as any).name)
+        }
         if ((r as any).email) setEmail((r as any).email)
       } catch (err) {
         console.error('fetch profile error', err)

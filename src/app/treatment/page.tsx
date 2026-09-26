@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import TableTreatment from '../_components/tableTreatment'
 import { TreatmentType } from '../_types/treatment'
 import { logout } from '../_functions/logout'
@@ -49,9 +50,11 @@ export default function ListTreatment() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
+
       <Card
-        className="size-full"
+        className="size-full border border-blue-gray-100 shadow-md"
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
@@ -170,6 +173,6 @@ export default function ListTreatment() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }

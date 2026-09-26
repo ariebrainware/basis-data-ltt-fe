@@ -9,6 +9,7 @@ import {
   CardFooter,
 } from '@material-tailwind/react'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import Header from '../_components/header'
 import SubHeader from '../_components/subheader'
 import TablePatient from '../_components/tablePatient'
@@ -134,66 +135,70 @@ export default function Patient() {
   }
 
   return (
-    <Card
-      className="size-full"
-      placeholder={undefined}
-      onPointerEnterCapture={undefined}
-      onPointerLeaveCapture={undefined}
-      onResize={undefined}
-      onResizeCapture={undefined}
-    >
-      <CardHeader
-        floated={false}
-        shadow={false}
-        className="rounded-none"
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
+
+      <Card
+        className="size-full border border-blue-gray-100 shadow-md"
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
         onResize={undefined}
         onResizeCapture={undefined}
       >
-        <Header />
-        <SubHeader
-          handleInputKeyDown={handleInputKeyDown}
-          handleGroupingByDateFilter={handleGroupingByDateFilter}
-        />
-      </CardHeader>
-      <CardBody
-        className="overflow-scroll px-0"
-        placeholder={undefined}
-        onPointerEnterCapture={undefined}
-        onPointerLeaveCapture={undefined}
-        onResize={undefined}
-        onResizeCapture={undefined}
-      >
-        <TablePatient
-          Data={{
-            patients: data.patients,
-          }}
-          onDataChange={handleRefresh}
-          sortBy={sortBy}
-          sortDir={sortDir}
-          onSortChange={handleSortChange}
-        />
-      </CardBody>
-      <CardFooter
-        className="flex items-center justify-between border-t border-blue-gray-50 p-4"
-        placeholder={undefined}
-        onPointerEnterCapture={undefined}
-        onPointerLeaveCapture={undefined}
-        onResize={undefined}
-        onResizeCapture={undefined}
-      >
-        <Pagination
-          currentPage={currentPage}
-          setCurrentPage={
-            setCurrentPage as React.Dispatch<SetStateAction<number>>
-          }
-          total={total}
-          pageSize={100}
-          disabled={currentPage * 100 >= total}
-        />
-      </CardFooter>
-    </Card>
+        <CardHeader
+          floated={false}
+          shadow={false}
+          className="rounded-none"
+          placeholder={undefined}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
+        >
+          <Header />
+          <SubHeader
+            handleInputKeyDown={handleInputKeyDown}
+            handleGroupingByDateFilter={handleGroupingByDateFilter}
+          />
+        </CardHeader>
+        <CardBody
+          className="overflow-scroll px-0"
+          placeholder={undefined}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
+        >
+          <TablePatient
+            Data={{
+              patients: data.patients,
+            }}
+            onDataChange={handleRefresh}
+            sortBy={sortBy}
+            sortDir={sortDir}
+            onSortChange={handleSortChange}
+          />
+        </CardBody>
+        <CardFooter
+          className="flex items-center justify-between border-t border-blue-gray-50 p-4"
+          placeholder={undefined}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
+          onResize={undefined}
+          onResizeCapture={undefined}
+        >
+          <Pagination
+            currentPage={currentPage}
+            setCurrentPage={
+              setCurrentPage as React.Dispatch<SetStateAction<number>>
+            }
+            total={total}
+            pageSize={100}
+            disabled={currentPage * 100 >= total}
+          />
+        </CardFooter>
+      </Card>
+    </div>
   )
 }

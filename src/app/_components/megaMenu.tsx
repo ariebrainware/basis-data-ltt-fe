@@ -1,4 +1,5 @@
 'use client'
+
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -22,10 +23,15 @@ import {
   ReceiptPercentIcon,
   CubeIcon,
   BanknotesIcon,
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  HomeIcon,
 } from '@heroicons/react/24/outline'
 import { HeartIcon } from '@heroicons/react/24/solid'
 import { SquaresPlusIcon, UserGroupIcon } from '@heroicons/react/24/solid'
-import { getUserRole, useUserRole } from '../_functions/userRole'
+import { useUserRole } from '../_functions/userRole'
+import { useUserName, setUserName } from '../_functions/userName'
+import { fetchUserProfile } from '../_functions/profileService'
 import { logout } from '../_functions/logout'
 
 // Workaround: Material Tailwind's `Typography` props typing requires many
@@ -107,6 +113,14 @@ const navListMenuItems = [
   },
 ]
 
+function formatRoleLabel(role: string | null): string {
+  if (!role) return 'Pengguna'
+  const lower = role.toLowerCase().trim()
+  if (lower === 'super_admin' || lower === 'admin') return 'Super Admin'
+  if (lower === 'therapist') return 'Terapis'
+  return role.charAt(0).toUpperCase() + role.slice(1)
+}
+
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
@@ -135,8 +149,7 @@ function NavListMenu() {
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <div className="flex items-center justify-center rounded-lg !bg-blue-gray-50 p-2 ">
-            {' '}
+          <div className="flex items-center justify-center rounded-lg !bg-blue-gray-50 p-2">
             {React.createElement(icon, {
               strokeWidth: 2,
               className: 'h-6 text-gray-900 w-6',
@@ -254,9 +267,14 @@ function NavListMenu() {
 
 function NavList() {
   const router = useRouter()
+  const userName = useUserName()
+  const userRole = useUserRole()
+  const roleLabel = formatRoleLabel(userRole)
+  const displayName = userName?.trim() || roleLabel
+
   return (
     <List
-      className="mb-6 mt-4 p-0 lg:my-0 lg:flex-row lg:p-1"
+      className="mb-6 mt-4 p-0 lg:my-0 lg:flex-row lg:items-center lg:gap-1 lg:p-1"
       placeholder={undefined}
       onPointerEnterCapture={undefined}
       onPointerLeaveCapture={undefined}
@@ -287,9 +305,43 @@ function NavList() {
           onResize={undefined}
           onResizeCapture={undefined}
         >
+          <HomeIcon className="size-4 text-blue-gray-600" />
           Home
         </ListItem>
       </Typography>
+
+      <NavListMenu />
+
+      {/* Personalized Logged-in User Profile Link / Badge */}
+      <Typography
+        as="div"
+        variant="small"
+        className="my-1 lg:my-0"
+        placeholder={undefined}
+      >
+        <button
+          data-testid="nav-user-profile"
+          onClick={() => router.push('/profile')}
+          className="group flex items-center gap-2 rounded-full border border-blue-gray-100 bg-blue-gray-50/70 px-3 py-1 text-left transition-all duration-200 hover:border-indigo-200 hover:bg-indigo-50/80"
+          title="Lihat Profil"
+        >
+          <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-bold text-white shadow-sm transition-transform group-hover:scale-105">
+            {displayName.charAt(0).toUpperCase()}
+          </div>
+          <div className="flex flex-col">
+            <span
+              data-testid="nav-username"
+              className="max-w-[130px] truncate text-xs font-semibold text-blue-gray-800 group-hover:text-indigo-700 md:max-w-[170px]"
+            >
+              {displayName}
+            </span>
+          </div>
+          <span className="hidden rounded-full bg-indigo-100/80 px-2 py-0.5 text-[10px] font-medium text-indigo-700 sm:inline-block">
+            {roleLabel}
+          </span>
+        </button>
+      </Typography>
+
       <Typography
         as="a"
         href="#"
@@ -314,10 +366,11 @@ function NavList() {
           onResize={undefined}
           onResizeCapture={undefined}
         >
+          <UserCircleIcon className="size-4 text-blue-gray-600" />
           Profile
         </ListItem>
       </Typography>
-      <NavListMenu />
+
       <Typography
         as="a"
         href="#"
@@ -336,13 +389,14 @@ function NavList() {
         }}
       >
         <ListItem
-          className="flex items-center gap-2 py-2 pr-4"
+          className="flex items-center gap-2 py-2 pr-4 hover:text-red-600"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
           onResize={undefined}
           onResizeCapture={undefined}
         >
+          <ArrowRightOnRectangleIcon className="size-4 text-blue-gray-600" />
           Log Out
         </ListItem>
       </Typography>
@@ -351,19 +405,37 @@ function NavList() {
 }
 
 export default function MegaMenuDefault() {
+  const router = useRouter()
   const [openNav, setOpenNav] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
     // Defer mounted flag to avoid synchronous setState inside effect
-    const t = setTimeout(() => setMounted(true), 0)
+    const t = setTimeout(() => {
+      setMounted(true)
+      // Check if user-name is not in cache yet
+      if (
+        !localStorage.getItem('user-name') &&
+        localStorage.getItem('session-token')
+      ) {
+        const USER_ENDPOINT =
+          process.env.NEXT_PUBLIC_CURRENT_USER_ENDPOINT || '/user'
+        fetchUserProfile({ endpoint: USER_ENDPOINT, router })
+          .then((res: any) => {
+            if (res && res.name) {
+              setUserName(res.name)
+            }
+          })
+          .catch(() => {})
+      }
+    }, 0)
     const onResize = () => window.innerWidth >= 960 && setOpenNav(false)
     window.addEventListener('resize', onResize)
     return () => {
       clearTimeout(t)
       window.removeEventListener('resize', onResize)
     }
-  }, [])
+  }, [router])
 
   return (
     <Navbar
@@ -380,10 +452,16 @@ export default function MegaMenuDefault() {
           href="#"
           variant="h6"
           className="mr-4 cursor-pointer py-1.5 lg:ml-2"
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault()
+            router.push('/dashboard')
+          }}
         >
           Lee Tit Tar Dashboard
         </Typography>
-        <div className="hidden lg:block">{mounted && <NavList />}</div>
+        <div className="hidden lg:block">
+          <NavList />
+        </div>
         <IconButton
           variant="text"
           color="blue-gray"
@@ -397,7 +475,9 @@ export default function MegaMenuDefault() {
           )}
         </IconButton>
       </div>
-      <Collapse open={openNav}>{mounted && <NavList />}</Collapse>
+      <Collapse open={openNav}>
+        <NavList />
+      </Collapse>
     </Navbar>
   )
 }

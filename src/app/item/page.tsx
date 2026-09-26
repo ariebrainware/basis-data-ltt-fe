@@ -18,6 +18,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import TableItem from '../_components/tableItem'
 import { apiFetch } from '../_functions/apiFetch'
 import {
@@ -103,7 +104,8 @@ export default function ItemPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
       <Dialog
         size={'md'}
         handler={handleOpenAddDialog}
@@ -313,6 +315,6 @@ export default function ItemPage() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }
