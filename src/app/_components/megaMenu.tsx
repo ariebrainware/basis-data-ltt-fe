@@ -23,7 +23,6 @@ import {
   ReceiptPercentIcon,
   CubeIcon,
   BanknotesIcon,
-  UserCircleIcon,
   ArrowRightOnRectangleIcon,
   HomeIcon,
 } from '@heroicons/react/24/outline'
@@ -312,7 +311,7 @@ function NavList() {
 
       <NavListMenu />
 
-      {/* Personalized Logged-in User Profile Link / Badge */}
+      {/* Single Personalized Logged-in User Profile Button */}
       <Typography
         as="div"
         variant="small"
@@ -322,19 +321,21 @@ function NavList() {
         <button
           data-testid="nav-user-profile"
           onClick={() => router.push('/profile')}
-          className="group flex items-center gap-2 rounded-full border border-blue-gray-100 bg-blue-gray-50/70 px-3 py-1 text-left transition-all duration-200 hover:border-indigo-200 hover:bg-indigo-50/80"
+          className="group flex items-center gap-2 rounded-full border border-blue-gray-100 bg-blue-gray-50/70 px-3 py-1.5 text-left transition-all duration-200 hover:border-indigo-200 hover:bg-indigo-50/80"
           title="Lihat Profil"
         >
           <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-bold text-white shadow-sm transition-transform group-hover:scale-105">
             {displayName.charAt(0).toUpperCase()}
           </div>
-          <div className="flex flex-col">
+          <div className="flex items-center gap-1.5">
             <span
               data-testid="nav-username"
               className="max-w-[130px] truncate text-xs font-semibold text-blue-gray-800 group-hover:text-indigo-700 md:max-w-[170px]"
             >
               {displayName}
             </span>
+            <span className="text-xs font-medium text-blue-gray-300">·</span>
+            <span className="text-xs font-medium text-indigo-600">Profile</span>
           </div>
           <span className="hidden rounded-full bg-indigo-100/80 px-2 py-0.5 text-[10px] font-medium text-indigo-700 sm:inline-block">
             {roleLabel}
@@ -342,35 +343,7 @@ function NavList() {
         </button>
       </Typography>
 
-      <Typography
-        as="a"
-        href="#"
-        variant="small"
-        color="blue-gray"
-        className="font-medium"
-        placeholder={undefined}
-        onPointerEnterCapture={undefined}
-        onPointerLeaveCapture={undefined}
-        onResize={undefined}
-        onResizeCapture={undefined}
-        onClick={(e: React.MouseEvent) => {
-          e.preventDefault()
-          router.push('/profile')
-        }}
-      >
-        <ListItem
-          className="flex cursor-pointer items-center gap-2 py-2 pr-4"
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-        >
-          <UserCircleIcon className="size-4 text-blue-gray-600" />
-          Profile
-        </ListItem>
-      </Typography>
-
+      {/* Single Log Out Button */}
       <Typography
         as="a"
         href="#"

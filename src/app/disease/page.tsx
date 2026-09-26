@@ -23,7 +23,6 @@ import MegaMenuDefault from '../_components/megaMenu'
 import TableDisease from '../_components/tableDisease'
 import { DiseaseType } from '../_types/disease'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import Swal from 'sweetalert2'
 
 interface ListDiseaseResponse {
@@ -300,21 +299,6 @@ export default function Disease() {
                 onResizeCapture={undefined}
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah Penyakit
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
               </Button>
             </div>
           </div>

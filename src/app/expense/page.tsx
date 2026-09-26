@@ -35,7 +35,6 @@ import {
   formatRupiah,
 } from '../_functions/expenseHelpers'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import { useFetchExpense } from '../_hooks/useFetchExpense'
 import { EXPENSE_CATEGORIES } from '../_types/expense'
 
@@ -275,34 +274,6 @@ export default function ExpensePage() {
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah
                 Pengeluaran
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={() => router.push('/dashboard')}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Dashboard
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                color="red"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
               </Button>
             </div>
           </div>

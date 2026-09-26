@@ -18,7 +18,6 @@ import MegaMenuDefault from '../../_components/megaMenu'
 import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
-import { logout } from '../../_functions/logout'
 import { useFetchTreatment } from '../../_hooks/useFetchTreatment'
 
 // `useFetchTreatment` moved to `src/app/_hooks/useFetchTreatment.ts`
@@ -63,13 +62,7 @@ export default function TherapistTreatmentList() {
         onResize={undefined}
         onResizeCapture={undefined}
       >
-        <TherapistTreatmentHeader
-          onLogout={async () => {
-            await logout()
-            router.replace('/login')
-          }}
-          onSearchEnter={handleInputKeyDown}
-        />
+        <TherapistTreatmentHeader onSearchEnter={handleInputKeyDown} />
         <CardBody
           className="overflow-scroll px-0"
           placeholder={undefined}

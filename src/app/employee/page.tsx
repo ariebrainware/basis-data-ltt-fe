@@ -28,7 +28,6 @@ import {
   validateEmployeeForm,
 } from '../_functions/employeeHelpers'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import { useFetchEmployee } from '../_hooks/useFetchEmployee'
 
 export default function EmployeePage() {
@@ -235,21 +234,6 @@ export default function EmployeePage() {
                 onResizeCapture={undefined}
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah Karyawan
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
               </Button>
             </div>
           </div>

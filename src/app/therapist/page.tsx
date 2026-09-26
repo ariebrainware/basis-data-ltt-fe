@@ -16,7 +16,6 @@ import MegaMenuDefault from '../_components/megaMenu'
 import TableTherapist from '../_components/tableTherapist'
 import { TherapistType } from '../_types/therapist'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import { useFetchTherapist } from '@/app/_hooks/useFetchTherapist'
 import TherapistHeader from '@/app/_components/therapistHeader'
 const TABS = [
@@ -106,10 +105,6 @@ export default function ListTherapist() {
             <TherapistHeader
               tabs={TABS}
               onAddClick={() => window.open('/therapist/register', '_blank')}
-              onLogoutClick={async () => {
-                await logout()
-                router.replace('/login')
-              }}
               onSearchEnter={handleInputKeyDown}
             />
           </div>

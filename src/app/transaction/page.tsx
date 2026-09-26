@@ -21,7 +21,6 @@ import Pagination from '../_components/pagination'
 import MegaMenuDefault from '../_components/megaMenu'
 import TableTransaction from '../_components/tableTransaction'
 import { formatRupiah } from '../_functions/expenseHelpers'
-import { logout } from '../_functions/logout'
 import {
   calculatePaymentMethodBreakdown,
   useFetchTransaction,
@@ -128,36 +127,6 @@ export default function TransactionPage() {
                 Transaksi dibuat otomatis dari backend saat penanganan dibuat,
                 halaman ini hanya untuk mengubah data transaksi
               </Typography>
-            </div>
-            <div className="flex shrink-0 flex-wrap gap-2">
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={() => router.push('/dashboard')}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Dashboard
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                color="red"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
-              </Button>
             </div>
           </div>
 

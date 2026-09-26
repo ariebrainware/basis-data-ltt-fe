@@ -27,7 +27,6 @@ import {
   validateItemForm,
 } from '../_functions/itemHelpers'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import { useFetchItem } from '../_hooks/useFetchItem'
 
 export default function ItemPage() {
@@ -256,21 +255,6 @@ export default function ItemPage() {
                 onResizeCapture={undefined}
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah Item
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
               </Button>
             </div>
           </div>

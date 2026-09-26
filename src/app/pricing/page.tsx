@@ -25,7 +25,6 @@ import { ControlledSelect } from '../_components/selectTherapist'
 import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { PricingType } from '../_types/pricing'
-import { logout } from '../_functions/logout'
 
 interface ListPricingResponse {
   data: PricingType[]
@@ -331,21 +330,6 @@ export default function PricingPage() {
                 onResizeCapture={undefined}
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah Harga
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
               </Button>
             </div>
           </div>

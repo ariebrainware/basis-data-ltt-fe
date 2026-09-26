@@ -16,7 +16,6 @@ import Pagination from '../_components/pagination'
 import MegaMenuDefault from '../_components/megaMenu'
 import TableTreatment from '../_components/tableTreatment'
 import { TreatmentType } from '../_types/treatment'
-import { logout } from '../_functions/logout'
 import { useUserRole } from '../_functions/userRole'
 import { useFetchTreatment } from '../_hooks/useFetchTreatment'
 
@@ -113,21 +112,6 @@ export default function ListTreatment() {
                   Penanganan
                 </Button>
               )}
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
-              </Button>
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
