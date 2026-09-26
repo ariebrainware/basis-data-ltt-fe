@@ -96,29 +96,56 @@ export async function handleErrorString(responseData: LoginResponseData) {
  * // Sets localStorage['user-role'] = 'therapist'
  * ```
  */
-export function storeSession(tokenVal: string, roleVal: string | undefined) {
+export function storeSession(
+  tokenVal: string,
+  roleVal?: string,
+  nameVal?: string
+) {
   // Guard against storing invalid or empty tokens
   if (typeof tokenVal !== 'string' || tokenVal.trim() === '') {
     return
   }
   localStorage.setItem('session-token', tokenVal)
   if (roleVal) localStorage.setItem('user-role', roleVal)
+  if (nameVal && nameVal.trim()) {
+    localStorage.setItem('user-name', nameVal.trim())
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('user-name-change'))
+    }
+  }
 }
 
 /**
- * Displays a success modal after successful login
+ * Displays a success modal after successful login with greeting
+ * @param roleVal - Optional user role to display in the greeting
+ * @param nameVal - Optional user name to display in the greeting
  * @returns Promise that resolves when the modal timer expires (1400ms)
  * @example
  * ```typescript
- * await showLoginSuccess()
- * // Shows "Login Successful!" modal for 1.4 seconds
+ * await showLoginSuccess('super_admin', 'Budi')
+ * // Shows "Selamat Datang, Budi!" modal with role info
  * ```
  */
-export async function showLoginSuccess() {
+export async function showLoginSuccess(roleVal?: string, nameVal?: string) {
+  const roleLabel =
+    roleVal === 'super_admin'
+      ? 'Super Admin'
+      : roleVal === 'therapist'
+        ? 'Terapis'
+        : roleVal
+          ? roleVal.charAt(0).toUpperCase() + roleVal.slice(1)
+          : null
+
+  const titleText = nameVal?.trim()
+    ? `Selamat Datang, ${nameVal.trim()}!`
+    : 'Selamat Datang!'
+
   await Swal.fire({
     icon: 'success',
-    title: 'Login Successful!',
-    text: 'Redirecting to your dashboard...',
+    title: titleText,
+    html: roleLabel
+      ? `Login berhasil sebagai <strong>${roleLabel}</strong>.<br/><span style="font-size: 0.875rem; color: #64748b;">Mengalihkan ke dashboard...</span>`
+      : 'Login berhasil! Mengalihkan ke dashboard...',
     timer: 1400,
     showConfirmButton: false,
   })

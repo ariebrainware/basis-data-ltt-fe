@@ -1,14 +1,6 @@
 'use client'
-import { useRouter } from 'next/navigation'
-import { logout } from '../_functions/logout'
 
 export default function Header() {
-  const router = useRouter()
-  const handleLogout = async () => {
-    await logout()
-    router.replace('/login')
-  }
-
   return (
     <div className="mb-8 flex items-center justify-between gap-8">
       <div>
@@ -59,22 +51,6 @@ export default function Header() {
           </svg>{' '}
           Tambah Pasien
         </a>
-        <button
-          onClick={handleLogout}
-          className="border-slate-200 bg-slate-200 text-slate-800 hover:bg-slate-100 inline-flex select-none items-center justify-center rounded-md border px-3 py-1.5 text-center align-middle font-sans text-sm font-medium shadow-sm transition-all duration-300 ease-in hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-          data-shape="default"
-          data-width="default"
-        >
-          Logout
-        </button>
-        <button
-          onClick={() => router.push('/profile')}
-          className="inline-flex select-none items-center justify-center rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-center align-middle font-sans text-sm font-medium text-white shadow-sm transition-all duration-300 ease-in hover:border-blue-500 hover:bg-blue-500 hover:shadow focus:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none data-[width=full]:w-full data-[shape=pill]:rounded-full"
-          data-shape="default"
-          data-width="default"
-        >
-          Profile
-        </button>
       </div>
     </div>
   )

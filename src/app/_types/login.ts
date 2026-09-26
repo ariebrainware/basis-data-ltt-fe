@@ -5,6 +5,9 @@ export type LoginResponseData = {
   data?: {
     token?: string
     role?: string
+    name?: string
+    username?: string
+    email?: string
     id?: number | string
     user_id?: number | string
     therapist_id?: number | string
@@ -12,10 +15,14 @@ export type LoginResponseData = {
     therapist?: {
       ID?: number | string
       id?: number | string
+      name?: string
     }
     user?: {
       ID?: number | string
       id?: number | string
+      name?: string
+      username?: string
+      email?: string
     }
     locked_until?: string
     lockedUntil?: string

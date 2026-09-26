@@ -77,6 +77,21 @@ export async function fetchCurrentUserId(): Promise<string | null> {
       data.user_id ||
       data.therapist_id
 
+    // Try to extract user name
+    const userName =
+      data.data?.name ||
+      data.data?.username ||
+      data.data?.user?.name ||
+      data.data?.user?.username ||
+      data.data?.therapist?.name ||
+      data.name ||
+      data.username
+
+    if (userName && typeof window !== 'undefined') {
+      localStorage.setItem('user-name', String(userName))
+      window.dispatchEvent(new Event('user-name-change'))
+    }
+
     if (userId) {
       if (data.data?.therapist_id && typeof window !== 'undefined') {
         localStorage.setItem('therapist-id', String(data.data.therapist_id))

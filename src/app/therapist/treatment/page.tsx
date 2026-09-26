@@ -14,10 +14,10 @@ import { useRouter } from 'next/navigation'
 import { apiFetch } from '../../_functions/apiFetch'
 import { UnauthorizedAccess } from '../../_functions/unauthorized'
 import TherapistTreatmentHeader from '../../_components/therapistTreatmentHeader'
+import MegaMenuDefault from '../../_components/megaMenu'
 import Pagination from '../../_components/pagination'
 import TableTreatment from '../../_components/tableTreatment'
 import { TreatmentType } from '../../_types/treatment'
-import { logout } from '../../_functions/logout'
 import { useFetchTreatment } from '../../_hooks/useFetchTreatment'
 
 // `useFetchTreatment` moved to `src/app/_hooks/useFetchTreatment.ts`
@@ -51,22 +51,18 @@ export default function TherapistTreatmentList() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
+
       <Card
-        className="size-full"
+        className="size-full border border-blue-gray-100 shadow-md"
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
         onResize={undefined}
         onResizeCapture={undefined}
       >
-        <TherapistTreatmentHeader
-          onLogout={async () => {
-            await logout()
-            router.replace('/login')
-          }}
-          onSearchEnter={handleInputKeyDown}
-        />
+        <TherapistTreatmentHeader onSearchEnter={handleInputKeyDown} />
         <CardBody
           className="overflow-scroll px-0"
           placeholder={undefined}
@@ -95,6 +91,6 @@ export default function TherapistTreatmentList() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }

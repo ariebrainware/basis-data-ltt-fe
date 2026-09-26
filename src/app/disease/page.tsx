@@ -19,10 +19,10 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import TableDisease from '../_components/tableDisease'
 import { DiseaseType } from '../_types/disease'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import Swal from 'sweetalert2'
 
 interface ListDiseaseResponse {
@@ -158,7 +158,8 @@ export default function Disease() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
       <Dialog
         size={'md'}
         handler={handleOpenAddDialog}
@@ -299,21 +300,6 @@ export default function Disease() {
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah Penyakit
               </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
-              </Button>
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -363,6 +349,6 @@ export default function Disease() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }

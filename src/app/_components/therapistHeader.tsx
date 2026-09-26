@@ -15,14 +15,12 @@ type TabItem = { label: string; value: string }
 interface Props {
   tabs: TabItem[]
   onAddClick: () => void
-  onLogoutClick: () => Promise<void>
   onSearchEnter: (e: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
 export default function TherapistHeader({
   tabs,
   onAddClick,
-  onLogoutClick,
   onSearchEnter,
 }: Props) {
   return (
@@ -64,18 +62,6 @@ export default function TherapistHeader({
             onResizeCapture={undefined}
           >
             <UserPlusIcon strokeWidth={2} className="size-4" /> Tambah Terapis
-          </Button>
-          <Button
-            variant="outlined"
-            size="sm"
-            onClick={onLogoutClick}
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            Log Out
           </Button>
         </div>
       </div>

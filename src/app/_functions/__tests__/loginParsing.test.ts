@@ -2,6 +2,7 @@ import {
   getLockedFieldFromResponse,
   extractDateStringFromText,
   getUserIdFromResponse,
+  getUserNameFromResponse,
 } from '../loginParsing'
 
 describe('loginParsing helpers', () => {
@@ -183,6 +184,33 @@ describe('loginParsing helpers', () => {
     test('handles string ID values', () => {
       const response = { data: { id: '123' } }
       expect(getUserIdFromResponse(response)).toBe('123')
+    })
+  })
+
+  describe('getUserNameFromResponse', () => {
+    test('extracts name from data', () => {
+      const response = { data: { name: 'Dr. John' } }
+      expect(getUserNameFromResponse(response)).toBe('Dr. John')
+    })
+
+    test('extracts username from data', () => {
+      const response = { data: { username: 'john_doe' } }
+      expect(getUserNameFromResponse(response)).toBe('john_doe')
+    })
+
+    test('extracts name from user object', () => {
+      const response = { data: { user: { name: 'Admin User' } } }
+      expect(getUserNameFromResponse(response)).toBe('Admin User')
+    })
+
+    test('extracts name from therapist object', () => {
+      const response = { data: { therapist: { name: 'Therapist Budi' } } }
+      expect(getUserNameFromResponse(response)).toBe('Therapist Budi')
+    })
+
+    test('returns undefined when no name field exists', () => {
+      const response = { data: { token: 'abc123' } }
+      expect(getUserNameFromResponse(response)).toBeUndefined()
     })
   })
 })

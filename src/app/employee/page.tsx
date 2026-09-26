@@ -18,6 +18,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import TableEmployee from '../_components/tableEmployee'
 import { apiFetch } from '../_functions/apiFetch'
 import { EmployeeForm } from '../_components/employeeForm'
@@ -27,7 +28,6 @@ import {
   validateEmployeeForm,
 } from '../_functions/employeeHelpers'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import { useFetchEmployee } from '../_hooks/useFetchEmployee'
 
 export default function EmployeePage() {
@@ -108,7 +108,8 @@ export default function EmployeePage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
       <Dialog
         size={'xl'}
         className="max-h-[90vh] overflow-y-auto"
@@ -234,21 +235,6 @@ export default function EmployeePage() {
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah Karyawan
               </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
-              </Button>
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -295,6 +281,6 @@ export default function EmployeePage() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }

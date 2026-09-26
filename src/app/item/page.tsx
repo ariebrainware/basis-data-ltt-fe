@@ -18,6 +18,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import TableItem from '../_components/tableItem'
 import { apiFetch } from '../_functions/apiFetch'
 import {
@@ -26,7 +27,6 @@ import {
   validateItemForm,
 } from '../_functions/itemHelpers'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import { useFetchItem } from '../_hooks/useFetchItem'
 
 export default function ItemPage() {
@@ -103,7 +103,8 @@ export default function ItemPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
       <Dialog
         size={'md'}
         handler={handleOpenAddDialog}
@@ -255,21 +256,6 @@ export default function ItemPage() {
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah Item
               </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
-              </Button>
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -313,6 +299,6 @@ export default function ItemPage() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }

@@ -19,12 +19,12 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import TablePricing from '../_components/tablePricing'
 import { ControlledSelect } from '../_components/selectTherapist'
 import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { PricingType } from '../_types/pricing'
-import { logout } from '../_functions/logout'
 
 interface ListPricingResponse {
   data: PricingType[]
@@ -182,7 +182,8 @@ export default function PricingPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
       <Dialog
         size={'md'}
         handler={handleOpenAddDialog}
@@ -330,21 +331,6 @@ export default function PricingPage() {
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah Harga
               </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
-              </Button>
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -388,6 +374,6 @@ export default function PricingPage() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }

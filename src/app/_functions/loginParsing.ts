@@ -84,3 +84,31 @@ export function getUserIdFromResponse(responseData?: LoginResponseData | null) {
   }
   return undefined
 }
+
+const USER_NAME_ACCESSORS = [
+  (data: any) => data?.name,
+  (data: any) => data?.username,
+  (data: any) => data?.user?.name,
+  (data: any) => data?.user?.username,
+  (data: any) => data?.therapist?.name,
+  (data: any) => data?.email,
+]
+
+/**
+ * Extracts user name from various possible locations in the login response
+ * @param responseData - The API response data from login endpoint
+ * @returns The user name as a string, or undefined if not found
+ */
+export function getUserNameFromResponse(
+  responseData?: LoginResponseData | null
+): string | undefined {
+  const data = responseData?.data
+  if (!data) return undefined
+  for (const getValue of USER_NAME_ACCESSORS) {
+    const value = getValue(data)
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim()
+    }
+  }
+  return undefined
+}

@@ -3,14 +3,10 @@ import { CardHeader, Input, Typography, Button } from '@material-tailwind/react'
 import React from 'react'
 
 interface Props {
-  onLogout: () => void | Promise<void>
   onSearchEnter: (e: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
-export default function TherapistTreatmentHeader({
-  onLogout,
-  onSearchEnter,
-}: Props) {
+export default function TherapistTreatmentHeader({ onSearchEnter }: Props) {
   return (
     <CardHeader
       floated={false}
@@ -46,22 +42,6 @@ export default function TherapistTreatmentHeader({
           >
             Lihat dan lengkapi informasi penanganan pasien
           </Typography>
-        </div>
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-          <Button
-            variant="outlined"
-            size="sm"
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onClick={async () => {
-              await onLogout()
-            }}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            Log Out
-          </Button>
         </div>
       </div>
       <div className="flex flex-col items-center justify-between gap-4 md:flex-row">

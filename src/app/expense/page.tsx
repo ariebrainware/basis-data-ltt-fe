@@ -24,6 +24,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import TableExpense from '../_components/tableExpense'
 import { apiFetch } from '../_functions/apiFetch'
 import { ExpenseForm } from '../_components/expenseForm'
@@ -34,7 +35,6 @@ import {
   formatRupiah,
 } from '../_functions/expenseHelpers'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import { useFetchExpense } from '../_hooks/useFetchExpense'
 import { EXPENSE_CATEGORIES } from '../_types/expense'
 
@@ -144,7 +144,8 @@ export default function ExpensePage() {
     : data.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0)
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
       {/* Modal Add Expense */}
       <Dialog
         size={'xl'}
@@ -273,34 +274,6 @@ export default function ExpensePage() {
               >
                 <PlusIcon strokeWidth={2} className="size-4" /> Tambah
                 Pengeluaran
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={() => router.push('/dashboard')}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Dashboard
-              </Button>
-              <Button
-                variant="outlined"
-                size="sm"
-                color="red"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onClick={async () => {
-                  await logout()
-                  router.replace('/login')
-                }}
-                onResize={undefined}
-                onResizeCapture={undefined}
-              >
-                Log Out
               </Button>
             </div>
           </div>
@@ -476,6 +449,6 @@ export default function ExpensePage() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }

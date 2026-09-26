@@ -12,10 +12,10 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch } from '../_functions/apiFetch'
 import Pagination from '../_components/pagination'
+import MegaMenuDefault from '../_components/megaMenu'
 import TableTherapist from '../_components/tableTherapist'
 import { TherapistType } from '../_types/therapist'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
-import { logout } from '../_functions/logout'
 import { useFetchTherapist } from '@/app/_hooks/useFetchTherapist'
 import TherapistHeader from '@/app/_components/therapistHeader'
 const TABS = [
@@ -80,9 +80,11 @@ export default function ListTherapist() {
   }
 
   return (
-    <>
+    <div className="min-h-screen space-y-6 bg-blue-gray-50/20 p-4 md:p-6">
+      <MegaMenuDefault />
+
       <Card
-        className="size-full"
+        className="size-full border border-blue-gray-100 shadow-md"
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
@@ -103,10 +105,6 @@ export default function ListTherapist() {
             <TherapistHeader
               tabs={TABS}
               onAddClick={() => window.open('/therapist/register', '_blank')}
-              onLogoutClick={async () => {
-                await logout()
-                router.replace('/login')
-              }}
               onSearchEnter={handleInputKeyDown}
             />
           </div>
@@ -139,6 +137,6 @@ export default function ListTherapist() {
           />
         </CardFooter>
       </Card>
-    </>
+    </div>
   )
 }
