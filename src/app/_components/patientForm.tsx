@@ -35,6 +35,16 @@ interface PatientFormProps extends PatientType {
   diseases?: DiseaseType[]
 }
 
+function parseDobToDate(dob?: string): DateValueType {
+  if (!dob) return null
+  const parsed = new Date(dob)
+  if (isNaN(parsed.getTime())) return null
+  return {
+    startDate: parsed,
+    endDate: parsed,
+  }
+}
+
 export function PatientForm({
   ID,
   full_name,
@@ -54,23 +64,14 @@ export function PatientForm({
   diseases,
 }: PatientFormProps) {
   const [admin, setAdmin] = useState(isAdmin())
-  const [dateOfBirthVal, setDateOfBirthVal] = useState<DateValueType | null>(
-    () => {
-      if (!date_of_birth) return null
-      return {
-        startDate: date_of_birth,
-        endDate: date_of_birth,
-      }
-    }
+  const [dateOfBirthVal, setDateOfBirthVal] = useState<DateValueType>(() =>
+    parseDobToDate(date_of_birth)
   )
 
   useEffect(() => {
     if (date_of_birth) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDateOfBirthVal({
-        startDate: date_of_birth,
-        endDate: date_of_birth,
-      })
+      setDateOfBirthVal(parseDobToDate(date_of_birth))
     } else {
       setDateOfBirthVal(null)
     }
