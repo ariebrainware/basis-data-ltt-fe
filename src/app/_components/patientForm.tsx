@@ -6,6 +6,8 @@ import { DiseaseType } from '../_types/disease'
 import { GenderSelect } from './selectGender'
 import { DiseaseMultiSelect } from './selectDisease'
 import { SignaturePad } from './signaturePad'
+import DatePicker from './datePicker'
+import type { DateValueType } from 'react-tailwindcss-datepicker'
 import {
   getApiHost,
   getAttachmentUrl,
@@ -38,7 +40,7 @@ export function PatientForm({
   full_name,
   phone_number,
   job,
-  age,
+  date_of_birth,
   email,
   gender,
   address,
@@ -52,6 +54,27 @@ export function PatientForm({
   diseases,
 }: PatientFormProps) {
   const [admin, setAdmin] = useState(isAdmin())
+  const [dateOfBirthVal, setDateOfBirthVal] = useState<DateValueType | null>(
+    () => {
+      if (!date_of_birth) return null
+      return {
+        startDate: date_of_birth,
+        endDate: date_of_birth,
+      }
+    }
+  )
+
+  useEffect(() => {
+    if (date_of_birth) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDateOfBirthVal({
+        startDate: date_of_birth,
+        endDate: date_of_birth,
+      })
+    } else {
+      setDateOfBirthVal(null)
+    }
+  }, [date_of_birth])
   const [selected, setSelected] = useState<string[]>(() => {
     return health_history
       ? health_history
@@ -213,19 +236,19 @@ export function PatientForm({
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <Input
-              id="age"
-              type="number"
-              label="Age"
-              defaultValue={
-                age !== undefined && age !== null ? String(age) : ''
-              }
-              onPointerEnterCapture={undefined}
-              onPointerLeaveCapture={undefined}
-              crossOrigin={undefined}
-              onResize={undefined}
-              onResizeCapture={undefined}
-            />
+            <div className="w-full">
+              <label
+                htmlFor="date_of_birth"
+                className="text-slate-800 mb-1 block font-sans text-sm font-semibold antialiased dark:text-white"
+              >
+                Tanggal Lahir
+              </label>
+              <DatePicker
+                id="date_of_birth"
+                value={dateOfBirthVal}
+                onChange={setDateOfBirthVal}
+              />
+            </div>
             <Input
               id="email"
               type="text"

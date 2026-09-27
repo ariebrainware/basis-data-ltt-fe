@@ -127,14 +127,14 @@ test.describe('Patient Edit Functionality', () => {
       const fullNameInput = page.locator('#full_name')
       const phoneInput = page.locator('#phone_number')
       const jobInput = page.locator('#job')
-      const ageInput = page.locator('#age')
+      const dateOfBirthInput = page.locator('#date_of_birth')
       const emailInput = page.locator('#email')
       const addressInput = page.locator('#address')
 
       await expect(fullNameInput).toBeVisible()
       await expect(phoneInput).toBeVisible()
       await expect(jobInput).toBeVisible()
-      await expect(ageInput).toBeVisible()
+      await expect(dateOfBirthInput).toBeVisible()
       await expect(emailInput).toBeVisible()
       await expect(addressInput).toBeVisible()
     }

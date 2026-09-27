@@ -120,7 +120,7 @@ describe('PatientForm Component', () => {
     full_name: 'John Doe',
     phone_number: ['+628123456789'],
     job: 'Software Engineer',
-    age: 30,
+    date_of_birth: '1995-05-20',
     email: 'john@example.com',
     gender: 'male',
     address: 'Jl. Test No. 123',
@@ -143,7 +143,8 @@ describe('PatientForm Component', () => {
     expect(screen.getByTestId('full_name')).toBeInTheDocument()
     expect(screen.getByTestId('phone_number')).toBeInTheDocument()
     expect(screen.getByTestId('job')).toBeInTheDocument()
-    expect(screen.getByTestId('age')).toBeInTheDocument()
+    expect(screen.getByText('Tanggal Lahir')).toBeInTheDocument()
+    expect(document.getElementById('date_of_birth')).toBeInTheDocument()
     expect(screen.getByTestId('email')).toBeInTheDocument()
     expect(screen.getByTestId('gender')).toBeInTheDocument()
     expect(screen.getByTestId('address')).toBeInTheDocument()
@@ -159,7 +160,7 @@ describe('PatientForm Component', () => {
     expect(screen.getByTestId('full_name')).toHaveValue('John Doe')
     expect(screen.getByTestId('phone_number')).toHaveValue('+628123456789')
     expect(screen.getByTestId('job')).toHaveValue('Software Engineer')
-    expect(screen.getByTestId('age')).toHaveValue(30)
+    expect(document.getElementById('date_of_birth')).toHaveValue('1995-05-20')
     expect(screen.getByTestId('email')).toHaveValue('john@example.com')
     expect(screen.getByTestId('gender')).toHaveValue('male')
     expect(screen.getByTestId('address')).toHaveValue('Jl. Test No. 123')
@@ -181,7 +182,7 @@ describe('PatientForm Component', () => {
       full_name: '',
       phone_number: [],
       job: '',
-      age: 0,
+      date_of_birth: '',
       email: '',
       gender: '',
       address: '',
