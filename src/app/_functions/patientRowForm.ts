@@ -5,10 +5,16 @@ import { parseAttachmentPaths } from './apiHost'
 
 export type PatientUpdatePayload = Omit<
   PatientType,
-  'ID' | 'last_visit' | 'onDataChange' | 'patient_code' | 'attachment_path'
+  | 'ID'
+  | 'last_visit'
+  | 'onDataChange'
+  | 'patient_code'
+  | 'attachment_path'
+  | 'age'
 > & {
   patient_code?: string
   attachment_path?: string[]
+  date_of_birth?: string
 }
 
 const LOCKED_HEALTH_INPUT = '-'
@@ -138,6 +144,7 @@ type PatientUpdatePayloadArgs = {
   name: string
   phoneNumber: string | string[] | undefined
   job?: string
+  date_of_birth?: string
   age?: number
   email?: string
   address?: string
@@ -161,7 +168,7 @@ type PatientUpdatePayloadArgs = {
  *   name: 'John Doe',
  *   phoneNumber: '123-456-7890',
  *   job: 'Engineer',
- *   age: 30,
+ *   date_of_birth: '1995-05-20',
  *   email: 'john@example.com',
  *   address: '123 Main St',
  *   healthHistory: 'diabetes',
@@ -179,7 +186,7 @@ export function buildPatientUpdatePayload(
     name,
     phoneNumber,
     job,
-    age,
+    date_of_birth,
     email,
     address,
     healthHistory,
@@ -200,7 +207,7 @@ export function buildPatientUpdatePayload(
   const phone_number_new_input_arr: string[] =
     normalizePhoneInput(rawPhoneInput)
   const job_new_input = getInputValue('#job', job)
-  const age_new_input = getInputValue('#age', String(age))
+  const date_of_birth_new_input = getInputValue('#date_of_birth', date_of_birth)
   const email_new_input = getInputValue('#email', email)
   const address_new_input = getInputValue('#address', address)
   const health_history_new_input = getTextAreaValue(
@@ -224,7 +231,7 @@ export function buildPatientUpdatePayload(
     phone_number: phone_number_new_input_arr,
     gender: gender_new_input,
     job: job_new_input,
-    age: Number(age_new_input),
+    date_of_birth: date_of_birth_new_input,
     email: email_new_input,
     address: address_new_input,
     health_history: resolveHealthConditionInput(

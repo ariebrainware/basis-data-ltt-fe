@@ -3,6 +3,7 @@ import {
   normalizePhoneInput,
   getInputValue,
   getTextAreaValue,
+  buildPatientUpdatePayload,
 } from '../patientRowForm'
 import { DiseaseType } from '../../_types/disease'
 
@@ -221,6 +222,41 @@ describe('patientRowForm helpers', () => {
     test('returns empty string for undefined fallback', () => {
       const result = getTextAreaValue('#nonexistent', undefined)
       expect(result).toBe('')
+    })
+  })
+
+  describe('buildPatientUpdatePayload', () => {
+    test('builds payload with date_of_birth instead of age', () => {
+      const payload = buildPatientUpdatePayload({
+        name: 'John Doe',
+        phoneNumber: '08123456789',
+        job: 'Engineer',
+        date_of_birth: '1995-05-20',
+        email: 'john@example.com',
+        address: 'Jl. Sudirman No. 1',
+        healthHistory: '1,2',
+        surgeryHistory: 'None',
+        genderValue: 'male',
+        patientCode: 'PAT-001',
+        signature: 'data:image/png;base64,mockSig',
+        attachmentPath: '/uploads/doc.pdf',
+        diseases: [],
+      })
+
+      expect(payload).toEqual(
+        expect.objectContaining({
+          full_name: 'John Doe',
+          phone_number: ['08123456789'],
+          job: 'Engineer',
+          date_of_birth: '1995-05-20',
+          email: 'john@example.com',
+          address: 'Jl. Sudirman No. 1',
+          gender: 'male',
+          signature: 'data:image/png;base64,mockSig',
+          attachment_path: ['/uploads/doc.pdf'],
+        })
+      )
+      expect(payload).not.toHaveProperty('age')
     })
   })
 })

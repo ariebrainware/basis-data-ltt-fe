@@ -346,6 +346,8 @@ export default function ExpensePage() {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
             <div>
               <Input
+                id="expense-search-input"
+                data-testid="expense-search-input"
                 label="Cari Deskripsi / Catatan"
                 icon={<MagnifyingGlassIcon className="size-5" />}
                 onPointerEnterCapture={undefined}
@@ -359,9 +361,10 @@ export default function ExpensePage() {
             <div>
               <Select
                 label="Filter Kategori"
-                value={categoryFilter}
+                value={categoryFilter || 'all'}
                 onChange={(val) => {
-                  setCategoryFilter(val || '')
+                  const selectedCategory = !val || val === 'all' ? '' : val
+                  setCategoryFilter(selectedCategory)
                   setCurrentPage(1)
                 }}
                 placeholder={undefined}
@@ -370,7 +373,7 @@ export default function ExpensePage() {
                 onResize={undefined}
                 onResizeCapture={undefined}
               >
-                <Option value="">Semua Kategori</Option>
+                <Option value="all">Semua Kategori</Option>
                 {EXPENSE_CATEGORIES.map((cat) => (
                   <Option key={cat} value={cat}>
                     {cat}

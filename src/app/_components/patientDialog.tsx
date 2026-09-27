@@ -21,6 +21,7 @@ type PatientProps = {
   full_name?: string
   job?: string
   age?: number | string
+  date_of_birth?: string
   phone_number?: string | string[]
   email?: string
   address?: string
@@ -35,10 +36,11 @@ type PatientProps = {
 
 type PatientUpdatePayload = Omit<
   PatientProps & { ID: number },
-  'ID' | 'patient_code' | 'attachment_path'
+  'ID' | 'patient_code' | 'attachment_path' | 'age'
 > & {
   patient_code?: string
   attachment_path?: string[]
+  date_of_birth?: string
 }
 
 export default function PatientDialog({
@@ -47,6 +49,7 @@ export default function PatientDialog({
   full_name: name,
   job,
   age,
+  date_of_birth,
   phone_number: phoneNumber,
   email,
   address,
@@ -68,6 +71,9 @@ export default function PatientDialog({
   )
   const [currentAttachmentPath, setCurrentAttachmentPath] =
     React.useState<string>(attachment_path || '')
+  const [currentDateOfBirth, setCurrentDateOfBirth] = React.useState<string>(
+    date_of_birth || ''
+  )
 
   React.useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -78,6 +84,11 @@ export default function PatientDialog({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentAttachmentPath(attachment_path || '')
   }, [attachment_path])
+
+  React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentDateOfBirth(date_of_birth || '')
+  }, [date_of_birth])
 
   const fetchDiseasesIfNeeded = async () => {
     if (diseasesFetched) return
@@ -121,6 +132,9 @@ export default function PatientDialog({
             }
             if (resData.data.attachment_path) {
               setCurrentAttachmentPath(resData.data.attachment_path)
+            }
+            if (resData.data.date_of_birth) {
+              setCurrentDateOfBirth(resData.data.date_of_birth)
             }
           }
         }
@@ -193,7 +207,10 @@ export default function PatientDialog({
     const phone_number_new_input_arr: string[] =
       normalizePhoneInput(rawPhoneInput)
     const job_new_input = getInputValue('#job', job)
-    const age_new_input = getInputValue('#age', String(age))
+    const date_of_birth_new_input = getInputValue(
+      '#date_of_birth',
+      currentDateOfBirth || date_of_birth
+    )
     const email_new_input = getInputValue('#email', email)
     const address_new_input = getInputValue('#address', address)
     const health_history_new_input = getTextAreaValue(
@@ -217,7 +234,7 @@ export default function PatientDialog({
       phone_number: phone_number_new_input_arr,
       gender: gender_new_input,
       job: job_new_input,
-      age: Number(age_new_input),
+      date_of_birth: date_of_birth_new_input,
       email: email_new_input,
       address: address_new_input,
       health_history: handleHealthConditionInput(
@@ -337,7 +354,7 @@ export default function PatientDialog({
             patient_code={patientCode ?? ''}
             full_name={name ?? ''}
             job={job ?? ''}
-            age={typeof age === 'string' ? Number(age) : (age ?? 0)}
+            date_of_birth={currentDateOfBirth || date_of_birth || ''}
             phone_number={
               Array.isArray(phoneNumber)
                 ? phoneNumber

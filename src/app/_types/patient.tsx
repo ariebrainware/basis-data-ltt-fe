@@ -3,7 +3,7 @@ export interface PatientType {
   full_name: string
   phone_number: string[]
   job: string
-  age: number
+  age?: number
   email: string
   gender: string
   address: string

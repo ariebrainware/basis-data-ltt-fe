@@ -27,6 +27,7 @@ export default function Patient({
   phone_number: phoneNumber,
   job,
   age,
+  date_of_birth,
   email,
   gender,
   address,
@@ -67,7 +68,7 @@ export default function Patient({
       name,
       phoneNumber,
       job,
-      age,
+      date_of_birth,
       email,
       address,
       healthHistory: health_history,
@@ -164,7 +165,7 @@ export default function Patient({
               patient_code={patientCode}
               full_name={name}
               job={job}
-              age={age}
+              date_of_birth={date_of_birth}
               phone_number={phoneNumber}
               email={email}
               address={address}
@@ -259,6 +260,7 @@ export default function Patient({
             full_name={name}
             job={job}
             age={age}
+            date_of_birth={date_of_birth}
             phone_number={phoneNumber}
             email={email}
             address={address}
