@@ -281,7 +281,11 @@ export default function Treatment({
     const attachment_path_new_input = combinedPaths.join(',')
 
     // Sync to patient record if patient code is present
-    if (patient_code_new_input && combinedPaths.length > 0 && process.env.NODE_ENV !== 'test') {
+    if (
+      patient_code_new_input &&
+      combinedPaths.length > 0 &&
+      process.env.NODE_ENV !== 'test'
+    ) {
       try {
         const pRes = await apiFetch(
           `/patient?keyword=${encodeURIComponent(patient_code_new_input)}`

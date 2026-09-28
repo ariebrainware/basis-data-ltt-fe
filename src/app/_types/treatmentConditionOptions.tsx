@@ -14,4 +14,5 @@ export const TreatmentConditionOptions = [
   { id: 'TDP', label: 'Teding Diancibo Pu / Infrared (TDP)' },
   { id: 'PL', label: 'Palu (PL)' },
   { id: 'DT', label: 'Drop Table (DT)' },
+  { id: 'PM', label: 'Papan Miring (PM)' },
 ]

@@ -172,7 +172,7 @@ describe('TreatmentConditionMultiSelect', () => {
       expect(selectElement.selectedOptions.length).toBe(0)
     })
 
-    test('renders all 15 treatment condition options', () => {
+    test('renders all 16 treatment condition options', () => {
       const mockOnChange = jest.fn()
       render(
         <TreatmentConditionMultiSelect
@@ -186,8 +186,9 @@ describe('TreatmentConditionMultiSelect', () => {
       const selectElement = screen.getByTestId(
         'test-select'
       ) as HTMLSelectElement
-      // Should have 15 options based on TreatmentConditionOptions
-      expect(selectElement.options.length).toBe(15)
+      // Should have 16 options based on TreatmentConditionOptions
+      expect(selectElement.options.length).toBe(16)
+      expect(screen.getByText('Papan Miring (PM)')).toBeInTheDocument()
     })
   })
 })
