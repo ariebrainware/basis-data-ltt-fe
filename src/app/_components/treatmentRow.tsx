@@ -209,6 +209,28 @@ export default function Treatment({
       } catch (err) {
         // ignore error fetching patient attachment
       }
+
+      try {
+        if (ID && process.env.NODE_ENV !== 'test') {
+          const tRes = await apiFetch(`/treatment/${ID}`)
+          if (tRes.ok) {
+            const tData = await tRes.json()
+            const tAttachment =
+              tData?.data?.attachment_path || tData?.attachment_path
+            if (tAttachment) {
+              const parsed = parseAttachmentPaths(tAttachment)
+              if (parsed.length > 0) {
+                setCurrentAttachmentPath((prev) => {
+                  const existing = parseAttachmentPaths(prev)
+                  return Array.from(new Set([...existing, ...parsed])).join(',')
+                })
+              }
+            }
+          }
+        }
+      } catch (err) {
+        // ignore error fetching treatment detail
+      }
     } else {
       setOpen(false)
     }
@@ -221,15 +243,15 @@ export default function Treatment({
     onSuccess: onDataChange,
   })
 
-  const handleUpdateTreatment = () => {
+  const handleUpdateTreatment = async () => {
     const treatment_date_new_input =
       document.querySelector<HTMLInputElement>('#treatment_date')?.value ||
       treatmentDate
     const patient_code_new_input =
-      document.querySelector<HTMLTextAreaElement>('#patient_code')?.value ||
+      document.querySelector<HTMLInputElement>('#patient_code')?.value ||
       patientCode
     const patient_name_new_input =
-      document.querySelector<HTMLTextAreaElement>('#patient_name')?.value ||
+      document.querySelector<HTMLInputElement>('#patient_name')?.value ||
       patientName
     const therapist_id_new_input = therapistIDState || therapistId
     const issues_new_input =
@@ -248,9 +270,54 @@ export default function Treatment({
     const surgery_history_new_input =
       document.querySelector<HTMLTextAreaElement>('#surgery_history')?.value ??
       (surgeryHistory || '')
-    const attachment_path_new_input =
-      document.querySelector<HTMLInputElement>('#attachment_path')?.value ??
-      (currentAttachmentPath || '')
+    const formAttachmentInput =
+      document.querySelector<HTMLInputElement>('#attachment_path')?.value
+    const combinedPaths = Array.from(
+      new Set([
+        ...parseAttachmentPaths(currentAttachmentPath),
+        ...parseAttachmentPaths(formAttachmentInput),
+      ])
+    )
+    const attachment_path_new_input = combinedPaths.join(',')
+
+    // Sync to patient record if patient code is present
+    if (patient_code_new_input && combinedPaths.length > 0 && process.env.NODE_ENV !== 'test') {
+      try {
+        const pRes = await apiFetch(
+          `/patient?keyword=${encodeURIComponent(patient_code_new_input)}`
+        )
+        if (pRes.ok) {
+          const pData = await pRes.json()
+          const patients = Array.isArray(pData?.data?.patients)
+            ? pData.data.patients
+            : Array.isArray(pData?.data)
+              ? pData.data
+              : []
+          const found =
+            patients.find(
+              (p: any) =>
+                String(p.patient_code) === String(patient_code_new_input) ||
+                String(p.ID) === String(patient_code_new_input)
+            ) || patients[0]
+          if (found?.ID) {
+            const existingPatientAttachments = parseAttachmentPaths(
+              found.attachment_path
+            )
+            const allPatientAttachments = Array.from(
+              new Set([...existingPatientAttachments, ...combinedPaths])
+            )
+            await apiFetch(`/patient/${found.ID}`, {
+              method: 'PATCH',
+              body: JSON.stringify({
+                attachment_path: allPatientAttachments,
+              }),
+            }).catch(() => {})
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
 
     apiFetch(`/treatment/${ID}`, {
       method: 'PATCH',
@@ -340,25 +407,28 @@ export default function Treatment({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <TreatmentForm
-            ID={ID}
-            treatment_date={treatmentDate}
-            patient_code={patientCode}
-            patient_name={patientName}
-            therapist_name={therapistName}
-            therapist_id={therapistId}
-            issues={issues}
-            age={age}
-            treatment={treatment}
-            remarks={remarks}
-            next_visit={nextVisit}
-            therapistIDState={therapistIDState}
-            setTherapistIDState={setTherapistIDState}
-            disabled={!canEdit}
-            health_history={healthHistory}
-            surgery_history={surgeryHistory}
-            attachment_path={currentAttachmentPath}
-          />
+          {open && (
+            <TreatmentForm
+              ID={ID}
+              treatment_date={treatmentDate}
+              patient_code={patientCode}
+              patient_name={patientName}
+              therapist_name={therapistName}
+              therapist_id={therapistId}
+              issues={issues}
+              age={age}
+              treatment={treatment}
+              remarks={remarks}
+              next_visit={nextVisit}
+              therapistIDState={therapistIDState}
+              setTherapistIDState={setTherapistIDState}
+              disabled={!canEdit}
+              health_history={healthHistory}
+              surgery_history={surgeryHistory}
+              attachment_path={currentAttachmentPath}
+              onAttachmentChange={(val) => setCurrentAttachmentPath(val)}
+            />
+          )}
         </DialogBody>
         <DialogFooter
           placeholder={undefined}

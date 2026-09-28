@@ -5,12 +5,22 @@ import { getUserId, getTherapistId } from '../../_functions/userId'
 import Treatment from '../treatmentRow'
 import { TreatmentType } from '../../_types/treatment'
 
+import { apiFetch } from '../../_functions/apiFetch'
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     refresh: jest.fn(),
     replace: jest.fn(),
   }),
+}))
+
+jest.mock('../../_functions/apiFetch', () => ({
+  apiFetch: jest.fn(),
+}))
+
+jest.mock('sweetalert2', () => ({
+  fire: jest.fn(() => Promise.resolve({ isConfirmed: true })),
 }))
 
 // Mock Material Tailwind elements
@@ -33,7 +43,17 @@ jest.mock('../treatmentForm', () => ({
     <div
       data-testid="treatment-form"
       data-attachment-path={props.attachment_path}
-    />
+    >
+      <button
+        data-testid="upload-mock-btn"
+        onClick={() =>
+          props.onAttachmentChange &&
+          props.onAttachmentChange('uploads/attachments/new_file.pdf')
+        }
+      >
+        Upload File
+      </button>
+    </div>
   ),
 }))
 
@@ -175,6 +195,51 @@ describe('Treatment Row Component', () => {
       expect(form).toHaveAttribute(
         'data-attachment-path',
         'uploads/attachments/history.pdf'
+      )
+    })
+  })
+
+  test('updates treatment with new attachment_path when uploaded and confirmed', async () => {
+    ;(isAdmin as jest.Mock).mockReturnValue(true)
+    ;(apiFetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        data: {
+          attachment_path: 'uploads/attachments/new_file.pdf',
+        },
+      }),
+    })
+
+    render(
+      <table>
+        <tbody>
+          <Treatment {...mockTreatment} />
+        </tbody>
+      </table>
+    )
+
+    const editBtn = screen.getByRole('button', { name: /edit treatment/i })
+    fireEvent.click(editBtn)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('treatment-form')).toBeInTheDocument()
+    })
+
+    // Simulate file upload inside TreatmentForm triggering onAttachmentChange
+    fireEvent.click(screen.getByTestId('upload-mock-btn'))
+
+    // Click Confirm button in dialog footer
+    const confirmBtn = screen.getByRole('button', { name: /confirm/i })
+    fireEvent.click(confirmBtn)
+
+    await waitFor(() => {
+      expect(apiFetch).toHaveBeenCalledWith(
+        '/treatment/1',
+        expect.objectContaining({
+          method: 'PATCH',
+          body: expect.stringContaining('uploads/attachments/new_file.pdf'),
+        })
       )
     })
   })
