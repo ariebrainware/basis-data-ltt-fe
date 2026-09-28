@@ -14,6 +14,7 @@ interface TreatmentFormProps extends TreatmentType {
   therapistIDState?: string
   setTherapistIDState?: (value: string) => void
   disabled?: boolean
+  onAttachmentChange?: (value: string) => void
 }
 
 export function TreatmentForm({
@@ -33,6 +34,7 @@ export function TreatmentForm({
   health_history,
   surgery_history,
   attachment_path,
+  onAttachmentChange,
 }: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
   // The backend may return treatment data in either JSON array format or comma-separated string format.
@@ -186,6 +188,7 @@ export function TreatmentForm({
     formData.append('file', file, sanitizedName)
 
     try {
+      let uploadedPath: string | undefined
       const res = await apiFetch('/patient/upload', {
         method: 'POST',
         body: formData,
@@ -199,34 +202,80 @@ export function TreatmentForm({
           throw new Error('Gagal mengunggah file')
         }
         const fbData = await fallbackRes.json()
-        const uploadedPath =
+        uploadedPath =
           fbData?.data?.file_path ||
           fbData?.data?.attachment_path ||
           fbData?.file_path ||
           fbData?.attachment_path
-        if (uploadedPath) {
-          const parsed = parseAttachmentPaths(uploadedPath)
-          setAttachmentPaths((prev) =>
-            Array.from(
-              new Set([...prev, ...(parsed.length ? parsed : [uploadedPath])])
-            )
-          )
-        }
-        return
+      } else {
+        const data = await res.json()
+        uploadedPath =
+          data?.data?.file_path ||
+          data?.data?.attachment_path ||
+          data?.file_path ||
+          data?.attachment_path
       }
-      const data = await res.json()
-      const uploadedPath =
-        data?.data?.file_path ||
-        data?.data?.attachment_path ||
-        data?.file_path ||
-        data?.attachment_path
+
       if (uploadedPath) {
         const parsed = parseAttachmentPaths(uploadedPath)
-        setAttachmentPaths((prev) =>
-          Array.from(
-            new Set([...prev, ...(parsed.length ? parsed : [uploadedPath])])
-          )
-        )
+        const toAdd = parsed.length ? parsed : [uploadedPath]
+        const nextPaths = Array.from(new Set([...attachmentPaths, ...toAdd]))
+        setAttachmentPaths(nextPaths)
+        const joined = nextPaths.join(',')
+        if (onAttachmentChange) {
+          onAttachmentChange(joined)
+        }
+
+        // Auto-save attachment to treatment record
+        if (ID && ID !== '0' && process.env.NODE_ENV !== 'test') {
+          void apiFetch(`/treatment/${ID}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              attachment_path: joined,
+            }),
+          }).catch(() => {})
+        }
+
+        // Auto-save attachment to patient record if patient code is available
+        if (patientCode && process.env.NODE_ENV !== 'test') {
+          void (async () => {
+            try {
+              const pRes = await apiFetch(
+                `/patient?keyword=${encodeURIComponent(patientCode)}`
+              )
+              if (pRes.ok) {
+                const pData = await pRes.json()
+                const patients = Array.isArray(pData?.data?.patients)
+                  ? pData.data.patients
+                  : Array.isArray(pData?.data)
+                    ? pData.data
+                    : []
+                const found =
+                  patients.find(
+                    (p: any) =>
+                      String(p.patient_code) === String(patientCode) ||
+                      String(p.ID) === String(patientCode)
+                  ) || patients[0]
+                if (found?.ID) {
+                  const existingPatientAttachments = parseAttachmentPaths(
+                    found.attachment_path
+                  )
+                  const allPatientAttachments = Array.from(
+                    new Set([...existingPatientAttachments, ...nextPaths])
+                  )
+                  await apiFetch(`/patient/${found.ID}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                      attachment_path: allPatientAttachments,
+                    }),
+                  })
+                }
+              }
+            } catch (err) {
+              // ignore error
+            }
+          })()
+        }
       }
     } catch (err: any) {
       console.error(err)

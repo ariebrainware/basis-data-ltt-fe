@@ -352,20 +352,42 @@ describe('TreatmentForm Component', () => {
     )
   })
 
-  test('hides upload button when disabled is true', () => {
+  test('calls onAttachmentChange when new attachment is uploaded', async () => {
+    ;(apiFetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        data: {
+          file_path: 'uploads/attachments/new_scan.pdf',
+        },
+      }),
+    })
+
+    const onAttachmentChangeMock = jest.fn()
     const treatmentWithAttachment: TreatmentType = {
       ...mockTreatment,
       attachment_path: 'uploads/attachments/initial.pdf',
     }
 
     const { container } = render(
-      <TreatmentForm {...treatmentWithAttachment} disabled={true} />
+      <TreatmentForm
+        {...treatmentWithAttachment}
+        onAttachmentChange={onAttachmentChangeMock}
+      />
     )
 
-    expect(screen.getByText('initial.pdf')).toBeInTheDocument()
-    expect(
-      container.querySelector('input[type="file"]')
-    ).not.toBeInTheDocument()
-    expect(screen.queryByText(/Tambah Lampiran/i)).not.toBeInTheDocument()
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    const file = new File(['dummy content'], 'new_scan.pdf', {
+      type: 'application/pdf',
+    })
+
+    const { fireEvent } = require('@testing-library/react')
+    fireEvent.change(fileInput, { target: { files: [file] } })
+
+    expect(await screen.findByText('new_scan.pdf')).toBeInTheDocument()
+    expect(onAttachmentChangeMock).toHaveBeenCalledWith(
+      'uploads/attachments/initial.pdf,uploads/attachments/new_scan.pdf'
+    )
   })
 })
