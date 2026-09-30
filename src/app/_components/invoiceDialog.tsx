@@ -24,7 +24,9 @@ import {
   buildInitialInvoiceData,
   calculateInvoiceTotals,
   formatRupiah,
+  printInvoiceDocument,
 } from '../_functions/invoiceHelpers'
+
 import { apiFetch } from '../_functions/apiFetch'
 import { extractItemList } from '../_functions/itemDataHelpers'
 import { ItemType } from '../_types/item'
@@ -169,16 +171,7 @@ export default function InvoiceDialog({
   }, [open, transaction.ID])
 
   const handlePrint = () => {
-    // If currently in edit mode, switch to preview for clean print
-    if (isEditing) {
-      setIsEditing(false)
-      // Small timeout to allow DOM to rerender before print dialog
-      setTimeout(() => {
-        window.print()
-      }, 150)
-    } else {
-      window.print()
-    }
+    printInvoiceDocument(invoice)
   }
 
   const handleReset = () => {
@@ -408,7 +401,6 @@ export default function InvoiceDialog({
             <span>Memuat rincian transaksi dan data pasien...</span>
           </div>
         )}
-
 
         {/* Printable Invoice Container */}
         <div
@@ -876,4 +868,3 @@ export default function InvoiceDialog({
     </Dialog>
   )
 }
-

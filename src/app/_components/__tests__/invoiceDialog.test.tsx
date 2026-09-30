@@ -3,6 +3,16 @@ import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import InvoiceDialog from '../invoiceDialog'
 import { apiFetch } from '../../_functions/apiFetch'
+import * as invoiceHelpers from '../../_functions/invoiceHelpers'
+
+const mockPrintInvoiceDocument = jest.fn()
+jest.mock('../../_functions/invoiceHelpers', () => {
+  const actual = jest.requireActual('../../_functions/invoiceHelpers')
+  return {
+    ...actual,
+    printInvoiceDocument: (invoice: any) => mockPrintInvoiceDocument(invoice),
+  }
+})
 
 jest.mock('@material-tailwind/react', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
@@ -128,7 +138,7 @@ describe('InvoiceDialog', () => {
     )
     fireEvent.click(printButtons[0])
 
-    expect(mockPrint).toHaveBeenCalled()
+    expect(mockPrintInvoiceDocument).toHaveBeenCalled()
   })
 
   test('resets modified invoice to original transaction state when Reset is clicked', async () => {

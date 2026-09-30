@@ -137,4 +137,65 @@ describe('invoiceHelpers', () => {
       expect(result.total).toBe(0)
     })
   })
+
+  describe('printInvoiceDocument', () => {
+    test('creates print iframe and calls contentWindow.print', () => {
+      const mockPrint = jest.fn()
+      const dummyInvoice = {
+        companyName: DEFAULT_COMPANY_NAME,
+        companyPhone: DEFAULT_COMPANY_PHONE,
+        companyEmail: DEFAULT_COMPANY_EMAIL,
+        companyAddress: DEFAULT_COMPANY_ADDRESS,
+        invoiceNumber: 'INV-00001',
+        orderDate: '2026-05-20',
+        patientName: 'Test Patient',
+        patientPhone: '08123',
+        items: [
+          {
+            id: '1',
+            description: 'Item A',
+            quantity: 1,
+            unitPrice: 10000,
+            total: 10000,
+          },
+        ],
+        subtotal: 10000,
+        discount: 0,
+        total: 10000,
+        bestRegards: DEFAULT_COMPANY_NAME,
+      }
+
+      // Mock iframe creation in jsdom
+      const originalCreateElement = document.createElement.bind(document)
+      jest
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const el = originalCreateElement(tagName)
+          if (tagName.toLowerCase() === 'iframe') {
+            Object.defineProperty(el, 'contentWindow', {
+              value: {
+                document: {
+                  open: jest.fn(),
+                  write: jest.fn(),
+                  close: jest.fn(),
+                },
+                focus: jest.fn(),
+                print: mockPrint,
+              },
+              writable: true,
+            })
+          }
+          return el
+        })
+
+      jest.useFakeTimers()
+      const { printInvoiceDocument: printFn } = require('../invoiceHelpers')
+      printFn(dummyInvoice)
+
+      jest.advanceTimersByTime(300)
+      expect(mockPrint).toHaveBeenCalled()
+      jest.useRealTimers()
+      ;(document.createElement as jest.Mock).mockRestore?.()
+    })
+  })
 })
