@@ -3,6 +3,15 @@ import { TransactionType } from '../_types/transaction'
 import { ItemType } from '../_types/item'
 import { formatRupiah } from './expenseHelpers'
 
+function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export const DEFAULT_COMPANY_NAME = 'LEE TIT TAR'
 export const DEFAULT_COMPANY_PHONE = '0851-3369-0700'
 export const DEFAULT_COMPANY_EMAIL = 'ptleetittar@gmail.com'
@@ -131,6 +140,16 @@ export function printInvoiceDocument(invoice: InvoiceData): void {
     return
   }
 
+  const safeInvoiceNumber = escapeHtml(invoice.invoiceNumber)
+  const safeCompanyName = escapeHtml(invoice.companyName)
+  const safeCompanyPhone = escapeHtml(invoice.companyPhone)
+  const safeCompanyEmail = escapeHtml(invoice.companyEmail)
+  const safeCompanyAddress = escapeHtml(invoice.companyAddress)
+  const safePatientName = escapeHtml(invoice.patientName)
+  const safePatientPhone = escapeHtml(invoice.patientPhone)
+  const safeOrderDate = escapeHtml(invoice.orderDate)
+  const safeBestRegards = escapeHtml(invoice.bestRegards)
+
   const existingIframe = document.getElementById('invoice-print-iframe')
   if (existingIframe) {
     existingIframe.remove()
@@ -189,7 +208,7 @@ export function printInvoiceDocument(invoice: InvoiceData): void {
     <html>
       <head>
         <meta charset="utf-8" />
-        <title>Invoice - ${invoice.invoiceNumber}</title>
+        <title>Invoice - ${safeInvoiceNumber}</title>
         <style>
           @page {
             size: A4 portrait;
@@ -362,11 +381,11 @@ export function printInvoiceDocument(invoice: InvoiceData): void {
       <body>
         <div class="invoice-box">
           <div class="header-banner">
-            <div class="company-title">${invoice.companyName}</div>
+            <div class="company-title">${safeCompanyName}</div>
             <div class="company-details">
-              <div class="company-phone">${invoice.companyPhone}</div>
-              <div>${invoice.companyEmail}</div>
-              <div>${invoice.companyAddress}</div>
+              <div class="company-phone">${safeCompanyPhone}</div>
+              <div>${safeCompanyEmail}</div>
+              <div>${safeCompanyAddress}</div>
             </div>
           </div>
 
@@ -427,7 +446,7 @@ export function printInvoiceDocument(invoice: InvoiceData): void {
 
           <div class="footer-signoff">
             <div class="signoff-label">Best Regards,</div>
-            <div class="signoff-name">${invoice.bestRegards}</div>
+            <div class="signoff-name">${safeBestRegards}</div>
           </div>
         </div>
       </body>
