@@ -145,10 +145,13 @@ export function printInvoiceDocument(invoice: InvoiceData): void {
   const safeCompanyPhone = escapeHtml(invoice.companyPhone)
   const safeCompanyEmail = escapeHtml(invoice.companyEmail)
   const safeCompanyAddress = escapeHtml(invoice.companyAddress)
-  const safePatientName = escapeHtml(invoice.patientName)
-  const safePatientPhone = escapeHtml(invoice.patientPhone)
+  const safePatientName = escapeHtml(invoice.patientName || '-')
+  const safePatientPhone = escapeHtml(invoice.patientPhone || '-')
   const safeOrderDate = escapeHtml(invoice.orderDate)
   const safeBestRegards = escapeHtml(invoice.bestRegards)
+  const safeSubtotal = escapeHtml(formatRupiah(invoice.subtotal))
+  const safeDiscount = escapeHtml(formatRupiah(invoice.discount))
+  const safeTotal = escapeHtml(formatRupiah(invoice.total))
 
   const existingIframe = document.getElementById('invoice-print-iframe')
   if (existingIframe) {
@@ -173,13 +176,17 @@ export function printInvoiceDocument(invoice: InvoiceData): void {
     .map((item, idx) => {
       const isOdd = (idx + 1) % 2 !== 0
       const bg = isOdd ? '#F3F3F3' : '#FFFFFF'
+      const itemDesc = escapeHtml(item.description)
+      const itemQty = escapeHtml(item.quantity)
+      const itemUnitPrice = escapeHtml(formatRupiah(item.unitPrice))
+      const itemTotal = escapeHtml(formatRupiah(item.total))
       return `
         <tr style="background-color: ${bg};">
           <td style="padding: 6px 10px; text-align: center; font-size: 11px; color: #4B5563; border-bottom: 1px solid #E5E7EB;">${idx + 1}</td>
-          <td style="padding: 6px 12px; font-size: 12px; color: #1F2937; border-bottom: 1px solid #E5E7EB; font-weight: 500;">${item.description}</td>
-          <td style="padding: 6px 10px; text-align: center; font-size: 12px; color: #1F2937; border-bottom: 1px solid #E5E7EB;">${item.quantity}</td>
-          <td style="padding: 6px 12px; text-align: right; font-size: 12px; color: #1F2937; border-bottom: 1px solid #E5E7EB;">${formatRupiah(item.unitPrice)}</td>
-          <td style="padding: 6px 12px; text-align: right; font-size: 12px; color: #111827; border-bottom: 1px solid #E5E7EB; font-weight: 600;">${formatRupiah(item.total)}</td>
+          <td style="padding: 6px 12px; font-size: 12px; color: #1F2937; border-bottom: 1px solid #E5E7EB; font-weight: 500;">${itemDesc}</td>
+          <td style="padding: 6px 10px; text-align: center; font-size: 12px; color: #1F2937; border-bottom: 1px solid #E5E7EB;">${itemQty}</td>
+          <td style="padding: 6px 12px; text-align: right; font-size: 12px; color: #1F2937; border-bottom: 1px solid #E5E7EB;">${itemUnitPrice}</td>
+          <td style="padding: 6px 12px; text-align: right; font-size: 12px; color: #111827; border-bottom: 1px solid #E5E7EB; font-weight: 600;">${itemTotal}</td>
         </tr>
       `
     })
@@ -396,17 +403,17 @@ export function printInvoiceDocument(invoice: InvoiceData): void {
           <div class="info-box">
             <div class="info-left">
               <div class="label-sub">Kepada:</div>
-              <div class="info-patient-name">${invoice.patientName || '-'}</div>
-              <div class="info-patient-phone">${invoice.patientPhone || '-'}</div>
+              <div class="info-patient-name">${safePatientName}</div>
+              <div class="info-patient-phone">${safePatientPhone}</div>
             </div>
             <div class="info-right">
               <div class="meta-row">
                 <span class="meta-label">Invoice #</span>
-                <span class="meta-value">: ${invoice.invoiceNumber}</span>
+                <span class="meta-value">: ${safeInvoiceNumber}</span>
               </div>
               <div class="meta-row">
                 <span class="meta-label">Tanggal Pesanan</span>
-                <span class="meta-value">: ${invoice.orderDate}</span>
+                <span class="meta-value">: ${safeOrderDate}</span>
               </div>
             </div>
           </div>
@@ -431,15 +438,15 @@ export function printInvoiceDocument(invoice: InvoiceData): void {
             <div class="totals-table">
               <div class="totals-row subtotal">
                 <span>Subtotal :</span>
-                <strong>${formatRupiah(invoice.subtotal)}</strong>
+                <strong>${safeSubtotal}</strong>
               </div>
               <div class="totals-row">
                 <span>Diskon :</span>
-                <strong>${formatRupiah(invoice.discount)}</strong>
+                <strong>${safeDiscount}</strong>
               </div>
               <div class="totals-row grand-total">
                 <span>TOTAL :</span>
-                <span>${formatRupiah(invoice.total)}</span>
+                <span>${safeTotal}</span>
               </div>
             </div>
           </div>
