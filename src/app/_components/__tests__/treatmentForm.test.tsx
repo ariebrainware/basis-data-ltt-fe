@@ -107,6 +107,7 @@ jest.mock('@material-tailwind/react', () => {
     id?: string
     label?: string
     defaultValue?: string | number | readonly string[] | undefined
+    value?: string | number | readonly string[] | undefined
     disabled?: boolean
   }
 
@@ -114,8 +115,14 @@ jest.mock('@material-tailwind/react', () => {
     Card: ({ children }: { children: React.ReactNode }) => (
       <div data-testid="card">{children}</div>
     ),
-    Input: ({ id, label, defaultValue, disabled }: MockProps) =>
-      MockField({ id, label, defaultValue, disabled, as: 'input' }),
+    Input: ({ id, label, defaultValue, value, disabled }: MockProps) =>
+      MockField({
+        id,
+        label,
+        defaultValue: value !== undefined ? value : defaultValue,
+        disabled,
+        as: 'input',
+      }),
     Textarea: ({ id, label, defaultValue, disabled }: MockProps) =>
       MockField({ id, label, defaultValue, disabled, as: 'textarea' }),
     // Minimal Select/Option mocks used by ControlledSelect

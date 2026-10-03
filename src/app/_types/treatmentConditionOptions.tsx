@@ -15,4 +15,5 @@ export const TreatmentConditionOptions = [
   { id: 'PL', label: 'Palu (PL)' },
   { id: 'DT', label: 'Drop Table (DT)' },
   { id: 'PM', label: 'Papan Miring (PM)' },
+  { id: 'M', label: 'Massage (M)' },
 ]

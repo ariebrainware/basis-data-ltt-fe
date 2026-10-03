@@ -376,7 +376,6 @@ export function TreatmentForm({
                   type="text"
                   label="Umur"
                   value={displayAge ? `${displayAge} tahun` : ''}
-                  defaultValue={displayAge ? `${displayAge} tahun` : ''}
                   disabled
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
@@ -391,7 +390,6 @@ export function TreatmentForm({
                   type="text"
                   label="Jenis Kelamin"
                   value={getGenderLabel(displayGender)}
-                  defaultValue={getGenderLabel(displayGender)}
                   disabled
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
