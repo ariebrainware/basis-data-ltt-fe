@@ -168,6 +168,7 @@ describe('TreatmentForm Component', () => {
     remarks: 'Patient responding well',
     next_visit: '2024-01-22',
     age: 42,
+    gender: 'male',
     health_history: 'Diabetes',
     surgery_history: 'Appendectomy',
   }
@@ -183,6 +184,8 @@ describe('TreatmentForm Component', () => {
     expect(screen.getByTestId('treatment_date')).toBeInTheDocument()
     expect(screen.getByTestId('patient_code')).toBeInTheDocument()
     expect(screen.getByTestId('patient_name')).toBeInTheDocument()
+    expect(screen.getByTestId('age')).toBeInTheDocument()
+    expect(screen.getByTestId('gender')).toBeInTheDocument()
     expect(screen.getByTestId('therapist_name')).toBeInTheDocument()
     expect(screen.getByTestId('therapist_id')).toBeInTheDocument()
     expect(screen.getByTestId('issues')).toBeInTheDocument()
@@ -201,6 +204,8 @@ describe('TreatmentForm Component', () => {
     expect(screen.getByTestId('treatment_date')).toHaveValue('2024-01-15')
     expect(screen.getByTestId('patient_code')).toHaveValue('1')
     expect(screen.getByTestId('patient_name')).toHaveValue('John Doe')
+    expect(screen.getByTestId('age')).toHaveValue('42 tahun')
+    expect(screen.getByTestId('gender')).toHaveValue('Laki-laki')
     expect(screen.getByTestId('therapist_name')).toHaveValue('Dr. Jane Smith')
     expect(screen.getByTestId('therapist_id')).toHaveValue('10')
     expect(screen.getByTestId('issues')).toHaveValue('Back pain')
