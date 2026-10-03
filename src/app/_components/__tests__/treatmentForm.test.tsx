@@ -107,6 +107,7 @@ jest.mock('@material-tailwind/react', () => {
     id?: string
     label?: string
     defaultValue?: string | number | readonly string[] | undefined
+    value?: string | number | readonly string[] | undefined
     disabled?: boolean
   }
 
@@ -114,8 +115,14 @@ jest.mock('@material-tailwind/react', () => {
     Card: ({ children }: { children: React.ReactNode }) => (
       <div data-testid="card">{children}</div>
     ),
-    Input: ({ id, label, defaultValue, disabled }: MockProps) =>
-      MockField({ id, label, defaultValue, disabled, as: 'input' }),
+    Input: ({ id, label, defaultValue, value, disabled }: MockProps) =>
+      MockField({
+        id,
+        label,
+        defaultValue: value !== undefined ? value : defaultValue,
+        disabled,
+        as: 'input',
+      }),
     Textarea: ({ id, label, defaultValue, disabled }: MockProps) =>
       MockField({ id, label, defaultValue, disabled, as: 'textarea' }),
     // Minimal Select/Option mocks used by ControlledSelect
@@ -168,6 +175,7 @@ describe('TreatmentForm Component', () => {
     remarks: 'Patient responding well',
     next_visit: '2024-01-22',
     age: 42,
+    gender: 'male',
     health_history: 'Diabetes',
     surgery_history: 'Appendectomy',
   }
@@ -183,6 +191,8 @@ describe('TreatmentForm Component', () => {
     expect(screen.getByTestId('treatment_date')).toBeInTheDocument()
     expect(screen.getByTestId('patient_code')).toBeInTheDocument()
     expect(screen.getByTestId('patient_name')).toBeInTheDocument()
+    expect(screen.getByTestId('age')).toBeInTheDocument()
+    expect(screen.getByTestId('gender')).toBeInTheDocument()
     expect(screen.getByTestId('therapist_name')).toBeInTheDocument()
     expect(screen.getByTestId('therapist_id')).toBeInTheDocument()
     expect(screen.getByTestId('issues')).toBeInTheDocument()
@@ -201,6 +211,8 @@ describe('TreatmentForm Component', () => {
     expect(screen.getByTestId('treatment_date')).toHaveValue('2024-01-15')
     expect(screen.getByTestId('patient_code')).toHaveValue('1')
     expect(screen.getByTestId('patient_name')).toHaveValue('John Doe')
+    expect(screen.getByTestId('age')).toHaveValue('42 tahun')
+    expect(screen.getByTestId('gender')).toHaveValue('Laki-laki')
     expect(screen.getByTestId('therapist_name')).toHaveValue('Dr. Jane Smith')
     expect(screen.getByTestId('therapist_id')).toHaveValue('10')
     expect(screen.getByTestId('issues')).toHaveValue('Back pain')

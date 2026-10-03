@@ -9,6 +9,7 @@ export interface TreatmentType {
   ID: string
   patient_code: number
   age: number
+  gender?: string
   therapist_id: string
   health_history?: string
   surgery_history?: string
