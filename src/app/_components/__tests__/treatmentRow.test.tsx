@@ -82,6 +82,7 @@ describe('Treatment Row Component', () => {
     remarks: 'Patient responding well',
     next_visit: '2024-01-22',
     age: 42,
+    gender: 'male',
   }
 
   beforeEach(() => {
@@ -101,6 +102,7 @@ describe('Treatment Row Component', () => {
     )
 
     expect(screen.getByText('John Doe (123)')).toBeInTheDocument()
+    expect(screen.getByText('42 tahun • Laki-laki')).toBeInTheDocument()
     expect(screen.getByText('Back pain')).toBeInTheDocument()
     expect(screen.getByText('Dr. Jane Smith (10)')).toBeInTheDocument()
   })

@@ -17,6 +17,7 @@ import { useDeleteResource } from '../_hooks/useDeleteResource'
 import { isTherapist, isAdmin, getUserRole } from '../_functions/userRole'
 import { getUserId, getTherapistId } from '../_functions/userId'
 import { parseAttachmentPaths } from '../_functions/apiHost'
+import { getGenderLabel } from '../_functions/normalizeGender'
 
 export default function Treatment({
   ID,
@@ -26,6 +27,7 @@ export default function Treatment({
   therapist_name: therapistName,
   therapist_id: therapistId,
   age: age,
+  gender,
   issues,
   treatment,
   remarks,
@@ -421,6 +423,7 @@ export default function Treatment({
               therapist_id={therapistId}
               issues={issues}
               age={age}
+              gender={gender}
               treatment={treatment}
               remarks={remarks}
               next_visit={nextVisit}
@@ -504,6 +507,17 @@ export default function Treatment({
             <small className="font-sans text-sm text-current antialiased opacity-70">
               {patientName} ({patientCode})
             </small>
+            {((age !== undefined && age !== null && Number(age) > 0) ||
+              Boolean(gender)) && (
+              <small className="font-sans text-xs text-blue-gray-400">
+                {[
+                  age && Number(age) > 0 ? `${age} tahun` : null,
+                  gender ? getGenderLabel(gender) : null,
+                ]
+                  .filter(Boolean)
+                  .join(' • ')}
+              </small>
+            )}
           </div>
         </td>
         <td className="p-3">

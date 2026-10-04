@@ -9,6 +9,7 @@ import { DiseaseMultiSelect } from './selectDisease'
 import { parseAttachmentPaths } from '../_functions/apiHost'
 import { viewAttachment } from '../_functions/viewAttachment'
 import { apiFetch } from '../_functions/apiFetch'
+import { getGenderLabel } from '../_functions/normalizeGender'
 
 interface TreatmentFormProps extends TreatmentType {
   therapistIDState?: string
@@ -35,8 +36,21 @@ export function TreatmentForm({
   surgery_history,
   attachment_path,
   onAttachmentChange,
+  age,
+  gender,
 }: TreatmentFormProps) {
   const isTherapistRole = isTherapist()
+  const [fetchedPatientAge, setFetchedPatientAge] = React.useState<
+    number | string
+  >('')
+  const [fetchedPatientGender, setFetchedPatientGender] =
+    React.useState<string>('')
+
+  const displayAge =
+    age !== undefined && age !== null && Number(age) > 0
+      ? age
+      : fetchedPatientAge
+  const displayGender = gender || fetchedPatientGender
   // The backend may return treatment data in either JSON array format or comma-separated string format.
   // This function handles both formats to ensure compatibility with different API versions or data states.
   const parseTreatmentToArray = (raw: string | undefined): string[] => {
@@ -151,12 +165,20 @@ export function TreatmentForm({
                 String(p.ID) === String(patientCode)
             ) || patients[0]
 
-          if (found?.attachment_path && mounted) {
-            const parsed = parseAttachmentPaths(found.attachment_path)
-            if (parsed.length > 0) {
-              setAttachmentPaths((prev) =>
-                Array.from(new Set([...prev, ...parsed]))
-              )
+          if (found && mounted) {
+            if (found.age) {
+              setFetchedPatientAge(found.age)
+            }
+            if (found.gender) {
+              setFetchedPatientGender(found.gender)
+            }
+            if (found.attachment_path) {
+              const parsed = parseAttachmentPaths(found.attachment_path)
+              if (parsed.length > 0) {
+                setAttachmentPaths((prev) =>
+                  Array.from(new Set([...prev, ...parsed]))
+                )
+              }
             }
           }
         }
@@ -347,6 +369,36 @@ export function TreatmentForm({
               onResize={undefined}
               onResizeCapture={undefined}
             />
+            <div className="flex gap-4">
+              <div className="w-1/2">
+                <Input
+                  id="age"
+                  type="text"
+                  label="Umur"
+                  value={displayAge ? `${displayAge} tahun` : ''}
+                  disabled
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
+                  crossOrigin={undefined}
+                  onResize={undefined}
+                  onResizeCapture={undefined}
+                />
+              </div>
+              <div className="w-1/2">
+                <Input
+                  id="gender"
+                  type="text"
+                  label="Jenis Kelamin"
+                  value={getGenderLabel(displayGender)}
+                  disabled
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
+                  crossOrigin={undefined}
+                  onResize={undefined}
+                  onResizeCapture={undefined}
+                />
+              </div>
+            </div>
             <Input
               id="therapist_name"
               type="text"

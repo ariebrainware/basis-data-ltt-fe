@@ -235,6 +235,7 @@ const TableBody = ({
           patient_code={item.patient_code}
           patient_name={item.patient_name}
           age={item.age}
+          gender={item.gender}
           issues={item.issues}
           treatment={item.treatment}
           remarks={item.remarks}

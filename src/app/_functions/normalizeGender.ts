@@ -44,3 +44,18 @@ export function normalizeGenderValue(
   // Any other non-empty value is considered 'other'
   return 'other'
 }
+
+/**
+ * Get human-readable Indonesian label for gender
+ * @param gender - Gender value to convert
+ * @returns 'Laki-laki', 'Perempuan', 'Lainnya', or ''
+ */
+export function getGenderLabel(
+  gender: string | number | undefined | null
+): string {
+  const normalized = normalizeGenderValue(gender)
+  if (normalized === 'male') return 'Laki-laki'
+  if (normalized === 'female') return 'Perempuan'
+  if (normalized === 'other') return 'Lainnya'
+  return ''
+}
