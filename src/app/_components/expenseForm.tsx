@@ -212,16 +212,13 @@ export function ExpenseForm({
               <Select
                 id={`${prefix}_category`}
                 data-testid={`${prefix}_category`}
-                key={`${prefix}_category_${category}`}
                 label="Kategori Pengeluaran"
                 value={category}
-                selected={(element) =>
-                  element && React.isValidElement(element)
-                    ? (element.props as { children?: React.ReactNode }).children
-                    : category
-                }
                 onChange={(val) =>
                   onCategoryChange && onCategoryChange(val || '')
+                }
+                selected={(element) =>
+                  element?.props?.children || category || ''
                 }
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
@@ -253,17 +250,17 @@ export function ExpenseForm({
               <Select
                 id={`${prefix}_payment_method`}
                 data-testid={`${prefix}_payment_method`}
-                key={`${prefix}_payment_method_${payment_method}`}
                 label="Metode Pembayaran"
                 value={payment_method}
-                selected={(element) =>
-                  element && React.isValidElement(element)
-                    ? (element.props as { children?: React.ReactNode }).children
-                    : PAYMENT_METHODS.find((m) => m.value === payment_method)
-                        ?.label || payment_method
-                }
                 onChange={(val) =>
                   onPaymentMethodChange && onPaymentMethodChange(val || '')
+                }
+                selected={(element) =>
+                  element?.props?.children ||
+                  PAYMENT_METHODS.find((m) => m.value === payment_method)
+                    ?.label ||
+                  payment_method ||
+                  ''
                 }
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
@@ -355,7 +352,7 @@ export function ExpenseForm({
                     <button
                       type="button"
                       onClick={() => handleRemoveAttachment(index)}
-                      className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1.5 hover:text-red-500 transition-colors"
+                      className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1.5 transition-colors hover:text-red-500"
                       aria-label={`Hapus bukti ${index + 1}`}
                       title="Hapus bukti lampiran"
                     >
@@ -380,7 +377,7 @@ export function ExpenseForm({
                 <div>
                   <label
                     htmlFor={`${prefix}_file_upload`}
-                    className="border-slate-300 hover:border-blue-500 hover:bg-blue-50/30 dark:bg-slate-900/50 dark:hover:bg-slate-900/80 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed p-3 transition-all"
+                    className="border-slate-300 dark:bg-slate-900/50 dark:hover:bg-slate-900/80 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed p-3 transition-all hover:border-blue-500 hover:bg-blue-50/30"
                   >
                     {isUploading ? (
                       <svg

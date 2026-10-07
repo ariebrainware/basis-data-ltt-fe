@@ -133,9 +133,7 @@ describe('ExpenseForm', () => {
       )
     })
 
-    expect(
-      await screen.findByText('kwitansi_januari.pdf')
-    ).toBeInTheDocument()
+    expect(await screen.findByText('kwitansi_januari.pdf')).toBeInTheDocument()
 
     const hiddenInput = container.querySelector(
       '#add_receipt_url'

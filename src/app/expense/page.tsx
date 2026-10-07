@@ -41,7 +41,7 @@ import { EXPENSE_CATEGORIES } from '../_types/expense'
 export default function ExpensePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [keyword, setKeyword] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
   const [startDateFilter, setStartDateFilter] = useState('')
   const [endDateFilter, setEndDateFilter] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -367,27 +367,18 @@ export default function ExpensePage() {
               <Select
                 id="expense-category-filter"
                 data-testid="expense-category-filter"
-                key={`category-filter-${categoryFilter || 'all'}`}
                 label="Filter Kategori"
-                value={categoryFilter || 'all'}
-                selected={(element) =>
-                  element && React.isValidElement(element)
-                    ? (element.props as { children?: React.ReactNode }).children
-                    : categoryFilter
-                      ? categoryFilter
-                      : 'Show All'
-                }
+                value={categoryFilter}
                 onChange={(val) => {
-                  const selectedCategory =
-                    !val ||
-                    val === 'all' ||
-                    val.toLowerCase() === 'show all' ||
-                    val.toLowerCase() === 'semua kategori'
-                      ? ''
-                      : val
-                  setCategoryFilter(selectedCategory)
+                  setCategoryFilter(val || 'all')
                   setCurrentPage(1)
                 }}
+                selected={(element) =>
+                  element?.props?.children ||
+                  (categoryFilter === 'all' || !categoryFilter
+                    ? 'Show All'
+                    : categoryFilter)
+                }
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}

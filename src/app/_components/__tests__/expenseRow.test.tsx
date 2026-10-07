@@ -128,7 +128,10 @@ describe('ExpenseRow', () => {
     const viewButton = screen.getByText('Lihat Bukti')
     expect(viewButton).toBeInTheDocument()
     fireEvent.click(viewButton)
-    expect(viewAttachment).toHaveBeenCalledWith('https://receipt.jpg', 'receipt.jpg')
+    expect(viewAttachment).toHaveBeenCalledWith(
+      'https://receipt.jpg',
+      'receipt.jpg'
+    )
 
     expect(screen.getAllByText('Lunas')[0]).toBeInTheDocument()
   })

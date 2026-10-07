@@ -66,7 +66,7 @@ export default function ExpenseRow({
                 onClick={() =>
                   void viewAttachment(path, path.split('/').pop() || 'receipt')
                 }
-                className="inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition-colors dark:bg-blue-950/40 dark:text-blue-400"
+                className="dark:bg-blue-950/40 inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-800 dark:text-blue-400"
                 title={`Lihat bukti ${idx + 1}`}
               >
                 <svg
