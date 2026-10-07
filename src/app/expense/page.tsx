@@ -20,7 +20,7 @@ import {
   Option,
   Typography,
 } from '@material-tailwind/react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
@@ -371,7 +371,11 @@ export default function ExpensePage() {
                 label="Filter Kategori"
                 value={categoryFilter || 'all'}
                 selected={(element) =>
-                  element || (categoryFilter ? categoryFilter : 'Show All')
+                  element && React.isValidElement(element)
+                    ? (element.props as { children?: React.ReactNode }).children
+                    : categoryFilter
+                      ? categoryFilter
+                      : 'Show All'
                 }
                 onChange={(val) => {
                   const selectedCategory =

@@ -215,7 +215,11 @@ export function ExpenseForm({
                 key={`${prefix}_category_${category}`}
                 label="Kategori Pengeluaran"
                 value={category}
-                selected={(element) => element || category}
+                selected={(element) =>
+                  element && React.isValidElement(element)
+                    ? (element.props as { children?: React.ReactNode }).children
+                    : category
+                }
                 onChange={(val) =>
                   onCategoryChange && onCategoryChange(val || '')
                 }
@@ -252,7 +256,12 @@ export function ExpenseForm({
                 key={`${prefix}_payment_method_${payment_method}`}
                 label="Metode Pembayaran"
                 value={payment_method}
-                selected={(element) => element}
+                selected={(element) =>
+                  element && React.isValidElement(element)
+                    ? (element.props as { children?: React.ReactNode }).children
+                    : PAYMENT_METHODS.find((m) => m.value === payment_method)
+                        ?.label || payment_method
+                }
                 onChange={(val) =>
                   onPaymentMethodChange && onPaymentMethodChange(val || '')
                 }
