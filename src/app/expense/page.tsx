@@ -50,6 +50,7 @@ export default function ExpensePage() {
   // Form states for Add Dialog
   const [addCategory, setAddCategory] = useState('Operational')
   const [addPaymentMethod, setAddPaymentMethod] = useState('bank_transfer')
+  const [isAddUploading, setIsAddUploading] = useState(false)
 
   const { data, summary, total, loading } = useFetchExpense(
     currentPage,
@@ -77,6 +78,7 @@ export default function ExpensePage() {
       resetExpenseFormInputs('add')
       setAddCategory('Operational')
       setAddPaymentMethod('bank_transfer')
+      setIsAddUploading(false)
     }
     setOpenAddDialog((prev) => !prev)
   }
@@ -180,6 +182,7 @@ export default function ExpensePage() {
             payment_method={addPaymentMethod}
             onCategoryChange={setAddCategory}
             onPaymentMethodChange={setAddPaymentMethod}
+            onUploadingChange={setIsAddUploading}
             isEdit={false}
           />
         </DialogBody>
@@ -207,13 +210,14 @@ export default function ExpensePage() {
             variant="gradient"
             color="green"
             onClick={handleAddExpense}
+            disabled={isAddUploading}
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             onResize={undefined}
             onResizeCapture={undefined}
           >
-            <span>Simpan</span>
+            <span>{isAddUploading ? 'Mengunggah...' : 'Simpan'}</span>
           </Button>
         </DialogFooter>
       </Dialog>
@@ -349,6 +353,7 @@ export default function ExpensePage() {
                 id="expense-search-input"
                 data-testid="expense-search-input"
                 label="Cari Deskripsi / Catatan"
+                placeholder="Cari deskripsi atau catatan..."
                 icon={<MagnifyingGlassIcon className="size-5" />}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
@@ -363,7 +368,13 @@ export default function ExpensePage() {
                 label="Filter Kategori"
                 value={categoryFilter || 'all'}
                 onChange={(val) => {
-                  const selectedCategory = !val || val === 'all' ? '' : val
+                  const selectedCategory =
+                    !val ||
+                    val === 'all' ||
+                    val.toLowerCase() === 'show all' ||
+                    val.toLowerCase() === 'semua kategori'
+                      ? ''
+                      : val
                   setCategoryFilter(selectedCategory)
                   setCurrentPage(1)
                 }}
@@ -373,7 +384,7 @@ export default function ExpensePage() {
                 onResize={undefined}
                 onResizeCapture={undefined}
               >
-                <Option value="all">Semua Kategori</Option>
+                <Option value="all">Show All</Option>
                 {EXPENSE_CATEGORIES.map((cat) => (
                   <Option key={cat} value={cat}>
                     {cat}

@@ -19,7 +19,7 @@ describe('ExpensePage', () => {
     jest.clearAllMocks()
   })
 
-  it('renders expense page elements, search box, and category filter with all categories option', async () => {
+  it('renders expense page elements, search box with placeholder, and category filter with Show All option', async () => {
     ;(apiFetch as jest.Mock).mockResolvedValue({
       ok: true,
       status: 200,
@@ -58,9 +58,16 @@ describe('ExpensePage', () => {
     expect(screen.getByText('Jumlah Transaksi')).toBeInTheDocument()
     expect(screen.getByText('Kategori Terbanyak')).toBeInTheDocument()
 
-    // Test search box input with Enter key
+    // Test search box input with placeholder and Enter key
     const searchInput = screen.getByTestId('expense-search-input')
     expect(searchInput).toBeInTheDocument()
+    expect(searchInput).toHaveAttribute(
+      'placeholder',
+      'Cari deskripsi atau catatan...'
+    )
+
+    // Test Show All option is present
+    expect(screen.getByText('Show All')).toBeInTheDocument()
 
     fireEvent.change(searchInput, { target: { value: 'Cleaning' } })
     fireEvent.keyDown(searchInput, { key: 'Enter', code: 'Enter' })

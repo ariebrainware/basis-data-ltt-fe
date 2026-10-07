@@ -3,6 +3,7 @@ import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ExpenseRow from '../expenseRow'
 import { apiFetch } from '../../_functions/apiFetch'
+import { viewAttachment } from '../../_functions/viewAttachment'
 
 const mockRefresh = jest.fn()
 const mockDeleteExpense = jest.fn()
@@ -70,6 +71,10 @@ jest.mock('../../_functions/apiFetch', () => ({
   apiFetch: jest.fn(),
 }))
 
+jest.mock('../../_functions/viewAttachment', () => ({
+  viewAttachment: jest.fn(),
+}))
+
 jest.mock('../../_functions/unauthorized', () => ({
   UnauthorizedAccess: jest.fn(),
 }))
@@ -94,7 +99,7 @@ describe('ExpenseRow', () => {
     })
   })
 
-  test('renders expense row data properly', () => {
+  test('renders expense row data properly and opens attachment when clicking Lihat Bukti', () => {
     render(
       <table>
         <tbody>
@@ -119,7 +124,12 @@ describe('ExpenseRow', () => {
     expect(screen.getAllByText('Tagihan listrik')[0]).toBeInTheDocument()
     expect(screen.getByText('bank transfer')).toBeInTheDocument()
     expect(screen.getByText('Rp 150.000')).toBeInTheDocument()
-    expect(screen.getByText('Lihat Bukti')).toBeInTheDocument()
+
+    const viewButton = screen.getByText('Lihat Bukti')
+    expect(viewButton).toBeInTheDocument()
+    fireEvent.click(viewButton)
+    expect(viewAttachment).toHaveBeenCalledWith('https://receipt.jpg', 'receipt.jpg')
+
     expect(screen.getAllByText('Lunas')[0]).toBeInTheDocument()
   })
 

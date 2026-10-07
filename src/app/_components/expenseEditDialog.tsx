@@ -43,6 +43,7 @@ export default function ExpenseEditDialog({
   const [paymentMethod, setPaymentMethod] = React.useState<string>(
     initialPaymentMethod || 'bank_transfer'
   )
+  const [isUploading, setIsUploading] = React.useState(false)
 
   React.useEffect(() => {
     if (open) {
@@ -152,6 +153,7 @@ export default function ExpenseEditDialog({
           notes={notes}
           onCategoryChange={setCategory}
           onPaymentMethodChange={setPaymentMethod}
+          onUploadingChange={setIsUploading}
           isEdit={true}
         />
       </DialogBody>
@@ -179,13 +181,14 @@ export default function ExpenseEditDialog({
           variant="gradient"
           color="green"
           onClick={handleConfirm}
+          disabled={isUploading}
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <span>Simpan Perubahan</span>
+          <span>{isUploading ? 'Mengunggah...' : 'Simpan Perubahan'}</span>
         </Button>
       </DialogFooter>
     </Dialog>

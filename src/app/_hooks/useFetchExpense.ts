@@ -39,7 +39,9 @@ export function useFetchExpense(
         if (
           category &&
           category.trim() !== '' &&
-          category.trim().toLowerCase() !== 'all'
+          category.trim().toLowerCase() !== 'all' &&
+          category.trim().toLowerCase() !== 'show all' &&
+          category.trim().toLowerCase() !== 'semua kategori'
         ) {
           params += `&category=${encodeURIComponent(category.trim())}`
         }
