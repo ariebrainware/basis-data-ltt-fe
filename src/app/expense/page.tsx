@@ -38,6 +38,11 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useFetchExpense } from '../_hooks/useFetchExpense'
 import { EXPENSE_CATEGORIES } from '../_types/expense'
 
+const FILTER_CATEGORIES = [
+  { value: 'all', label: 'Show All' },
+  ...EXPENSE_CATEGORIES.map((cat) => ({ value: cat, label: cat })),
+]
+
 export default function ExpensePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [keyword, setKeyword] = useState('')
@@ -223,7 +228,7 @@ export default function ExpensePage() {
       </Dialog>
 
       <Card
-        className="size-full"
+        className="size-full overflow-visible"
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
@@ -233,7 +238,7 @@ export default function ExpensePage() {
         <CardHeader
           floated={false}
           shadow={false}
-          className="rounded-none"
+          className="relative z-20 overflow-visible rounded-none"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
@@ -347,7 +352,7 @@ export default function ExpensePage() {
           </div>
 
           {/* Filters Bar */}
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+          <div className="relative z-20 grid grid-cols-1 gap-3 md:grid-cols-4">
             <div>
               <Input
                 id="expense-search-input"
@@ -374,21 +379,25 @@ export default function ExpensePage() {
                   setCurrentPage(1)
                 }}
                 selected={(element) =>
-                  element?.props?.children ||
-                  (categoryFilter === 'all' || !categoryFilter
-                    ? 'Show All'
-                    : categoryFilter)
+                  React.isValidElement<{ children?: React.ReactNode }>(element)
+                    ? element.props.children
+                    : FILTER_CATEGORIES.find(
+                        (item) => item.value === categoryFilter
+                      )?.label || 'Show All'
                 }
+                menuProps={{
+                  className:
+                    'z-[9999] max-h-72 shadow-xl border border-blue-gray-100',
+                }}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
                 onResize={undefined}
                 onResizeCapture={undefined}
               >
-                <Option value="all">Show All</Option>
-                {EXPENSE_CATEGORIES.map((cat) => (
-                  <Option key={cat} value={cat}>
-                    {cat}
+                {FILTER_CATEGORIES.map((item) => (
+                  <Option key={item.value} value={item.value}>
+                    {item.label}
                   </Option>
                 ))}
               </Select>

@@ -218,8 +218,14 @@ export function ExpenseForm({
                   onCategoryChange && onCategoryChange(val || '')
                 }
                 selected={(element) =>
-                  element?.props?.children || category || ''
+                  React.isValidElement<{ children?: React.ReactNode }>(element)
+                    ? element.props.children
+                    : category || ''
                 }
+                menuProps={{
+                  className:
+                    'z-[9999] max-h-72 shadow-xl border border-blue-gray-100',
+                }}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
@@ -256,12 +262,17 @@ export function ExpenseForm({
                   onPaymentMethodChange && onPaymentMethodChange(val || '')
                 }
                 selected={(element) =>
-                  element?.props?.children ||
-                  PAYMENT_METHODS.find((m) => m.value === payment_method)
-                    ?.label ||
-                  payment_method ||
-                  ''
+                  React.isValidElement<{ children?: React.ReactNode }>(element)
+                    ? element.props.children
+                    : PAYMENT_METHODS.find((m) => m.value === payment_method)
+                        ?.label ||
+                      payment_method ||
+                      ''
                 }
+                menuProps={{
+                  className:
+                    'z-[9999] max-h-72 shadow-xl border border-blue-gray-100',
+                }}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
