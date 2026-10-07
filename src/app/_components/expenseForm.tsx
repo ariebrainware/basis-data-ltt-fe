@@ -233,6 +233,7 @@ export function ExpenseForm({
               </Select>
             </div>
             <Input
+              shrink
               id={`${prefix}_amount`}
               type="number"
               label="Nominal (Rp)"
@@ -273,6 +274,7 @@ export function ExpenseForm({
           {/* Right Column */}
           <div className="flex w-full flex-col gap-4 md:w-1/2">
             <Textarea
+              shrink
               id={`${prefix}_description`}
               label="Deskripsi / Keperluan"
               rows={3}
@@ -428,6 +430,7 @@ export function ExpenseForm({
             </div>
 
             <Textarea
+              shrink
               id={`${prefix}_notes`}
               label="Catatan Tambahan (Opsional)"
               rows={2}
