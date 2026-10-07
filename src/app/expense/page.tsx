@@ -20,7 +20,7 @@ import {
   Option,
   Typography,
 } from '@material-tailwind/react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import Pagination from '../_components/pagination'
@@ -38,10 +38,15 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { useFetchExpense } from '../_hooks/useFetchExpense'
 import { EXPENSE_CATEGORIES } from '../_types/expense'
 
+const FILTER_CATEGORIES = [
+  { value: 'all', label: 'Show All' },
+  ...EXPENSE_CATEGORIES.map((cat) => ({ value: cat, label: cat })),
+]
+
 export default function ExpensePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [keyword, setKeyword] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
   const [startDateFilter, setStartDateFilter] = useState('')
   const [endDateFilter, setEndDateFilter] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -50,6 +55,7 @@ export default function ExpensePage() {
   // Form states for Add Dialog
   const [addCategory, setAddCategory] = useState('Operational')
   const [addPaymentMethod, setAddPaymentMethod] = useState('bank_transfer')
+  const [isAddUploading, setIsAddUploading] = useState(false)
 
   const { data, summary, total, loading } = useFetchExpense(
     currentPage,
@@ -77,6 +83,7 @@ export default function ExpensePage() {
       resetExpenseFormInputs('add')
       setAddCategory('Operational')
       setAddPaymentMethod('bank_transfer')
+      setIsAddUploading(false)
     }
     setOpenAddDialog((prev) => !prev)
   }
@@ -180,6 +187,7 @@ export default function ExpensePage() {
             payment_method={addPaymentMethod}
             onCategoryChange={setAddCategory}
             onPaymentMethodChange={setAddPaymentMethod}
+            onUploadingChange={setIsAddUploading}
             isEdit={false}
           />
         </DialogBody>
@@ -207,19 +215,20 @@ export default function ExpensePage() {
             variant="gradient"
             color="green"
             onClick={handleAddExpense}
+            disabled={isAddUploading}
             placeholder={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             onResize={undefined}
             onResizeCapture={undefined}
           >
-            <span>Simpan</span>
+            <span>{isAddUploading ? 'Mengunggah...' : 'Simpan'}</span>
           </Button>
         </DialogFooter>
       </Dialog>
 
       <Card
-        className="size-full"
+        className="size-full overflow-visible"
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
@@ -229,7 +238,7 @@ export default function ExpensePage() {
         <CardHeader
           floated={false}
           shadow={false}
-          className="rounded-none"
+          className="relative z-20 overflow-visible rounded-none"
           placeholder={undefined}
           onPointerEnterCapture={undefined}
           onPointerLeaveCapture={undefined}
@@ -343,12 +352,13 @@ export default function ExpensePage() {
           </div>
 
           {/* Filters Bar */}
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+          <div className="relative z-20 grid grid-cols-1 gap-3 md:grid-cols-4">
             <div>
               <Input
                 id="expense-search-input"
                 data-testid="expense-search-input"
                 label="Cari Deskripsi / Catatan"
+                placeholder="Cari deskripsi atau catatan..."
                 icon={<MagnifyingGlassIcon className="size-5" />}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
@@ -360,12 +370,24 @@ export default function ExpensePage() {
             </div>
             <div>
               <Select
+                id="expense-category-filter"
+                data-testid="expense-category-filter"
                 label="Filter Kategori"
-                value={categoryFilter || 'all'}
+                value={categoryFilter}
                 onChange={(val) => {
-                  const selectedCategory = !val || val === 'all' ? '' : val
-                  setCategoryFilter(selectedCategory)
+                  setCategoryFilter(val || 'all')
                   setCurrentPage(1)
+                }}
+                selected={(element) =>
+                  React.isValidElement<{ children?: React.ReactNode }>(element)
+                    ? element.props.children
+                    : FILTER_CATEGORIES.find(
+                        (item) => item.value === categoryFilter
+                      )?.label || 'Show All'
+                }
+                menuProps={{
+                  className:
+                    'z-[9999] max-h-72 shadow-xl border border-blue-gray-100',
                 }}
                 placeholder={undefined}
                 onPointerEnterCapture={undefined}
@@ -373,10 +395,9 @@ export default function ExpensePage() {
                 onResize={undefined}
                 onResizeCapture={undefined}
               >
-                <Option value="all">Semua Kategori</Option>
-                {EXPENSE_CATEGORIES.map((cat) => (
-                  <Option key={cat} value={cat}>
-                    {cat}
+                {FILTER_CATEGORIES.map((item) => (
+                  <Option key={item.value} value={item.value}>
+                    {item.label}
                   </Option>
                 ))}
               </Select>
