@@ -212,8 +212,10 @@ export function ExpenseForm({
               <Select
                 id={`${prefix}_category`}
                 data-testid={`${prefix}_category`}
+                key={`${prefix}_category_${category}`}
                 label="Kategori Pengeluaran"
                 value={category}
+                selected={(element) => element || category}
                 onChange={(val) =>
                   onCategoryChange && onCategoryChange(val || '')
                 }
@@ -246,8 +248,10 @@ export function ExpenseForm({
               <Select
                 id={`${prefix}_payment_method`}
                 data-testid={`${prefix}_payment_method`}
+                key={`${prefix}_payment_method_${payment_method}`}
                 label="Metode Pembayaran"
                 value={payment_method}
+                selected={(element) => element}
                 onChange={(val) =>
                   onPaymentMethodChange && onPaymentMethodChange(val || '')
                 }

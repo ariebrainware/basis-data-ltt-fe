@@ -365,8 +365,14 @@ export default function ExpensePage() {
             </div>
             <div>
               <Select
+                id="expense-category-filter"
+                data-testid="expense-category-filter"
+                key={`category-filter-${categoryFilter || 'all'}`}
                 label="Filter Kategori"
                 value={categoryFilter || 'all'}
+                selected={(element) =>
+                  element || (categoryFilter ? categoryFilter : 'Show All')
+                }
                 onChange={(val) => {
                   const selectedCategory =
                     !val ||
