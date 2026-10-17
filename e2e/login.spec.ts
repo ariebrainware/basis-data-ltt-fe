@@ -94,11 +94,19 @@ test.describe('Login Page', () => {
   test('should redirect to dashboard if already logged in', async ({
     page,
   }) => {
-    await page.goto('/login')
     await page.evaluate(() =>
       localStorage.setItem('session-token', 'valid-mock-token')
     )
-    await page.goto('/login')
+    try {
+      await page.goto('/login', { waitUntil: 'commit' })
+    } catch (err: any) {
+      if (
+        !err?.message?.includes('interrupted by another navigation') &&
+        !err?.message?.includes('NS_BINDING_ABORTED')
+      ) {
+        throw err
+      }
+    }
     await page.waitForURL('**/dashboard')
     expect(page.url()).toContain('/dashboard')
   })
