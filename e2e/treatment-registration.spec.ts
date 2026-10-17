@@ -2,12 +2,16 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Treatment Registration', () => {
   test.beforeEach(async ({ page }) => {
-    // This page requires authentication
-    // Set up mock session token for testing
-    await page.goto('/treatment/register')
-    await page.evaluate(() => {
-      localStorage.setItem('session-token', 'mock-test-token')
-      localStorage.setItem('user-role', 'admin')
+    // This page requires authentication as super_admin
+    // Set up mock session token and role before navigation to prevent client-side redirects
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('session-token', 'mock-test-token')
+        localStorage.setItem('__E2E_TEST__', '1')
+        localStorage.setItem('user-role', 'admin')
+      } catch {
+        // ignore
+      }
     })
     await page.goto('/treatment/register')
   })
