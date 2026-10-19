@@ -58,10 +58,10 @@ export function PatientTreatmentHistory({
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({})
 
   // Toggle card expansion
-  const toggleExpand = (id: string) => {
+  const toggleExpand = (id: string, defaultExpanded: boolean) => {
     setExpandedIds((prev) => ({
       ...prev,
-      [id]: !prev[id],
+      [id]: !(prev[id] ?? defaultExpanded),
     }))
   }
 
@@ -242,9 +242,11 @@ export function PatientTreatmentHistory({
                 }`}
               >
                 {/* Header row */}
-                <div
-                  className="flex cursor-pointer items-center justify-between p-3.5 hover:bg-blue-gray-50/30 sm:p-4"
-                  onClick={() => toggleExpand(itemId)}
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between p-3.5 text-left hover:bg-blue-gray-50/30 sm:p-4"
+                  onClick={() => toggleExpand(itemId, idx === 0 || isCurrent)}
+                  aria-expanded={isExpanded}
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Date Badge */}
@@ -296,7 +298,7 @@ export function PatientTreatmentHistory({
                       <ChevronDownIcon className="size-4 text-gray-500" />
                     )}
                   </div>
-                </div>
+                </button>
 
                 {/* Collapsible Content */}
                 {isExpanded && (

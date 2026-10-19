@@ -94,11 +94,11 @@ export default function PatientDialog({
     }
   }, [initialTab])
 
-  const { total: historyCount, loading: historyLoading } = usePatientTreatments(
-    patientCode,
-    name,
-    open
-  )
+  const {
+    treatments: historyTreatments,
+    total: historyCount,
+    loading: historyLoading,
+  } = usePatientTreatments(patientCode, name, open)
 
   const router = useRouter()
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
@@ -128,7 +128,7 @@ export default function PatientDialog({
     setCurrentDateOfBirth(date_of_birth || '')
   }, [date_of_birth])
 
-  const fetchDiseasesIfNeeded = async () => {
+  const fetchDiseasesIfNeeded = React.useCallback(async () => {
     if (diseasesFetched) return
     try {
       const res = await apiFetch('/disease', { method: 'GET' })
@@ -146,40 +146,49 @@ export default function PatientDialog({
     } finally {
       setDiseasesFetched(true)
     }
-  }
+  }, [diseasesFetched, router])
 
-  const handleOpen = async (overrideTab?: 'form' | 'history') => {
-    if (!open) {
-      setActiveTab(overrideTab || initialTab || 'form')
-      setGenderValue(gender || '')
-      await fetchDiseasesIfNeeded()
-      setOpen(true)
-
-      try {
-        const res = await apiFetch(`/patient/${ID}`, { method: 'GET' })
-        if (res.status === 401) {
-          UnauthorizedAccess(router)
-          return
-        }
-        if (res.ok) {
-          const resData = await res.json()
-          if (resData.data) {
-            if (resData.data.signature_path || resData.data.signature) {
-              setCurrentSignature(
-                resData.data.signature_path || resData.data.signature
-              )
-            }
-            if (resData.data.attachment_path) {
-              setCurrentAttachmentPath(resData.data.attachment_path)
-            }
-            if (resData.data.date_of_birth) {
-              setCurrentDateOfBirth(resData.data.date_of_birth)
-            }
+  const fetchPatientDetails = React.useCallback(async () => {
+    try {
+      const res = await apiFetch(`/patient/${ID}`, { method: 'GET' })
+      if (res.status === 401) {
+        UnauthorizedAccess(router)
+        return
+      }
+      if (res.ok) {
+        const resData = await res.json()
+        if (resData.data) {
+          if (resData.data.signature_path || resData.data.signature) {
+            setCurrentSignature(
+              resData.data.signature_path || resData.data.signature
+            )
+          }
+          if (resData.data.attachment_path) {
+            setCurrentAttachmentPath(resData.data.attachment_path)
+          }
+          if (resData.data.date_of_birth) {
+            setCurrentDateOfBirth(resData.data.date_of_birth)
           }
         }
-      } catch (err) {
-        console.error('Error fetching patient details:', err)
       }
+    } catch (err) {
+      console.error('Error fetching patient details:', err)
+    }
+  }, [ID, router])
+
+  React.useEffect(() => {
+    if (!open) return
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setGenderValue(gender || '')
+    void fetchDiseasesIfNeeded()
+    void fetchPatientDetails()
+  }, [open, gender, fetchDiseasesIfNeeded, fetchPatientDetails])
+
+  const handleOpen = (overrideTab?: 'form' | 'history') => {
+    if (!open) {
+      setActiveTab(overrideTab || initialTab || 'form')
+      setOpen(true)
     } else {
       setOpen(false)
     }
@@ -506,6 +515,7 @@ export default function PatientDialog({
                   <PatientTreatmentHistory
                     patientCode={patientCode}
                     patientName={name}
+                    initialTreatments={historyTreatments}
                   />
                 </div>
               )}

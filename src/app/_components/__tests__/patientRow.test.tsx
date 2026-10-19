@@ -2,6 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Patient from '../patientRow'
 import { PatientType } from '../../_types/patient'
+import { apiFetch } from '../../_functions/apiFetch'
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -151,6 +152,10 @@ describe('Patient Row Component', () => {
     await waitFor(() => {
       expect(screen.getByTestId('dialog')).toBeInTheDocument()
       expect(screen.getByTestId('patient-form')).toBeInTheDocument()
+    })
+    await waitFor(() => {
+      expect(apiFetch).toHaveBeenCalledWith('/disease', { method: 'GET' })
+      expect(apiFetch).toHaveBeenCalledWith('/patient/1', { method: 'GET' })
     })
 
     // Click tab to switch to Riwayat Penanganan

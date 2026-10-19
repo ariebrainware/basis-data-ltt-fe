@@ -56,7 +56,9 @@ describe('usePatientTreatments hook', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    expect(apiFetch).toHaveBeenCalledWith('/treatment?keyword=P001&limit=100')
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/treatment?keyword=P001&limit=100&offset=0'
+    )
     expect(result.current.treatments).toHaveLength(2)
     expect(result.current.total).toBe(2)
     expect(result.current.error).toBeNull()
@@ -98,6 +100,64 @@ describe('usePatientTreatments hook', () => {
 
     expect(result.current.treatments).toHaveLength(1)
     expect(result.current.treatments[0].ID).toBe('101')
+  })
+
+  it('fetches additional pages when first page reaches fetch limit', async () => {
+    const firstPage = Array.from({ length: 100 }, (_, idx) => ({
+      ID: `P001-${idx + 1}`,
+      patient_code: 'P001',
+      patient_name: 'John Doe',
+      treatment_date: `2026-05-${String((idx % 28) + 1).padStart(2, '0')}`,
+    }))
+    const secondPage = [
+      {
+        ID: 'P001-101',
+        patient_code: 'P001',
+        patient_name: 'John Doe',
+        treatment_date: '2026-06-01',
+      },
+    ]
+
+    ;(apiFetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          data: {
+            treatments: firstPage,
+            total: 101,
+          },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          data: {
+            treatments: secondPage,
+            total: 101,
+          },
+        }),
+      })
+
+    const { result } = renderHook(() =>
+      usePatientTreatments('P001', 'John Doe', true)
+    )
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    expect(apiFetch).toHaveBeenNthCalledWith(
+      1,
+      '/treatment?keyword=P001&limit=100&offset=0'
+    )
+    expect(apiFetch).toHaveBeenNthCalledWith(
+      2,
+      '/treatment?keyword=P001&limit=100&offset=100'
+    )
+    expect(result.current.treatments).toHaveLength(101)
+    expect(result.current.total).toBe(101)
   })
 
   it('handles error response gracefully', async () => {

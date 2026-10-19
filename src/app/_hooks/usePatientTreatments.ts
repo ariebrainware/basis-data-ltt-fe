@@ -19,6 +19,8 @@ export function usePatientTreatments(
   patientName?: string | null,
   enabled: boolean = true
 ): PatientTreatmentsResult {
+  const HISTORY_FETCH_LIMIT = 100
+  const MAX_HISTORY_FETCH_PAGES = 50
   const [treatments, setTreatments] = useState<TreatmentType[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,21 +55,49 @@ export function usePatientTreatments(
 
     const fetchHistory = async () => {
       try {
-        const res = await apiFetch(
-          `/treatment?keyword=${encodeURIComponent(queryKey)}&limit=100`
-        )
-        if (res.status === 401) {
-          return
+        let raw: TreatmentType[] = []
+        let offset = 0
+        let pageCount = 0
+        let totalFromApi: number | null = null
+
+        while (pageCount < MAX_HISTORY_FETCH_PAGES) {
+          const query = `/treatment?keyword=${encodeURIComponent(queryKey)}&limit=${HISTORY_FETCH_LIMIT}&offset=${offset}`
+          const res = await apiFetch(query)
+          if (res.status === 401) {
+            return
+          }
+          if (!res.ok) {
+            throw new Error('Gagal mengambil riwayat penanganan')
+          }
+
+          const json = await res.json()
+          const pageItems: TreatmentType[] = Array.isArray(
+            json?.data?.treatments
+          )
+            ? json.data.treatments
+            : Array.isArray(json?.data)
+              ? json.data
+              : []
+          const pageTotal =
+            typeof json?.data?.total === 'number' ? json.data.total : null
+
+          if (totalFromApi === null && pageTotal !== null) {
+            totalFromApi = pageTotal
+          }
+
+          raw = [...raw, ...pageItems]
+          pageCount += 1
+
+          if (
+            pageItems.length === 0 ||
+            pageItems.length < HISTORY_FETCH_LIMIT ||
+            (totalFromApi !== null && raw.length >= totalFromApi)
+          ) {
+            break
+          }
+
+          offset += HISTORY_FETCH_LIMIT
         }
-        if (!res.ok) {
-          throw new Error('Gagal mengambil riwayat penanganan')
-        }
-        const json = await res.json()
-        const raw = Array.isArray(json?.data?.treatments)
-          ? json.data.treatments
-          : Array.isArray(json?.data)
-            ? json.data
-            : []
 
         const normalizedCode =
           patientCode !== null && patientCode !== undefined

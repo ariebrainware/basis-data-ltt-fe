@@ -42,11 +42,11 @@ export default function Treatment({
 }: TreatmentType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
   const [activeTab, setActiveTab] = React.useState<'form' | 'history'>('form')
-  const { total: historyCount, loading: historyLoading } = usePatientTreatments(
-    patientCode,
-    patientName,
-    open
-  )
+  const {
+    treatments: historyTreatments,
+    total: historyCount,
+    loading: historyLoading,
+  } = usePatientTreatments(patientCode, patientName, open)
   const [prevAttachmentPath, setPrevAttachmentPath] =
     React.useState(attachmentPath)
   const [currentAttachmentPath, setCurrentAttachmentPath] =
@@ -531,6 +531,7 @@ export default function Treatment({
                     patientCode={patientCode}
                     patientName={patientName}
                     currentTreatmentId={ID}
+                    initialTreatments={historyTreatments}
                   />
                 </div>
               )}

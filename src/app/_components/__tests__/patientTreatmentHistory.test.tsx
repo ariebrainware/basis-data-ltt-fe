@@ -140,4 +140,20 @@ describe('PatientTreatmentHistory Component', () => {
       'foto1.png'
     )
   })
+
+  it('uses keyboard-focusable button for history expansion control', () => {
+    render(
+      <PatientTreatmentHistory
+        patientCode="123"
+        patientName="Budi Santoso"
+        initialTreatments={mockTreatments}
+      />
+    )
+
+    const toggleBtn = screen.getByRole('button', { name: /2026-05-15/i })
+    expect(toggleBtn).toHaveAttribute('aria-expanded', 'true')
+
+    fireEvent.click(toggleBtn)
+    expect(toggleBtn).toHaveAttribute('aria-expanded', 'false')
+  })
 })
