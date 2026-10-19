@@ -18,6 +18,9 @@ import { isTherapist, isAdmin, getUserRole } from '../_functions/userRole'
 import { getUserId, getTherapistId } from '../_functions/userId'
 import { parseAttachmentPaths } from '../_functions/apiHost'
 import { getGenderLabel } from '../_functions/normalizeGender'
+import { PatientTreatmentHistory } from './patientTreatmentHistory'
+import { usePatientTreatments } from '../_hooks/usePatientTreatments'
+import { DocumentTextIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
 
 export default function Treatment({
   ID,
@@ -38,6 +41,12 @@ export default function Treatment({
   attachment_path: attachmentPath,
 }: TreatmentType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
+  const [activeTab, setActiveTab] = React.useState<'form' | 'history'>('form')
+  const { total: historyCount, loading: historyLoading } = usePatientTreatments(
+    patientCode,
+    patientName,
+    open
+  )
   const [prevAttachmentPath, setPrevAttachmentPath] =
     React.useState(attachmentPath)
   const [currentAttachmentPath, setCurrentAttachmentPath] =
@@ -174,6 +183,7 @@ export default function Treatment({
 
   const handleOpen = async () => {
     if (!open) {
+      setActiveTab('form')
       // When opening the dialog, ensure therapistIDState is synced with current therapistId
       setTherapistIDState(therapistId?.toString() ?? '')
       setOpen(true)
@@ -399,12 +409,48 @@ export default function Treatment({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          {canEdit
-            ? isTherapistRole
-              ? 'Lengkapi Data Penanganan Pasien'
-              : 'Ubah Data Penanganan Pasien'
-            : 'Detail Data Penanganan Pasien'}
+          {activeTab === 'history'
+            ? `Riwayat Penanganan - ${patientName || 'Pasien'}`
+            : canEdit
+              ? isTherapistRole
+                ? 'Lengkapi Data Penanganan Pasien'
+                : 'Ubah Data Penanganan Pasien'
+              : 'Detail Data Penanganan Pasien'}
         </DialogHeader>
+
+        {/* Tab switcher */}
+        <div className="flex border-b border-blue-gray-100 px-4 md:px-6">
+          <button
+            type="button"
+            data-testid="tab-form"
+            onClick={() => setActiveTab('form')}
+            className={`border-b-2 px-4 py-2.5 text-xs font-medium transition-colors md:text-sm ${
+              activeTab === 'form'
+                ? 'border-indigo-600 font-semibold text-indigo-700'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            }`}
+          >
+            Form Penanganan
+          </button>
+          <button
+            type="button"
+            data-testid="tab-history"
+            onClick={() => setActiveTab('history')}
+            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-medium transition-colors md:text-sm ${
+              activeTab === 'history'
+                ? 'border-indigo-600 font-semibold text-indigo-700'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            }`}
+          >
+            <span>Riwayat Semua Penanganan</span>
+            {historyCount > 0 && (
+              <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                {historyCount}
+              </span>
+            )}
+          </button>
+        </div>
+
         <DialogBody
           className="px-2 md:px-6"
           placeholder={undefined}
@@ -414,27 +460,81 @@ export default function Treatment({
           onResizeCapture={undefined}
         >
           {open && (
-            <TreatmentForm
-              ID={ID}
-              treatment_date={treatmentDate}
-              patient_code={patientCode}
-              patient_name={patientName}
-              therapist_name={therapistName}
-              therapist_id={therapistId}
-              issues={issues}
-              age={age}
-              gender={gender}
-              treatment={treatment}
-              remarks={remarks}
-              next_visit={nextVisit}
-              therapistIDState={therapistIDState}
-              setTherapistIDState={setTherapistIDState}
-              disabled={!canEdit}
-              health_history={healthHistory}
-              surgery_history={surgeryHistory}
-              attachment_path={currentAttachmentPath}
-              onAttachmentChange={(val) => setCurrentAttachmentPath(val)}
-            />
+            <>
+              {activeTab === 'form' ? (
+                <>
+                  <TreatmentForm
+                    ID={ID}
+                    treatment_date={treatmentDate}
+                    patient_code={patientCode}
+                    patient_name={patientName}
+                    therapist_name={therapistName}
+                    therapist_id={therapistId}
+                    issues={issues}
+                    age={age}
+                    gender={gender}
+                    treatment={treatment}
+                    remarks={remarks}
+                    next_visit={nextVisit}
+                    therapistIDState={therapistIDState}
+                    setTherapistIDState={setTherapistIDState}
+                    disabled={!canEdit}
+                    health_history={healthHistory}
+                    surgery_history={surgeryHistory}
+                    attachment_path={currentAttachmentPath}
+                    onAttachmentChange={(val) => setCurrentAttachmentPath(val)}
+                  />
+
+                  {/* Summary Callout Banner linking to History Tab */}
+                  <div className="dark:bg-indigo-950/20 mt-4 rounded-xl border border-indigo-100 bg-indigo-50/50 p-4 dark:border-indigo-900/50">
+                    <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-lg bg-indigo-100 p-2 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                          <DocumentTextIcon className="size-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+                            Riwayat Penanganan Pasien
+                          </p>
+                          <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80">
+                            {historyLoading
+                              ? 'Memuat riwayat penanganan...'
+                              : historyCount > 0
+                                ? `Pasien ${patientName || ''} memiliki ${historyCount} catatan penanganan.`
+                                : 'Belum ada catatan penanganan lainnya untuk pasien ini.'}
+                          </p>
+                        </div>
+                      </div>
+                      {historyCount > 0 && (
+                        <Button
+                          size="sm"
+                          variant="outlined"
+                          color="indigo"
+                          onClick={() => setActiveTab('history')}
+                          className="flex items-center gap-1.5 whitespace-nowrap text-xs normal-case"
+                          placeholder={undefined}
+                          onPointerEnterCapture={undefined}
+                          onPointerLeaveCapture={undefined}
+                          onResize={undefined}
+                          onResizeCapture={undefined}
+                        >
+                          <span>Lihat Riwayat ({historyCount})</span>
+                          <ArrowRightIcon className="size-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="py-2">
+                  <PatientTreatmentHistory
+                    patientCode={patientCode}
+                    patientName={patientName}
+                    currentTreatmentId={ID}
+                  />
+                </div>
+              )}
+            </>
           )}
         </DialogBody>
         <DialogFooter
@@ -444,7 +544,35 @@ export default function Treatment({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          {canEdit ? (
+          {activeTab === 'history' ? (
+            <>
+              <Button
+                variant="text"
+                color="blue-gray"
+                onClick={() => setActiveTab('form')}
+                className="mr-2"
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <span>Kembali ke Form</span>
+              </Button>
+              <Button
+                variant="gradient"
+                color="blue"
+                onClick={() => handleOpen()}
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <span>Tutup</span>
+              </Button>
+            </>
+          ) : canEdit ? (
             <>
               <Button
                 variant="text"

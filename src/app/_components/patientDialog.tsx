@@ -14,6 +14,9 @@ import {
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { isAdmin } from '../_functions/userRole'
+import { PatientTreatmentHistory } from './patientTreatmentHistory'
+import { usePatientTreatments } from '../_hooks/usePatientTreatments'
+import { DocumentTextIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
 
 type PatientProps = {
   ID: number
@@ -32,6 +35,10 @@ type PatientProps = {
   signature_path?: string
   attachment_path?: string
   onDataChange?: () => void
+  isOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+  initialTab?: 'form' | 'history'
+  hideTriggerButton?: boolean
 }
 
 type PatientUpdatePayload = Omit<
@@ -60,8 +67,39 @@ export default function PatientDialog({
   signature_path,
   attachment_path,
   onDataChange,
+  isOpen,
+  onOpenChange,
+  initialTab = 'form',
+  hideTriggerButton = false,
 }: PatientProps) {
-  const [open, setOpen] = React.useState(false)
+  const [internalOpen, setInternalOpen] = React.useState(false)
+  const isControlled = isOpen !== undefined
+  const open = isControlled ? isOpen : internalOpen
+  const setOpen = React.useCallback(
+    (newVal: boolean) => {
+      if (onOpenChange) onOpenChange(newVal)
+      if (!isControlled) setInternalOpen(newVal)
+    },
+    [isControlled, onOpenChange]
+  )
+
+  const [activeTab, setActiveTab] = React.useState<'form' | 'history'>(
+    initialTab || 'form'
+  )
+
+  React.useEffect(() => {
+    if (initialTab) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveTab(initialTab)
+    }
+  }, [initialTab])
+
+  const { total: historyCount, loading: historyLoading } = usePatientTreatments(
+    patientCode,
+    name,
+    open
+  )
+
   const router = useRouter()
   const [genderValue, setGenderValue] = React.useState<string>(gender || '')
   const [diseases, setDiseases] = React.useState<DiseaseType[]>([])
@@ -110,8 +148,9 @@ export default function PatientDialog({
     }
   }
 
-  const handleOpen = async () => {
+  const handleOpen = async (overrideTab?: 'form' | 'history') => {
     if (!open) {
+      setActiveTab(overrideTab || initialTab || 'form')
       setGenderValue(gender || '')
       await fetchDiseasesIfNeeded()
       setOpen(true)
@@ -296,30 +335,34 @@ export default function PatientDialog({
 
   return (
     <>
-      <button
-        data-open={open}
-        className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
-        data-shape="default"
-        onClick={() => handleOpen()}
-      >
-        <svg
-          width="1.5em"
-          height="1.5em"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          color="currentColor"
-          className="text-slate-800 size-4 dark:text-white"
+      {!hideTriggerButton && (
+        <button
+          data-open={open}
+          className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
+          data-shape="default"
+          onClick={() => handleOpen('form')}
+          aria-label="Edit patient"
+          title="Ubah Data Pasien"
         >
-          <path
-            d="M14.3632 5.65156L15.8431 4.17157C16.6242 3.39052 17.8905 3.39052 18.6716 4.17157L20.0858 5.58579C20.8668 6.36683 20.8668 7.63316 20.0858 8.41421L18.6058 9.8942M14.3632 5.65156L4.74749 15.2672C4.41542 15.5993 4.21079 16.0376 4.16947 16.5054L3.92738 19.2459C3.87261 19.8659 4.39148 20.3848 5.0115 20.33L7.75191 20.0879C8.21972 20.0466 8.65806 19.8419 8.99013 19.5099L18.6058 9.8942M14.3632 5.65156L18.6058 9.8942"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          ></path>
-        </svg>
-      </button>
+          <svg
+            width="1.5em"
+            height="1.5em"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            color="currentColor"
+            className="text-slate-800 size-4 dark:text-white"
+          >
+            <path
+              d="M14.3632 5.65156L15.8431 4.17157C16.6242 3.39052 17.8905 3.39052 18.6716 4.17157L20.0858 5.58579C20.8668 6.36683 20.8668 7.63316 20.0858 8.41421L18.6058 9.8942M14.3632 5.65156L4.74749 15.2672C4.41542 15.5993 4.21079 16.0376 4.16947 16.5054L3.92738 19.2459C3.87261 19.8659 4.39148 20.3848 5.0115 20.33L7.75191 20.0879C8.21972 20.0466 8.65806 19.8419 8.99013 19.5099L18.6058 9.8942M14.3632 5.65156L18.6058 9.8942"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            ></path>
+          </svg>
+        </button>
+      )}
 
       <Dialog
         size={'xl'}
@@ -339,8 +382,44 @@ export default function PatientDialog({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          Ubah Data Pasien
+          {activeTab === 'history'
+            ? `Riwayat Penanganan - ${name || 'Pasien'}`
+            : 'Ubah Data Pasien'}
         </DialogHeader>
+
+        {/* Tab Switcher */}
+        <div className="flex border-b border-blue-gray-100 px-4 md:px-6">
+          <button
+            type="button"
+            data-testid="tab-form"
+            onClick={() => setActiveTab('form')}
+            className={`border-b-2 px-4 py-2.5 text-xs font-medium transition-colors md:text-sm ${
+              activeTab === 'form'
+                ? 'border-indigo-600 font-semibold text-indigo-700'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            }`}
+          >
+            Data Pasien
+          </button>
+          <button
+            type="button"
+            data-testid="tab-history"
+            onClick={() => setActiveTab('history')}
+            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-medium transition-colors md:text-sm ${
+              activeTab === 'history'
+                ? 'border-indigo-600 font-semibold text-indigo-700'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            }`}
+          >
+            <span>Riwayat Penanganan</span>
+            {historyCount > 0 && (
+              <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                {historyCount}
+              </span>
+            )}
+          </button>
+        </div>
+
         <DialogBody
           className="px-2 md:px-6"
           placeholder={undefined}
@@ -349,34 +428,89 @@ export default function PatientDialog({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <PatientForm
-            ID={ID}
-            patient_code={patientCode ?? ''}
-            full_name={name ?? ''}
-            job={job ?? ''}
-            date_of_birth={currentDateOfBirth || date_of_birth || ''}
-            phone_number={
-              Array.isArray(phoneNumber)
-                ? phoneNumber
-                : typeof phoneNumber === 'string' && phoneNumber.trim()
-                  ? phoneNumber
-                      .split(',')
-                      .map((p) => p.trim())
-                      .filter(Boolean)
-                  : []
-            }
-            email={email ?? ''}
-            address={address ?? ''}
-            health_history={health_history ?? ''}
-            surgery_history={surgery_history ?? ''}
-            gender={genderValue}
-            last_visit={''}
-            signature={currentSignature}
-            signature_path={signature_path}
-            attachment_path={currentAttachmentPath}
-            onGenderChange={setGenderValue}
-            diseases={diseasesFetched ? diseases : undefined}
-          />
+          {open && (
+            <>
+              {activeTab === 'form' ? (
+                <>
+                  <PatientForm
+                    ID={ID}
+                    patient_code={patientCode ?? ''}
+                    full_name={name ?? ''}
+                    job={job ?? ''}
+                    date_of_birth={currentDateOfBirth || date_of_birth || ''}
+                    phone_number={
+                      Array.isArray(phoneNumber)
+                        ? phoneNumber
+                        : typeof phoneNumber === 'string' && phoneNumber.trim()
+                          ? phoneNumber
+                              .split(',')
+                              .map((p) => p.trim())
+                              .filter(Boolean)
+                          : []
+                    }
+                    email={email ?? ''}
+                    address={address ?? ''}
+                    health_history={health_history ?? ''}
+                    surgery_history={surgery_history ?? ''}
+                    gender={genderValue}
+                    last_visit={''}
+                    signature={currentSignature}
+                    signature_path={signature_path}
+                    attachment_path={currentAttachmentPath}
+                    onGenderChange={setGenderValue}
+                    diseases={diseasesFetched ? diseases : undefined}
+                  />
+
+                  {/* Summary Callout Banner linking to History Tab */}
+                  <div className="dark:bg-indigo-950/20 mt-4 rounded-xl border border-indigo-100 bg-indigo-50/50 p-4 dark:border-indigo-900/50">
+                    <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-lg bg-indigo-100 p-2 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                          <DocumentTextIcon className="size-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+                            Riwayat Penanganan Pasien
+                          </p>
+                          <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80">
+                            {historyLoading
+                              ? 'Memuat riwayat penanganan...'
+                              : historyCount > 0
+                                ? `Pasien ini memiliki ${historyCount} catatan riwayat penanganan.`
+                                : 'Belum ada catatan riwayat penanganan untuk pasien ini.'}
+                          </p>
+                        </div>
+                      </div>
+                      {historyCount > 0 && (
+                        <Button
+                          size="sm"
+                          variant="outlined"
+                          color="indigo"
+                          onClick={() => setActiveTab('history')}
+                          className="flex items-center gap-1.5 whitespace-nowrap text-xs normal-case"
+                          placeholder={undefined}
+                          onPointerEnterCapture={undefined}
+                          onPointerLeaveCapture={undefined}
+                          onResize={undefined}
+                          onResizeCapture={undefined}
+                        >
+                          <span>Lihat Riwayat ({historyCount})</span>
+                          <ArrowRightIcon className="size-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="py-2">
+                  <PatientTreatmentHistory
+                    patientCode={patientCode}
+                    patientName={name}
+                  />
+                </div>
+              )}
+            </>
+          )}
         </DialogBody>
         <DialogFooter
           placeholder={undefined}
@@ -385,31 +519,63 @@ export default function PatientDialog({
           onResize={undefined}
           onResizeCapture={undefined}
         >
-          <Button
-            variant="text"
-            color="red"
-            onClick={() => handleOpen()}
-            className="mr-1"
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            <span>Cancel</span>
-          </Button>
-          <Button
-            variant="gradient"
-            color="green"
-            onClick={() => handleUpdatePatientInfo()}
-            placeholder={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-            onResize={undefined}
-            onResizeCapture={undefined}
-          >
-            <span>Confirm</span>
-          </Button>
+          {activeTab === 'history' ? (
+            <>
+              <Button
+                variant="text"
+                color="blue-gray"
+                onClick={() => setActiveTab('form')}
+                className="mr-2"
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <span>Kembali ke Data Pasien</span>
+              </Button>
+              <Button
+                variant="gradient"
+                color="blue"
+                onClick={() => handleOpen()}
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <span>Tutup</span>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="text"
+                color="red"
+                onClick={() => handleOpen()}
+                className="mr-1"
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <span>Cancel</span>
+              </Button>
+              <Button
+                variant="gradient"
+                color="green"
+                onClick={() => handleUpdatePatientInfo()}
+                placeholder={undefined}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+                onResize={undefined}
+                onResizeCapture={undefined}
+              >
+                <span>Confirm</span>
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </Dialog>
     </>
