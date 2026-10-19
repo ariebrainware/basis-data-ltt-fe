@@ -93,7 +93,7 @@ describe('Treatment Row Component', () => {
     ;(isAdmin as jest.Mock).mockReturnValue(false)
     ;(isTherapist as jest.Mock).mockReturnValue(false)
 
-    render(
+    const { container } = render(
       <table>
         <tbody>
           <Treatment {...mockTreatment} />
@@ -105,6 +105,15 @@ describe('Treatment Row Component', () => {
     expect(screen.getByText('42 tahun • Laki-laki')).toBeInTheDocument()
     expect(screen.getByText('Back pain')).toBeInTheDocument()
     expect(screen.getByText('Dr. Jane Smith (10)')).toBeInTheDocument()
+
+    const cells = container.querySelectorAll('td')
+    expect(cells[0]).toHaveTextContent('2024-01-15')
+    expect(cells[1]).toHaveTextContent('John Doe (123)')
+    expect(cells[2]).toHaveTextContent('Dr. Jane Smith (10)')
+    expect(cells[3]).toHaveTextContent('Back pain')
+    expect(cells[4]).toHaveTextContent('Massage therapy')
+    expect(cells[5]).toHaveTextContent('Patient responding well')
+    expect(cells[6]).toHaveTextContent('2024-01-22')
   })
 
   test('shows view button (enabled) for normal users', () => {

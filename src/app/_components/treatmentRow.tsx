@@ -523,6 +523,13 @@ export default function Treatment({
         <td className="p-3">
           <div className="flex flex-col">
             <small className="font-sans text-sm text-current antialiased">
+              {therapistName} ({therapistId})
+            </small>
+          </div>
+        </td>
+        <td className="p-3">
+          <div className="flex flex-col">
+            <small className="font-sans text-sm text-current antialiased">
               {issues}
             </small>
           </div>
@@ -546,13 +553,6 @@ export default function Treatment({
           <div className="flex flex-col">
             <small className="font-sans text-sm text-current antialiased">
               {nextVisit}
-            </small>
-          </div>
-        </td>
-        <td className="p-3">
-          <div className="flex flex-col">
-            <small className="font-sans text-sm text-current antialiased">
-              {therapistName} ({therapistId})
             </small>
           </div>
         </td>
