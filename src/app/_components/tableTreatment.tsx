@@ -18,11 +18,11 @@ export interface ColumnConfig {
 export const TABLE_COLUMNS: ColumnConfig[] = [
   { label: 'Waktu & Tanggal', key: 'treatment_date', sortable: true },
   { label: 'Nama Pasien', key: 'patient_name', sortable: true },
+  { label: 'Terapis', key: 'therapist_name', sortable: true },
   { label: 'Keluhan', key: 'issues', sortable: true },
   { label: 'Penanganan', key: 'treatment', sortable: true },
   { label: 'Keterangan', key: 'remarks', sortable: true },
   { label: 'Kunjungan Selanjutnya', key: 'next_visit', sortable: true },
-  { label: 'Terapis', key: 'therapist_name', sortable: true },
   { label: '', sortable: false },
 ]
 

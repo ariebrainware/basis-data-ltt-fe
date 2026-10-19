@@ -85,16 +85,30 @@ describe('TableTreatment Sorting', () => {
     },
   ]
 
-  test('renders all headers including sortable ones', () => {
+  test('renders all headers including sortable ones in correct order', () => {
     render(<TableTreatment Data={{ treatment: mockTreatments }} />)
 
     expect(screen.getByText('Waktu & Tanggal')).toBeInTheDocument()
     expect(screen.getByText('Nama Pasien')).toBeInTheDocument()
+    expect(screen.getByText('Terapis')).toBeInTheDocument()
     expect(screen.getByText('Keluhan')).toBeInTheDocument()
     expect(screen.getByText('Penanganan')).toBeInTheDocument()
     expect(screen.getByText('Keterangan')).toBeInTheDocument()
     expect(screen.getByText('Kunjungan Selanjutnya')).toBeInTheDocument()
-    expect(screen.getByText('Terapis')).toBeInTheDocument()
+
+    const headers = screen
+      .getAllByRole('columnheader')
+      .map((th) => th.textContent?.trim())
+    expect(headers).toEqual([
+      'Waktu & Tanggal',
+      'Nama Pasien',
+      'Terapis',
+      'Keluhan',
+      'Penanganan',
+      'Keterangan',
+      'Kunjungan Selanjutnya',
+      '',
+    ])
   })
 
   test('sorts by Nama Pasien ascending then descending when header is clicked', () => {
