@@ -13,7 +13,9 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { TransactionType } from '../_types/transaction'
 import { TransactionForm } from './transactionForm'
 import InvoiceDialog from './invoiceDialog'
-import { PrinterIcon } from '@heroicons/react/24/outline'
+import { PrinterIcon, PaperClipIcon } from '@heroicons/react/24/outline'
+import { parseAttachmentPaths } from '../_functions/apiHost'
+import { viewAttachment } from '../_functions/viewAttachment'
 
 interface TransactionRowProps extends TransactionType {
   onUpdateSuccess?: () => void
@@ -294,6 +296,24 @@ export default function TransactionRow({
         </td>
         <td className="p-3">
           <div className="flex items-center gap-1">
+            {parseAttachmentPaths(currentAttachmentPath).length > 0 && (
+              <button
+                type="button"
+                className="dark:hover:bg-indigo-950/30 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium text-indigo-600 shadow-none outline-none transition-all duration-300 ease-in hover:bg-indigo-50 hover:shadow-none dark:text-indigo-400"
+                onClick={() => {
+                  const paths = parseAttachmentPaths(currentAttachmentPath)
+                  if (paths.length === 1) {
+                    void viewAttachment(paths[0], paths[0].split('/').pop())
+                  } else {
+                    handleOpen()
+                  }
+                }}
+                aria-label="Lihat lampiran transaksi"
+                title="Lihat Lampiran Transaksi"
+              >
+                <PaperClipIcon className="h-5 w-5" />
+              </button>
+            )}
             <button
               type="button"
               className="text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none"

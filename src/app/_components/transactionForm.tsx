@@ -9,7 +9,10 @@ import { useRouter } from 'next/navigation'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 
 import { getAttachmentUrl, parseAttachmentPaths } from '../_functions/apiHost'
-import { viewAttachment } from '../_functions/viewAttachment'
+import {
+  viewAttachment,
+  downloadAttachment,
+} from '../_functions/viewAttachment'
 
 const formatPaymentStatus = (s?: string | null) => {
   if (!s) return '-'
@@ -636,18 +639,35 @@ export function TransactionForm({
                       </svg>
                     </span>
                     <div className="flex flex-col overflow-hidden text-xs">
-                      <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
+                      <span
+                        className="text-slate-800 dark:text-slate-200 truncate font-semibold"
+                        title={path.split('/').pop()}
+                      >
                         {path.split('/').pop()}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          void viewAttachment(path, path.split('/').pop())
-                        }
-                        className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
-                      >
-                        Lihat Lampiran
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void viewAttachment(path, path.split('/').pop())
+                          }
+                          className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                          Lihat Lampiran
+                        </button>
+                        <span className="text-slate-300 dark:text-slate-600 text-[10px]">
+                          •
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void downloadAttachment(path, path.split('/').pop())
+                          }
+                          className="text-emerald-600 dark:text-emerald-400 cursor-pointer text-left text-[10px] hover:underline"
+                        >
+                          Unduh
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <button

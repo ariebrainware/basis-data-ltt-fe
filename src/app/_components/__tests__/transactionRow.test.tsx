@@ -3,6 +3,12 @@ import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import TransactionRow from '../transactionRow'
 import { apiFetch } from '../../_functions/apiFetch'
+import { viewAttachment } from '../../_functions/viewAttachment'
+
+jest.mock('../../_functions/viewAttachment', () => ({
+  viewAttachment: jest.fn(),
+  downloadAttachment: jest.fn(),
+}))
 
 const mockRefresh = jest.fn()
 
@@ -221,5 +227,38 @@ describe('TransactionRow', () => {
       attachment_path: 'uploads/attachments/receipt_new.pdf',
     })
     await waitFor(() => expect(mockRefresh).toHaveBeenCalled())
+  })
+
+  test('renders attachment button when row has attachment and calls viewAttachment on click', () => {
+    ;(viewAttachment as jest.Mock).mockResolvedValue('blob:url')
+
+    render(
+      <table>
+        <tbody>
+          <TransactionRow
+            ID={10}
+            treatment_id={30}
+            patient_name="Budi"
+            pricing_name="Paket Gold"
+            amount={250000}
+            payment_status="cash"
+            notes="catatan"
+            transaction_date="2026-05-20 10:00"
+            treatment_date="2026-05-21"
+            attachment_path="storage/attachments/receipt1.pdf"
+          />
+        </tbody>
+      </table>
+    )
+
+    const attachmentBtn = screen.getByLabelText('Lihat lampiran transaksi')
+    expect(attachmentBtn).toBeInTheDocument()
+
+    fireEvent.click(attachmentBtn)
+
+    expect(viewAttachment).toHaveBeenCalledWith(
+      'storage/attachments/receipt1.pdf',
+      'receipt1.pdf'
+    )
   })
 })

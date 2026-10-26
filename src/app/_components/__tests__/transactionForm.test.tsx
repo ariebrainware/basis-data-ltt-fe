@@ -505,4 +505,65 @@ describe('TransactionForm', () => {
     URL.createObjectURL = originalCreateObjectURL
     URL.revokeObjectURL = originalRevokeObjectURL
   })
+
+  test('renders storage/attachments paths and allows clicking Unduh to download with proper filename', async () => {
+    const originalCreateObjectURL = URL.createObjectURL
+    const originalRevokeObjectURL = URL.revokeObjectURL
+    URL.createObjectURL = jest
+      .fn()
+      .mockReturnValue('blob:http://localhost/mock-download')
+    URL.revokeObjectURL = jest.fn()
+    window.localStorage.setItem('session-token', 'test-token')
+    ;(global.fetch as any) = jest.fn().mockResolvedValue({
+      ok: true,
+      blob: async () => new Blob(['image content']),
+      headers: new Headers({ 'content-type': 'image/jpeg' }),
+    })
+
+    let downloadedFilename = ''
+    const clickSpy = jest
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(function (this: HTMLAnchorElement) {
+        downloadedFilename = this.download
+      })
+
+    render(
+      <TransactionForm
+        ID={1}
+        treatment_id={100}
+        patient_name="John Doe"
+        pricing_name="cash"
+        amount={150000}
+        payment_status="paid"
+        notes="Pembayaran lunas"
+        transaction_date="2026-05-20 10:00"
+        treatment_date="2026-05-20"
+        attachment_path="storage/attachments/1789201450665503000_IMG_2438.JPG"
+      />
+    )
+
+    const unduhButton = screen.getByRole('button', { name: /unduh/i })
+    expect(unduhButton).toBeInTheDocument()
+
+    fireEvent.click(unduhButton)
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'storage/attachments/1789201450665503000_IMG_2438.JPG'
+        ),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'session-token': 'test-token',
+          }),
+        })
+      )
+      expect(clickSpy).toHaveBeenCalled()
+      expect(downloadedFilename).toBe('1789201450665503000_IMG_2438.JPG')
+    })
+
+    clickSpy.mockRestore()
+    URL.createObjectURL = originalCreateObjectURL
+    URL.revokeObjectURL = originalRevokeObjectURL
+  })
 })
