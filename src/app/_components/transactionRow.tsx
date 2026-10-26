@@ -13,7 +13,9 @@ import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { TransactionType } from '../_types/transaction'
 import { TransactionForm } from './transactionForm'
 import InvoiceDialog from './invoiceDialog'
-import { PrinterIcon } from '@heroicons/react/24/outline'
+import { PrinterIcon, PaperClipIcon } from '@heroicons/react/24/outline'
+import { parseAttachmentPaths } from '../_functions/apiHost'
+import { viewAttachment } from '../_functions/viewAttachment'
 
 interface TransactionRowProps extends TransactionType {
   onUpdateSuccess?: () => void
@@ -94,8 +96,29 @@ export default function TransactionRow({
       document.querySelector<HTMLTextAreaElement>('#notes')?.value || notes
     const itemsInput = document.querySelector<HTMLInputElement>('#items')?.value
     const itemsPayload = itemsInput ? JSON.parse(itemsInput) : []
-    const attachmentPathInput =
+    const scopedAttachmentInput = document.querySelector<HTMLInputElement>(
+      `#attachment_path_${ID}`
+    )?.value
+    const fallbackAttachmentInput =
       document.querySelector<HTMLInputElement>('#attachment_path')?.value
+
+    const attachmentPathToSave =
+      currentAttachmentPath !== undefined && currentAttachmentPath !== ''
+        ? currentAttachmentPath
+        : scopedAttachmentInput !== undefined
+          ? scopedAttachmentInput
+          : fallbackAttachmentInput !== undefined
+            ? fallbackAttachmentInput
+            : ''
+
+    if (!pricingNameInput || pricingNameInput.trim() === '') {
+      Swal.fire({
+        text: 'Silakan pilih Metode Pembayaran terlebih dahulu.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      })
+      return
+    }
 
     apiFetch(`/transaction/${ID}`, {
       method: 'PATCH',
@@ -105,29 +128,30 @@ export default function TransactionRow({
         payment_method: pricingNameInput.trim(),
         payment_status: paymentStatusInput.trim(),
         items: itemsPayload,
-        attachment_path:
-          attachmentPathInput !== undefined
-            ? attachmentPathInput
-            : currentAttachmentPath || '',
+        attachment_path: attachmentPathToSave,
       }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.status === 401) {
           UnauthorizedAccess(router)
           return Promise.reject(new Error('Unauthorized'))
         }
         if (!response.ok) {
-          throw new Error('Failed to update transaction information')
+          const errData = await response.json().catch(() => null)
+          const errorMsg =
+            errData?.msg ||
+            errData?.error ||
+            'Gagal memperbarui data transaksi.'
+          throw new Error(errorMsg)
         }
         return response.json()
       })
       .then((data) => {
         console.log('Transaction information updated successfully:', data)
         const updatedPath =
-          data?.data?.attachment_path ||
-          (attachmentPathInput !== undefined
-            ? attachmentPathInput
-            : currentAttachmentPath)
+          data?.data?.attachment_path !== undefined
+            ? data.data.attachment_path
+            : attachmentPathToSave
         if (updatedPath !== undefined) {
           setCurrentAttachmentPath(updatedPath)
         }
@@ -148,7 +172,7 @@ export default function TransactionRow({
         console.error('Error updating transaction information:', error)
         if (error.message !== 'Unauthorized') {
           Swal.fire({
-            text: 'Gagal memperbarui data transaksi.',
+            text: error.message || 'Gagal memperbarui data transaksi.',
             icon: 'error',
             confirmButtonText: 'OK',
           })
@@ -199,6 +223,7 @@ export default function TransactionRow({
             items={items}
             attachment_path={currentAttachmentPath}
             onUploadingChange={setIsUploading}
+            onAttachmentChange={(val) => setCurrentAttachmentPath(val)}
           />
         </DialogBody>
         <DialogFooter
@@ -294,6 +319,24 @@ export default function TransactionRow({
         </td>
         <td className="p-3">
           <div className="flex items-center gap-1">
+            {parseAttachmentPaths(currentAttachmentPath).length > 0 && (
+              <button
+                type="button"
+                className="dark:hover:bg-indigo-950/30 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium text-indigo-600 shadow-none outline-none transition-all duration-300 ease-in hover:bg-indigo-50 hover:shadow-none dark:text-indigo-400"
+                onClick={() => {
+                  const paths = parseAttachmentPaths(currentAttachmentPath)
+                  if (paths.length === 1) {
+                    void viewAttachment(paths[0], paths[0].split('/').pop())
+                  } else {
+                    handleOpen()
+                  }
+                }}
+                aria-label="Lihat lampiran transaksi"
+                title="Lihat Lampiran Transaksi"
+              >
+                <PaperClipIcon className="h-5 w-5" />
+              </button>
+            )}
             <button
               type="button"
               className="text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none"
