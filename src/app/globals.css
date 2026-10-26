@@ -87,3 +87,8 @@ a {
   }
 }
 
+/* Ensure SweetAlert2 modal popups always appear above Material Tailwind Dialogs (zIndex: 9999) */
+.swal2-container {
+  z-index: 10005 !important;
+}
+

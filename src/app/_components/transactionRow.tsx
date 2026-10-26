@@ -111,6 +111,15 @@ export default function TransactionRow({
             ? fallbackAttachmentInput
             : ''
 
+    if (!pricingNameInput || pricingNameInput.trim() === '') {
+      Swal.fire({
+        text: 'Silakan pilih Metode Pembayaran terlebih dahulu.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      })
+      return
+    }
+
     apiFetch(`/transaction/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify({
@@ -122,13 +131,18 @@ export default function TransactionRow({
         attachment_path: attachmentPathToSave,
       }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.status === 401) {
           UnauthorizedAccess(router)
           return Promise.reject(new Error('Unauthorized'))
         }
         if (!response.ok) {
-          throw new Error('Failed to update transaction information')
+          const errData = await response.json().catch(() => null)
+          const errorMsg =
+            errData?.msg ||
+            errData?.error ||
+            'Gagal memperbarui data transaksi.'
+          throw new Error(errorMsg)
         }
         return response.json()
       })
@@ -158,7 +172,7 @@ export default function TransactionRow({
         console.error('Error updating transaction information:', error)
         if (error.message !== 'Unauthorized') {
           Swal.fire({
-            text: 'Gagal memperbarui data transaksi.',
+            text: error.message || 'Gagal memperbarui data transaksi.',
             icon: 'error',
             confirmButtonText: 'OK',
           })
