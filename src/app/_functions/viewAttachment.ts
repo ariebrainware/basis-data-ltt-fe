@@ -221,27 +221,11 @@ export async function downloadAttachment(
 ): Promise<void> {
   if (!path) return
 
-  // Handle data URLs directly
-  if (path.startsWith('data:')) {
-    if (typeof window === 'undefined') return
-    const mimeMatch = path.match(/^data:([^;,]+)/)
-    const mime = mimeMatch ? mimeMatch[1] : undefined
-    const resolvedFilename = resolveAttachmentFilename(
-      undefined,
-      filename,
-      mime
-    )
-
-    const link = document.createElement('a')
-    link.href = path
-    link.download = resolvedFilename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    return
+  const url = getAttachmentUrl(path)
+  if (!url) {
+    throw new Error('Invalid attachment URL')
   }
 
-  const url = getAttachmentUrl(path)
   const token = getSessionToken()
   const headers: Record<string, string> = {}
   if (token) {
