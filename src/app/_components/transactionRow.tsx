@@ -96,8 +96,20 @@ export default function TransactionRow({
       document.querySelector<HTMLTextAreaElement>('#notes')?.value || notes
     const itemsInput = document.querySelector<HTMLInputElement>('#items')?.value
     const itemsPayload = itemsInput ? JSON.parse(itemsInput) : []
-    const attachmentPathInput =
+    const scopedAttachmentInput = document.querySelector<HTMLInputElement>(
+      `#attachment_path_${ID}`
+    )?.value
+    const fallbackAttachmentInput =
       document.querySelector<HTMLInputElement>('#attachment_path')?.value
+
+    const attachmentPathToSave =
+      currentAttachmentPath !== undefined && currentAttachmentPath !== ''
+        ? currentAttachmentPath
+        : scopedAttachmentInput !== undefined
+          ? scopedAttachmentInput
+          : fallbackAttachmentInput !== undefined
+            ? fallbackAttachmentInput
+            : ''
 
     apiFetch(`/transaction/${ID}`, {
       method: 'PATCH',
@@ -107,10 +119,7 @@ export default function TransactionRow({
         payment_method: pricingNameInput.trim(),
         payment_status: paymentStatusInput.trim(),
         items: itemsPayload,
-        attachment_path:
-          attachmentPathInput !== undefined
-            ? attachmentPathInput
-            : currentAttachmentPath || '',
+        attachment_path: attachmentPathToSave,
       }),
     })
       .then((response) => {
@@ -126,10 +135,9 @@ export default function TransactionRow({
       .then((data) => {
         console.log('Transaction information updated successfully:', data)
         const updatedPath =
-          data?.data?.attachment_path ||
-          (attachmentPathInput !== undefined
-            ? attachmentPathInput
-            : currentAttachmentPath)
+          data?.data?.attachment_path !== undefined
+            ? data.data.attachment_path
+            : attachmentPathToSave
         if (updatedPath !== undefined) {
           setCurrentAttachmentPath(updatedPath)
         }
@@ -201,6 +209,7 @@ export default function TransactionRow({
             items={items}
             attachment_path={currentAttachmentPath}
             onUploadingChange={setIsUploading}
+            onAttachmentChange={(val) => setCurrentAttachmentPath(val)}
           />
         </DialogBody>
         <DialogFooter

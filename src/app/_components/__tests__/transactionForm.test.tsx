@@ -566,4 +566,118 @@ describe('TransactionForm', () => {
     URL.createObjectURL = originalCreateObjectURL
     URL.revokeObjectURL = originalRevokeObjectURL
   })
+
+  test('calls onAttachmentChange when new attachment is uploaded and when deleted', async () => {
+    const onAttachmentChangeMock = jest.fn()
+    ;(apiFetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          file_path: 'storage/attachments/newly_uploaded.pdf',
+        },
+      }),
+    })
+
+    const { container } = render(
+      <TransactionForm
+        ID={1}
+        treatment_id={100}
+        patient_name="John Doe"
+        pricing_name="cash"
+        amount={150000}
+        payment_status="paid"
+        notes="Pembayaran lunas"
+        transaction_date="2026-05-20 10:00"
+        treatment_date="2026-05-20"
+        attachment_path="storage/attachments/existing.pdf"
+        onAttachmentChange={onAttachmentChangeMock}
+      />
+    )
+
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    const file = new File(['pdf-content'], 'test.pdf', {
+      type: 'application/pdf',
+    })
+    fireEvent.change(fileInput, { target: { files: [file] } })
+
+    await waitFor(() => {
+      expect(onAttachmentChangeMock).toHaveBeenCalledWith(
+        'storage/attachments/existing.pdf,storage/attachments/newly_uploaded.pdf'
+      )
+    })
+
+    // Now delete the first attachment
+    const deleteButtons = screen.getAllByRole('button', {
+      name: /hapus lampiran/i,
+    })
+    expect(deleteButtons.length).toBe(2)
+    fireEvent.click(deleteButtons[0])
+
+    expect(onAttachmentChangeMock).toHaveBeenCalledWith(
+      'storage/attachments/newly_uploaded.pdf'
+    )
+  })
+
+  test('falls back to /patient/upload when /transaction/upload returns 404', async () => {
+    const onAttachmentChangeMock = jest.fn()
+    ;(apiFetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        json: async () => ({
+          success: false,
+          msg: 'Route not found',
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: {
+            file_path: 'uploads/attachments/fallback_upload.pdf',
+          },
+        }),
+      })
+
+    const { container } = render(
+      <TransactionForm
+        ID={1}
+        treatment_id={100}
+        patient_name="John Doe"
+        pricing_name="cash"
+        amount={150000}
+        payment_status="paid"
+        notes="Pembayaran lunas"
+        transaction_date="2026-05-20 10:00"
+        treatment_date="2026-05-20"
+        onAttachmentChange={onAttachmentChangeMock}
+      />
+    )
+
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    const file = new File(['pdf-content'], 'test.pdf', {
+      type: 'application/pdf',
+    })
+    fireEvent.change(fileInput, { target: { files: [file] } })
+
+    await waitFor(() => {
+      expect(apiFetch).toHaveBeenCalledWith(
+        '/transaction/upload',
+        expect.any(Object)
+      )
+      expect(apiFetch).toHaveBeenCalledWith(
+        '/patient/upload',
+        expect.any(Object)
+      )
+      expect(onAttachmentChangeMock).toHaveBeenCalledWith(
+        'uploads/attachments/fallback_upload.pdf'
+      )
+    })
+  })
 })

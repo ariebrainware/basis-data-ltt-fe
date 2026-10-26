@@ -49,6 +49,7 @@ const normalizePaymentStatusDefault = (val?: string | null) => {
 export interface TransactionFormProps extends TransactionType {
   onUploadingChange?: (isUploading: boolean) => void
   onUploadStateChange?: (isUploading: boolean) => void
+  onAttachmentChange?: (attachmentPath: string) => void
 }
 
 export function TransactionForm({
@@ -65,6 +66,7 @@ export function TransactionForm({
   attachment_path,
   onUploadingChange,
   onUploadStateChange,
+  onAttachmentChange,
 }: TransactionFormProps) {
   const [allItems, setAllItems] = useState<ItemType[]>([])
   const [selectedItems, setSelectedItems] = useState<
@@ -167,7 +169,9 @@ export function TransactionForm({
               setSelectedItems(mapped)
             }
             if (fetchedAttachment && !isAttachmentDirtyRef.current) {
-              setAttachmentPaths(parseAttachmentPaths(fetchedAttachment))
+              const incoming = parseAttachmentPaths(fetchedAttachment)
+              setAttachmentPaths(incoming)
+              onAttachmentChange?.(incoming.join(','))
             }
           }
         }
@@ -179,7 +183,7 @@ export function TransactionForm({
     return () => {
       mounted = false
     }
-  }, [ID, router])
+  }, [ID, onAttachmentChange, router])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -198,6 +202,7 @@ export function TransactionForm({
     formData.append('file', file, sanitizedName)
 
     try {
+      let uploadedPath: string | undefined
       const res = await apiFetch('/transaction/upload', {
         method: 'POST',
         body: formData,
@@ -206,8 +211,43 @@ export function TransactionForm({
         UnauthorizedAccess(router)
         return
       }
-      const data = await res.json().catch(() => null)
-      if (!res.ok || data?.success === false) {
+
+      if (res.ok) {
+        const data = await res.json().catch(() => null)
+        uploadedPath =
+          data?.data?.attachment_path ||
+          data?.data?.file_path ||
+          data?.attachment_path ||
+          data?.file_path
+      } else if (res.status === 404 || res.status === 403) {
+        // Fallback to /patient/upload if /transaction/upload is not available or restricted
+        const fallbackRes = await apiFetch('/patient/upload', {
+          method: 'POST',
+          body: formData,
+        }).catch(() => null)
+        if (fallbackRes?.status === 401) {
+          UnauthorizedAccess(router)
+          return
+        }
+        if (fallbackRes?.ok) {
+          const fbData = await fallbackRes.json().catch(() => null)
+          uploadedPath =
+            fbData?.data?.file_path ||
+            fbData?.data?.attachment_path ||
+            fbData?.file_path ||
+            fbData?.attachment_path
+        } else {
+          const data = await res.json().catch(() => null)
+          const errorMsg =
+            data?.msg ||
+            data?.error ||
+            (res.ok
+              ? 'Gagal mengunggah file'
+              : `Gagal mengunggah file (${res.status})`)
+          throw new Error(errorMsg)
+        }
+      } else {
+        const data = await res.json().catch(() => null)
         const errorMsg =
           data?.msg ||
           data?.error ||
@@ -216,19 +256,15 @@ export function TransactionForm({
             : `Gagal mengunggah file (${res.status})`)
         throw new Error(errorMsg)
       }
-      const uploadedPath =
-        data?.data?.attachment_path ||
-        data?.data?.file_path ||
-        data?.attachment_path ||
-        data?.file_path
+
       if (uploadedPath) {
         isAttachmentDirtyRef.current = true
         const parsed = parseAttachmentPaths(uploadedPath)
-        if (parsed.length > 0) {
-          setAttachmentPaths((prev) => [...prev, ...parsed])
-        } else if (typeof uploadedPath === 'string') {
-          setAttachmentPaths((prev) => [...prev, uploadedPath])
-        }
+        const toAdd = parsed.length ? parsed : [uploadedPath]
+        const nextPaths = Array.from(new Set([...attachmentPaths, ...toAdd]))
+        setAttachmentPaths(nextPaths)
+        const joined = nextPaths.join(',')
+        onAttachmentChange?.(joined)
       }
     } catch (err: any) {
       console.error(err)
@@ -603,8 +639,14 @@ export function TransactionForm({
           />
 
           <input
-            id="attachment_path"
+            id={`attachment_path_${ID}`}
+            data-testid="attachment_path"
             name="attachment_path"
+            type="hidden"
+            value={attachmentPaths.join(',')}
+          />
+          <input
+            id="attachment_path"
             type="hidden"
             value={attachmentPaths.join(',')}
           />
@@ -674,9 +716,11 @@ export function TransactionForm({
                     type="button"
                     onClick={() => {
                       isAttachmentDirtyRef.current = true
-                      setAttachmentPaths((prev) =>
-                        prev.filter((_, i) => i !== index)
+                      const nextPaths = attachmentPaths.filter(
+                        (_, i) => i !== index
                       )
+                      setAttachmentPaths(nextPaths)
+                      onAttachmentChange?.(nextPaths.join(','))
                     }}
                     className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1 hover:text-red-500"
                     aria-label={`Hapus lampiran ${index + 1}`}
