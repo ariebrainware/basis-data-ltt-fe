@@ -300,7 +300,8 @@ describe('downloadAttachment', () => {
 
     expect(clickSpy).toHaveBeenCalled()
     expect(downloadedFilename).toBe('my_receipt.png')
-    expect(href).toBe(dataUri)
+    expect(href).toBe('blob:http://localhost/download-blob')
+    expect(URL.createObjectURL).toHaveBeenCalled()
     clickSpy.mockRestore()
   })
 

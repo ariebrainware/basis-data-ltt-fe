@@ -209,6 +209,36 @@ export async function viewAttachment(
 }
 
 /**
+ * Converts a data URL to a Blob object.
+ */
+function dataUriToBlob(dataUri: string): { blob: Blob; mimeType?: string } {
+  const [header, base64Data] = dataUri.split(',')
+  const mimeMatch = header?.match(/^data:([^;,]+)/)
+  const mimeType = mimeMatch ? mimeMatch[1] : undefined
+
+  if (base64Data !== undefined) {
+    const isBase64 = header.includes(';base64')
+    const byteString = isBase64
+      ? atob(base64Data)
+      : decodeURIComponent(base64Data)
+    const ab = new ArrayBuffer(byteString.length)
+    const ia = new Uint8Array(ab)
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i)
+    }
+    return {
+      blob: new Blob([ia], { type: mimeType || 'application/octet-stream' }),
+      mimeType,
+    }
+  }
+
+  return {
+    blob: new Blob([], { type: mimeType || 'application/octet-stream' }),
+    mimeType,
+  }
+}
+
+/**
  * Fetches an attachment using authenticated HTTP headers and triggers a direct browser download,
  * guaranteeing the file is saved with its proper name and file extension.
  *
@@ -221,19 +251,43 @@ export async function downloadAttachment(
 ): Promise<void> {
   if (!path) return
 
-  const url = getAttachmentUrl(path)
-  if (!url) {
-    throw new Error('Invalid attachment URL')
-  }
-
-  const token = getSessionToken()
-  const headers: Record<string, string> = {}
-  if (token) {
-    headers['session-token'] = token
-    headers['Authorization'] = `Bearer ${token}`
-  }
-
   try {
+    // Handle data URLs directly by converting to Blob URL (avoids DOM XSS / HTML reinterpretation)
+    if (path.startsWith('data:')) {
+      if (typeof window === 'undefined') return
+      const { blob, mimeType } = dataUriToBlob(path)
+      const resolvedFilename = resolveAttachmentFilename(
+        undefined,
+        filename,
+        mimeType
+      )
+
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = resolvedFilename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl)
+      }, 60000)
+      return
+    }
+
+    const url = getAttachmentUrl(path)
+    if (!url) {
+      throw new Error('Invalid attachment URL')
+    }
+
+    const token = getSessionToken()
+    const headers: Record<string, string> = {}
+    if (token) {
+      headers['session-token'] = token
+      headers['Authorization'] = `Bearer ${token}`
+    }
+
     const response = await fetch(url, {
       method: 'GET',
       headers,
