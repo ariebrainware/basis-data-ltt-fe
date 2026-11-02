@@ -165,9 +165,9 @@ describe('getAuthenticatedAttachmentUrl', () => {
 
   test('preserves existing query parameters when appending token', () => {
     window.localStorage.setItem('session-token', 'token-abc')
-    expect(
-      getAuthenticatedAttachmentUrl('uploads/doc.pdf?version=2')
-    ).toBe('https://localhost:19091/uploads/doc.pdf?version=2&token=token-abc')
+    expect(getAuthenticatedAttachmentUrl('uploads/doc.pdf?version=2')).toBe(
+      'https://localhost:19091/uploads/doc.pdf?version=2&token=token-abc'
+    )
   })
 
   test('returns data: URLs unchanged without token', () => {

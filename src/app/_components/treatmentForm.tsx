@@ -11,7 +11,10 @@ import {
   getAuthenticatedAttachmentUrl,
   parseAttachmentPaths,
 } from '../_functions/apiHost'
-import { viewAttachment, downloadAttachment } from '../_functions/viewAttachment'
+import {
+  viewAttachment,
+  downloadAttachment,
+} from '../_functions/viewAttachment'
 import { apiFetch } from '../_functions/apiFetch'
 import { getGenderLabel } from '../_functions/normalizeGender'
 
@@ -562,7 +565,7 @@ export function TreatmentForm({
 
                         {/* Inline preview */}
                         {isPreviewing && (
-                          <div className="mt-2.5 overflow-hidden rounded border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-900">
+                          <div className="border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900 mt-2.5 overflow-hidden rounded border p-2">
                             {isImage ? (
                               <img
                                 src={getAuthenticatedAttachmentUrl(path)}
@@ -573,12 +576,13 @@ export function TreatmentForm({
                               <iframe
                                 src={getAuthenticatedAttachmentUrl(path)}
                                 title={fileName}
-                                className="h-96 w-full rounded border border-slate-200 bg-white"
+                                className="border-slate-200 h-96 w-full rounded border bg-white"
                               />
                             ) : (
                               <div className="flex flex-col items-center justify-center p-4 text-center">
                                 <p className="mb-2 text-xs text-gray-600 dark:text-gray-400">
-                                  Preview langsung tidak tersedia untuk format file ini.
+                                  Preview langsung tidak tersedia untuk format
+                                  file ini.
                                 </p>
                                 <button
                                   type="button"

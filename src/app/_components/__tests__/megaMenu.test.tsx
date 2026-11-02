@@ -64,6 +64,8 @@ describe('MegaMenuDefault Component', () => {
     fireEvent.click(menuButtons[menuButtons.length - 1])
 
     expect(screen.getAllByText('Pasien').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText('Penanganan Terapis').length).toBeGreaterThanOrEqual(1)
+    expect(
+      screen.getAllByText('Penanganan Terapis').length
+    ).toBeGreaterThanOrEqual(1)
   })
 })

@@ -312,9 +312,7 @@ describe('viewAttachment', () => {
   test('falls back to direct URL navigation when all fetch attempts throw network or CORS error', async () => {
     window.localStorage.setItem('session-token', 'therapist-token')
 
-    global.fetch = jest
-      .fn()
-      .mockRejectedValue(new TypeError('Failed to fetch'))
+    global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'))
 
     const result = await viewAttachment('uploads/attachments/static_scan.pdf')
 
