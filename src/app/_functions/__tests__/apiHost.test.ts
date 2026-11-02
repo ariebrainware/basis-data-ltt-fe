@@ -156,17 +156,17 @@ describe('getAuthenticatedAttachmentUrl', () => {
     )
   })
 
-  test('appends token query param when token is present', () => {
+  test('does not append token query param when token is present', () => {
     window.localStorage.setItem('session-token', 'therapist-token-123')
     expect(getAuthenticatedAttachmentUrl('uploads/doc.pdf')).toBe(
-      'https://localhost:19091/uploads/doc.pdf?token=therapist-token-123'
+      'https://localhost:19091/uploads/doc.pdf'
     )
   })
 
-  test('preserves existing query parameters when appending token', () => {
+  test('preserves existing query parameters unchanged', () => {
     window.localStorage.setItem('session-token', 'token-abc')
     expect(getAuthenticatedAttachmentUrl('uploads/doc.pdf?version=2')).toBe(
-      'https://localhost:19091/uploads/doc.pdf?version=2&token=token-abc'
+      'https://localhost:19091/uploads/doc.pdf?version=2'
     )
   })
 

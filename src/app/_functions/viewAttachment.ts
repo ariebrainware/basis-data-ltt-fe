@@ -130,24 +130,17 @@ export async function viewAttachment(
         headers,
         credentials: 'include',
       })
-      if (!response.ok) {
-        // Fallback retry without Authorization or credentials: 'include'
-        // Useful if CORS or backend auth rejects Bearer token / credentials for therapist
+      if (!response.ok && token) {
         const retryRes = await fetch(url, {
           method: 'GET',
-          headers: token ? { 'session-token': token } : {},
+          headers: { 'session-token': token },
         }).catch(() => null)
         if (retryRes && retryRes.ok) {
           response = retryRes
-        } else {
-          const plainRes = await fetch(url, { method: 'GET' }).catch(() => null)
-          if (plainRes && plainRes.ok) {
-            response = plainRes
-          }
         }
       }
     } catch {
-      // First fetch threw CORS/network error, retry with session-token or plain
+      // First fetch threw CORS/network error, retry with session-token only
       const retryRes = await fetch(url, {
         method: 'GET',
         headers: token ? { 'session-token': token } : {},
@@ -155,35 +148,7 @@ export async function viewAttachment(
       if (retryRes && retryRes.ok) {
         response = retryRes
       } else {
-        const plainRes = await fetch(url, { method: 'GET' }).catch(() => null)
-        if (plainRes && plainRes.ok) {
-          response = plainRes
-        } else {
-          // If all fetch attempts threw network/CORS error, fall back to opening direct URL in new tab
-          // Top-level tab navigation is NOT subject to CORS restrictions
-          if (typeof window !== 'undefined') {
-            const authUrl = token
-              ? `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`
-              : url
-            if (window.open) {
-              const directWin = window.open(
-                authUrl,
-                '_blank',
-                'noopener,noreferrer'
-              )
-              if (directWin) return authUrl
-            }
-            const link = document.createElement('a')
-            link.href = authUrl
-            link.target = '_blank'
-            link.rel = 'noopener noreferrer'
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            return authUrl
-          }
-          throw new Error('Failed to fetch attachment')
-        }
+        throw new Error('Failed to fetch attachment')
       }
     }
 
@@ -240,26 +205,14 @@ export async function viewAttachment(
 
       // If opening in tab failed/blocked, or format cannot be displayed inline (e.g. HEIC, docx), download with extension
       if (!opened) {
-        if (isInline && window.open) {
-          try {
-            const authUrl = token
-              ? `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`
-              : url
-            opened = window.open(authUrl, '_blank', 'noopener,noreferrer')
-          } catch {
-            // ignore
-          }
-        }
-        if (!opened) {
-          const link = document.createElement('a')
-          link.href = blobUrl
-          link.download = resolvedFilename
-          link.target = '_blank'
-          link.rel = 'noopener noreferrer'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-        }
+        const link = document.createElement('a')
+        link.href = blobUrl
+        link.download = resolvedFilename
+        link.target = '_blank'
+        link.rel = 'noopener noreferrer'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
       }
 
       // Revoke the object URL after 60s to free memory
@@ -384,19 +337,6 @@ export async function downloadAttachment(
       if (retryRes && retryRes.ok) {
         response = retryRes
       } else {
-        // Fallback to direct anchor download
-        if (typeof window !== 'undefined') {
-          const authUrl = token
-            ? `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`
-            : url
-          const link = document.createElement('a')
-          link.href = authUrl
-          link.download = resolveAttachmentFilename(path, filename)
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          return
-        }
         throw new Error('Failed to fetch attachment')
       }
     }
