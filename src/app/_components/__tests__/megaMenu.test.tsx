@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import MegaMenuDefault from '../megaMenu'
 
 const mockPush = jest.fn()
@@ -53,5 +53,17 @@ describe('MegaMenuDefault Component', () => {
     expect(userProfileEls.length).toBeGreaterThanOrEqual(1)
     const usernameEls = screen.getAllByTestId('nav-username')
     expect(usernameEls[0]).toHaveTextContent('Terapis')
+  })
+
+  test('renders Pasien and Penanganan Terapis menu items for therapist role when menu is opened', async () => {
+    window.localStorage.setItem('user-role', 'therapist')
+
+    render(<MegaMenuDefault />)
+
+    const menuButtons = screen.getAllByText('Menu')
+    fireEvent.click(menuButtons[menuButtons.length - 1])
+
+    expect(screen.getAllByText('Pasien').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Penanganan Terapis').length).toBeGreaterThanOrEqual(1)
   })
 })

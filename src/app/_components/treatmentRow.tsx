@@ -190,11 +190,11 @@ export default function Treatment({
 
       // Fetch patient attachments & treatment details
       try {
-        if (patientCode && process.env.NODE_ENV !== 'test') {
+        if (patientCode) {
           const res = await apiFetch(
             `/patient?keyword=${encodeURIComponent(patientCode)}`
           )
-          if (res.ok) {
+          if (res && res.ok) {
             const data = await res.json()
             const patients = Array.isArray(data?.data?.patients)
               ? data.data.patients
@@ -207,6 +207,19 @@ export default function Treatment({
                   String(p.patient_code) === String(patientCode) ||
                   String(p.ID) === String(patientCode)
               ) || patients[0]
+            if (found?.ID && !found.attachment_path) {
+              try {
+                const detailRes = await apiFetch(`/patient/${found.ID}`)
+                if (detailRes && detailRes.ok) {
+                  const detailData = await detailRes.json()
+                  if (detailData?.data?.attachment_path) {
+                    found.attachment_path = detailData.data.attachment_path
+                  }
+                }
+              } catch {
+                // ignore
+              }
+            }
             if (found?.attachment_path) {
               const parsed = parseAttachmentPaths(found.attachment_path)
               if (parsed.length > 0) {

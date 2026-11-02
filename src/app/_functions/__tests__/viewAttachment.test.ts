@@ -220,6 +220,115 @@ describe('viewAttachment', () => {
     clickSpy.mockRestore()
   })
 
+  test('retries with session-token only when initial fetch returns 401/403 (therapist CORS/auth fallback)', async () => {
+    window.localStorage.setItem('session-token', 'therapist-token')
+
+    const mockBlob = new Blob(['pdf-data'], { type: 'application/pdf' })
+
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'application/pdf' }),
+        blob: jest.fn().mockResolvedValue(mockBlob),
+      })
+
+    const result = await viewAttachment(
+      'uploads/attachments/therapist_scan.pdf'
+    )
+
+    expect(global.fetch).toHaveBeenCalledTimes(2)
+    // First call has Authorization and credentials: include
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      1,
+      'https://localhost:19091/uploads/attachments/therapist_scan.pdf',
+      {
+        method: 'GET',
+        headers: {
+          'session-token': 'therapist-token',
+          Authorization: 'Bearer therapist-token',
+        },
+        credentials: 'include',
+      }
+    )
+    // Retry call has only session-token without credentials or Authorization
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      2,
+      'https://localhost:19091/uploads/attachments/therapist_scan.pdf',
+      {
+        method: 'GET',
+        headers: {
+          'session-token': 'therapist-token',
+        },
+      }
+    )
+
+    expect(result).toBe('blob:http://localhost/1234')
+    expect(window.open).toHaveBeenCalledWith(
+      'blob:http://localhost/1234',
+      '_blank',
+      'noopener,noreferrer'
+    )
+  })
+
+  test('retries with plain fetch when initial fetch throws network/CORS error', async () => {
+    window.localStorage.setItem('session-token', 'therapist-token')
+
+    const mockBlob = new Blob(['pdf-data'], { type: 'application/pdf' })
+
+    global.fetch = jest
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'application/pdf' }),
+        blob: jest.fn().mockResolvedValue(mockBlob),
+      })
+
+    const result = await viewAttachment('uploads/attachments/public_doc.pdf')
+
+    expect(global.fetch).toHaveBeenCalledTimes(3)
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      3,
+      'https://localhost:19091/uploads/attachments/public_doc.pdf',
+      {
+        method: 'GET',
+      }
+    )
+    expect(result).toBe('blob:http://localhost/1234')
+  })
+
+  test('falls back to direct URL navigation when all fetch attempts throw network or CORS error', async () => {
+    window.localStorage.setItem('session-token', 'therapist-token')
+
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(new TypeError('Failed to fetch'))
+
+    const result = await viewAttachment('uploads/attachments/static_scan.pdf')
+
+    expect(window.open).toHaveBeenCalledWith(
+      'https://localhost:19091/uploads/attachments/static_scan.pdf?token=therapist-token',
+      '_blank',
+      'noopener,noreferrer'
+    )
+    expect(result).toBe(
+      'https://localhost:19091/uploads/attachments/static_scan.pdf?token=therapist-token'
+    )
+    expect(window.alert).not.toHaveBeenCalled()
+  })
+
   test('handles HTTP errors gracefully and shows alert', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
@@ -336,6 +445,38 @@ describe('downloadAttachment', () => {
       })
     )
 
+    expect(clickSpy).toHaveBeenCalled()
+    expect(downloadedFilename).toBe('receipt_2026.jpg')
+    clickSpy.mockRestore()
+  })
+
+  test('retries download with session-token and plain fetch on error', async () => {
+    window.localStorage.setItem('session-token', 'valid-token')
+
+    let downloadedFilename = ''
+    const clickSpy = jest
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(function (this: HTMLAnchorElement) {
+        downloadedFilename = this.download
+      })
+
+    const mockBlob = new Blob(['sample receipt content'])
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'image/jpeg' }),
+        blob: jest.fn().mockResolvedValue(mockBlob),
+      })
+
+    await downloadAttachment('storage/attachments/receipt_2026.jpg')
+
+    expect(global.fetch).toHaveBeenCalledTimes(2)
     expect(clickSpy).toHaveBeenCalled()
     expect(downloadedFilename).toBe('receipt_2026.jpg')
     clickSpy.mockRestore()

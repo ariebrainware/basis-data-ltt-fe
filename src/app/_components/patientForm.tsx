@@ -11,9 +11,10 @@ import type { DateValueType } from 'react-tailwindcss-datepicker'
 import {
   getApiHost,
   getAttachmentUrl,
+  getAuthenticatedAttachmentUrl,
   parseAttachmentPaths,
 } from '../_functions/apiHost'
-import { viewAttachment } from '../_functions/viewAttachment'
+import { viewAttachment, downloadAttachment } from '../_functions/viewAttachment'
 import { apiFetch } from '../_functions/apiFetch'
 
 function getSignatureUrl(path?: string): string {
@@ -87,11 +88,11 @@ export function PatientForm({
   const initialSignature = signature_path || signature || ''
   const [signatureVal, setSignatureVal] = useState(initialSignature)
   const [isEditingSignature, setIsEditingSignature] = useState(false)
-  console.log('PatientForm attachment_path prop:', attachment_path)
   const [attachmentPaths, setAttachmentPaths] = useState<string[]>(() => {
     return parseAttachmentPaths(attachment_path)
   })
   const [isUploading, setIsUploading] = useState(false)
+  const [previewPath, setPreviewPath] = useState<string | null>(null)
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -113,15 +114,39 @@ export function PatientForm({
     formData.append('file', file, sanitizedName)
 
     try {
+      let uploadedPath: string | undefined
       const res = await apiFetch('/patient/upload', {
         method: 'POST',
         body: formData,
       })
       if (!res.ok) {
-        throw new Error('Upload failed')
+        const fallbackRes = await apiFetch('/treatment/upload', {
+          method: 'POST',
+          body: formData,
+        }).catch(() => null)
+        if (!fallbackRes || !fallbackRes.ok) {
+          throw new Error('Upload failed')
+        }
+        const fbData = await fallbackRes.json()
+        uploadedPath =
+          fbData?.data?.file_path ||
+          fbData?.data?.attachment_path ||
+          fbData?.file_path ||
+          fbData?.attachment_path
+      } else {
+        const data = await res.json()
+        uploadedPath =
+          data?.data?.file_path ||
+          data?.data?.attachment_path ||
+          data?.file_path ||
+          data?.attachment_path
       }
-      const data = await res.json()
-      setAttachmentPaths((prev) => [...prev, data.data.file_path])
+
+      if (uploadedPath) {
+        const parsed = parseAttachmentPaths(uploadedPath)
+        const toAdd = parsed.length ? parsed : [uploadedPath]
+        setAttachmentPaths((prev) => Array.from(new Set([...prev, ...toAdd])))
+      }
     } catch (err) {
       console.error(err)
       alert('Gagal mengunggah file')
@@ -308,6 +333,7 @@ export function PatientForm({
             <input
               id="attachment_path"
               name="attachment_path"
+              data-testid="attachment_path"
               type="hidden"
               value={attachmentPaths.join(',')}
             />
@@ -316,71 +342,132 @@ export function PatientForm({
                 Lampiran
               </label>
               <div className="space-y-2">
-                {attachmentPaths.map((path, index) => (
-                  <div
-                    key={index}
-                    className="border-slate-200 dark:bg-slate-900/50 flex items-center justify-between gap-4 rounded-md border bg-white/50 p-2 backdrop-blur-sm"
-                  >
-                    <div className="flex items-center gap-2.5 overflow-hidden">
-                      <span className="dark:bg-blue-950/40 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:text-blue-400">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                          <polyline points="14 2 14 8 20 8" />
-                          <line x1="16" y1="13" x2="8" y2="13" />
-                          <line x1="16" y1="17" x2="8" y2="17" />
-                          <polyline points="10 9 9 9 8 9" />
-                        </svg>
-                      </span>
-                      <div className="flex flex-col overflow-hidden text-xs">
-                        <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
-                          {path.split('/').pop()}
-                        </span>
+                {attachmentPaths.map((path, index) => {
+                  const fileName = path.split('/').pop() || 'lampiran'
+                  const isPreviewing = previewPath === path
+                  const isImage = /\.(jpe?g|png|webp|gif|svg)$/i.test(path)
+                  const isPdf = /\.pdf$/i.test(path)
+
+                  return (
+                    <div
+                      key={index}
+                      className="border-slate-200 dark:bg-slate-900/50 flex flex-col rounded-md border bg-white/50 p-2 backdrop-blur-sm"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-2.5 overflow-hidden">
+                          <span className="dark:bg-blue-950/40 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:text-blue-400">
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
+                              <line x1="16" y1="13" x2="8" y2="13" />
+                              <line x1="16" y1="17" x2="8" y2="17" />
+                              <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                          </span>
+                          <div className="flex flex-col overflow-hidden text-xs">
+                            <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
+                              {fileName}
+                            </span>
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  void viewAttachment(path, fileName)
+                                  setPreviewPath(isPreviewing ? null : path)
+                                }}
+                                className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                              >
+                                {isPreviewing
+                                  ? 'Tutup Lampiran'
+                                  : 'Lihat Lampiran'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  void downloadAttachment(path, fileName)
+                                }}
+                                className="cursor-pointer text-left text-[10px] text-indigo-600 hover:underline dark:text-indigo-400"
+                              >
+                                Unduh
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                         <button
                           type="button"
                           onClick={() =>
-                            void viewAttachment(path, path.split('/').pop())
+                            setAttachmentPaths((prev) =>
+                              prev.filter((_, i) => i !== index)
+                            )
                           }
-                          className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                          className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1 hover:text-red-500"
                         >
-                          Lihat Lampiran
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="h-4 w-4"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6 18 18 6M6 6l12 12"
+                            />
+                          </svg>
                         </button>
                       </div>
+
+                      {/* Inline preview */}
+                      {isPreviewing && (
+                        <div className="mt-2.5 overflow-hidden rounded border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-900">
+                          {isImage ? (
+                            <img
+                              src={getAuthenticatedAttachmentUrl(path)}
+                              alt={fileName}
+                              className="mx-auto max-h-80 w-auto max-w-full rounded object-contain"
+                            />
+                          ) : isPdf ? (
+                            <iframe
+                              src={getAuthenticatedAttachmentUrl(path)}
+                              title={fileName}
+                              className="h-96 w-full rounded border border-slate-200 bg-white"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-4 text-center">
+                              <p className="mb-2 text-xs text-gray-600 dark:text-gray-400">
+                                Preview langsung tidak tersedia untuk format file ini.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  void downloadAttachment(path, fileName)
+                                }
+                                className="rounded bg-blue-600 px-3 py-1 text-xs text-white hover:bg-blue-700"
+                              >
+                                Unduh {fileName}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setAttachmentPaths((prev) =>
-                          prev.filter((_, i) => i !== index)
-                        )
-                      }
-                      className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1 hover:text-red-500"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="h-4 w-4"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18 18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
+                  )
+                })}
 
                 <div>
                   <label className="border-slate-350 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-900/80 flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed p-3 transition-all">

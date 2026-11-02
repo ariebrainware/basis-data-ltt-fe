@@ -45,7 +45,7 @@ const navListMenuItems = [
     description: 'Halaman untuk manajemen pasien',
     icon: SquaresPlusIcon,
     url: '/patient',
-    roles: ['super_admin'],
+    roles: ['super_admin', 'therapist'],
   },
   {
     title: 'Terapis',

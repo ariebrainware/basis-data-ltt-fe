@@ -1,3 +1,5 @@
+import { getSessionToken } from './sessionToken'
+
 /**
  * Get the API host URL from environment variable or default
  * @returns The API host URL from NEXT_PUBLIC_API_HOST environment variable, defaults to 'https://localhost:19091'
@@ -108,4 +110,19 @@ export function getAttachmentUrl(path?: string): string {
   } catch {
     return `${host}${cleanPath}`
   }
+}
+
+/**
+ * Resolves the full URL for an attachment path, appending the session token as a query parameter
+ * so that direct browser navigations, images, and iframes are authenticated by the backend.
+ * @param path The relative or absolute attachment path
+ * @returns The authenticated URL with ?token= query param if token exists
+ */
+export function getAuthenticatedAttachmentUrl(path?: string): string {
+  const url = getAttachmentUrl(path)
+  if (!url || url.startsWith('data:')) return url
+  const token = getSessionToken()
+  if (!token) return url
+  const separator = url.includes('?') ? '&' : '?'
+  return `${url}${separator}token=${encodeURIComponent(token)}`
 }
