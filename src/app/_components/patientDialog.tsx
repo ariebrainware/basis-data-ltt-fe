@@ -14,6 +14,7 @@ import {
 import Swal from 'sweetalert2'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { isAdmin } from '../_functions/userRole'
+import { parseAttachmentPaths } from '../_functions/apiHost'
 import { PatientTreatmentHistory } from './patientTreatmentHistory'
 import { usePatientTreatments } from '../_hooks/usePatientTreatments'
 import { DocumentTextIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
@@ -290,12 +291,7 @@ export default function PatientDialog({
       ),
       surgery_history: surgery_history_new_input,
       signature: signature_new_input,
-      attachment_path: attachment_path_new_input
-        ? attachment_path_new_input
-            .split(/,(?=\/?uploads\/|https?:\/\/)/)
-            .map((p) => p.trim())
-            .filter(Boolean)
-        : [],
+      attachment_path: parseAttachmentPaths(attachment_path_new_input),
     }
 
     if (isAdmin()) {

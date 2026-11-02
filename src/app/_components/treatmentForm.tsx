@@ -6,8 +6,15 @@ import { isTherapist } from '../_functions/userRole'
 import { ControlledSelect } from './selectTherapist'
 import { TreatmentConditionMultiSelect } from './selectTreatmentCondition'
 import { DiseaseMultiSelect } from './selectDisease'
-import { parseAttachmentPaths } from '../_functions/apiHost'
-import { viewAttachment } from '../_functions/viewAttachment'
+import {
+  getAttachmentUrl,
+  getAuthenticatedAttachmentUrl,
+  parseAttachmentPaths,
+} from '../_functions/apiHost'
+import {
+  viewAttachment,
+  downloadAttachment,
+} from '../_functions/viewAttachment'
 import { apiFetch } from '../_functions/apiFetch'
 import { getGenderLabel } from '../_functions/normalizeGender'
 
@@ -129,6 +136,7 @@ export function TreatmentForm({
     return parseAttachmentPaths(attachment_path)
   })
   const [isUploading, setIsUploading] = React.useState(false)
+  const [previewPath, setPreviewPath] = React.useState<string | null>(null)
 
   if (attachment_path !== prevAttachmentPath) {
     setPrevAttachmentPath(attachment_path)
@@ -166,6 +174,26 @@ export function TreatmentForm({
             ) || patients[0]
 
           if (found && mounted) {
+            if (found.ID && !found.attachment_path) {
+              try {
+                const detailRes = await apiFetch(`/patient/${found.ID}`)
+                if (detailRes.ok) {
+                  const detailData = await detailRes.json()
+                  if (detailData?.data?.attachment_path) {
+                    found.attachment_path = detailData.data.attachment_path
+                  }
+                  if (detailData?.data?.age && !found.age) {
+                    found.age = detailData.data.age
+                  }
+                  if (detailData?.data?.gender && !found.gender) {
+                    found.gender = detailData.data.gender
+                  }
+                }
+              } catch {
+                // ignore detail fetch error
+              }
+            }
+
             if (found.age) {
               setFetchedPatientAge(found.age)
             }
@@ -469,48 +497,109 @@ export function TreatmentForm({
                     Tidak ada lampiran
                   </p>
                 ) : (
-                  attachmentPaths.map((path, index) => (
-                    <div
-                      key={index}
-                      className="border-slate-200 dark:bg-slate-900/50 flex items-center justify-between gap-4 rounded-md border bg-white/50 p-2 backdrop-blur-sm"
-                    >
-                      <div className="flex items-center gap-2.5 overflow-hidden">
-                        <span className="dark:bg-blue-950/40 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:text-blue-400">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                            <line x1="16" y1="13" x2="8" y2="13" />
-                            <line x1="16" y1="17" x2="8" y2="17" />
-                            <polyline points="10 9 9 9 8 9" />
-                          </svg>
-                        </span>
-                        <div className="flex flex-col overflow-hidden text-xs">
-                          <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
-                            {path.split('/').pop()}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void viewAttachment(path, path.split('/').pop())
-                            }
-                            className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
-                          >
-                            Lihat Lampiran
-                          </button>
+                  attachmentPaths.map((path, index) => {
+                    const fileName = path.split('/').pop() || 'lampiran'
+                    const isPreviewing = previewPath === path
+                    const isImage = /\.(jpe?g|png|webp|gif|svg)$/i.test(path)
+                    const isPdf = /\.pdf$/i.test(path)
+
+                    return (
+                      <div
+                        key={index}
+                        className="border-slate-200 dark:bg-slate-900/50 flex flex-col rounded-md border bg-white/50 p-2 backdrop-blur-sm"
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2.5 overflow-hidden">
+                            <span className="dark:bg-blue-950/40 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:text-blue-400">
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                              </svg>
+                            </span>
+                            <div className="flex flex-col overflow-hidden text-xs">
+                              <span className="text-slate-800 dark:text-slate-200 truncate font-semibold">
+                                {fileName}
+                              </span>
+                              <div className="flex items-center gap-3">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    void viewAttachment(path, fileName)
+                                    setPreviewPath(isPreviewing ? null : path)
+                                  }}
+                                  className="cursor-pointer text-left text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                                >
+                                  {isPreviewing
+                                    ? 'Tutup Lampiran'
+                                    : 'Lihat Lampiran'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    void downloadAttachment(path, fileName)
+                                  }}
+                                  className="cursor-pointer text-left text-[10px] text-indigo-600 hover:underline dark:text-indigo-400"
+                                >
+                                  Unduh
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
+
+                        {/* Inline preview */}
+                        {isPreviewing && (
+                          <div className="border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900 mt-2.5 overflow-hidden rounded border p-2">
+                            {isImage ? (
+                              <img
+                                src={getAuthenticatedAttachmentUrl(path)}
+                                alt={fileName}
+                                className="mx-auto max-h-80 w-auto max-w-full rounded object-contain"
+                              />
+                            ) : isPdf ? (
+                              <iframe
+                                src={getAuthenticatedAttachmentUrl(path)}
+                                title={fileName}
+                                className="border-slate-200 h-96 w-full rounded border bg-white"
+                              />
+                            ) : (
+                              <div className="flex flex-col items-center justify-center p-4 text-center">
+                                <p className="mb-2 text-xs text-gray-600 dark:text-gray-400">
+                                  Preview langsung tidak tersedia untuk format
+                                  file ini.
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    void downloadAttachment(path, fileName)
+                                  }
+                                  className="rounded bg-blue-600 px-3 py-1 text-xs text-white hover:bg-blue-700"
+                                >
+                                  Unduh {fileName}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      {/* Note: No delete button rendered here to restrict to view and append-only access */}
-                    </div>
-                  ))
+                    )
+                  })
                 )}
 
                 {!disabled && (
