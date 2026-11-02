@@ -109,3 +109,13 @@ export function getAttachmentUrl(path?: string): string {
     return `${host}${cleanPath}`
   }
 }
+
+/**
+ * Resolves the full URL for an attachment path.
+ * Kept for compatibility with existing callers that render attachment previews.
+ * @param path The relative or absolute attachment path
+ * @returns The resolved URL.
+ */
+export function getAuthenticatedAttachmentUrl(path?: string): string {
+  return getAttachmentUrl(path)
+}

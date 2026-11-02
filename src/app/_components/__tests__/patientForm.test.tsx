@@ -4,6 +4,16 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { PatientForm } from '../patientForm'
 import { PatientType } from '@/app/_types/patient'
 import { DiseaseType } from '@/app/_types/disease'
+import { apiFetch } from '@/app/_functions/apiFetch'
+import { viewAttachment } from '@/app/_functions/viewAttachment'
+
+jest.mock('@/app/_functions/apiFetch', () => ({
+  apiFetch: jest.fn(),
+}))
+
+jest.mock('@/app/_functions/viewAttachment', () => ({
+  viewAttachment: jest.fn(),
+}))
 
 // Mock Material Tailwind components
 jest.mock('@material-tailwind/react', () => ({
@@ -260,5 +270,62 @@ describe('PatientForm Component', () => {
     fireEvent.click(cancelBtn)
     expect(screen.getByText('Tanda Tangan Terdaftar')).toBeInTheDocument()
     expect(hiddenInput).toHaveValue('data:image/png;base64,oldMockSignature')
+  })
+
+  test('renders attachment and allows viewing with viewAttachment', () => {
+    render(
+      <PatientForm
+        {...mockPatient}
+        attachment_path="uploads/attachments/ktp.pdf"
+      />
+    )
+
+    expect(screen.getByText('ktp.pdf')).toBeInTheDocument()
+    const viewButton = screen.getByRole('button', { name: 'Lihat Lampiran' })
+    fireEvent.click(viewButton)
+
+    expect(viewAttachment).toHaveBeenCalledWith(
+      'uploads/attachments/ktp.pdf',
+      'ktp.pdf'
+    )
+  })
+
+  test('uploads attachment falling back to /treatment/upload when /patient/upload fails', async () => {
+    ;(apiFetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          data: {
+            file_path: 'uploads/attachments/fallback_scanned.pdf',
+          },
+        }),
+      })
+
+    const { container } = render(
+      <PatientForm
+        {...mockPatient}
+        attachment_path="uploads/attachments/initial.pdf"
+      />
+    )
+
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    expect(fileInput).toBeInTheDocument()
+
+    const file = new File(['file data'], 'fallback_scanned.pdf', {
+      type: 'application/pdf',
+    })
+    fireEvent.change(fileInput, { target: { files: [file] } })
+
+    expect(await screen.findByText('fallback_scanned.pdf')).toBeInTheDocument()
+    expect(screen.getByTestId('attachment_path')).toHaveValue(
+      'uploads/attachments/initial.pdf,uploads/attachments/fallback_scanned.pdf'
+    )
   })
 })

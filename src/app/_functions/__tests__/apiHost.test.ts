@@ -1,4 +1,9 @@
-import { getApiHost, getAttachmentUrl, parseAttachmentPaths } from '../apiHost'
+import {
+  getApiHost,
+  getAttachmentUrl,
+  getAuthenticatedAttachmentUrl,
+  parseAttachmentPaths,
+} from '../apiHost'
 
 describe('getApiHost', () => {
   const originalEnv = process.env.NEXT_PUBLIC_API_HOST
@@ -136,6 +141,39 @@ describe('getAttachmentUrl', () => {
     expect(getAttachmentUrl('./storage/attachments/receipt.pdf')).toBe(
       'https://localhost:19091/storage/attachments/receipt.pdf'
     )
+  })
+})
+
+describe('getAuthenticatedAttachmentUrl', () => {
+  beforeEach(() => {
+    delete process.env.NEXT_PUBLIC_API_HOST
+    window.localStorage.clear()
+  })
+
+  test('returns base URL when token is not present', () => {
+    expect(getAuthenticatedAttachmentUrl('uploads/doc.pdf')).toBe(
+      'https://localhost:19091/uploads/doc.pdf'
+    )
+  })
+
+  test('does not append token query param when token is present', () => {
+    window.localStorage.setItem('session-token', 'therapist-token-123')
+    expect(getAuthenticatedAttachmentUrl('uploads/doc.pdf')).toBe(
+      'https://localhost:19091/uploads/doc.pdf'
+    )
+  })
+
+  test('preserves existing query parameters unchanged', () => {
+    window.localStorage.setItem('session-token', 'token-abc')
+    expect(getAuthenticatedAttachmentUrl('uploads/doc.pdf?version=2')).toBe(
+      'https://localhost:19091/uploads/doc.pdf?version=2'
+    )
+  })
+
+  test('returns data: URLs unchanged without token', () => {
+    window.localStorage.setItem('session-token', 'token-abc')
+    const dataUri = 'data:image/png;base64,abc'
+    expect(getAuthenticatedAttachmentUrl(dataUri)).toBe(dataUri)
   })
 })
 

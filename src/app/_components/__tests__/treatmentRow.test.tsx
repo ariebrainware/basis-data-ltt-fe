@@ -254,4 +254,66 @@ describe('Treatment Row Component', () => {
       )
     })
   })
+
+  test('fetches patient detail to populate attachments when keyword search returns patient without attachment_path', async () => {
+    ;(isAdmin as jest.Mock).mockReturnValue(true)
+
+    ;(apiFetch as jest.Mock).mockImplementation((url: string) => {
+      if (url.startsWith('/patient?keyword=')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: {
+              patients: [
+                {
+                  ID: '88',
+                  patient_code: 123,
+                  attachment_path: '',
+                },
+              ],
+            },
+          }),
+        })
+      }
+      if (url === '/patient/88') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: {
+              ID: '88',
+              attachment_path: 'uploads/attachments/patient_record.pdf',
+            },
+          }),
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ data: { treatments: [], total: 0 } }),
+      })
+    })
+
+    render(
+      <table>
+        <tbody>
+          <Treatment {...mockTreatment} />
+        </tbody>
+      </table>
+    )
+
+    const editBtn = screen.getByRole('button', { name: /edit treatment/i })
+    fireEvent.click(editBtn)
+
+    await waitFor(() => {
+      expect(apiFetch).toHaveBeenCalledWith('/patient?keyword=123')
+      expect(apiFetch).toHaveBeenCalledWith('/patient/88')
+    })
+
+    await waitFor(() => {
+      const form = screen.getByTestId('treatment-form')
+      expect(form).toHaveAttribute(
+        'data-attachment-path',
+        'uploads/attachments/patient_record.pdf'
+      )
+    })
+  })
 })

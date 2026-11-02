@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { TreatmentType } from '@/app/_types/treatment'
 import { isTherapist } from '@/app/_functions/userRole'
 
@@ -307,11 +307,19 @@ describe('TreatmentForm Component', () => {
     expect(viewButtons).toHaveLength(2)
 
     // Click the view button
-    viewButtons[0].click()
+    fireEvent.click(viewButtons[0])
     expect(viewAttachment).toHaveBeenCalledWith(
       'uploads/attachments/xray.pdf',
       'xray.pdf'
     )
+    // Verify preview renders inline
+    expect(screen.getByTitle('xray.pdf')).toBeInTheDocument()
+    expect(viewButtons[0]).toHaveTextContent('Tutup Lampiran')
+
+    // Click again to close preview
+    fireEvent.click(viewButtons[0])
+    expect(screen.queryByTitle('xray.pdf')).not.toBeInTheDocument()
+    expect(viewButtons[0]).toHaveTextContent('Lihat Lampiran')
 
     // Verify there are no delete buttons for attachments
     expect(screen.queryByLabelText(/delete/i)).not.toBeInTheDocument()

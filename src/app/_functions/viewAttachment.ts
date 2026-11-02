@@ -123,11 +123,34 @@ export async function viewAttachment(
   }
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      credentials: 'include',
-    })
+    let response: Response
+    try {
+      response = await fetch(url, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      })
+      if (!response.ok && token) {
+        const retryRes = await fetch(url, {
+          method: 'GET',
+          headers: { 'session-token': token },
+        }).catch(() => null)
+        if (retryRes && retryRes.ok) {
+          response = retryRes
+        }
+      }
+    } catch {
+      // First fetch threw CORS/network error, retry with session-token only
+      const retryRes = await fetch(url, {
+        method: 'GET',
+        headers: token ? { 'session-token': token } : {},
+      }).catch(() => null)
+      if (retryRes && retryRes.ok) {
+        response = retryRes
+      } else {
+        throw new Error('Failed to fetch attachment')
+      }
+    }
 
     if (!response.ok) {
       throw new Error(
@@ -288,11 +311,35 @@ export async function downloadAttachment(
       headers['Authorization'] = `Bearer ${token}`
     }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      credentials: 'include',
-    })
+    let response: Response
+    try {
+      response = await fetch(url, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      })
+      if (!response.ok && token) {
+        const retryRes = await fetch(url, {
+          method: 'GET',
+          headers: { 'session-token': token },
+        }).catch(() => null)
+        if (retryRes && retryRes.ok) {
+          response = retryRes
+        }
+      }
+    } catch {
+      const retryRes = token
+        ? await fetch(url, {
+            method: 'GET',
+            headers: { 'session-token': token },
+          }).catch(() => null)
+        : null
+      if (retryRes && retryRes.ok) {
+        response = retryRes
+      } else {
+        throw new Error('Failed to fetch attachment')
+      }
+    }
 
     if (!response.ok) {
       throw new Error(
