@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 import { getUserRole } from '../../_functions/userRole'
+import { format } from 'date-fns'
+import type { DateValueType } from 'react-tailwindcss-datepicker'
 
 import DatePicker from '../../_components/datePicker'
 import styles from '../../page.module.css'
@@ -21,6 +23,25 @@ let issuesInput: HTMLInputElement | null = null
 let remarksInput: HTMLInputElement | null = null
 let nextVisitInput: HTMLInputElement | null = null
 
+function parseDateQueryParam(rawDate: string | null): Date | null {
+  if (!rawDate || !/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+    return null
+  }
+
+  const [year, month, day] = rawDate.split('-').map(Number)
+  const parsedDate = new Date(year, month - 1, day)
+
+  if (
+    parsedDate.getFullYear() !== year ||
+    parsedDate.getMonth() !== month - 1 ||
+    parsedDate.getDate() !== day
+  ) {
+    return null
+  }
+
+  return parsedDate
+}
+
 export default function RegisterTreatment() {
   const router = useRouter()
 
@@ -32,8 +53,19 @@ export default function RegisterTreatment() {
   }, [router])
 
   const [therapistID, setTherapistID] = useState<string>('')
+  const [treatmentDateValue, setTreatmentDateValue] =
+    useState<DateValueType | null>(null)
   const [selectedTreatmentConditions, setSelectedTreatmentConditions] =
     useState<string[]>([])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const parsedDate = parseDateQueryParam(params.get('date'))
+    if (parsedDate) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTreatmentDateValue({ startDate: parsedDate, endDate: parsedDate })
+    }
+  }, [])
 
   // Keep the module-scoped `treatmentHistoryInput` in sync for legacy code paths
   React.useEffect(() => {
@@ -62,7 +94,13 @@ export default function RegisterTreatment() {
   }
 
   const getFormValues = () => {
-    const treatmentDate = treatmentDateInput ? treatmentDateInput.value : ''
+    let treatmentDate = treatmentDateInput ? treatmentDateInput.value : ''
+    if (!treatmentDate && treatmentDateValue?.startDate) {
+      treatmentDate =
+        typeof treatmentDateValue.startDate === 'string'
+          ? treatmentDateValue.startDate
+          : format(treatmentDateValue.startDate, 'yyyy-MM-dd')
+    }
     const treatmentTime = treatmentTimeInput ? treatmentTimeInput.value : ''
     const patientCode = patientCodeInput ? patientCodeInput.value : ''
     const issues = issuesInput ? issuesInput.value : ''
@@ -90,6 +128,7 @@ export default function RegisterTreatment() {
 
   const clearFormFields = () => {
     if (treatmentDateInput) treatmentDateInput.value = ''
+    setTreatmentDateValue(null)
     if (treatmentTimeInput) treatmentTimeInput.value = ''
     if (patientCodeInput) patientCodeInput.value = ''
     setTherapistID('')
@@ -172,13 +211,18 @@ export default function RegisterTreatment() {
     treatmentTimeInput = document.getElementById(
       'treatmentTime'
     ) as HTMLInputElement | null
-    if (treatmentDateInput && treatmentTimeInput) {
-      treatmentDateInput.value = `${treatmentDateInput.value}T${treatmentTimeInput.value}:00`
-    }
     issuesInput = document.getElementById('issues') as HTMLInputElement
     remarksInput = document.getElementById('remarks') as HTMLInputElement
     nextVisitInput = document.getElementById('nextVisit') as HTMLInputElement
-  }, [])
+
+    if (treatmentDateInput) {
+      treatmentDateInput.value = treatmentDateValue?.startDate
+        ? typeof treatmentDateValue.startDate === 'string'
+          ? treatmentDateValue.startDate
+          : format(treatmentDateValue.startDate, 'yyyy-MM-dd')
+        : ''
+    }
+  }, [treatmentDateValue])
 
   return (
     <div className={styles.page}>
@@ -192,7 +236,11 @@ export default function RegisterTreatment() {
             >
               Waktu & Tanggal
             </label>
-            <DatePicker id="treatmentDate" />
+            <DatePicker
+              id="treatmentDate"
+              value={treatmentDateValue}
+              onChange={setTreatmentDateValue}
+            />
             <TimePicker id="treatmentTime" />
           </div>
           <div className="w-72 space-y-1">
