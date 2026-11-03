@@ -40,13 +40,15 @@ export default function RegisterTreatment() {
         const params = new URLSearchParams(window.location.search)
         const dateParam = params.get('date')
         if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
-          const parts = dateParam.split('-')
-          const d = new Date(
-            parseInt(parts[0], 10),
-            parseInt(parts[1], 10) - 1,
-            parseInt(parts[2], 10)
-          )
-          return { startDate: d, endDate: d }
+          const [year, month, day] = dateParam.split('-').map(Number)
+          const d = new Date(year, month - 1, day)
+          if (
+            d.getFullYear() === year &&
+            d.getMonth() === month - 1 &&
+            d.getDate() === day
+          ) {
+            return { startDate: d, endDate: d }
+          }
         }
       }
       return null
