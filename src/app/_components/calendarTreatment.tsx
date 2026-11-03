@@ -693,8 +693,11 @@ export default function CalendarTreatment({
                     disabled={filterAllDates}
                     value={selectedDate}
                     onChange={(e) => {
-                      if (e.target.value) {
-                        setSelectedDate(e.target.value)
+                      const value = e.target.value
+                      if (value) {
+                        setSelectedDate(value)
+                        const [year, month, day] = value.split('-').map(Number)
+                        setCurrentMonth(new Date(year, month - 1, day))
                         setCurrentPage(1)
                       }
                     }}
