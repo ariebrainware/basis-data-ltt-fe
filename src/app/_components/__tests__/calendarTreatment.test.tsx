@@ -190,9 +190,7 @@ describe('CalendarTreatment Component', () => {
     fireEvent.click(besokBtn)
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Jadwal Mendatang/i)
-      ).toBeInTheDocument()
+      expect(screen.getByText(/Jadwal Mendatang/i)).toBeInTheDocument()
     })
 
     // Quick jump to Kemarin (Yesterday, past date)
