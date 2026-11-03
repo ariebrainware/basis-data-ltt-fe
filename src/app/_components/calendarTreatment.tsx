@@ -482,7 +482,16 @@ export default function CalendarTreatment({
                   return (
                     <div
                       key={dayDateStr}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={formatIndonesianDate(dayDateStr)}
                       onClick={() => handleSelectDate(day)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleSelectDate(day)
+                        }
+                      }}
                       className={`group relative flex min-h-[75px] cursor-pointer flex-col justify-between p-1.5 transition-colors md:min-h-[90px] md:p-2 ${
                         isCurrentSelected
                           ? 'shadow-xs border-2 border-indigo-600 bg-indigo-50/80'
