@@ -17,7 +17,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
   Typography,
   Button,
   Input,
@@ -130,23 +129,50 @@ export default function CalendarTreatment({
   // Fetch monthly scheduled treatment counts to show badges on calendar days
   const fetchMonthTreatmentCounts = useCallback(async () => {
     try {
-      const res = await apiFetch('/treatment?limit=300')
-      if (!res.ok) return
-      const json = await res.json()
-      const list = Array.isArray(json?.data?.treatments)
-        ? json.data.treatments
-        : Array.isArray(json?.data)
-          ? json.data
-          : []
       const counts: Record<string, number> = {}
-      list.forEach((item: any) => {
-        if (item?.treatment_date) {
-          const dStr = String(item.treatment_date).trim().slice(0, 10)
-          if (dStr && /^\d{4}-\d{2}-\d{2}$/.test(dStr)) {
-            counts[dStr] = (counts[dStr] || 0) + 1
-          }
+      const limit = 300
+      let offset = 0
+      let totalItems: number | null = null
+      let fetchedItems = 0
+
+      while (totalItems === null || fetchedItems < totalItems) {
+        const res = await apiFetch(`/treatment?limit=${limit}&offset=${offset}`)
+        if (!res.ok) return
+
+        const json = await res.json()
+        const list = Array.isArray(json?.data?.treatments)
+          ? json.data.treatments
+          : Array.isArray(json?.data)
+            ? json.data
+            : []
+
+        if (typeof json?.data?.total === 'number') {
+          totalItems = json.data.total
+        } else if (typeof json?.total === 'number') {
+          totalItems = json.total
         }
-      })
+
+        if (list.length === 0) {
+          break
+        }
+
+        list.forEach((item: any) => {
+          if (item?.treatment_date) {
+            const dStr = String(item.treatment_date).trim().slice(0, 10)
+            if (dStr && /^\d{4}-\d{2}-\d{2}$/.test(dStr)) {
+              counts[dStr] = (counts[dStr] || 0) + 1
+            }
+          }
+        })
+
+        fetchedItems += list.length
+        offset += limit
+
+        if (list.length < limit && totalItems === null) {
+          break
+        }
+      }
+
       setMonthCounts(counts)
     } catch {
       // Non-critical background count
