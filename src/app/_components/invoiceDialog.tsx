@@ -168,6 +168,7 @@ export default function InvoiceDialog({
     return () => {
       isMounted = false
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, transaction.ID])
 
   const handlePrint = () => {

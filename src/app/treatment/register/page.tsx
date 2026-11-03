@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 import { getUserRole } from '../../_functions/userRole'
+import { format } from 'date-fns'
+import type { DateValueType } from 'react-tailwindcss-datepicker'
 
 import DatePicker from '../../_components/datePicker'
 import styles from '../../page.module.css'
@@ -32,6 +34,23 @@ export default function RegisterTreatment() {
   }, [router])
 
   const [therapistID, setTherapistID] = useState<string>('')
+  const [treatmentDateValue, setTreatmentDateValue] =
+    useState<DateValueType | null>(() => {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search)
+        const dateParam = params.get('date')
+        if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+          const parts = dateParam.split('-')
+          const d = new Date(
+            parseInt(parts[0], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[2], 10)
+          )
+          return { startDate: d, endDate: d }
+        }
+      }
+      return null
+    })
   const [selectedTreatmentConditions, setSelectedTreatmentConditions] =
     useState<string[]>([])
 
@@ -62,7 +81,13 @@ export default function RegisterTreatment() {
   }
 
   const getFormValues = () => {
-    const treatmentDate = treatmentDateInput ? treatmentDateInput.value : ''
+    let treatmentDate = treatmentDateInput ? treatmentDateInput.value : ''
+    if (!treatmentDate && treatmentDateValue?.startDate) {
+      treatmentDate =
+        typeof treatmentDateValue.startDate === 'string'
+          ? treatmentDateValue.startDate
+          : format(treatmentDateValue.startDate, 'yyyy-MM-dd')
+    }
     const treatmentTime = treatmentTimeInput ? treatmentTimeInput.value : ''
     const patientCode = patientCodeInput ? patientCodeInput.value : ''
     const issues = issuesInput ? issuesInput.value : ''
@@ -90,6 +115,7 @@ export default function RegisterTreatment() {
 
   const clearFormFields = () => {
     if (treatmentDateInput) treatmentDateInput.value = ''
+    setTreatmentDateValue(null)
     if (treatmentTimeInput) treatmentTimeInput.value = ''
     if (patientCodeInput) patientCodeInput.value = ''
     setTherapistID('')
@@ -178,7 +204,14 @@ export default function RegisterTreatment() {
     issuesInput = document.getElementById('issues') as HTMLInputElement
     remarksInput = document.getElementById('remarks') as HTMLInputElement
     nextVisitInput = document.getElementById('nextVisit') as HTMLInputElement
-  }, [])
+
+    if (treatmentDateValue?.startDate && treatmentDateInput) {
+      treatmentDateInput.value =
+        typeof treatmentDateValue.startDate === 'string'
+          ? treatmentDateValue.startDate
+          : format(treatmentDateValue.startDate, 'yyyy-MM-dd')
+    }
+  }, [treatmentDateValue])
 
   return (
     <div className={styles.page}>
@@ -192,7 +225,11 @@ export default function RegisterTreatment() {
             >
               Waktu & Tanggal
             </label>
-            <DatePicker id="treatmentDate" />
+            <DatePicker
+              id="treatmentDate"
+              value={treatmentDateValue}
+              onChange={setTreatmentDateValue}
+            />
             <TimePicker id="treatmentTime" />
           </div>
           <div className="w-72 space-y-1">

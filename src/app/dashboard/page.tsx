@@ -3,20 +3,8 @@ import React from 'react'
 import { useState, useEffect, useCallback } from 'react'
 import MegaMenuDefault from '../_components/megaMenu'
 import GreetingBanner from '../_components/greetingBanner'
-import {
-  MagnifyingGlassIcon,
-  PlusCircleIcon,
-} from '@heroicons/react/24/outline'
 
-import {
-  Card,
-  CardHeader,
-  Typography,
-  Button,
-  CardBody,
-  CardFooter,
-  Input,
-} from '@material-tailwind/react'
+import { Card, CardBody } from '@material-tailwind/react'
 import {
   format,
   startOfWeek,
@@ -24,15 +12,11 @@ import {
   startOfMonth,
   endOfMonth,
 } from 'date-fns'
-import { TreatmentType } from '../_types/treatment'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
 import { apiFetch } from '../_functions/apiFetch'
 import { useRouter } from 'next/navigation'
 import { getUserRole, useUserRole } from '../_functions/userRole'
-import Pagination from '../_components/pagination'
-import { getApiHost } from '../_functions/apiHost'
-import { useFetchTreatment } from '../_hooks/useFetchTreatment'
-import TableTreatment from '../_components/tableTreatment'
+import CalendarTreatment from '../_components/calendarTreatment'
 
 interface TherapistSummary {
   therapistId: number
@@ -321,17 +305,6 @@ function SummaryCard({
 }
 
 export default function Dashboard() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [keyword, setKeyword] = useState('')
-  const todayStr = format(new Date(), 'yyyy-MM-dd')
-  const {
-    data,
-    total,
-    loading: treatmentLoading,
-    error: treatmentError,
-    refetch: refetchTreatment,
-  } = useFetchTreatment(currentPage, keyword, undefined, undefined, todayStr)
-  const treatment = data.treatment
   const router = useRouter()
   const userRole = useUserRole()
 
@@ -610,111 +583,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <Card
-        placeholder={undefined}
-        onPointerEnterCapture={undefined}
-        onPointerLeaveCapture={undefined}
-        onResize={undefined}
-        onResizeCapture={undefined}
-        className="border border-blue-gray-100 shadow-md"
-      >
-        <CardHeader
-          floated={false}
-          shadow={false}
-          className="m-0 rounded-none p-4 pb-0"
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-        >
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <div>
-              <Typography
-                variant="h5"
-                color="blue-gray"
-                placeholder={undefined}
-                onPointerEnterCapture={undefined}
-                onPointerLeaveCapture={undefined}
-                onResize={undefined}
-                onResizeCapture={undefined}
-                className="font-bold"
-              >
-                Jadwal Penanganan Hari Ini
-              </Typography>
-            </div>
-            <div className="flex w-full shrink-0 gap-2 md:w-max">
-              <div className="w-full md:w-72">
-                <Input
-                  label="Search"
-                  icon={<MagnifyingGlassIcon className="size-5" />}
-                  onPointerEnterCapture={undefined}
-                  onPointerLeaveCapture={undefined}
-                  crossOrigin={undefined}
-                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                    if (e.key === 'Enter') {
-                      const newKeyword = (e.target as HTMLInputElement).value
-                      setKeyword(newKeyword)
-                      setCurrentPage(1)
-                    }
-                  }}
-                  onResize={undefined}
-                  onResizeCapture={undefined}
-                />
-              </div>
-              {userRole === 'super_admin' && (
-                <Button
-                  className="flex items-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700"
-                  size="sm"
-                  placeholder={undefined}
-                  onPointerEnterCapture={undefined}
-                  onPointerLeaveCapture={undefined}
-                  onResize={undefined}
-                  onResizeCapture={undefined}
-                  onClick={() => window.open('/treatment/register', '_blank')}
-                >
-                  <PlusCircleIcon
-                    strokeWidth={2}
-                    className="size-4 text-white"
-                  />{' '}
-                  Tambah Penanganan
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardBody
-          className="overflow-scroll px-0"
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-        >
-          <TableTreatment
-            Data={{ treatment }}
-            onDataChange={refetchTreatment}
-            loading={treatmentLoading}
-            error={treatmentError}
-            onRetry={refetchTreatment}
-            emptyMessage="Tidak ada jadwal penanganan hari ini"
-          />
-        </CardBody>
-        <CardFooter
-          className="flex items-center justify-between border-t border-blue-gray-50 p-4"
-          placeholder={undefined}
-          onPointerEnterCapture={undefined}
-          onPointerLeaveCapture={undefined}
-          onResize={undefined}
-          onResizeCapture={undefined}
-        >
-          <Pagination
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            total={total}
-          />
-        </CardFooter>
-      </Card>
+      <CalendarTreatment userRole={userRole} />
     </div>
   )
 }

@@ -439,6 +439,7 @@ export function PatientForm({
                       {isPreviewing && (
                         <div className="border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900 mt-2.5 overflow-hidden rounded border p-2">
                           {isImage ? (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={getAuthenticatedAttachmentUrl(path)}
                               alt={fileName}
