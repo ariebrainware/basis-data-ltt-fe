@@ -191,7 +191,7 @@ describe('CalendarTreatment Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/Jadwal Mendatang \(Masa Depan\)/i)
+        screen.getByText(/Jadwal Mendatang/i)
       ).toBeInTheDocument()
     })
 

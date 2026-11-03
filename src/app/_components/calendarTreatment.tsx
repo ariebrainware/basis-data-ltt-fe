@@ -299,7 +299,7 @@ export default function CalendarTreatment({
               onResizeCapture={undefined}
             >
               Pantau riwayat penanganan, kelola jadwal hari ini, serta atur
-              jadwal penanganan masa depan.
+              jadwal penanganan mendatang.
             </Typography>
           </div>
 
@@ -629,7 +629,7 @@ export default function CalendarTreatment({
                     {dateCategory === 'future' && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
                         <ClockIcon className="size-3 text-indigo-600" />
-                        Jadwal Mendatang (Masa Depan)
+                        Jadwal Mendatang
                       </span>
                     )}
                     {dateCategory === 'past' && (
