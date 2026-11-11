@@ -26,6 +26,7 @@ export default function Therapist({
   height,
   is_approved: isApproved,
   role: initialRole,
+  commission = '',
   onDataChange,
 }: TherapistType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
@@ -75,6 +76,19 @@ export default function Therapist({
       document.querySelector<HTMLTextAreaElement>('#height')?.value || height
     const role_input =
       document.querySelector<HTMLTextAreaElement>('#role')?.value || role
+    const commission_input =
+      document.querySelector<HTMLInputElement>('#commission')?.value ??
+      commission
+
+    if (!commission_input.trim()) {
+      Swal.fire({
+        text: 'Komisi terapis tidak boleh kosong.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      })
+      return
+    }
+
     apiFetch(`/therapist/${ID}`, {
       method: 'PATCH',
       body: JSON.stringify({
@@ -87,6 +101,7 @@ export default function Therapist({
         weight: Number(weight_input),
         height: Number(height_input),
         role: role_input,
+        commission: commission_input.trim(),
       }),
     })
       .then((response) => {
@@ -165,6 +180,7 @@ export default function Therapist({
             height={height}
             role={role}
             is_approved={isApproved}
+            commission={commission}
             onRoleChange={handleRoleChange}
           />
         </DialogBody>
@@ -247,16 +263,23 @@ export default function Therapist({
           </div>
         </td>
         <td className="p-3">
-          <div className="w-max">
-            <div
-              data-open="true"
-              data-shape="pill"
-              className="relative inline-flex w-max items-center rounded-md border border-green-500 bg-green-500 p-0.5 font-sans text-xs font-medium text-green-50 shadow-sm data-[shape=pill]:rounded-full"
-            >
-              <span className="mx-1.5 my-0.5 font-sans leading-none text-current">
-                {role}
-              </span>
+          <div className="flex flex-col gap-1">
+            <div className="w-max">
+              <div
+                data-open="true"
+                data-shape="pill"
+                className="relative inline-flex w-max items-center rounded-md border border-green-500 bg-green-500 p-0.5 font-sans text-xs font-medium text-green-50 shadow-sm data-[shape=pill]:rounded-full"
+              >
+                <span className="mx-1.5 my-0.5 font-sans leading-none text-current">
+                  {role}
+                </span>
+              </div>
             </div>
+            {commission && (
+              <small className="font-sans text-xs text-blue-gray-600">
+                Komisi: {commission}
+              </small>
+            )}
           </div>
         </td>
         <td className="p-3">
@@ -313,6 +336,7 @@ export default function Therapist({
             className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
             data-shape="default"
             onClick={() => handleOpen()}
+            aria-label="Edit terapis"
           >
             <svg
               width="1.5em"
@@ -336,6 +360,7 @@ export default function Therapist({
             className="text-slate-800 hover:border-slate-600/10 hover:bg-slate-200/10 group inline-grid min-h-[38px] min-w-[38px] select-none place-items-center rounded-md border border-transparent bg-transparent text-center align-middle font-sans text-sm font-medium shadow-none outline-none transition-all duration-300 ease-in hover:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none data-[shape=circular]:rounded-full"
             data-shape="default"
             onClick={handleDeleteTherapist}
+            aria-label="Delete terapis"
           >
             <svg
               width="1.5em"

@@ -65,6 +65,7 @@ const TableBody = ({
         phone_number={therapist.phone_number}
         role={therapist.role}
         is_approved={therapist.is_approved}
+        commission={therapist.commission}
         date_of_birth={therapist.date_of_birth}
         nik={therapist.nik}
         weight={therapist.weight}

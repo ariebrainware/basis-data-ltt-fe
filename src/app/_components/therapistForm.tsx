@@ -19,6 +19,7 @@ export const TherapistForm: React.FC<TherapistForm> = ({
   height,
   onRoleChange,
   role: initialRole = '',
+  commission = '',
 }: TherapistForm) => {
   const [role, setRole] = useState<string>(initialRole)
 
@@ -116,6 +117,18 @@ export const TherapistForm: React.FC<TherapistForm> = ({
             />
           </div>
           <div className="flex flex-col items-center gap-4">
+            <Input
+              id="commission"
+              type="text"
+              label="Komisi"
+              defaultValue={commission}
+              maxLength={200}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            />
             <Textarea
               id="nik"
               label="NIK"

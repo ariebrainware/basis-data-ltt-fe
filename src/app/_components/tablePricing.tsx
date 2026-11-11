@@ -10,7 +10,14 @@ interface TablePricingProps {
   onDataChange?: () => void
 }
 
-const TABLE_HEAD = ['ID Harga', 'Nama Harga', 'Nominal', 'Deskripsi', 'Aksi']
+const TABLE_HEAD = [
+  'ID Harga',
+  'Nama Harga',
+  'Nominal',
+  'Komisi',
+  'Deskripsi',
+  'Aksi',
+]
 
 const TableHeader = () => (
   <thead>
@@ -55,6 +62,7 @@ const TableBody = ({
         ID={item.ID}
         name={item.name}
         amount={item.amount}
+        commission={item.commission}
         description={item.description}
         onDataChange={onDataChange}
       />

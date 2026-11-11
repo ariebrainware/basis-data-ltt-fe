@@ -84,6 +84,7 @@ describe('TherapistForm Component', () => {
     weight: 60,
     height: 165,
     role: 'therapist',
+    commission: '50000',
   }
 
   beforeEach(() => {
@@ -105,6 +106,7 @@ describe('TherapistForm Component', () => {
     expect(screen.getByTestId('address')).toBeInTheDocument()
     expect(screen.getByTestId('date_of_birth')).toBeInTheDocument()
     expect(screen.getByTestId('nik')).toBeInTheDocument()
+    expect(screen.getByTestId('commission')).toBeInTheDocument()
     expect(screen.getByTestId('weight')).toBeInTheDocument()
     expect(screen.getByTestId('height')).toBeInTheDocument()
     expect(screen.getByTestId('role')).toBeInTheDocument()
@@ -122,6 +124,7 @@ describe('TherapistForm Component', () => {
     expect(screen.getByTestId('address')).toHaveValue('Jl. Therapy No. 456')
     expect(screen.getByTestId('date_of_birth')).toHaveValue('1985-05-15')
     expect(screen.getByTestId('nik')).toHaveValue('1234567890123456')
+    expect(screen.getByTestId('commission')).toHaveValue('50000')
     expect(screen.getByTestId('weight')).toHaveValue('60')
     expect(screen.getByTestId('height')).toHaveValue('165')
   })
