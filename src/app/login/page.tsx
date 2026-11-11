@@ -9,30 +9,27 @@ import { getApiHost } from '../_functions/apiHost'
 import { fetchCurrentUserId } from '../_functions/fetchCurrentUser'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
-import { format as formatDate } from 'date-fns'
 import {
   getLockedFieldFromResponse,
   getUserIdFromResponse,
   getUserNameFromResponse,
 } from '../_functions/loginParsing'
 import {
-  handleUserNotFound,
   handleErrorString,
   storeSession,
   showLoginSuccess,
   showAccountLockedModal,
+  showGenericLoginError,
 } from '../_functions/loginUi'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { LoginResponseData } from '../_types/login'
 import { getSessionToken } from '../_functions/sessionToken'
 
-let usernameInput: HTMLInputElement | null = null
-let passwordInput: HTMLInputElement | null = null
-
 async function tryHandleErrorResponse(responseData: LoginResponseData | null) {
-  if (!responseData) return false
-
-  if (await handleUserNotFound(responseData)) return true
+  if (!responseData) {
+    await showGenericLoginError('Invalid email or password.')
+    return true
+  }
 
   const lockedField = getLockedFieldFromResponse(responseData)
   if (lockedField) {
@@ -42,7 +39,10 @@ async function tryHandleErrorResponse(responseData: LoginResponseData | null) {
 
   if (await handleErrorString(responseData)) return true
 
-  return false
+  // For any authentication failure, keep the message generic and safe
+  // to prevent user enumeration and avoid leaking backend internals.
+  await showGenericLoginError('Invalid email or password.')
+  return true
 }
 
 async function ensureAndStoreUserId(
@@ -97,13 +97,34 @@ async function ensureAndStoreUserId(
 }
 
 export default function Login() {
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [showError, setShowVariantAlert] = useState<boolean>(false)
   const [textMessage, setMessage] = useState<string | null>(null)
   const router = useRouter()
 
   async function sendLoginRequest() {
-    const email = usernameInput ? usernameInput.value : ''
-    const password = passwordInput ? passwordInput.value : ''
+    const emailVal =
+      email ||
+      (document.getElementById('email') as HTMLInputElement)?.value ||
+      ''
+    const passwordVal =
+      password ||
+      (document.getElementById('password') as HTMLInputElement)?.value ||
+      ''
+
+    if (!emailVal.trim() || !passwordVal) {
+      const msg = 'Please enter both email and password.'
+      setMessage(msg)
+      setShowVariantAlert(true)
+      await showGenericLoginError(msg)
+      return null
+    }
+
+    setIsLoading(true)
+    setShowVariantAlert(false)
+    setMessage(null)
 
     async function performRequest() {
       const url = `${getApiHost()}/login`
@@ -111,9 +132,14 @@ export default function Login() {
         console.log('[Login] POST', url)
       const response = await apiFetch('/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: emailVal.trim(), password: passwordVal }),
       })
-      const responseData = await response.json()
+      let responseData: LoginResponseData | null = null
+      try {
+        responseData = await response.json()
+      } catch {
+        responseData = null
+      }
       return { response, responseData }
     }
 
@@ -121,17 +147,37 @@ export default function Login() {
       const { response, responseData } = await performRequest()
 
       if (!response.ok) {
-        const handled = await tryHandleErrorResponse(responseData)
-        if (handled) return
-        throw new Error(`HTTP error! Status: ${response.status}`)
+        setMessage('Invalid email or password.')
+        setShowVariantAlert(true)
+        await tryHandleErrorResponse(responseData)
+        return null
+      }
+
+      if (!responseData?.data?.token) {
+        setMessage('Invalid email or password.')
+        setShowVariantAlert(true)
+        await showGenericLoginError('Invalid email or password.')
+        return null
       }
 
       await handleSuccessfulLogin(responseData, router)
       return response
     } catch (error) {
-      console.error('Failed to fetch:', error)
-      setMessage('Login failed due to network error!')
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('[Login] Connection error:', error)
+      }
+      const safeConnMsg =
+        'Unable to connect to the server. Please check your connection and try again.'
+      setMessage(safeConnMsg)
+      setShowVariantAlert(true)
+      await Swal.fire({
+        icon: 'error',
+        title: 'Connection Error',
+        text: safeConnMsg,
+      })
       return null
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -165,10 +211,7 @@ export default function Login() {
   useEffect(() => {
     if (getSessionToken()) {
       router.replace('/dashboard')
-      return
     }
-    usernameInput = document.getElementById('email') as HTMLInputElement
-    passwordInput = document.getElementById('password') as HTMLInputElement
   }, [router])
 
   return (
@@ -183,35 +226,71 @@ export default function Login() {
       )}
       <main className={styles.main}>
         <h1 className="text-3xl font-bold antialiased">Login Lee Tit Tar</h1>
-        <div className="w-72 space-y-4">
-          {renderInput('Email', 'email', 'text')}
-          {renderInput('Password', 'password', 'password')}
-        </div>
-        <div id="loginBtn" className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="#"
-            onClick={(e) => {
-              e.preventDefault()
-              sendLoginRequest()
-            }}
-          >
-            LOGIN
-          </a>
-        </div>
+        <form
+          className="flex w-72 flex-col items-center space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            sendLoginRequest()
+          }}
+        >
+          <div className="w-full space-y-4">
+            {renderInput('Email', 'email', 'text', email, setEmail, isLoading)}
+            {renderInput(
+              'Password',
+              'password',
+              'password',
+              password,
+              setPassword,
+              isLoading
+            )}
+          </div>
+          <div id="loginBtn" className={styles.ctas}>
+            <a
+              role="button"
+              className={`${styles.primary} ${isLoading ? 'pointer-events-none opacity-60' : ''}`}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                sendLoginRequest()
+              }}
+            >
+              {isLoading ? 'LOGGING IN...' : 'LOGIN'}
+            </a>
+            <button
+              type="submit"
+              className="sr-only"
+              tabIndex={-1}
+              disabled={isLoading}
+              aria-hidden="true"
+            >
+              LOGIN
+            </button>
+          </div>
+        </form>
       </main>
       <Footer />
     </div>
   )
 }
 
-function renderInput(placeholder: string, id: string, type: string) {
+function renderInput(
+  placeholder: string,
+  id: string,
+  type: string,
+  value: string,
+  onChange: (val: string) => void,
+  disabled = false
+) {
   return (
     <div className="relative w-full">
       <input
         id={id}
+        name={id}
         type={type}
         placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
         className="border-slate-200 text-slate-800 placeholder:text-slate-600/60 hover:border-slate-800 hover:ring-slate-800/10 focus:border-slate-800 focus:ring-slate-800/10 peer w-full rounded-md border bg-transparent px-2.5 py-2 text-sm shadow-sm outline-none ring ring-transparent transition-all duration-300 ease-in focus:outline-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:cursor-not-allowed data-[error=true]:border-red-500 data-[success=true]:border-green-500 data-[icon-placement=end]:pe-9 data-[icon-placement=start]:ps-9 dark:text-white"
         data-error="false"
         data-success="false"

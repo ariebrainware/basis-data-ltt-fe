@@ -33,6 +33,22 @@ export async function showAccountLockedModal(lockedField: string) {
 }
 
 /**
+ * Displays a safe, non-revealing error message for failed login attempts
+ * to prevent user enumeration and avoid leaking backend internals.
+ * @param message - The safe error message to display (defaults to 'Invalid email or password.')
+ * @returns Promise that resolves when the alert is closed
+ */
+export async function showGenericLoginError(
+  message = 'Invalid email or password.'
+) {
+  await Swal.fire({
+    icon: 'error',
+    title: 'Login Failed',
+    text: message,
+  })
+}
+
+/**
  * Handles the "user not found" error from login response
  * @param responseData - The API response data from login endpoint
  * @returns Promise<boolean> - true if the error was handled, false otherwise
