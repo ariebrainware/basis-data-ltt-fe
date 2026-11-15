@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, Input, Textarea } from '@material-tailwind/react'
+import { Card, Input } from '@material-tailwind/react'
 import { TherapistType } from '../_types/therapist'
 import { ControlledSelect } from './selectTherapistRole'
 
@@ -33,9 +33,10 @@ export const TherapistForm: React.FC<TherapistForm> = ({
       onResize={undefined}
       onResizeCapture={undefined}
     >
-      <form className="mb-2 mt-8 w-80 max-w-screen-lg sm:w-96">
-        <div className="mb-1 flex w-72 gap-6">
-          <div className="flex flex-col items-center gap-4">
+      <form className="mb-2 mt-4 w-full px-2 md:mt-8 md:px-0">
+        <div className="mb-1 flex w-full flex-col gap-4 md:flex-row md:gap-6">
+          {/* Left Column */}
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <Input
               id="ID"
               type="text"
@@ -104,6 +105,10 @@ export const TherapistForm: React.FC<TherapistForm> = ({
               onResize={undefined}
               onResizeCapture={undefined}
             />
+          </div>
+
+          {/* Right Column */}
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <Input
               id="date_of_birth"
               type="text"
@@ -115,8 +120,6 @@ export const TherapistForm: React.FC<TherapistForm> = ({
               onResize={undefined}
               onResizeCapture={undefined}
             />
-          </div>
-          <div className="flex flex-col items-center gap-4">
             <Input
               id="commission"
               type="text"
@@ -129,30 +132,37 @@ export const TherapistForm: React.FC<TherapistForm> = ({
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <Textarea
+            <Input
               id="nik"
+              type="text"
               label="NIK"
               defaultValue={nik}
+              maxLength={16}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <Textarea
+            <Input
               id="weight"
+              type="number"
               label="Weight"
               defaultValue={weight}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
               onResize={undefined}
               onResizeCapture={undefined}
             />
-            <Textarea
+            <Input
               id="height"
+              type="number"
               label="Height"
               defaultValue={height}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
               onResize={undefined}
               onResizeCapture={undefined}
             />

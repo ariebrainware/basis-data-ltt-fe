@@ -24,9 +24,10 @@ export function ControlledSelect({
   ])
 
   return (
-    <div className="w-72">
+    <div className="w-full">
       <Select
         id={id}
+        data-testid={id}
         label={label}
         value={value}
         defaultValue={value}
