@@ -17,4 +17,5 @@ export const TreatmentConditionOptions = [
   { id: 'PM', label: 'Papan Miring (PM)' },
   { id: 'M', label: 'Massage (M)' },
   { id: 'AP', label: 'Acupuncture Pen (AP)' },
+  { id: 'CZ', label: 'Chuzen (CZ)' },
 ]
