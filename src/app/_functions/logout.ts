@@ -37,6 +37,7 @@ export async function logout(): Promise<void> {
   localStorage.removeItem('user-name')
   localStorage.removeItem('user-id')
   localStorage.removeItem('therapist-id')
+  localStorage.removeItem('therapist-commission')
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('user-name-change'))
   }

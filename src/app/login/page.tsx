@@ -58,6 +58,12 @@ async function ensureAndStoreUserId(
         responseData.data.therapist_id.toString()
       )
     }
+    const loginCommission =
+      (responseData.data as any)?.commission ??
+      (responseData.data as any)?.therapist?.commission
+    if (loginCommission !== undefined && loginCommission !== null) {
+      localStorage.setItem('therapist-commission', String(loginCommission))
+    }
     if (process.env.NODE_ENV !== 'production')
       console.log('[Login] Stored user-id:', userId.toString())
     router.replace('/dashboard')
