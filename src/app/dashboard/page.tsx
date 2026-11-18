@@ -67,6 +67,21 @@ const fetchTherapistCommissions = async (): Promise<
   }
 }
 
+const extractCommissionFromObject = (obj: any): string | undefined => {
+  if (!obj || typeof obj !== 'object') return undefined
+  const raw =
+    obj.commission ??
+    obj.commision ??
+    obj.therapist_commission ??
+    obj.therapist?.commission ??
+    obj.therapist?.commision ??
+    obj.user?.commission ??
+    obj.user?.commision
+  if (raw === undefined || raw === null) return undefined
+  const str = String(raw).trim()
+  return str || undefined
+}
+
 const resolveCurrentTherapistIdentity = async (): Promise<{
   therapistId: number | null
   therapistName: string
@@ -106,12 +121,11 @@ const resolveCurrentTherapistIdentity = async (): Promise<{
           if (foundName && !therapistName) {
             therapistName = String(foundName)
           }
-          const foundCommission =
-            json?.data?.commission ??
-            json?.data?.therapist?.commission ??
-            json?.data?.user?.commission
-          if (foundCommission !== undefined && foundCommission !== null) {
-            commission = String(foundCommission)
+          const foundCommission = extractCommissionFromObject(
+            json?.data ?? json
+          )
+          if (foundCommission !== undefined) {
+            commission = foundCommission
             if (typeof window !== 'undefined') {
               localStorage.setItem('therapist-commission', commission)
             }
@@ -124,6 +138,78 @@ const resolveCurrentTherapistIdentity = async (): Promise<{
   }
 
   const numericTherapistId = therapistIdStr ? Number(therapistIdStr) : null
+
+  if (
+    commission === undefined &&
+    numericTherapistId &&
+    numericTherapistId > 0
+  ) {
+    try {
+      const res = await apiFetch(`/therapist/${numericTherapistId}`, {
+        method: 'GET',
+      })
+      if (res.ok) {
+        const json = await res.json()
+        const tData = json?.data?.therapist ?? json?.data ?? json
+        if ((tData?.full_name || tData?.name) && !therapistName) {
+          therapistName = String(tData.full_name ?? tData.name)
+        }
+        const foundCommission = extractCommissionFromObject(tData)
+        if (foundCommission !== undefined) {
+          commission = foundCommission
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('therapist-commission', commission)
+          }
+        }
+      }
+    } catch {
+      // Ignore 401/403 or network errors for therapist endpoint
+    }
+  }
+
+  if (commission === undefined && (numericTherapistId || therapistName)) {
+    try {
+      const res = await apiFetch('/pricing?limit=100&offset=0', {
+        method: 'GET',
+      })
+      if (res.ok) {
+        const json = await res.json()
+        const list = Array.isArray(json?.data?.pricings)
+          ? json.data.pricings
+          : Array.isArray(json?.data?.pricing)
+            ? json.data.pricing
+            : Array.isArray(json?.data)
+              ? json.data
+              : []
+        const matched = list.find((item: any) => {
+          const itemTherapistId = Number(item?.therapist_id || 0)
+          if (
+            numericTherapistId &&
+            itemTherapistId > 0 &&
+            itemTherapistId === numericTherapistId
+          ) {
+            return true
+          }
+          const itemName = String(item?.therapist_name ?? item?.name ?? '')
+            .trim()
+            .toLowerCase()
+          return (
+            Boolean(therapistName) &&
+            itemName === therapistName.trim().toLowerCase()
+          )
+        })
+        const foundCommission = extractCommissionFromObject(matched)
+        if (foundCommission !== undefined) {
+          commission = foundCommission
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('therapist-commission', commission)
+          }
+        }
+      }
+    } catch {
+      // Ignore 401/403 or network errors for pricing endpoint
+    }
+  }
 
   return {
     therapistId: numericTherapistId,

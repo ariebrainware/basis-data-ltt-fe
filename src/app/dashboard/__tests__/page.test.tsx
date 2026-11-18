@@ -253,4 +253,85 @@ describe('Dashboard Page - Therapist Income Estimation', () => {
     // 1 matching treatment * 50.000 = 50.000
     expect(screen.getAllByText(/50\.000/).length).toBeGreaterThan(0)
   })
+
+  test('falls back to /pricing when /user and /therapist/:id do not provide commission for therapist', async () => {
+    mockUseUserRole.mockReturnValue('therapist')
+    mockGetTherapistId.mockReturnValue('4')
+    mockGetUserId.mockReturnValue('44')
+    localStorage.setItem('user-name', 'Terapis Dewi')
+
+    mockApiFetch.mockImplementation(async (url: string) => {
+      if (url === '/user/44') {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            data: {
+              therapist_id: 4,
+              full_name: 'Terapis Dewi',
+            },
+          }),
+        } as Response
+      }
+
+      if (url === '/therapist/4') {
+        return {
+          ok: false,
+          status: 401,
+          json: async () => ({ error: 'Unauthorized' }),
+        } as Response
+      }
+
+      if (url.startsWith('/pricing')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            data: {
+              pricings: [
+                {
+                  ID: 1,
+                  therapist_id: 4,
+                  name: 'Terapis Dewi',
+                  commission: '35%',
+                },
+              ],
+            },
+          }),
+        } as Response
+      }
+
+      if (url.startsWith('/transaction')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            data: {
+              transactions: [
+                {
+                  ID: 301,
+                  therapist_id: 4,
+                  therapist_name: 'Terapis Dewi',
+                  amount: 200000,
+                  payment_status: 'paid',
+                },
+              ],
+            },
+          }),
+        } as Response
+      }
+
+      return { ok: true, status: 200, json: async () => ({}) } as Response
+    })
+
+    render(<Dashboard />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Komisi: 35%')).toBeInTheDocument()
+    })
+    // 35% of 200.000 = 70.000
+    await waitFor(() => {
+      expect(screen.getAllByText(/70\.000/).length).toBeGreaterThan(0)
+    })
+  })
 })
