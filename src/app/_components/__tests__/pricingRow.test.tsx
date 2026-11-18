@@ -88,6 +88,38 @@ describe('PricingRow', () => {
     expect(JSON.parse(request.body)).toEqual({
       name: 'Harga Umum',
       amount: 10000,
+      commission: '',
+      description: 'Deskripsi',
+    })
+    await waitFor(() => expect(mockOnDataChange).toHaveBeenCalled())
+  })
+
+  test('submits PATCH payload with commission when provided', async () => {
+    render(
+      <table>
+        <tbody>
+          <PricingRow
+            ID={2}
+            name="Harga Senior"
+            amount={50000}
+            commission="20000"
+            description="Deskripsi"
+            onDataChange={mockOnDataChange}
+          />
+        </tbody>
+      </table>
+    )
+
+    fireEvent.click(screen.getByLabelText('Edit pricing'))
+    fireEvent.click(screen.getByText('Konfirmasi'))
+
+    await waitFor(() => expect(apiFetch).toHaveBeenCalled())
+    const [, request] = (apiFetch as jest.Mock).mock.calls[0]
+    expect(request.method).toBe('PATCH')
+    expect(JSON.parse(request.body)).toEqual({
+      name: 'Harga Senior',
+      amount: 50000,
+      commission: '20000',
       description: 'Deskripsi',
     })
     await waitFor(() => expect(mockOnDataChange).toHaveBeenCalled())

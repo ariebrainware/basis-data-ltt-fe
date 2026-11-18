@@ -5,6 +5,7 @@ import {
   handleUserNotFound,
   handleErrorString,
   storeSession,
+  showGenericLoginError,
 } from '../loginUi'
 
 jest.mock('sweetalert2', () => ({
@@ -108,6 +109,32 @@ describe('loginUi functions', () => {
 
       expect(handled).toBe(false)
       expect(Swal.fire).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('showGenericLoginError', () => {
+    test('shows default safe generic error message', async () => {
+      await showGenericLoginError()
+
+      expect(Swal.fire).toHaveBeenCalledWith(
+        expect.objectContaining({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'Invalid email or password.',
+        })
+      )
+    })
+
+    test('shows custom message when provided', async () => {
+      await showGenericLoginError('Please enter both email and password.')
+
+      expect(Swal.fire).toHaveBeenCalledWith(
+        expect.objectContaining({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'Please enter both email and password.',
+        })
+      )
     })
   })
 })

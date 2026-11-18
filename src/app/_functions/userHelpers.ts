@@ -41,14 +41,15 @@ export async function tryVerifyCurrentPassword(currentPassword: string) {
 }
 
 export function navigateAfterSuccess(router: any) {
+  let isE2E = false
   try {
-    const isE2E =
+    isE2E =
       typeof window !== 'undefined' &&
       window.localStorage.getItem('__E2E_TEST__') === '1'
-    if (!isE2E) {
-      router.push('/dashboard')
-    }
-  } catch (err) {
-    if (typeof window !== 'undefined') window.location.href = '/dashboard'
+  } catch {
+    isE2E = false
+  }
+  if (!isE2E) {
+    router?.push?.('/dashboard')
   }
 }

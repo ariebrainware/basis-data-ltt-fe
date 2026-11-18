@@ -18,6 +18,7 @@ export default function PricingRow({
   ID,
   name,
   amount,
+  commission = '',
   description,
   onDataChange,
 }: PricingType & { onDataChange?: () => void }) {
@@ -39,6 +40,9 @@ export default function PricingRow({
     const amountInput =
       document.querySelector<HTMLInputElement>('#amount')?.value ||
       String(amount)
+    const commissionInput =
+      document.querySelector<HTMLInputElement>('#commission')?.value ??
+      commission
     const descriptionInput =
       document.querySelector<HTMLTextAreaElement>('#description')?.value ||
       description
@@ -57,6 +61,7 @@ export default function PricingRow({
       body: JSON.stringify({
         name: nameInput.trim(),
         amount: Number(amountInput),
+        commission: commissionInput.trim(),
         description: descriptionInput.trim(),
       }),
     })
@@ -127,6 +132,7 @@ export default function PricingRow({
             ID={ID}
             name={name}
             amount={amount}
+            commission={commission}
             description={description}
           />
         </DialogBody>
@@ -179,6 +185,11 @@ export default function PricingRow({
         <td className="p-3">
           <small className="font-sans text-sm text-current antialiased">
             Rp. {Number(amount || 0).toLocaleString('id-ID')}
+          </small>
+        </td>
+        <td className="p-3">
+          <small className="font-sans text-sm text-current antialiased">
+            {commission || '-'}
           </small>
         </td>
         <td className="p-3">

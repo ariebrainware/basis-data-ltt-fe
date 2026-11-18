@@ -10,4 +10,5 @@ export interface TherapistType {
   height: number
   role: string
   is_approved: boolean
+  commission?: string
 }

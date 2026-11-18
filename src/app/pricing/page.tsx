@@ -41,6 +41,7 @@ function normalizePricing(item: any): PricingType {
     ID: toNumber(item?.ID ?? item?.id),
     name: String(item?.name ?? item?.therapist_name ?? ''),
     amount: toNumber(item?.amount ?? item?.price),
+    commission: String(item?.commission ?? item?.commision ?? ''),
     description: String(item?.description ?? item?.notes ?? ''),
   }
 }
@@ -117,9 +118,12 @@ export default function PricingPage() {
       setSelectedTherapistId('')
       const amountInput =
         document.querySelector<HTMLInputElement>('#add_amount')
+      const commissionInput =
+        document.querySelector<HTMLInputElement>('#add_commission')
       const descriptionInput =
         document.querySelector<HTMLTextAreaElement>('#add_description')
       if (amountInput) amountInput.value = ''
+      if (commissionInput) commissionInput.value = ''
       if (descriptionInput) descriptionInput.value = ''
     }
     setOpenAddDialog((prev) => !prev)
@@ -128,6 +132,8 @@ export default function PricingPage() {
   const handleAddPricing = () => {
     const amountInput =
       document.querySelector<HTMLInputElement>('#add_amount')?.value || '0'
+    const commissionInput =
+      document.querySelector<HTMLInputElement>('#add_commission')?.value || ''
     const descriptionInput =
       document.querySelector<HTMLTextAreaElement>('#add_description')?.value ||
       ''
@@ -146,6 +152,7 @@ export default function PricingPage() {
       body: JSON.stringify({
         therapist_id: Number(selectedTherapistId),
         price: Number(amountInput),
+        commission: commissionInput.trim(),
       }),
     })
       .then((response) => {
@@ -223,6 +230,17 @@ export default function PricingPage() {
               id="add_amount"
               type="number"
               label="Nominal"
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            />
+            <Input
+              id="add_commission"
+              type="text"
+              label="Komisi"
+              maxLength={200}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}
