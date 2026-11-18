@@ -9,11 +9,21 @@ const mockRefresh = jest.fn()
 const mockDeleteTherapist = jest.fn()
 
 jest.mock('@material-tailwind/react', () => ({
-  Dialog: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Button: (props: any) => <button onClick={props.onClick}>{props.children}</button>,
+  Dialog: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogBody: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogFooter: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  Button: (props: any) => (
+    <button onClick={props.onClick}>{props.children}</button>
+  ),
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Input: (props: React.ComponentProps<'input'> & { label?: string }) => (
     <input {...props} aria-label={props.label} />

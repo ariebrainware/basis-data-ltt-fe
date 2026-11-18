@@ -78,8 +78,9 @@ export default function Therapist({
       document.querySelector<HTMLInputElement | HTMLTextAreaElement>('#height')
         ?.value || height
     const role_input =
-      document.querySelector<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>('#role')
-        ?.value || role
+      document.querySelector<
+        HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement
+      >('#role')?.value || role
     const commission_input =
       document.querySelector<HTMLInputElement>('#commission')?.value ??
       commission
