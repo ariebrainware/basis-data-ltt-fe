@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { EmployeeType } from '../_types/employee'
 import EmployeeRowActions from './employeeRowActions'
 
@@ -34,9 +35,12 @@ export default function EmployeeRow({
       </td>
       <td className="p-3">
         <div className="flex flex-col">
-          <small className="font-sans text-sm font-medium text-current antialiased">
+          <Link
+            href={`/employee/${ID}`}
+            className="font-sans text-sm font-medium text-current antialiased hover:text-blue-600 hover:underline"
+          >
             {full_name}
-          </small>
+          </Link>
           <small className="font-sans text-xs text-blue-gray-400">
             {position}
           </small>
