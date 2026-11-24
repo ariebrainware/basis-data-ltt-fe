@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { EmployeeType } from '../_types/employee'
 import EmployeeRowActions from './employeeRowActions'
 
@@ -18,6 +19,7 @@ export default function EmployeeRow({
   lunch_money,
   onDataChange,
 }: EmployeeType & { onDataChange?: () => void }) {
+  const router = useRouter()
   const getGenderLabel = (gVal?: string) => {
     const g = (gVal || '').toString().trim().toLowerCase()
     if (g === 'female' || g === 'perempuan') return 'Perempuan'
@@ -26,8 +28,27 @@ export default function EmployeeRow({
     return gVal ? String(g.charAt(0).toUpperCase() + g.slice(1)) : ''
   }
 
+  const detailHref = `/employee/${ID}`
+
+  const handleRowClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
+    // Let real links/buttons handle their own clicks
+    if ((e.target as HTMLElement).closest('a, button, input, select, textarea'))
+      return
+    // Don't navigate when the user is selecting text to copy
+    if (window.getSelection()?.toString()) return
+    if (e.metaKey || e.ctrlKey) {
+      window.open(detailHref, '_blank', 'noopener,noreferrer')
+      return
+    }
+    router.push(detailHref)
+  }
+
   return (
-    <tr className="border-slate-200 border-b last:border-0">
+    <tr
+      className="border-slate-200 cursor-pointer border-b transition-colors last:border-0 hover:bg-blue-gray-50/50"
+      onClick={handleRowClick}
+      data-testid={`employee-row-${ID}`}
+    >
       <td className="p-3">
         <small className="font-sans text-sm text-current antialiased">
           {nik}
@@ -36,7 +57,7 @@ export default function EmployeeRow({
       <td className="p-3">
         <div className="flex flex-col">
           <Link
-            href={`/employee/${ID}`}
+            href={detailHref}
             className="font-sans text-sm font-medium text-current antialiased hover:text-blue-600 hover:underline"
           >
             {full_name}
@@ -81,7 +102,8 @@ export default function EmployeeRow({
           </small>
         </div>
       </td>
-      <td className="p-3">
+      {/* Clicks here (incl. the edit dialog rendered in a portal) must not open the detail page */}
+      <td className="cursor-default p-3" onClick={(e) => e.stopPropagation()}>
         <EmployeeRowActions
           ID={ID}
           nik={nik}
