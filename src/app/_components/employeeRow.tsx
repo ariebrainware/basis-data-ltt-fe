@@ -17,6 +17,7 @@ export default function EmployeeRow({
   position,
   base_salary,
   lunch_money,
+  birth_date,
   onDataChange,
 }: EmployeeType & { onDataChange?: () => void }) {
   const router = useRouter()
@@ -117,6 +118,7 @@ export default function EmployeeRow({
           position={position}
           base_salary={base_salary}
           lunch_money={lunch_money}
+          birth_date={birth_date}
           onDataChange={onDataChange}
         />
       </td>

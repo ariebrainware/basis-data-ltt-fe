@@ -11,6 +11,8 @@ export interface EmployeeType {
   position: string
   base_salary: number
   lunch_money: number
+  /** Place and date of birth as free text, e.g. "Medan, 20 Juli 2007" */
+  birth_date?: string
 }
 
 export type EmployeeAttachmentCategory = 'contract' | 'identity' | 'other'

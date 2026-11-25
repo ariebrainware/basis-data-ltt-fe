@@ -16,6 +16,7 @@ export default function EmployeeRowActions({
   position,
   base_salary,
   lunch_money,
+  birth_date,
   onDataChange,
 }: EmployeeType & { onDataChange?: () => void }) {
   const [open, setOpen] = React.useState(false)
@@ -44,6 +45,7 @@ export default function EmployeeRowActions({
         position={position}
         base_salary={base_salary}
         lunch_money={lunch_money}
+        birth_date={birth_date}
         open={open}
         setOpen={setOpen}
         onDataChange={onDataChange}

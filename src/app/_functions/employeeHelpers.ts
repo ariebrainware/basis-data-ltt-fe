@@ -10,6 +10,7 @@ export function resetEmployeeFormInputs(): void {
     '#add_base_salary',
     '#add_lunch_money',
     '#add_address',
+    '#add_birth_date',
   ]
   fields.forEach((selector) => {
     const el = document.querySelector<HTMLInputElement | HTMLTextAreaElement>(
@@ -30,6 +31,7 @@ export function readEmployeeFormValues(): {
   base_salary: string
   lunch_money: string
   address: string
+  birth_date: string
 } {
   return {
     nik: document.querySelector<HTMLInputElement>('#add_nik')?.value || '',
@@ -53,7 +55,18 @@ export function readEmployeeFormValues(): {
       '0',
     address:
       document.querySelector<HTMLTextAreaElement>('#add_address')?.value || '',
+    birth_date:
+      document.querySelector<HTMLInputElement>('#add_birth_date')?.value || '',
   }
+}
+
+export const EMPLOYEE_BIRTH_DATE_MAX_LENGTH = 200
+
+/** Returns an error message when the free-text birth place/date is too long, else null. */
+export function validateBirthDate(value: string): string | null {
+  return value.trim().length > EMPLOYEE_BIRTH_DATE_MAX_LENGTH
+    ? `Tempat, tanggal lahir maksimal ${EMPLOYEE_BIRTH_DATE_MAX_LENGTH} karakter.`
+    : null
 }
 
 export interface EmployeePayload {
@@ -68,6 +81,7 @@ export interface EmployeePayload {
   position: string
   base_salary: number
   lunch_money: number
+  birth_date?: string
 }
 
 export function validateEmployeeForm(
@@ -108,6 +122,10 @@ export function validateEmployeeForm(
   if (!values.address.trim()) {
     return { ok: false, message: 'Alamat tidak boleh kosong.' }
   }
+  const birthDateError = validateBirthDate(values.birth_date ?? '')
+  if (birthDateError) {
+    return { ok: false, message: birthDateError }
+  }
 
   const parsedSalary = Number(values.base_salary)
   const parsedLunchMoney = Number(values.lunch_money)
@@ -139,6 +157,10 @@ export function validateEmployeeForm(
       position: values.position.trim(),
       base_salary: parsedSalary,
       lunch_money: parsedLunchMoney,
+      // Optional: only sent when filled in
+      ...(values.birth_date?.trim()
+        ? { birth_date: values.birth_date.trim() }
+        : {}),
     },
   }
 }

@@ -69,6 +69,7 @@ export default function EmployeeDetailPage() {
   const details: [string, string][] = employee
     ? [
         ['NIK', employee.nik],
+        ['Tempat, Tanggal Lahir', employee.birth_date ?? ''],
         ['Jenis Kelamin', genderLabel(employee.gender)],
         ['Agama', employee.religion],
         ['Telepon', employee.phone_number],

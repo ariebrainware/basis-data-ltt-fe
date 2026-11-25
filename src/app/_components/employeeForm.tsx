@@ -2,6 +2,7 @@ import React from 'react'
 import { Card, Input, Textarea } from '@material-tailwind/react'
 import { EmployeeType } from '../_types/employee'
 import { GenderSelect } from './selectGender'
+import { EMPLOYEE_BIRTH_DATE_MAX_LENGTH } from '../_functions/employeeHelpers'
 
 interface EmployeeFormProps {
   ID?: number
@@ -16,6 +17,7 @@ interface EmployeeFormProps {
   position?: string
   base_salary?: number
   lunch_money?: number
+  birth_date?: string
   onGenderChange?: (value: string) => void
   isEdit?: boolean
 }
@@ -33,6 +35,7 @@ export function EmployeeForm({
   position,
   base_salary,
   lunch_money,
+  birth_date,
   onGenderChange,
   isEdit = false,
 }: EmployeeFormProps) {
@@ -80,6 +83,19 @@ export function EmployeeForm({
               type="text"
               label="Nama Lengkap"
               defaultValue={full_name}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+              crossOrigin={undefined}
+              onResize={undefined}
+              onResizeCapture={undefined}
+            />
+            <Input
+              id={isEdit ? 'birth_date' : 'add_birth_date'}
+              type="text"
+              label="Tempat, Tanggal Lahir"
+              placeholder="Medan, 20 Juli 2007"
+              maxLength={EMPLOYEE_BIRTH_DATE_MAX_LENGTH}
+              defaultValue={birth_date}
               onPointerEnterCapture={undefined}
               onPointerLeaveCapture={undefined}
               crossOrigin={undefined}

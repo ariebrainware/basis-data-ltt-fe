@@ -12,6 +12,7 @@ import { EmployeeForm } from './employeeForm'
 import { EmployeeType } from '../_types/employee'
 import { apiFetch } from '../_functions/apiFetch'
 import { UnauthorizedAccess } from '../_functions/unauthorized'
+import { validateBirthDate } from '../_functions/employeeHelpers'
 
 export interface EmployeeEditDialogProps extends EmployeeType {
   open: boolean
@@ -32,6 +33,7 @@ export default function EmployeeEditDialog({
   position,
   base_salary,
   lunch_money,
+  birth_date,
   open,
   setOpen,
   onDataChange,
@@ -73,6 +75,12 @@ export default function EmployeeEditDialog({
     )
     const addressVal =
       document.querySelector<HTMLTextAreaElement>('#address')?.value || address
+    // Optional field: an emptied input clears it, so don't fall back to the old value
+    const birthDateInput =
+      document.querySelector<HTMLInputElement>('#birth_date')
+    const birthDateVal = birthDateInput
+      ? birthDateInput.value
+      : (birth_date ?? '')
 
     if (!nikVal.trim()) {
       Swal.fire({ text: 'NIK tidak boleh kosong.', icon: 'warning' })
@@ -117,6 +125,11 @@ export default function EmployeeEditDialog({
       Swal.fire({ text: 'Alamat tidak boleh kosong.', icon: 'warning' })
       return
     }
+    const birthDateError = validateBirthDate(birthDateVal)
+    if (birthDateError) {
+      Swal.fire({ text: birthDateError, icon: 'warning' })
+      return
+    }
 
     const payload = {
       nik: nikVal.trim(),
@@ -130,6 +143,7 @@ export default function EmployeeEditDialog({
       position: positionVal.trim(),
       base_salary: salaryVal,
       lunch_money: lunchMoneyVal,
+      birth_date: birthDateVal.trim(),
     }
 
     try {
@@ -212,6 +226,7 @@ export default function EmployeeEditDialog({
           position={position}
           base_salary={base_salary}
           lunch_money={lunch_money}
+          birth_date={birth_date}
           onGenderChange={setGenderValue}
           isEdit={true}
         />
