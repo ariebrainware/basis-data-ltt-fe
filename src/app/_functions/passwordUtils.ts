@@ -1,3 +1,5 @@
+import { isDefaultPassword } from './defaultPassword'
+
 export function isPasswordError(serverMsg: string) {
   const m = serverMsg || ''
   return m.includes('current') || m.includes('incorrect')
@@ -29,6 +31,20 @@ export function validatePasswordFields(
       ok: false,
       error:
         'To change your password, fill all password fields or leave them all empty',
+    }
+  }
+
+  if (isDefaultPassword(newPassword)) {
+    return {
+      ok: false,
+      error: 'New password must not be the default password',
+    }
+  }
+
+  if (currentPassword === newPassword) {
+    return {
+      ok: false,
+      error: 'New password must be different from the current password',
     }
   }
 

@@ -177,4 +177,64 @@ describe('Login Page', () => {
       )
     })
   })
+  async function submitLogin(password: string, data: Record<string, unknown>) {
+    ;(apiFetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        data: { token: 'token-123', role: 'therapist', id: 7, ...data },
+      }),
+    })
+    render(<Login />)
+    fireEvent.change(screen.getByPlaceholderText('Email'), {
+      target: { value: 'user@example.com' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
+      target: { value: password },
+    })
+    const form = screen.getByRole('button', { name: /login/i }).closest('form')!
+    fireEvent.submit(form)
+  }
+
+  test('forces password change when logging in with the default password', async () => {
+    await submitLogin('LTT2025', {})
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('/profile')
+    })
+    expect(window.localStorage.getItem('must-change-password')).toBe('1')
+    expect(Swal.fire).toHaveBeenCalledWith(
+      expect.objectContaining({
+        icon: 'warning',
+        title: 'Ganti Password Default',
+      })
+    )
+    expect(mockReplace).not.toHaveBeenCalledWith('/dashboard')
+  })
+
+  test('forces password change when backend flags must_change_password', async () => {
+    await submitLogin('NotDefault1!', { must_change_password: true })
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('/profile')
+    })
+    expect(window.localStorage.getItem('must-change-password')).toBe('1')
+  })
+
+  test('does not force password change for non-default password', async () => {
+    await submitLogin('NotDefault1!', {})
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('/dashboard')
+    })
+    expect(window.localStorage.getItem('must-change-password')).toBeNull()
+  })
+
+  test('redirects logged-in user with pending password change to /profile', () => {
+    window.localStorage.setItem('session-token', 'mock-existing-token')
+    window.localStorage.setItem('must-change-password', '1')
+
+    render(<Login />)
+
+    expect(mockReplace).toHaveBeenCalledWith('/profile')
+  })
 })

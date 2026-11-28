@@ -14,6 +14,7 @@ export function UnauthorizedAccess(router?: {
       localStorage.removeItem('user-id')
       localStorage.removeItem('therapist-id')
       localStorage.removeItem('therapist-commission')
+      localStorage.removeItem('must-change-password')
     } catch {}
 
     // During E2E tests we skip the redirect to allow tests to control navigation
