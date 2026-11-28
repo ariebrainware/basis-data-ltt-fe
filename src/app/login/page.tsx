@@ -24,6 +24,28 @@ import {
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { LoginResponseData } from '../_types/login'
 import { getSessionToken } from '../_functions/sessionToken'
+import {
+  CHANGE_PASSWORD_ROUTE,
+  isDefaultPassword,
+  mustChangePassword,
+  responseRequiresPasswordChange,
+  setMustChangePassword,
+} from '../_functions/defaultPassword'
+
+function getPostLoginRoute() {
+  return mustChangePassword() ? CHANGE_PASSWORD_ROUTE : '/dashboard'
+}
+
+async function showDefaultPasswordWarning() {
+  await Swal.fire({
+    icon: 'warning',
+    title: 'Ganti Password Default',
+    html: 'Anda masih menggunakan password default. Demi keamanan akun, silakan ganti password Anda sekarang sebelum melanjutkan.',
+    confirmButtonText: 'Ganti Password',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+  })
+}
 
 async function tryHandleErrorResponse(responseData: LoginResponseData | null) {
   if (!responseData) {
@@ -66,7 +88,7 @@ async function ensureAndStoreUserId(
     }
     if (process.env.NODE_ENV !== 'production')
       console.log('[Login] Stored user-id:', userId.toString())
-    router.replace('/dashboard')
+    router.replace(getPostLoginRoute())
     return
   }
 
@@ -98,7 +120,7 @@ async function ensureAndStoreUserId(
       html: 'You are logged in, but we could not load your profile due to a network or server error. Some actions may not be available.',
     })
   } finally {
-    router.replace('/dashboard')
+    router.replace(getPostLoginRoute())
   }
 }
 
@@ -166,7 +188,7 @@ export default function Login() {
         return null
       }
 
-      await handleSuccessfulLogin(responseData, router)
+      await handleSuccessfulLogin(responseData, router, passwordVal)
       return response
     } catch (error) {
       if (process.env.NODE_ENV !== 'production') {
@@ -189,7 +211,8 @@ export default function Login() {
 
   async function handleSuccessfulLogin(
     responseData: LoginResponseData,
-    router: AppRouterInstance
+    router: AppRouterInstance,
+    passwordVal: string
   ) {
     const token = responseData.data?.token
     const role = responseData.data?.role
@@ -210,13 +233,21 @@ export default function Login() {
 
     if (!token) return
     storeSession(token, role, userName)
-    await showLoginSuccess(role, userName)
+    if (
+      isDefaultPassword(passwordVal) ||
+      responseRequiresPasswordChange(responseData.data)
+    ) {
+      setMustChangePassword()
+      await showDefaultPasswordWarning()
+    } else {
+      await showLoginSuccess(role, userName)
+    }
     await ensureAndStoreUserId(userId, responseData, router)
   }
 
   useEffect(() => {
     if (getSessionToken()) {
-      router.replace('/dashboard')
+      router.replace(getPostLoginRoute())
     }
   }, [router])
 

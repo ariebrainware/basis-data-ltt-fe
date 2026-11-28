@@ -12,6 +12,7 @@ interface ProfileFormProps {
   loading: boolean
   error: string | null | undefined
   pwError: string | null | undefined
+  forcePasswordChange?: boolean
   currentPassword: string
   setCurrentPassword: React.Dispatch<React.SetStateAction<string>>
   newPassword: string
@@ -37,6 +38,7 @@ export default function ProfileForm(props: ProfileFormProps) {
     loading,
     error,
     pwError,
+    forcePasswordChange = false,
     currentPassword,
     setCurrentPassword,
     newPassword,
@@ -57,6 +59,19 @@ export default function ProfileForm(props: ProfileFormProps) {
 
   return (
     <form onSubmit={handleUpdateProfile} className="space-y-4">
+      {forcePasswordChange && (
+        <div
+          role="alert"
+          className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-900"
+        >
+          <p className="font-semibold">Ganti password default Anda</p>
+          <p className="text-sm">
+            Akun Anda masih menggunakan password default. Silakan buat password
+            baru untuk melanjutkan menggunakan aplikasi.
+          </p>
+        </div>
+      )}
+
       {error && <p className="text-red-600">{error}</p>}
 
       <div>
@@ -92,6 +107,7 @@ export default function ProfileForm(props: ProfileFormProps) {
             onChange={(e) => setCurrentPassword(e.target.value)}
             className="w-full rounded border px-3 py-2"
             type="password"
+            required={forcePasswordChange}
           />
         </div>
 

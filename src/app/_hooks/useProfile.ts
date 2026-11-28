@@ -14,6 +14,10 @@ import {
   submitProfileUpdate,
 } from '@/app/_functions/profileService'
 import { setUserName } from '@/app/_functions/userName'
+import {
+  clearMustChangePassword,
+  mustChangePassword,
+} from '@/app/_functions/defaultPassword'
 
 function isEmailValid(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -53,6 +57,7 @@ function buildProfileBody(params: {
 function validateProfileInputs(params: {
   name: string
   email: string
+  forcePasswordChange: boolean
   changingPassword: boolean
   currentPassword: string
   newPassword: string
@@ -61,6 +66,7 @@ function validateProfileInputs(params: {
   const {
     name,
     email,
+    forcePasswordChange,
     changingPassword,
     currentPassword,
     newPassword,
@@ -69,6 +75,9 @@ function validateProfileInputs(params: {
 
   if (!name.trim()) return 'Name is required'
   if (!isEmailValid(email)) return 'Please enter a valid email'
+  if (forcePasswordChange && !changingPassword) {
+    return 'You must change your default password before continuing'
+  }
 
   const pwdValidation = validatePasswordFields(
     changingPassword,
@@ -127,6 +136,10 @@ async function performProfileUpdateHelper(params: {
     return false
   }
 
+  if (changingPasswordFlag) {
+    clearMustChangePassword()
+  }
+
   if (typeof body.name === 'string' && body.name.trim()) {
     setUserName(body.name.trim())
   }
@@ -159,6 +172,7 @@ export function useProfile() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [pwError, setPwError] = useState<string | null>(null)
+  const [forcePasswordChange, setForcePasswordChange] = useState(false)
 
   // Live password requirement booleans
   const { lengthOk, lowerOk, upperOk, digitOk, specialOk, strengthCount } =
@@ -187,6 +201,7 @@ export function useProfile() {
         console.error('fetch profile error', err)
         setError('Failed to load profile')
       } finally {
+        setForcePasswordChange(mustChangePassword())
         setLoading(false)
       }
     }
@@ -213,6 +228,7 @@ export function useProfile() {
     const validationError = validateProfileInputs({
       name,
       email,
+      forcePasswordChange,
       changingPassword,
       currentPassword,
       newPassword,
@@ -237,7 +253,7 @@ export function useProfile() {
       newPassword,
       changingPassword,
     })
-    await performProfileUpdateHelper({
+    const updated = await performProfileUpdateHelper({
       endpoint: UPDATE_PROFILE_ENDPOINT,
       body,
       changingPasswordFlag: changingPassword,
@@ -246,6 +262,7 @@ export function useProfile() {
       setPwError,
       setError,
     })
+    if (updated && changingPassword) setForcePasswordChange(false)
   }
 
   return {
@@ -258,6 +275,7 @@ export function useProfile() {
     error,
     pwError,
     setPwError,
+    forcePasswordChange,
     currentPassword,
     setCurrentPassword,
     newPassword,
